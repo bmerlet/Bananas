@@ -1,0 +1,173 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="Household" targetNamespace="http://prose.org/Household.xsd" xmlns:mstns="http://prose.org/Household.xsd" xmlns="http://prose.org/Household.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="Household" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="Household" msprop:Generator_UserDSName="Household">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="Accounts" msprop:Generator_TableClassName="AccountsDataTable" msprop:Generator_TableVarName="tableAccounts" msprop:Generator_RowChangedName="AccountsRowChanged" msprop:Generator_TablePropName="Accounts" msprop:Generator_RowDeletingName="AccountsRowDeleting" msprop:Generator_RowChangingName="AccountsRowChanging" msprop:Generator_RowEvHandlerName="AccountsRowChangeEventHandler" msprop:Generator_RowDeletedName="AccountsRowDeleted" msprop:Generator_RowClassName="AccountsRow" msprop:Generator_UserTableName="Accounts" msprop:Generator_RowEvArgName="AccountsRowChangeEvent">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
+              <xs:element name="Name" msprop:Generator_ColumnVarNameInTable="columnName" msprop:Generator_ColumnPropNameInRow="Name" msprop:Generator_ColumnPropNameInTable="NameColumn" msprop:Generator_UserColumnName="Name" type="xs:string" />
+              <xs:element name="Description" msprop:Generator_ColumnVarNameInTable="columnDescription" msprop:Generator_ColumnPropNameInRow="Description" msprop:Generator_ColumnPropNameInTable="DescriptionColumn" msprop:Generator_UserColumnName="Description" type="xs:string" minOccurs="0" />
+              <xs:element name="IType" msprop:Generator_ColumnVarNameInTable="columnIType" msprop:Generator_ColumnPropNameInRow="IType" msprop:Generator_ColumnPropNameInTable="ITypeColumn" msprop:Generator_UserColumnName="IType" type="xs:int" />
+              <xs:element name="CreditLimit" msprop:Generator_ColumnVarNameInTable="columnCreditLimit" msprop:Generator_ColumnPropNameInRow="CreditLimit" msprop:Generator_ColumnPropNameInTable="CreditLimitColumn" msprop:Generator_UserColumnName="CreditLimit" type="xs:decimal" minOccurs="0" />
+              <xs:element name="IKind" msprop:Generator_ColumnVarNameInTable="columnIKind" msprop:Generator_ColumnPropNameInRow="IKind" msprop:Generator_ColumnPropNameInTable="IKindColumn" msprop:Generator_UserColumnName="IKind" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Categories" msprop:Generator_TableClassName="CategoriesDataTable" msprop:Generator_TableVarName="tableCategories" msprop:Generator_RowChangedName="CategoriesRowChanged" msprop:Generator_TablePropName="Categories" msprop:Generator_RowDeletingName="CategoriesRowDeleting" msprop:Generator_RowChangingName="CategoriesRowChanging" msprop:Generator_RowEvHandlerName="CategoriesRowChangeEventHandler" msprop:Generator_RowDeletedName="CategoriesRowDeleted" msprop:Generator_RowClassName="CategoriesRow" msprop:Generator_UserTableName="Categories" msprop:Generator_RowEvArgName="CategoriesRowChangeEvent">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
+              <xs:element name="Name" msprop:Generator_ColumnVarNameInTable="columnName" msprop:Generator_ColumnPropNameInRow="Name" msprop:Generator_ColumnPropNameInTable="NameColumn" msprop:Generator_UserColumnName="Name" type="xs:string" />
+              <xs:element name="Description" msprop:Generator_ColumnVarNameInTable="columnDescription" msprop:Generator_ColumnPropNameInRow="Description" msprop:Generator_ColumnPropNameInTable="DescriptionColumn" msprop:Generator_UserColumnName="Description" type="xs:string" minOccurs="0" />
+              <xs:element name="IsIncome" msdata:Caption="Income" msprop:Generator_ColumnVarNameInTable="columnIsIncome" msprop:Generator_ColumnPropNameInRow="IsIncome" msprop:Generator_ColumnPropNameInTable="IsIncomeColumn" msprop:Generator_UserColumnName="IsIncome" type="xs:boolean" />
+              <xs:element name="TaxInfo" msprop:Generator_ColumnVarNameInTable="columnTaxInfo" msprop:Generator_ColumnPropNameInRow="TaxInfo" msprop:Generator_ColumnPropNameInTable="TaxInfoColumn" msprop:Generator_UserColumnName="TaxInfo" type="xs:string" minOccurs="0" />
+              <xs:element name="ParentID" msprop:Generator_ColumnVarNameInTable="columnParentID" msprop:Generator_ColumnPropNameInRow="ParentID" msprop:Generator_ColumnPropNameInTable="ParentIDColumn" msprop:Generator_UserColumnName="ParentID" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Securities" msprop:Generator_TableClassName="SecuritiesDataTable" msprop:Generator_TableVarName="tableSecurities" msprop:Generator_RowChangedName="SecuritiesRowChanged" msprop:Generator_TablePropName="Securities" msprop:Generator_RowDeletingName="SecuritiesRowDeleting" msprop:Generator_RowChangingName="SecuritiesRowChanging" msprop:Generator_RowEvHandlerName="SecuritiesRowChangeEventHandler" msprop:Generator_RowDeletedName="SecuritiesRowDeleted" msprop:Generator_RowClassName="SecuritiesRow" msprop:Generator_UserTableName="Securities" msprop:Generator_RowEvArgName="SecuritiesRowChangeEvent">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
+              <xs:element name="Name" msprop:Generator_ColumnVarNameInTable="columnName" msprop:Generator_ColumnPropNameInRow="Name" msprop:Generator_ColumnPropNameInTable="NameColumn" msprop:Generator_UserColumnName="Name" type="xs:string" />
+              <xs:element name="Symbol" msprop:Generator_ColumnVarNameInTable="columnSymbol" msprop:Generator_ColumnPropNameInRow="Symbol" msprop:Generator_ColumnPropNameInTable="SymbolColumn" msprop:Generator_UserColumnName="Symbol" type="xs:string" minOccurs="0" />
+              <xs:element name="IType" msprop:Generator_ColumnVarNameInTable="columnIType" msprop:Generator_ColumnPropNameInRow="IType" msprop:Generator_ColumnPropNameInTable="ITypeColumn" msprop:Generator_UserColumnName="IType" type="xs:int" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="SecurityPrices" msprop:Generator_TableClassName="SecurityPricesDataTable" msprop:Generator_TableVarName="tableSecurityPrices" msprop:Generator_RowChangedName="SecurityPricesRowChanged" msprop:Generator_TablePropName="SecurityPrices" msprop:Generator_RowDeletingName="SecurityPricesRowDeleting" msprop:Generator_RowChangingName="SecurityPricesRowChanging" msprop:Generator_RowEvHandlerName="SecurityPricesRowChangeEventHandler" msprop:Generator_RowDeletedName="SecurityPricesRowDeleted" msprop:Generator_RowClassName="SecurityPricesRow" msprop:Generator_UserTableName="SecurityPrices" msprop:Generator_RowEvArgName="SecurityPricesRowChangeEvent">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
+              <xs:element name="SecurityID" msprop:Generator_ColumnVarNameInTable="columnSecurityID" msprop:Generator_ColumnPropNameInRow="SecurityID" msprop:Generator_ColumnPropNameInTable="SecurityIDColumn" msprop:Generator_UserColumnName="SecurityID" type="xs:int" />
+              <xs:element name="Date" msprop:Generator_ColumnVarNameInTable="columnDate" msprop:Generator_ColumnPropNameInRow="Date" msprop:Generator_ColumnPropNameInTable="DateColumn" msprop:Generator_UserColumnName="Date" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="Value" msprop:Generator_ColumnVarNameInTable="columnValue" msprop:Generator_ColumnPropNameInRow="Value" msprop:Generator_ColumnPropNameInTable="ValueColumn" msprop:Generator_UserColumnName="Value" type="xs:decimal" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Transactions" msprop:Generator_TableClassName="TransactionsDataTable" msprop:Generator_TableVarName="tableTransactions" msprop:Generator_RowChangedName="TransactionsRowChanged" msprop:Generator_TablePropName="Transactions" msprop:Generator_RowDeletingName="TransactionsRowDeleting" msprop:Generator_RowChangingName="TransactionsRowChanging" msprop:Generator_RowEvHandlerName="TransactionsRowChangeEventHandler" msprop:Generator_RowDeletedName="TransactionsRowDeleted" msprop:Generator_RowClassName="TransactionsRow" msprop:Generator_UserTableName="Transactions" msprop:Generator_RowEvArgName="TransactionsRowChangeEvent">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
+              <xs:element name="AccountID" msprop:Generator_ColumnVarNameInTable="columnAccountID" msprop:Generator_ColumnPropNameInRow="AccountID" msprop:Generator_ColumnPropNameInTable="AccountIDColumn" msprop:Generator_UserColumnName="AccountID" type="xs:int" />
+              <xs:element name="Date" msprop:Generator_ColumnVarNameInTable="columnDate" msprop:Generator_ColumnPropNameInRow="Date" msprop:Generator_ColumnPropNameInTable="DateColumn" msprop:Generator_UserColumnName="Date" type="xs:dateTime" />
+              <xs:element name="Payee" msprop:Generator_ColumnVarNameInTable="columnPayee" msprop:Generator_ColumnPropNameInRow="Payee" msprop:Generator_ColumnPropNameInTable="PayeeColumn" msprop:Generator_UserColumnName="Payee" type="xs:string" minOccurs="0" />
+              <xs:element name="IStatus" msprop:Generator_ColumnVarNameInTable="columnIStatus" msprop:Generator_ColumnPropNameInRow="IStatus" msprop:Generator_ColumnPropNameInTable="IStatusColumn" msprop:Generator_UserColumnName="IStatus" type="xs:int" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="LineItems" msprop:Generator_TableClassName="LineItemsDataTable" msprop:Generator_TableVarName="tableLineItems" msprop:Generator_RowChangedName="LineItemsRowChanged" msprop:Generator_TablePropName="LineItems" msprop:Generator_RowDeletingName="LineItemsRowDeleting" msprop:Generator_RowChangingName="LineItemsRowChanging" msprop:Generator_RowEvHandlerName="LineItemsRowChangeEventHandler" msprop:Generator_RowDeletedName="LineItemsRowDeleted" msprop:Generator_RowClassName="LineItemsRow" msprop:Generator_UserTableName="LineItems" msprop:Generator_RowEvArgName="LineItemsRowChangeEvent">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
+              <xs:element name="TransactionID" msprop:Generator_ColumnVarNameInTable="columnTransactionID" msprop:Generator_ColumnPropNameInRow="TransactionID" msprop:Generator_ColumnPropNameInTable="TransactionIDColumn" msprop:Generator_UserColumnName="TransactionID" type="xs:int" />
+              <xs:element name="IsTransfer" msprop:Generator_ColumnVarNameInTable="columnIsTransfer" msprop:Generator_ColumnPropNameInRow="IsTransfer" msprop:Generator_ColumnPropNameInTable="IsTransferColumn" msprop:Generator_UserColumnName="IsTransfer" type="xs:boolean" />
+              <xs:element name="AccountID" msprop:Generator_ColumnVarNameInTable="columnAccountID" msprop:Generator_ColumnPropNameInRow="AccountID" msprop:Generator_ColumnPropNameInTable="AccountIDColumn" msprop:Generator_UserColumnName="AccountID" type="xs:int" minOccurs="0" />
+              <xs:element name="CategoryID" msprop:Generator_ColumnVarNameInTable="columnCategoryID" msprop:Generator_ColumnPropNameInRow="CategoryID" msprop:Generator_ColumnPropNameInTable="CategoryIDColumn" msprop:Generator_UserColumnName="CategoryID" type="xs:int" minOccurs="0" />
+              <xs:element name="Memo" msprop:Generator_ColumnVarNameInTable="columnMemo" msprop:Generator_ColumnPropNameInRow="Memo" msprop:Generator_ColumnPropNameInTable="MemoColumn" msprop:Generator_UserColumnName="Memo" type="xs:string" minOccurs="0" />
+              <xs:element name="Amount" msprop:Generator_ColumnVarNameInTable="columnAmount" msprop:Generator_ColumnPropNameInRow="Amount" msprop:Generator_ColumnPropNameInTable="AmountColumn" msprop:Generator_UserColumnName="Amount" type="xs:decimal" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="BankingTransactions" msprop:Generator_TableClassName="BankingTransactionsDataTable" msprop:Generator_TableVarName="tableBankingTransactions" msprop:Generator_RowChangedName="BankingTransactionsRowChanged" msprop:Generator_TablePropName="BankingTransactions" msprop:Generator_RowDeletingName="BankingTransactionsRowDeleting" msprop:Generator_RowChangingName="BankingTransactionsRowChanging" msprop:Generator_RowEvHandlerName="BankingTransactionsRowChangeEventHandler" msprop:Generator_RowDeletedName="BankingTransactionsRowDeleted" msprop:Generator_RowClassName="BankingTransactionsRow" msprop:Generator_UserTableName="BankingTransactions" msprop:Generator_RowEvArgName="BankingTransactionsRowChangeEvent">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
+              <xs:element name="TransactionID" msprop:Generator_ColumnVarNameInTable="columnTransactionID" msprop:Generator_ColumnPropNameInRow="TransactionID" msprop:Generator_ColumnPropNameInTable="TransactionIDColumn" msprop:Generator_UserColumnName="TransactionID" type="xs:int" />
+              <xs:element name="IMedium" msprop:Generator_ColumnVarNameInTable="columnIMedium" msprop:Generator_ColumnPropNameInRow="IMedium" msprop:Generator_ColumnPropNameInTable="IMediumColumn" msprop:Generator_UserColumnName="IMedium" type="xs:int" />
+              <xs:element name="CheckNumber" msprop:Generator_ColumnVarNameInTable="columnCheckNumber" msprop:Generator_ColumnPropNameInRow="CheckNumber" msprop:Generator_ColumnPropNameInTable="CheckNumberColumn" msprop:Generator_UserColumnName="CheckNumber" type="xs:decimal" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="InvestmentTransactions" msprop:Generator_TableClassName="InvestmentTransactionsDataTable" msprop:Generator_TableVarName="tableInvestmentTransactions" msprop:Generator_RowChangedName="InvestmentTransactionsRowChanged" msprop:Generator_TablePropName="InvestmentTransactions" msprop:Generator_RowDeletingName="InvestmentTransactionsRowDeleting" msprop:Generator_RowChangingName="InvestmentTransactionsRowChanging" msprop:Generator_RowEvHandlerName="InvestmentTransactionsRowChangeEventHandler" msprop:Generator_RowDeletedName="InvestmentTransactionsRowDeleted" msprop:Generator_RowClassName="InvestmentTransactionsRow" msprop:Generator_UserTableName="InvestmentTransactions" msprop:Generator_RowEvArgName="InvestmentTransactionsRowChangeEvent">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
+              <xs:element name="TransactionID" msprop:Generator_ColumnVarNameInTable="columnTransactionID" msprop:Generator_ColumnPropNameInRow="TransactionID" msprop:Generator_ColumnPropNameInTable="TransactionIDColumn" msprop:Generator_UserColumnName="TransactionID" type="xs:int" />
+              <xs:element name="IType" msprop:Generator_ColumnVarNameInTable="columnIType" msprop:Generator_ColumnPropNameInRow="IType" msprop:Generator_ColumnPropNameInTable="ITypeColumn" msprop:Generator_UserColumnName="IType" type="xs:int" />
+              <xs:element name="SecurityID" msprop:Generator_ColumnVarNameInTable="columnSecurityID" msprop:Generator_ColumnPropNameInRow="SecurityID" msprop:Generator_ColumnPropNameInTable="SecurityIDColumn" msprop:Generator_UserColumnName="SecurityID" type="xs:int" minOccurs="0" />
+              <xs:element name="SecurityPrice" msprop:Generator_ColumnVarNameInTable="columnSecurityPrice" msprop:Generator_ColumnPropNameInRow="SecurityPrice" msprop:Generator_ColumnPropNameInTable="SecurityPriceColumn" msprop:Generator_UserColumnName="SecurityPrice" type="xs:decimal" minOccurs="0" />
+              <xs:element name="SecurityQuantity" msprop:Generator_ColumnVarNameInTable="columnSecurityQuantity" msprop:Generator_ColumnPropNameInRow="SecurityQuantity" msprop:Generator_ColumnPropNameInTable="SecurityQuantityColumn" msprop:Generator_UserColumnName="SecurityQuantity" type="xs:decimal" minOccurs="0" />
+              <xs:element name="Commission" msprop:Generator_ColumnVarNameInTable="columnCommission" msprop:Generator_ColumnPropNameInRow="Commission" msprop:Generator_ColumnPropNameInTable="CommissionColumn" msprop:Generator_UserColumnName="Commission" type="xs:decimal" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+    <xs:unique name="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:Accounts" />
+      <xs:field xpath="mstns:ID" />
+    </xs:unique>
+    <xs:unique name="Constraint2">
+      <xs:selector xpath=".//mstns:Accounts" />
+      <xs:field xpath="mstns:Name" />
+    </xs:unique>
+    <xs:unique name="Categories_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:Categories" />
+      <xs:field xpath="mstns:ID" />
+    </xs:unique>
+    <xs:unique name="SecuritiesKey1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:Securities" />
+      <xs:field xpath="mstns:ID" />
+    </xs:unique>
+    <xs:unique name="Securities_Constraint1" msdata:ConstraintName="Constraint1">
+      <xs:selector xpath=".//mstns:Securities" />
+      <xs:field xpath="mstns:Name" />
+    </xs:unique>
+    <xs:unique name="SecurityPrices_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:SecurityPrices" />
+      <xs:field xpath="mstns:ID" />
+    </xs:unique>
+    <xs:unique name="Transactions_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:Transactions" />
+      <xs:field xpath="mstns:ID" />
+    </xs:unique>
+    <xs:unique name="LineItems_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:LineItems" />
+      <xs:field xpath="mstns:ID" />
+    </xs:unique>
+    <xs:unique name="BankingTransactions_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:BankingTransactions" />
+      <xs:field xpath="mstns:ID" />
+    </xs:unique>
+    <xs:unique name="InvestmentTransactions_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:InvestmentTransactions" />
+      <xs:field xpath="mstns:ID" />
+    </xs:unique>
+    <xs:keyref name="FK_Transactions_BankTransactions" refer="Transactions_Constraint1" msprop:rel_Generator_UserChildTable="BankingTransactions" msprop:rel_Generator_ChildPropName="GetBankingTransactionsRows" msprop:rel_Generator_UserRelationName="FK_Transactions_BankTransactions" msprop:rel_Generator_RelationVarName="relationFK_Transactions_BankTransactions" msprop:rel_Generator_UserParentTable="Transactions" msprop:rel_Generator_ParentPropName="TransactionsRow">
+      <xs:selector xpath=".//mstns:BankingTransactions" />
+      <xs:field xpath="mstns:TransactionID" />
+    </xs:keyref>
+    <xs:keyref name="FK_Transactions_LineItems" refer="Transactions_Constraint1" msprop:rel_Generator_UserChildTable="LineItems" msprop:rel_Generator_ChildPropName="GetLineItemsRows" msprop:rel_Generator_UserRelationName="FK_Transactions_LineItems" msprop:rel_Generator_RelationVarName="relationFK_Transactions_LineItems" msprop:rel_Generator_UserParentTable="Transactions" msprop:rel_Generator_ParentPropName="TransactionsRow">
+      <xs:selector xpath=".//mstns:LineItems" />
+      <xs:field xpath="mstns:TransactionID" />
+    </xs:keyref>
+    <xs:keyref name="FK_Accounts_Transactions" refer="Constraint1" msprop:rel_Generator_UserChildTable="Transactions" msprop:rel_Generator_ChildPropName="GetTransactionsRows" msprop:rel_Generator_UserRelationName="FK_Accounts_Transactions" msprop:rel_Generator_RelationVarName="relationFK_Accounts_Transactions" msprop:rel_Generator_UserParentTable="Accounts" msprop:rel_Generator_ParentPropName="AccountsRow" msdata:DeleteRule="None">
+      <xs:selector xpath=".//mstns:Transactions" />
+      <xs:field xpath="mstns:AccountID" />
+    </xs:keyref>
+    <xs:keyref name="FK_Securities_SecurityPrices" refer="SecuritiesKey1" msprop:rel_Generator_UserChildTable="SecurityPrices" msprop:rel_Generator_ChildPropName="GetSecurityPricesRows" msprop:rel_Generator_UserRelationName="FK_Securities_SecurityPrices" msprop:rel_Generator_RelationVarName="relationFK_Securities_SecurityPrices" msprop:rel_Generator_UserParentTable="Securities" msprop:rel_Generator_ParentPropName="SecuritiesRow">
+      <xs:selector xpath=".//mstns:SecurityPrices" />
+      <xs:field xpath="mstns:SecurityID" />
+    </xs:keyref>
+  </xs:element>
+  <xs:annotation>
+    <xs:appinfo>
+      <msdata:Relationship name="Accounts_LineItems" msdata:parent="Accounts" msdata:child="LineItems" msdata:parentkey="ID" msdata:childkey="AccountID" msprop:Generator_UserChildTable="LineItems" msprop:Generator_ChildPropName="GetLineItemsRows" msprop:Generator_UserRelationName="Accounts_LineItems" msprop:Generator_RelationVarName="relationAccounts_LineItems" msprop:Generator_UserParentTable="Accounts" msprop:Generator_ParentPropName="AccountsRow" />
+      <msdata:Relationship name="Categories_LineItems" msdata:parent="Categories" msdata:child="LineItems" msdata:parentkey="ID" msdata:childkey="CategoryID" msprop:Generator_UserChildTable="LineItems" msprop:Generator_ChildPropName="GetLineItemsRows" msprop:Generator_UserRelationName="Categories_LineItems" msprop:Generator_RelationVarName="relationCategories_LineItems" msprop:Generator_UserParentTable="Categories" msprop:Generator_ParentPropName="CategoriesRow" />
+      <msdata:Relationship name="Transactions_InvestmentTransactions" msdata:parent="Transactions" msdata:child="InvestmentTransactions" msdata:parentkey="ID" msdata:childkey="TransactionID" msprop:Generator_UserChildTable="InvestmentTransactions" msprop:Generator_ChildPropName="GetInvestmentTransactionsRows" msprop:Generator_UserRelationName="Transactions_InvestmentTransactions" msprop:Generator_RelationVarName="relationTransactions_InvestmentTransactions" msprop:Generator_UserParentTable="Transactions" msprop:Generator_ParentPropName="TransactionsRow" />
+      <msdata:Relationship name="Securities_InvestmentTransactions" msdata:parent="Securities" msdata:child="InvestmentTransactions" msdata:parentkey="ID" msdata:childkey="SecurityID" msprop:Generator_UserChildTable="InvestmentTransactions" msprop:Generator_ChildPropName="GetInvestmentTransactionsRows" msprop:Generator_UserRelationName="Securities_InvestmentTransactions" msprop:Generator_RelationVarName="relationSecurities_InvestmentTransactions" msprop:Generator_UserParentTable="Securities" msprop:Generator_ParentPropName="SecuritiesRow" />
+    </xs:appinfo>
+  </xs:annotation>
+</xs:schema>
