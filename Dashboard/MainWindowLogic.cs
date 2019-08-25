@@ -10,7 +10,7 @@ namespace Dashboard
     {
         #region Constructor
 
-        private Listener listener = new Listener();
+        //private Listener listener = new Listener();
 
         public MainWindowLogic(Action Exit)
         {
