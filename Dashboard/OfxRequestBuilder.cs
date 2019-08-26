@@ -48,7 +48,6 @@ namespace Dashboard
             else
             {
                 header =
-                    "<!--" + eol +
                     "OFXHEADER:100" + eol +
                     "DATA:OFXSGML" + eol +
                     "VERSION:102" + eol +
@@ -57,9 +56,16 @@ namespace Dashboard
                     "CHARSET:1252" + eol +
                     "COMPRESSION:NONE" + eol +
                     "OLDFILEUID:NONE" + eol +
-                    "NEWFILEUID:NONE" + eol + eol +
-                    "-->" + eol;
-                // "NEWFILEUID:" + newFileId + eol + eol;
+                    "NEWFILEUID:NONE" + eol + eol;
+
+                bool putInXmlComment = false; // ZZZ
+                if (putInXmlComment)
+                {
+                    header =
+                        "<!--" + eol +
+                        header +
+                        "-->" + eol;
+                }
             }
 
             return header;
@@ -68,24 +74,30 @@ namespace Dashboard
         //
         // Message sets
         //
+
+        // Get profile (i.e. capabilities) of a financial institution
         public string GetProfileMessageSet()
         {
+            var anonymous = FinancialInstitution.ANONYMOUS;
             var messageSet = new SgmlAggregate("OFX");
-            messageSet.AddTag(GetSignonMessage("anonymous00000000000000000000000", "anonymous00000000000000000000000", false));
+            messageSet.AddTag(GetSignonMessage(anonymous, anonymous, false));
             messageSet.AddTag(GetProfileMessage());
 
             return GetStringFromMessageSet(messageSet);
         }
 
+        // To encrypt password (not used)
         public string GetChallengeMessageSet(string user)
         {
+            var anonymous = FinancialInstitution.ANONYMOUS;
             var messageSet = new SgmlAggregate("OFX");
-            messageSet.AddTag(GetSignonMessage("anonymous00000000000000000000000", "anonymous00000000000000000000000", false));
+            messageSet.AddTag(GetSignonMessage(anonymous, anonymous, false));
             messageSet.AddTag(GetChallengeTransaction(user));
 
             return GetStringFromMessageSet(messageSet);
         }
 
+        // To get account list
         public string GetAccountsMessageSet(string user, string password)
         {
             var request = GetAccountsRequest();
@@ -101,6 +113,17 @@ namespace Dashboard
         public string GetInvestmentsMessageSet(string user, string password, string account)
         {
             throw new NotImplementedException();
+        }
+
+        // To get information about a financial institution (Intuit-specific)
+        public string GetFinancialInstitutionInformationMessageSet(string financialInstutionId)
+        {
+            var anonymous = FinancialInstitution.ANONYMOUS;
+            var messageSet = new SgmlAggregate("OFX");
+            messageSet.AddTag(GetSignonMessage(anonymous, anonymous, false));
+            messageSet.AddTag(GetFinancialInstitutionInformationMessage(financialInstutionId));
+
+            return GetStringFromMessageSet(messageSet);
         }
 
         private string GetStringFromMessageSet(SgmlAggregate messageSet)
@@ -126,6 +149,11 @@ namespace Dashboard
         private SgmlTag GetProfileMessage()
         {
             return GetMessageWrapper("PROF", "PROF", GetProfileRequest());
+        }
+
+        private SgmlTag GetFinancialInstitutionInformationMessage(string financialInstutionId)
+        {
+            return GetMessageWrapper("INTU.BRAND", "INTU.BRAND", GetFinancialInstitutionInformationRequest(financialInstutionId));
         }
 
         private SgmlTag GetMessageWrapper(string messageType, string transactionType, SgmlTag request)
@@ -165,7 +193,11 @@ namespace Dashboard
             request.AddElement("USERPASS", password);
             request.AddElement("GENUSERKEY", "N");
             request.AddElement("LANGUAGE", "ENG");
-            request.AddTag(GetFiInfo());
+            var fiInfo = GetFiInfo();
+            if (fiInfo != null)
+            {
+                request.AddTag(fiInfo);
+            }
             request.AddElement("APPID", "QWIN");
             request.AddElement("APPVER", "2700");
 
@@ -200,6 +232,44 @@ namespace Dashboard
             return request;
         }
 
+        private SgmlTag GetFinancialInstitutionInformationRequest(string financialInstutionId)
+        {
+            /*
+            <INTU.BRANDRQ>
+            <INTU.SW>
+            <INTU.SWPRODCD>Q
+            <INTU.SWVER>1000
+            <INTU.SWOSCD>W
+            </INTU.SW>
+            <INTU.SELECTBYBID>
+            <INTU.BIDINFO>
+            <INTU.PRESENCEID>15103
+            <INTU.DTUPDATE>19900101
+            <INTU.QUOTESID>C2A36156F5E60D00FC46350B2D43CDAB
+            </INTU.BIDINFO>
+            </INTU.SELECTBYBID>
+            </INTU.BRANDRQ>
+            */
+
+            var sw = new SgmlAggregate("INTU.SW");
+            sw.AddElement("INTU.SWPRODCD", "Q");    // I suppose this means Quicken
+            sw.AddElement("INTU.SWVER", "1000");    // I suppose this means latest version
+            sw.AddElement("INTU.SWOSCD", "W");      // I suppose this means runs on Windows
+
+            var bidInfo = new SgmlAggregate("INTU.BIDINFO");
+            bidInfo.AddElement("INTU.PRESENCEID", financialInstutionId);
+            bidInfo.AddElement("INTU.DTUPDATE", "19900101");
+            bidInfo.AddElement("INTU.PRESENCEID", "C2A36156F5E60D00FC46350B2D43CDAB"); // ZZZ ???
+
+            var selectById = new SgmlAggregate("INTU.SELECTBYBID");
+            selectById.Tags.Add(bidInfo);
+
+            var brandrq = new SgmlAggregate("INTU.BRANDRQ");
+            brandrq.Tags.Add(sw);
+            brandrq.Tags.Add(selectById);
+
+            return brandrq;
+        }
 
         //
         // Utilities
@@ -229,118 +299,20 @@ namespace Dashboard
 
         private SgmlAggregate GetFiInfo()
         {
-            var fiInfo = new SgmlAggregate("FI", new SgmlElement("ORG", FinancialInstitution.Organization));
-            if (FinancialInstitution.FID != null)
+            SgmlAggregate fiInfo = null;
+
+            if (FinancialInstitution.Organization != null)
             {
-                fiInfo.AddElement("FID", FinancialInstitution.FID);
+                fiInfo = new SgmlAggregate("FI", new SgmlElement("ORG", FinancialInstitution.Organization));
+                if (FinancialInstitution.FID != null)
+                {
+                    fiInfo.AddElement("FID", FinancialInstitution.FID);
+                }
             }
 
             return fiInfo;
         }
     }
 
-    // base class for sgml entities
-    public abstract class SgmlTag
-    {
-        public readonly string Tag;
-
-        public SgmlTag(string tag)
-        {
-            Tag = tag;
-        }
-
-        public abstract string ToXml();
-    }
-
-    // <tag>value
-    public class SgmlElement : SgmlTag
-    {
-        public readonly string Value;
-        public readonly bool NoNewLine;
-
-        public SgmlElement(string tag, string value, bool noNewLine = false)
-            : base(tag)
-        {
-            Value = value;
-            NoNewLine = noNewLine;
-        }
-
-        public override string ToString()
-        {
-            return $"<{Tag}>{Value}" + (NoNewLine ? "" : "\r\n");
-        }
-
-        public override string ToXml()
-        {
-            return $"<{Tag}>{Value}</{Tag}>\r\n";
-        }
-    }
-
-    // <tag>element(s)</tag>
-    public class SgmlAggregate : SgmlTag
-    {
-        public readonly List<SgmlTag> Tags;
-
-        public SgmlAggregate(string tag)
-            : base(tag)
-        {
-            Tags = new List<SgmlTag>();
-        }
-
-        public SgmlAggregate(string tag, SgmlTag value)
-            : this(tag)
-        {
-            Tags.Add(value);
-        }
-
-        public SgmlAggregate(string tag, SgmlTag val1, SgmlTag val2)
-            : this(tag)
-        {
-            Tags.Add(val1);
-            Tags.Add(val2);
-        }
-
-        public void AddTag(SgmlTag tag)
-        {
-            Tags.Add(tag);
-        }
-
-        public void AddElement(string tag, string value, bool noNewLine = false)
-        {
-            Tags.Add(new SgmlElement(tag, value, noNewLine));
-        }
-
-        public override string ToString()
-        {
-            string result;
-
-            result = $"<{Tag}>\r\n";
-
-            foreach (var tag in Tags)
-            {
-                result += tag.ToString();
-            }
-
-            result += $"</{Tag}>\r\n";
-
-            return result;
-        }
-
-        public override string ToXml()
-        {
-            string result;
-
-            result = $"<{Tag}>\r\n";
-
-            foreach (var tag in Tags)
-            {
-                result += tag.ToXml();
-            }
-
-            result += $"</{Tag}>\r\n";
-
-            return result;
-        }
-    }
 
 }

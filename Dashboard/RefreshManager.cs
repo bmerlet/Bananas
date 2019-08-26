@@ -13,7 +13,7 @@ namespace Dashboard
 {
     class RefreshManager
     {
-        public enum EAction { Profile, Accounts, Investments };
+        public enum EAction { Profile, Accounts, Investments, FinancialInstitutionInformation };
 
         public RefreshManager()
         {
@@ -25,6 +25,7 @@ namespace Dashboard
 
         public void GetFinancialInstitutionInfo()
         {
+            /*
             // So where to find info about financial institutions?
             //
             // gnucash uses libofx, which fetches a file with presumably a list of financial institution like so:
@@ -73,15 +74,51 @@ namespace Dashboard
                 Console.WriteLine($"Request exception: {ex.Message}");
             }
 
-
             httpClient.Dispose();
+            */
+
+            VerifyFinancialInstitution("15103");
+        }
+
+        private void VerifyFinancialInstitution(string idOfInstitutionToCheck)
+        {
+            // Get intuit server info
+            var financialInstitution = FinancialInstitution.FinancialInstitutions["Intuit"];
+
+            // Create request generator
+            var requestBuilder = new OfxRequestBuilder(financialInstitution);
+
+            // Create HTTP client
+            var httpClient = SetupHttpClient(financialInstitution);
+
+            // Send request
+            SendMessage(httpClient, requestBuilder, null, EAction.FinancialInstitutionInformation, financialInstitution.ProfileURL, null, null, idOfInstitutionToCheck);
+
+            // ZZZ Get result and verify status OK
+            // Parse answer
+            var parser = new OfxResponseParser();
+            string str = System.IO.File.ReadAllText("response.txt");
+            var doc = parser.Parse(str);
+
+            string[] detailsLocation =
+                { "INTU.BRANDMSGSRSV1", "INTU.BRANDTRNRS", "INTU.BRANDRS", "INTU.BRANDDATALIST", "INTU.BRANDDATA", "INTU.BRANDDETAILS",  };
+            var details = doc.Sgml.FindAggregate(detailsLocation);
+
+            var org = details.FindValue(new string[] { "FI", "ORG" });
+            var fid = details.FindValue(new string[] { "FI", "FID" });
+            var url = details.FindValue(new string[] { "INTU.FIPROFILEURL" });
+
+            if (!FinancialInstitution.FinancialInstitutions[idOfInstitutionToCheck].IsSameInstitution(org, fid, url))
+            {
+                throw new InvalidOperationException($"Institution {org} - id {idOfInstitutionToCheck} - does not match");
+            }
         }
 
         public void Connect()
         {
             //Connect("Test", "USERNAME", "PASSWORD", EAction.Accounts, null);
             //Connect("Reference", "GnuCash", "gcash", EAction.Accounts, null);
-            Connect("Vanguard", "NotreFric", "4G0r1lla5", EAction.Accounts, null);
+            Connect("15103", "NotreFric", "XXXXXX", EAction.Accounts, null);
             //Connect("Fidelity", "5847654", "def", EAction.Profile, null);
             //Connect("AFS", "025781392", "C0l0mb13n", EAction.Accounts, null);
             //Connect("Chase", "", "", EAction.Accounts, null);
@@ -107,10 +144,14 @@ namespace Dashboard
             }
 
             // First issue a profile request
-            SendMessage(httpClient, requestBuilder, cookies, EAction.Profile, null, null, null);
+            SendMessage(httpClient, requestBuilder, cookies, EAction.Profile, financialInstitution.ProfileURL, null, null, null);
+
+            // Retreive info from profile request (including URL to use!)
+            // ZZZZ
 
             // Then issue what the user wants
-            //SendMessage(httpClient, requestBuilder, cookies, action, null, null, null);
+            // SendMessage(httpClient, requestBuilder, cookies, action, ZZZURL, user, password, account);
+
 
 
             httpClient.Dispose();
@@ -126,7 +167,7 @@ namespace Dashboard
             // System.Net.ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 
             // Setup URL
-            httpClient.BaseAddress = new Uri(financialInstitution.URL);
+            httpClient.BaseAddress = new Uri(financialInstitution.ProfileURL);
 
             // Only accept x-ofx
             httpClient.DefaultRequestHeaders.Accept.Clear();
@@ -146,7 +187,7 @@ namespace Dashboard
             var challengeContent = new StringContent(challengeRequest, Encoding.ASCII, "application/x-ofx");
             try
             {
-                var result = httpClient.PostAsync(requestBuilder.FinancialInstitution.URL, challengeContent).Result;
+                var result = httpClient.PostAsync(requestBuilder.FinancialInstitution.ChallengeURL, challengeContent).Result;
                 string resultString = result.Content.ReadAsStringAsync().Result;
                 Console.WriteLine("Challenge request result:");
                 Console.WriteLine(resultString);
@@ -159,7 +200,7 @@ namespace Dashboard
             }
         }
 
-        private void SendMessage(HttpClient httpClient, OfxRequestBuilder requestBuilder, List<IEnumerable<string>> cookies, EAction action, string user, string password, string account)
+        private void SendMessage(HttpClient httpClient, OfxRequestBuilder requestBuilder, List<IEnumerable<string>> cookies, EAction action, string url, string user, string password, string account)
         {
             string comment = null;
             string request = null;
@@ -180,6 +221,12 @@ namespace Dashboard
                     comment = "Profile";
                     request = requestBuilder.GetProfileMessageSet();
                     break;
+
+                case EAction.FinancialInstitutionInformation:
+                    comment = "Financial institution information";
+                    // account is financial institution Id
+                    request = requestBuilder.GetFinancialInstitutionInformationMessageSet(account);
+                    break;
             }
 
 
@@ -191,7 +238,7 @@ namespace Dashboard
             // Post
             try
             {
-                var result = httpClient.PostAsync(requestBuilder.FinancialInstitution.URL, content).Result;
+                var result = httpClient.PostAsync(url, content).Result;
                 string resultString = result.Content.ReadAsStringAsync().Result;
                 Console.WriteLine($"{comment} request result:");
                 Console.WriteLine(resultString);
@@ -215,7 +262,7 @@ namespace Dashboard
                         content.Headers.Add("Set-Cookie", cookie);
                     }
                     content = new StringContent(request, Encoding.ASCII, "application/x-ofx");
-                    result = httpClient.PostAsync(requestBuilder.FinancialInstitution.URL, content).Result;
+                    result = httpClient.PostAsync(url, content).Result;
                     resultString = result.Content.ReadAsStringAsync().Result;
                     Console.WriteLine($"{comment} SECOND request result:");
                     Console.WriteLine(resultString);

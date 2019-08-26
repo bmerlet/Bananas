@@ -57,8 +57,11 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="FinancialInstitution.cs" />
+    <Compile Include="OfxDocument.cs" />
     <Compile Include="OfxRequestBuilder.cs" />
+    <Compile Include="OfxResponseParser.cs" />
     <Compile Include="RefreshManager.cs" />
+    <Compile Include="SgmlTag.cs" />
     <Compile Include="UICommand.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
