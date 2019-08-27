@@ -8,12 +8,12 @@ using OfxClient.Data;
 
 namespace OfxClient.Serializers
 {
-    public class ResponseParser
+    public static class ResponseParser
     {
         //
         // Entry point: Parse all
         //
-        public OfxDocument Parse(string str)
+       static  public OfxDocument Parse(string str)
         {
             OfxDocument result = null;
 
@@ -38,7 +38,7 @@ namespace OfxClient.Serializers
         //
         // Parse header
         //
-        private OfxHeader ParseHeader(string str)
+        static private OfxHeader ParseHeader(string str)
         {
             int version = 102;
 
@@ -62,7 +62,7 @@ namespace OfxClient.Serializers
         //
         // Parse top-level SGML
         //
-        private SgmlAggregate ParseSgml(string str)
+        static private SgmlAggregate ParseSgml(string str)
         {
             var ofxAggregate = new SgmlAggregate("OFX");
 
@@ -87,7 +87,7 @@ namespace OfxClient.Serializers
         //
         // Recursively parse the SGML
         //
-        private void ParseSgml(string str, SgmlAggregate aggregate)
+        static private void ParseSgml(string str, SgmlAggregate aggregate)
         {
             char[] blanks = { ' ', '\t', '\n', '\r' };
             char[] stops = { '<', '\n', '\r' };
@@ -166,7 +166,7 @@ namespace OfxClient.Serializers
         //
         // Find value for a tag
         //
-        private string FindValue(string str, string tag)
+        static private string FindValue(string str, string tag)
         {
             string val = null;
             char[] terminators = { '<', '\n', '\r' };

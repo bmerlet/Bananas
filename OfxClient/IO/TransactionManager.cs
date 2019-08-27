@@ -35,6 +35,8 @@ namespace OfxClient.IO
             string comment = null;
             string request = null;
             string result = null;
+            OfxDocument document = null;
+
             var financialInstitution = ofxRequest.FinancialInstitution;
             var url = financialInstitution.ProfileURL;
 
@@ -87,6 +89,12 @@ namespace OfxClient.IO
                 Console.WriteLine($"{comment} request result:");
                 Console.WriteLine(result);
 
+                // We now have the result as a string - parse it and create a document
+                document = ResponseParser.Parse(result);
+
+                // Get the signon status
+                var signonStatus = RequestBuilder.GetSignonStatus(document);
+
                 // Find returned cookies
                 if (cookies != null)
                 {
@@ -100,16 +108,17 @@ namespace OfxClient.IO
                         }
                     }
 
-                    bool resendWithCookies = false; // ZZZZ
-                    if (foundCookies && resendWithCookies)
+                    bool resendWithCookies = true; // ZZZZ
+                    if (resendWithCookies && signonStatus != "0" && foundCookies)
                     {
+                        content = new StringContent(request, Encoding.ASCII, "application/x-ofx");
                         foreach (var cookie in cookies)
                         {
                             content.Headers.Add("Set-Cookie", cookie);
                         }
-                        content = new StringContent(request, Encoding.ASCII, "application/x-ofx");
                         httpResult = httpClient.PostAsync(url, content).Result;
                         result = httpResult.Content.ReadAsStringAsync().Result;
+                        document = ResponseParser.Parse(result);
                         Console.WriteLine($"{comment} SECOND request result:");
                         Console.WriteLine(result);
                     }
@@ -121,10 +130,6 @@ namespace OfxClient.IO
                 Console.WriteLine(error);
                 return new OfxDocument(error, null, null);
             }
-
-            // We now have the result as a string - parse it and create a document
-            var parser = new ResponseParser();
-            var document = parser.Parse(result);
 
             return document;
         }

@@ -80,10 +80,6 @@ namespace Dashboard
             httpClient.Dispose();
             */
 
-            string resp = "<OFX><SIGNONMSGSRSV1><SONRS><STATUS><CODE>15500<SEVERITY>ERROR<MESSAGE>Login failed due to invalid credentials.</STATUS><DTSERVER>20190827080528[-5:EST]<LANGUAGE>ENG<DTPROFUP>20140605083000<FI><ORG>Vanguard<FID>15103</FI><SESSCOOKIE>2934F61E88A2F352F49E64790C5E582B.JUH7BwK7O47sD_hnwprd01_1</SONRS></SIGNONMSGSRSV1><SIGNUPMSGSRSV1><ACCTINFOTRNRS><TRNUID>6A054DCB-AABA-4EE3-B63D-133EB64F6B11<STATUS><CODE>15500<SEVERITY>ERROR<MESSAGE>Invalid signon</STATUS></ACCTINFOTRNRS></SIGNUPMSGSRSV1></OFX>";
-            (new ResponseParser()).Parse(resp);
-
-
             var error = VerifyFinancialInstitution("15103");
             if (error != null)
             {
