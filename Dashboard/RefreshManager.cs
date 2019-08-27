@@ -9,11 +9,14 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
+using OfxClient.Data;
+using OfxClient.IO;
+using OfxClient.Serializers;
+
 namespace Dashboard
 {
     class RefreshManager
     {
-        public enum EAction { Profile, Accounts, Investments, FinancialInstitutionInformation };
 
         public RefreshManager()
         {
@@ -77,28 +80,37 @@ namespace Dashboard
             httpClient.Dispose();
             */
 
-            VerifyFinancialInstitution("15103");
+            string resp = "<OFX><SIGNONMSGSRSV1><SONRS><STATUS><CODE>15500<SEVERITY>ERROR<MESSAGE>Login failed due to invalid credentials.</STATUS><DTSERVER>20190827080528[-5:EST]<LANGUAGE>ENG<DTPROFUP>20140605083000<FI><ORG>Vanguard<FID>15103</FI><SESSCOOKIE>2934F61E88A2F352F49E64790C5E582B.JUH7BwK7O47sD_hnwprd01_1</SONRS></SIGNONMSGSRSV1><SIGNUPMSGSRSV1><ACCTINFOTRNRS><TRNUID>6A054DCB-AABA-4EE3-B63D-133EB64F6B11<STATUS><CODE>15500<SEVERITY>ERROR<MESSAGE>Invalid signon</STATUS></ACCTINFOTRNRS></SIGNUPMSGSRSV1></OFX>";
+            (new ResponseParser()).Parse(resp);
+
+
+            var error = VerifyFinancialInstitution("15103");
+            if (error != null)
+            {
+                Console.WriteLine(error);
+            }
         }
 
-        private void VerifyFinancialInstitution(string idOfInstitutionToCheck)
+        private string VerifyFinancialInstitution(string idOfInstitutionToCheck)
         {
-            // Get intuit server info
-            var financialInstitution = FinancialInstitution.FinancialInstitutions["Intuit"];
+            // Create request
+            var request = new FinancialInstitutionInformationRequest("Intuit", idOfInstitutionToCheck);
 
-            // Create request generator
-            var requestBuilder = new OfxRequestBuilder(financialInstitution);
+            // Transact it
+            var transactionManager = new TransactionManager();
+            var doc = transactionManager.Transact(request, null);
 
-            // Create HTTP client
-            var httpClient = SetupHttpClient(financialInstitution);
+            if (doc.Error != null)
+            {
+                return doc.Error;
+            }
 
-            // Send request
-            SendMessage(httpClient, requestBuilder, null, EAction.FinancialInstitutionInformation, financialInstitution.ProfileURL, null, null, idOfInstitutionToCheck);
-
-            // ZZZ Get result and verify status OK
-            // Parse answer
-            var parser = new OfxResponseParser();
-            string str = System.IO.File.ReadAllText("response.txt");
-            var doc = parser.Parse(str);
+            // Check sign-on status
+            var error = RequestBuilder.GetSignonStatus(doc);
+            if (error != "0")
+            {
+                return "Signon error " + error;
+            }
 
             string[] detailsLocation =
                 { "INTU.BRANDMSGSRSV1", "INTU.BRANDTRNRS", "INTU.BRANDRS", "INTU.BRANDDATALIST", "INTU.BRANDDATA", "INTU.BRANDDETAILS",  };
@@ -110,171 +122,65 @@ namespace Dashboard
 
             if (!FinancialInstitution.FinancialInstitutions[idOfInstitutionToCheck].IsSameInstitution(org, fid, url))
             {
-                throw new InvalidOperationException($"Institution {org} - id {idOfInstitutionToCheck} - does not match");
+                return $"Institution {org} - id {idOfInstitutionToCheck} - does not match";
             }
+
+            return null;
         }
 
         public void Connect()
         {
-            //Connect("Test", "USERNAME", "PASSWORD", EAction.Accounts, null);
-            //Connect("Reference", "GnuCash", "gcash", EAction.Accounts, null);
-            Connect("15103", "NotreFric", "XXXXXX", EAction.Accounts, null);
-            //Connect("Fidelity", "5847654", "def", EAction.Profile, null);
-            //Connect("AFS", "025781392", "C0l0mb13n", EAction.Accounts, null);
-            //Connect("Chase", "", "", EAction.Accounts, null);
+            //Connect("Test", "USERNAME", "PASSWORD", null);
+            //Connect("Reference", "GnuCash", "gcash", null);
+            Connect("15103", "NotreFric", "4G0r1lla5", null);
+            //Connect("Fidelity", "5847654", "def", null);
+            //Connect("AFS", "025781392", "C0l0mb13n", null);
+            //Connect("Chase", "", "", null);
         }
 
-        private void Connect(string fi, string user, string password, EAction action, string account)
+        private string Connect(string fi, string user, string password, string account)
         {
             var cookies = new List<IEnumerable<string>>();
 
-            // Get financial institution
-            var financialInstitution = FinancialInstitution.FinancialInstitutions[fi];
+            // Create transaction manager
+            var transactionManager = new TransactionManager();
 
-            // Create request generator
-            var requestBuilder = new OfxRequestBuilder(financialInstitution);
+            // Create profile transaction request
+            OfxRequest request = new ProfileRequest("15103");
 
-            // Create HTTP client
-            var httpClient = SetupHttpClient(financialInstitution);
+            // Transact profile request
+            var profileDoc = transactionManager.Transact(request, cookies);
 
-            // Deal with challenge if password is encrypted
-            if (financialInstitution.EncryptedPassword)
+            if (profileDoc.Error != null)
             {
-                SendChallengeRequest(httpClient, requestBuilder, user);
+                return "Erro in getting profile: " + profileDoc.Error;
             }
 
-            // First issue a profile request
-            SendMessage(httpClient, requestBuilder, cookies, EAction.Profile, financialInstitution.ProfileURL, null, null, null);
+            // Check sign-on status
+            var error = RequestBuilder.GetSignonStatus(profileDoc);
+            if (error != "0")
+            {
+                return "Signon error " + error;
+            }
+
+            // Check profile status
+            error = RequestBuilder.GetProfileStatus(profileDoc);
+            if (error != "0")
+            {
+                return "Profile error " + error;
+            }
 
             // Retreive info from profile request (including URL to use!)
-            // ZZZZ
+            string url = RequestBuilder.GetCoreUrl(profileDoc);
 
-            // Then issue what the user wants
-            // SendMessage(httpClient, requestBuilder, cookies, action, ZZZURL, user, password, account);
+            // Then issue an accounts request
+            request = new AccountsRequest(fi, url, user, password);
+            var accountsDoc = transactionManager.Transact(request, cookies);
 
-
-
-            httpClient.Dispose();
-        }
-
-        private HttpClient SetupHttpClient(FinancialInstitution financialInstitution)
-        {
-            // Create HTTP client
-            var httpClient = new HttpClient();
-
-            //specify to use TLS 1.2 as default connection
-            // Not necessary after .Net 4.6.2
-            // System.Net.ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
-
-            // Setup URL
-            httpClient.BaseAddress = new Uri(financialInstitution.ProfileURL);
-
-            // Only accept x-ofx
-            httpClient.DefaultRequestHeaders.Accept.Clear();
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/x-ofx"));
-            //httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/plain")); // AFS returns plain text
-            //httpClient.DefaultRequestHeaders.Add("User-Agent", "Dashboard 1.0");
-            //httpClient.DefaultRequestHeaders.Add("User-Agent", "QWIN");
-            httpClient.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Dashboard 1.0");
-
-            return httpClient;
-        }
-
-        private void SendChallengeRequest(HttpClient httpClient, OfxRequestBuilder requestBuilder, string user)
-        {
-            var challengeRequest = requestBuilder.GetChallengeMessageSet(user);
-            var challengeContent = new StringContent(challengeRequest, Encoding.ASCII, "application/x-ofx");
-            try
-            {
-                var result = httpClient.PostAsync(requestBuilder.FinancialInstitution.ChallengeURL, challengeContent).Result;
-                string resultString = result.Content.ReadAsStringAsync().Result;
-                Console.WriteLine("Challenge request result:");
-                Console.WriteLine(resultString);
-                return; // RFU, haven't found a server yet that wants TYPE1 security.
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Challenge request exception: {ex.Message}");
-                return;
-            }
-        }
-
-        private void SendMessage(HttpClient httpClient, OfxRequestBuilder requestBuilder, List<IEnumerable<string>> cookies, EAction action, string url, string user, string password, string account)
-        {
-            string comment = null;
-            string request = null;
-
-            switch (action)
-            {
-                case EAction.Accounts:
-                    comment = "Accounts";
-                    request = requestBuilder.GetAccountsMessageSet(user, password);
-                    break;
-
-                case EAction.Investments:
-                    comment = "Investements";
-                    request = requestBuilder.GetInvestmentsMessageSet(user, password, account);
-                    break;
-
-                case EAction.Profile:
-                    comment = "Profile";
-                    request = requestBuilder.GetProfileMessageSet();
-                    break;
-
-                case EAction.FinancialInstitutionInformation:
-                    comment = "Financial institution information";
-                    // account is financial institution Id
-                    request = requestBuilder.GetFinancialInstitutionInformationMessageSet(account);
-                    break;
-            }
-
-
-            // Setup content
-            var content = new StringContent(request, Encoding.Default, "application/x-ofx");
-            Console.WriteLine($"{comment} request:");
-            Console.WriteLine(request);
-
-            // Post
-            try
-            {
-                var result = httpClient.PostAsync(url, content).Result;
-                string resultString = result.Content.ReadAsStringAsync().Result;
-                Console.WriteLine($"{comment} request result:");
-                Console.WriteLine(resultString);
-
-                // Find returned cookies
-                bool foundCookies = false;
-                bool resendWithCookies = false; // ZZZZ
-                foreach (var header in result.Headers)
-                {
-                    if (header.Key == "Set-Cookie")
-                    {
-                        cookies.Add(header.Value);
-                        foundCookies = true;
-                    }
-                }
-
-                if (foundCookies && resendWithCookies)
-                {
-                    foreach(var cookie in cookies)
-                    {
-                        content.Headers.Add("Set-Cookie", cookie);
-                    }
-                    content = new StringContent(request, Encoding.ASCII, "application/x-ofx");
-                    result = httpClient.PostAsync(url, content).Result;
-                    resultString = result.Content.ReadAsStringAsync().Result;
-                    Console.WriteLine($"{comment} SECOND request result:");
-                    Console.WriteLine(resultString);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"{comment} request exception: {ex.Message}");
-            }
+            // Success
+            return accountsDoc.Error;
         }
     }
-
 
     //
     // Local listener for debug

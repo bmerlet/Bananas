@@ -4,27 +4,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dashboard
+namespace OfxClient.Data
 {
     public class OfxDocument
     {
+        public readonly string Error;
         public readonly OfxHeader OfxHeader;
         public readonly SgmlAggregate Sgml;
 
-        public OfxDocument(OfxHeader ofxHeader, SgmlAggregate sgml)
+        public OfxDocument(string error, OfxHeader ofxHeader, SgmlAggregate sgml)
         {
+            Error = error;
             OfxHeader = ofxHeader;
             Sgml = sgml;
-        }
-    }
-
-    public class OfxHeader
-    {
-        public readonly int Version;
-
-        public OfxHeader(int version)
-        {
-            Version = version;
         }
     }
 }

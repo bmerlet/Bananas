@@ -4,22 +4,35 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dashboard
+using OfxClient.Data;
+
+namespace OfxClient.Serializers
 {
-    public class OfxResponseParser
+    public class ResponseParser
     {
         //
         // Entry point: Parse all
         //
         public OfxDocument Parse(string str)
         {
-            // Parse header
-            var header = ParseHeader(str);
+            OfxDocument result = null;
 
-            // Parse SGML
-            var sgml = ParseSgml(str);
+            try
+            {
+                // Parse header
+                var header = ParseHeader(str);
 
-            return new OfxDocument(header, sgml);
+                // Parse SGML
+                var sgml = ParseSgml(str);
+
+                result = new OfxDocument(null, header, sgml);
+            }
+            catch(InvalidOperationException e)
+            {
+                result = new OfxDocument(e.Message, null, null);
+            }
+
+            return result;
         }
 
         //
@@ -77,6 +90,7 @@ namespace Dashboard
         private void ParseSgml(string str, SgmlAggregate aggregate)
         {
             char[] blanks = { ' ', '\t', '\n', '\r' };
+            char[] stops = { '<', '\n', '\r' };
 
             // Get next tag
             int indexOfOpenBracket = str.IndexOf('<');
@@ -112,7 +126,7 @@ namespace Dashboard
                         }
 
                         restOfString = value.Substring(endOfAggregate + endTag.Length);
-                        value = value.Substring(0, endOfAggregate - 1);
+                        value = value.Substring(0, endOfAggregate);
 
                         var subAggregate = new SgmlAggregate(tag);
                         aggregate.AddTag(subAggregate);
@@ -123,7 +137,7 @@ namespace Dashboard
                     else
                     {
                         // Element
-                        int endOfValue = value.IndexOfAny(blanks);
+                        int endOfValue = value.IndexOfAny(stops);
 
                         if (endOfValue > 0)
                         {

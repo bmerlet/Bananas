@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dashboard
+namespace OfxClient.Data
 {
     // base class for sgml entities
     public abstract class SgmlTag
@@ -109,7 +109,7 @@ namespace Dashboard
 
         private string FindValue(string[] tagNames, int index)
         {
-            foreach(var st in Tags)
+            foreach (var st in Tags)
             {
                 if (st.Tag == tagNames[index])
                 {

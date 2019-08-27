@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dashboard
+using OfxClient.Data;
+
+namespace OfxClient.Serializers
 {
-    public class OfxRequestBuilder
+    public class RequestBuilder
     {
         public readonly FinancialInstitution FinancialInstitution;
 
@@ -19,7 +21,7 @@ namespace Dashboard
         private int cookie = 0;
 
         // Constructor
-        public OfxRequestBuilder(FinancialInstitution financialInstitution)
+        public RequestBuilder(FinancialInstitution financialInstitution)
         {
             this.FinancialInstitution = financialInstitution;
             newFileId = GenerateNewTransactionId();
@@ -125,6 +127,28 @@ namespace Dashboard
 
             return GetStringFromMessageSet(messageSet);
         }
+
+        static public string GetSignonStatus(OfxDocument doc)
+        {
+            string[] tags = { "SIGNONMSGSRSV1", "SONRS", "STATUS", "CODE" };
+
+            return doc.Sgml.FindValue(tags);
+        }
+
+        static public string GetProfileStatus(OfxDocument doc)
+        {
+            string[] tags = { "PROFMSGSRSV1", "PROFTRNRS", "STATUS", "CODE" };
+
+            return doc.Sgml.FindValue(tags);
+        }
+
+        static public string GetCoreUrl(OfxDocument profileDoc)
+        {
+            string[] tags = { "PROFMSGSRSV1", "PROFTRNRS", "PROFRS", "MSGSETLIST", "SIGNUPMSGSET", "SIGNUPMSGSETV1", "MSGSETCORE", "URL" };
+
+            return profileDoc.Sgml.FindValue(tags);
+        }
+
 
         private string GetStringFromMessageSet(SgmlAggregate messageSet)
         {
@@ -313,6 +337,4 @@ namespace Dashboard
             return fiInfo;
         }
     }
-
-
 }
