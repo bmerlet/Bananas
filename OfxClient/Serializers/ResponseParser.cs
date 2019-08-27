@@ -13,7 +13,7 @@ namespace OfxClient.Serializers
         //
         // Entry point: Parse all
         //
-       static  public OfxDocument Parse(string str)
+        static public OfxDocument Parse(string str)
         {
             OfxDocument result = null;
 
@@ -76,7 +76,7 @@ namespace OfxClient.Serializers
                 int endOfSgmlIx = ofxStr.IndexOf("</OFX>");
                 if (endOfSgmlIx > 0)
                 {
-                    ofxStr = ofxStr.Substring(0, endOfSgmlIx - 1);
+                    ofxStr = ofxStr.Substring(0, endOfSgmlIx);
                     ParseSgml(ofxStr, ofxAggregate);
                 }
             }
