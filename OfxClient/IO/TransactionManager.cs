@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,17 +18,25 @@ namespace OfxClient.IO
 
         static TransactionManager()
         {
-            httpClient = new HttpClient();
+            // Use Quicken client certificate
+            var handler = new HttpClientHandler();
+            var x = System.IO.File.ReadAllText("C:\\Program Files (x86)\\Quicken\\certs\\f73e89fd.0");
+            var certificate = new X509Certificate2("C:\\Program Files (x86)\\Quicken\\certs\\f73e89fd.0");
+            handler.ClientCertificates.Add(certificate);
+            handler.ClientCertificateOptions = ClientCertificateOption.Automatic;
+            
+            httpClient = new HttpClient(handler);
 
             // Only accept x-ofx
             httpClient.DefaultRequestHeaders.Accept.Clear();
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
+            //httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/x-ofx"));
             //httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/plain")); // AFS returns plain text
 
             // Headers
-            httpClient.DefaultRequestHeaders.Add("User-Agent", "Dashboard 1.0");
-            //httpClient.DefaultRequestHeaders.Add("User-Agent", "QWIN");
+            //httpClient.DefaultRequestHeaders.Add("User-Agent", "Dashboard 1.0");
+            httpClient.DefaultRequestHeaders.Add("User-Agent", "QWIN");
+
         }
 
         public OfxDocument Transact(OfxRequest ofxRequest, List<IEnumerable<string>> cookies)

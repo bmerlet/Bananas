@@ -126,11 +126,11 @@ namespace Dashboard
 
         public void Connect()
         {
-            //Connect("Test", "USERNAME", "PASSWORD", null);
+            //Connect("6666", "USERNAME", "PASSWORD", null); // Rascal
             //Connect("Reference", "GnuCash", "gcash", null);
-            Connect("15103", "NotreFric", "4G0r1lla5", null);
+            Connect("15103", "NotreFric", "ZZZZZZZZ", null); // Vanguard
             //Connect("Fidelity", "5847654", "def", null);
-            //Connect("AFS", "025781392", "C0l0mb13n", null);
+            //Connect("7779", "025781392", "ZZZZZZZZZ", null); // AFS
             //Connect("Chase", "", "", null);
         }
 
@@ -142,7 +142,7 @@ namespace Dashboard
             var transactionManager = new TransactionManager();
 
             // Create profile transaction request
-            OfxRequest request = new ProfileRequest("15103");
+            OfxRequest request = new ProfileRequest(fi);
 
             // Transact profile request
             var profileDoc = transactionManager.Transact(request, cookies);
@@ -175,67 +175,6 @@ namespace Dashboard
 
             // Success
             return accountsDoc.Error;
-        }
-    }
-
-    //
-    // Local listener for debug
-    //
-    public class Listener
-    {
-        private TcpListener listener;
-
-        public Listener()
-        {
-            // Create listener
-            listener = new TcpListener(IPAddress.Any, 80);
-
-            // Start listening for client requests.
-            listener.Start();
-
-            // Async
-            listener.BeginAcceptTcpClient(ProcessConnection, listener);
-        }
-
-        private void ProcessConnection(IAsyncResult ar)
-        {
-            var listener = (TcpListener)ar.AsyncState;
-
-            TcpClient client = listener.EndAcceptTcpClient(ar);
-
-            int sz = client.Available;
-            if (sz > 0)
-            {
-                var buf = new byte[sz];
-                client.GetStream().Read(buf, 0, sz);
-
-                string stringTransferred = Encoding.ASCII.GetString(buf, 0, sz);
-
-                Console.WriteLine($"Header:\n{stringTransferred}");
-                Console.WriteLine($"Size of header is {sz}");
-
-                string search = "\nContent-Length: ";
-                int lenIx = stringTransferred.IndexOf(search);
-                if (lenIx >= 0)
-                {
-                    string contentLength = stringTransferred.Substring(lenIx + search.Length).Split('\n')[0];
-                    int contentSize = int.Parse(contentLength);
-
-                    var contentBuf = new byte[contentSize];
-
-                    client.GetStream().Read(contentBuf, 0, contentSize);
-
-                    string content = Encoding.ASCII.GetString(contentBuf, 0, contentSize);
-
-                    Console.WriteLine($"Content:\n{content}");
-                    Console.WriteLine($"Size of content is {contentSize}");
-                }
-            }
-
-            client.Close();
-            client.Dispose();
-
-            listener.BeginAcceptTcpClient(ProcessConnection, listener);
         }
     }
 }

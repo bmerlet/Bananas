@@ -62,18 +62,25 @@ namespace OfxClient.Data
         static FinancialInstitution()
         {
             FinancialInstitutions = new Dictionary<string, FinancialInstitution>();
-            FinancialInstitutions["Test"] = new FinancialInstitution(
-                "Test", "6666", "http://127.0.0.1/go-ofx", false, true, true, false, false);
+            // Test listener
+            FinancialInstitutions["6666"] = new FinancialInstitution(
+                "Test", "6666", "http://my.benoit.com/", false, true, true, false, false);
+            // Reference fake institution (does not work)
             FinancialInstitutions["Reference"] = new FinancialInstitution(
                 "ReferenceFI", "00000", "https://ofx.innovision.com", true, true, true, false, true);
-            FinancialInstitutions["AFS"] = new FinancialInstitution(
+            // American funds
+            FinancialInstitutions["7779"] = new FinancialInstitution(
                 "INTUIT", "7779", "https://ofx3.financialtrans.com/tf/OFXServer?tx=OFXController&cz=702110804131918&cl=50900132018", false, true, true, false, false);
+            // Vanguard
             FinancialInstitutions["15103"] = new FinancialInstitution(
                 "Vanguard", "15103", "https://vesnc.vanguard.com/us/OfxProfileServlet", false, true, true, false, false);
-            FinancialInstitutions["Fidelity"] = new FinancialInstitution(
+            // Fidelity
+            FinancialInstitutions["7776"] = new FinancialInstitution(
                 "fidelity.com", "7776", "https://ofx.fidelity.com/ftgw/OFX/clients/download", false, true, true, false, false);
-            FinancialInstitutions["Chase"] = new FinancialInstitution(
+            // Chase
+            FinancialInstitutions["10898"] = new FinancialInstitution(
                 "B1", "10898", "https://ofx.chase.com", true, false, true, false, true);
+            // Intuit itself, to get FI information
             FinancialInstitutions["Intuit"] = new FinancialInstitution(
                 null, null, "https://ofx-prod-brand.intuit.com/qw2800/fib.dll", false, false, false, false, false);
         }

@@ -10,8 +10,6 @@ namespace Dashboard
     {
         #region Constructor
 
-        //private Listener listener = new Listener();
-
         public MainWindowLogic(Action Exit)
         {
             InfoCommand = new UICommand(Info);

@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.779
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rascal", "Rascal.csproj", "{93648943-1CD4-4017-A968-0F2A3093F426}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{93648943-1CD4-4017-A968-0F2A3093F426}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93648943-1CD4-4017-A968-0F2A3093F426}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93648943-1CD4-4017-A968-0F2A3093F426}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93648943-1CD4-4017-A968-0F2A3093F426}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {355CD84E-84F1-488E-B99C-2F0A7BCDB3AA}
+	EndGlobalSection
+EndGlobal
