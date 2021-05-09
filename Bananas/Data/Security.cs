@@ -30,7 +30,8 @@ namespace Bananas.Data
                 foreach (var securityPriceRow in GetChildRows(securityToSecurityPrice))
                 {
                     var securityPrice = securityPriceRow as SecurityPricesRow;
-                    if (securityPrice.Date.Ticks > mostRecent.Ticks)
+
+                    if (securityPrice.Date.CompareTo(mostRecent) > 0)
                     {
                         mostRecent = securityPrice.Date;
                         price = securityPrice.Value;

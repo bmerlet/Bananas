@@ -44,8 +44,8 @@ namespace Bananas.Data
                 security = household.Securities.FindByID(investmentTransaction.SecurityID);
             }
 
-            // Ah, take the commission first!
-            cashBalance -= investmentTransaction.Commission;
+            // Don't! The commission is taken into account in the transaction's amount
+            //cashBalance -= investmentTransaction.Commission;
 
             switch (investmentTransaction.Type)
             {
@@ -58,6 +58,7 @@ namespace Bananas.Data
                 case EInvestmentTransactionType.TransferCashIn:
                 case EInvestmentTransactionType.TransferMiscellaneousIncomeIn:
                 case EInvestmentTransactionType.ReturnOnCapital:
+                case EInvestmentTransactionType.Exercise:
                     cashBalance += transaction.GetAmount();
                     break;
 
@@ -89,7 +90,6 @@ namespace Bananas.Data
 
                 case EInvestmentTransactionType.Grant:
                 case EInvestmentTransactionType.Vest:
-                case EInvestmentTransactionType.Exercise:
                 case EInvestmentTransactionType.Expire:
                     break;
 
@@ -144,11 +144,15 @@ namespace Bananas.Data
         public decimal GetValuation(Household household)
         {
             decimal val = cashBalance;
+            decimal sum = 0;
 
             foreach (var lot in lots)
             {
                 val += lot.GetValuation();
+                sum += lot.Security.Name.Contains("TOTAL STOCK") ? lot.Quantity : 0;
             }
+
+            Console.WriteLine("Sum " + sum);
 
             return val;
         }

@@ -790,8 +790,12 @@ namespace Bananas.Data
                 // Parse date
                 subComps = comps[2].Split('"');
                 var date = ParseDate(subComps[1]);
+                if (date.CompareTo(DateTime.Now) <= 0)
+                {
+                    household.SecurityPrices.Add(securityRow, date, price);
+                }
 
-                household.SecurityPrices.Add(securityRow, date, price);
+
             }
         }
 
