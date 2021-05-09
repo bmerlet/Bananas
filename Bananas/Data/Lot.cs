@@ -12,36 +12,41 @@ namespace Bananas.Data
 {
     class Lot
     {
-        DateTime date;
-        Household.SecuritiesRow security;
-        decimal quantity;
-
         public Lot(DateTime date, Household.SecuritiesRow security, decimal quantity)
         {
-            this.date = date;
-            this.security = security;
-            this.quantity = quantity;
+            Date = date;
+            Security = security;
+            Quantity = quantity;
         }
 
-        public DateTime Date
-        {
-            get { return date; }
-        }
+        public DateTime Date;
 
-        public Household.SecuritiesRow Security
-        {
-            get { return security; }
-        }
+        public Household.SecuritiesRow Security { get; private set; }
 
-        public decimal Quantity
-        {
-            get { return quantity; }
-        }
+        public decimal Quantity { get; private set; }
 
         public decimal GetValuation()
         {
-            decimal price = security.GetMostRecentPrice();
-            return price * quantity;
+            decimal price = Security.GetMostRecentPrice();
+            return price * Quantity;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return
+                obj is Lot o &&
+                o.Date == Date &&
+                o.Security == Security &&
+                o.Quantity == Quantity;
+        }
+
+        public override int GetHashCode()
+        {
+            int hashCode = 1531903380;
+            hashCode = hashCode * -1521134295 + Date.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<Household.SecuritiesRow>.Default.GetHashCode(Security);
+            hashCode = hashCode * -1521134295 + Quantity.GetHashCode();
+            return hashCode;
         }
     }
 }

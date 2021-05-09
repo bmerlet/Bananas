@@ -134,8 +134,8 @@ namespace Bananas.GUI
             var l = new Label();
             l.BackColor = Color.Transparent;
             l.Text = text;
-            //l.Anchor = AnchorStyles.None;
-            l.TextAlign = (rightAlign) ? ContentAlignment.MiddleRight : ContentAlignment.MiddleLeft;
+            l.Anchor = rightAlign ? AnchorStyles.Right : AnchorStyles.Left;
+            l.TextAlign = rightAlign ? ContentAlignment.MiddleRight : ContentAlignment.MiddleLeft;
 
             tableLayoutPanelMain.Controls.Add(l, col, row);
             if (span)
@@ -150,7 +150,8 @@ namespace Bananas.GUI
             l.Text = text;
             l.Links.Add(0, text.Length, data);
             l.LinkClicked += accountLink_LinkClicked;
-            //l.Anchor = AnchorStyles.Left;
+            l.Anchor = AnchorStyles.Left;
+            l.TextAlign = ContentAlignment.MiddleLeft;
             l.Width = l.PreferredWidth;
             tableLayoutPanelMain.Controls.Add(l, col, row);
             if (span)

@@ -52,9 +52,12 @@ namespace Bananas.Data
                 case EInvestmentTransactionType.Cash:
                 case EInvestmentTransactionType.InterestIncome:
                 case EInvestmentTransactionType.Dividends:
+                case EInvestmentTransactionType.ShortTermCapitalGains:
+                case EInvestmentTransactionType.LongTermCapitalGains:
                 case EInvestmentTransactionType.TransferCash:
                 case EInvestmentTransactionType.TransferCashIn:
                 case EInvestmentTransactionType.TransferMiscellaneousIncomeIn:
+                case EInvestmentTransactionType.ReturnOnCapital:
                     cashBalance += transaction.GetAmount();
                     break;
 
@@ -89,6 +92,15 @@ namespace Bananas.Data
                 case EInvestmentTransactionType.Exercise:
                 case EInvestmentTransactionType.Expire:
                     break;
+
+                // ZZZ
+                case EInvestmentTransactionType.TransferDividends:
+                case EInvestmentTransactionType.TransferLongTermCapitalGains:
+                case EInvestmentTransactionType.TransferShortTermCapitalGains:
+                    break;
+
+                default:
+                    throw new InvalidOperationException("Unknown operation " + investmentTransaction.Type);
             }
         }
 
@@ -102,15 +114,25 @@ namespace Bananas.Data
             // ZZZ FIFO for now
             while (quantity > 0)
             {
-                if (quantity >= lots[0].Quantity)
+                // Find most ancient lot for this security
+                var lot = lots.FirstOrDefault(l => l.Security.ID == security.ID);
+                if (lot == null)
                 {
-                    quantity -= lots[0].Quantity;
-                    lots.RemoveAt(0);
+                    throw new InvalidOperationException("Cannot find lot to remove shares from");
+                }
+
+                if (quantity >= lot.Quantity)
+                {
+                    // Delete the lot
+                    quantity -= lot.Quantity;
+                    lots.Remove(lot);
                 }
                 else
                 {
-                    decimal newLotQuantity = lots[0].Quantity - quantity;
-                    lots[0] = new Lot(lots[0].Date, lots[0].Security, newLotQuantity);
+                    // Remove shares from the lot
+                    var ix = lots.IndexOf(lot);
+                    decimal newLotQuantity = lot.Quantity - quantity;
+                    lots[ix] = new Lot(lot.Date, lot.Security, newLotQuantity);
                     quantity = 0;
                 }
             }

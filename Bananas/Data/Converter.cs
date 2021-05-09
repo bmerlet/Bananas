@@ -554,6 +554,9 @@ namespace Bananas.Data
                         lineItemHolder.target = ParseTransactionTarget(household, account, l.Substring(1), out lineItemHolder.transfer);
                         break;
 
+                    case 'A':
+                        // Address (up to 6 lines) - ignore.
+                        break;
 
                     default:
                         throw new InvalidDataException("Unknown transaction attribute: " + l);
@@ -953,8 +956,17 @@ namespace Bananas.Data
                 case "Div":
                     type = EInvestmentTransactionType.Dividends;
                     break;
+                case "DivX":
+                    type = EInvestmentTransactionType.TransferDividends;
+                    break;
                 case "ReinvDiv":
                     type = EInvestmentTransactionType.ReinvestDividends;
+                    break;
+                case "CGShort":
+                    type = EInvestmentTransactionType.ShortTermCapitalGains;
+                    break;
+                case "CGShortX":
+                    type = EInvestmentTransactionType.TransferShortTermCapitalGains;
                     break;
                 case "ReinvSh":
                     type = EInvestmentTransactionType.ReinvestShortTermCapitalGains;
@@ -962,14 +974,23 @@ namespace Bananas.Data
                 case "ReinvMd":
                     type = EInvestmentTransactionType.ReinvestMediumTermCapitalGains;
                     break;
+                case "CGLong":
+                    type = EInvestmentTransactionType.LongTermCapitalGains;
+                    break;
+                case "CGLongX":
+                    type = EInvestmentTransactionType.TransferLongTermCapitalGains;
+                    break;
                 case "ReinvLg":
                     type = EInvestmentTransactionType.ReinvestLongTermCapitalGains;
+                    break;
+                case "RtrnCap":
+                    type = EInvestmentTransactionType.ReturnOnCapital;
                     break;
                 case "Grant":
                     type = EInvestmentTransactionType.Grant;
                     break;
                 case "Vest":
-                    type = EInvestmentTransactionType.Grant;
+                    type = EInvestmentTransactionType.Vest;
                     break;
                 case "Exercise":
                     type = EInvestmentTransactionType.Exercise;
