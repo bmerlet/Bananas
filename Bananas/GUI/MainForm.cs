@@ -59,10 +59,7 @@ namespace Bananas.GUI
         public void accountListUC_AccountClicked(object sender, AccountClickedEventArgs e)
         {
             // Propagate the event to local subscribers
-            if (AccountClicked != null)
-            {
-                AccountClicked(sender, e);
-            }
+            AccountClicked?.Invoke(sender, e);
         }
 
         #region File menu

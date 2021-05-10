@@ -137,6 +137,8 @@ namespace Bananas.GUI
             this.dataGridView.AutoGenerateColumns = false;
             this.dataGridView.Columns.Clear();
 
+            var rightAlignedCellStyle = new DataGridViewCellStyle() { Alignment =DataGridViewContentAlignment.MiddleRight };
+
             displayTable.Columns.Add("Date", typeof(DateTime));
             {
                 var col = new CalendarColumn();
@@ -183,6 +185,7 @@ namespace Bananas.GUI
                 var col = new DataGridViewTextBoxColumn();
                 col.Name = "Payment";
                 col.DataPropertyName = "Payment";
+                col.DefaultCellStyle = rightAlignedCellStyle;
                 this.dataGridView.Columns.Add(col);
             }
 
@@ -198,14 +201,16 @@ namespace Bananas.GUI
             {
                 var col = new DataGridViewTextBoxColumn();
                 col.Name = "Deposit";
+                col.DefaultCellStyle = rightAlignedCellStyle;
                 col.DataPropertyName = "Deposit";
                 this.dataGridView.Columns.Add(col);
             }
 
-            displayTable.Columns.Add("Balance", typeof(decimal));
+            displayTable.Columns.Add("Balance", typeof(string));
             {
                 var col = new DataGridViewTextBoxColumn();
                 col.Name = "Balance";
+                col.DefaultCellStyle = rightAlignedCellStyle;
                 col.DataPropertyName = "Balance";
                 this.dataGridView.Columns.Add(col);
             }
@@ -290,10 +295,10 @@ namespace Bananas.GUI
                 dr["Payee"] = (trans.IsPayeeNull()) ? "" : trans.Payee;
                 dr["Memo"] = memo;
                 dr["Category"] = category;
-                dr["Payment"] = (amount >= 0) ? "" : (-amount).ToString();
+                dr["Payment"] = (amount >= 0) ? "" : (-amount).ToString("N");
                 dr["Status"] = (trans.Status == ETransactionStatus.Reconciled) ? "R" : ((trans.Status == ETransactionStatus.Cleared) ? "c" : " ");
-                dr["Deposit"] = (amount >= 0) ? amount.ToString() : "";
-                dr["Balance"] = balance;
+                dr["Deposit"] = (amount >= 0) ? amount.ToString("N") : "";
+                dr["Balance"] = balance.ToString("N");
 
                 displayTable.Rows.Add(dr);
             }
