@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Bananas</RootNamespace>
     <AssemblyName>Bananas</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -44,43 +45,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Data\Account.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Data\BankingTransaction.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Data\Category.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Data\Enums.cs" />
-    <Compile Include="Data\HouseholdDataSet.cs">
-      <DependentUpon>HouseholdDataSet.xsd</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Data\HouseholdDataSet1.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>HouseholdDataSet.xsd</DependentUpon>
-    </Compile>
-    <Compile Include="Data\InvestmentTransaction.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Data\LineItem.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Data\Lot.cs" />
-    <Compile Include="Data\Portfolio.cs" />
-    <Compile Include="Data\Converter.cs" />
-    <Compile Include="Data\Security.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Data\SecurityPrice.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Data\Transaction.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="GUI\AccountListUC.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -124,18 +88,8 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="Data\HouseholdDataSet.xsc">
-      <DependentUpon>HouseholdDataSet.xsd</DependentUpon>
-    </None>
-    <None Include="Data\HouseholdDataSet.xsd">
-      <SubType>Designer</SubType>
-      <Generator>MSDataSetGenerator</Generator>
-      <LastGenOutput>HouseholdDataSet1.Designer.cs</LastGenOutput>
-    </None>
-    <None Include="Data\HouseholdDataSet.xss">
-      <DependentUpon>HouseholdDataSet.xsd</DependentUpon>
-    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -151,6 +105,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\DataSources\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Data\BanaData.csproj">
+      <Project>{236290e0-1e4f-489b-a6b3-0f48ada5b23b}</Project>
+      <Name>BanaData</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

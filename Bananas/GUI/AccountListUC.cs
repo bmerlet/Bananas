@@ -7,7 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Bananas.Data;
+
+using BanaData.Database;
 using Bananas.GUI.Events;
 
 namespace Bananas.GUI
