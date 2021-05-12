@@ -107,7 +107,7 @@
     <Folder Include="Properties\DataSources\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Data\BanaData.csproj">
+    <ProjectReference Include="..\BanaData\BanaData.csproj">
       <Project>{236290e0-1e4f-489b-a6b3-0f48ada5b23b}</Project>
       <Name>BanaData</Name>
     </ProjectReference>

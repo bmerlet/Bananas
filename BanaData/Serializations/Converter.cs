@@ -752,9 +752,6 @@ namespace BanaData.Serializations
                 decimal price = 0;
 
                 // The price may in the m a/b, or a/b format
-                decimal main = 0;
-                decimal num = 0;
-                decimal denom = 0;
                 string mainStr = "0";
                 string numStr = "0";
                 string denomStr = "1";
@@ -779,12 +776,12 @@ namespace BanaData.Serializations
                         throw new InvalidDataException("Garbled security price: " + l);
                 }
 
-                if (!decimal.TryParse(mainStr, out main) ||
-                    !decimal.TryParse(numStr, out num) ||
-                    !decimal.TryParse(denomStr, out denom) ||
+                if (!decimal.TryParse(mainStr, out decimal main) ||
+                    !decimal.TryParse(numStr, out decimal num) ||
+                    !decimal.TryParse(denomStr, out decimal denom) ||
                     denom == 0)
                 {
-                        throw new InvalidDataException("Garbled security price: " + l);
+                    throw new InvalidDataException("Garbled security price: " + l);
                 }
 
                 price = main + num / denom;

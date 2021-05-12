@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bananas", "Bananas\Bananas.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinformsUI", "WinformsUI\WinformsUI.csproj", "{DA0CCB4E-9A8D-478C-BBFC-E74F26F4854E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BanaData", "Data\BanaData.csproj", "{236290E0-1E4F-489B-A6B3-0F48ADA5B23B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BanaData", "BanaData\BanaData.csproj", "{236290E0-1E4F-489B-A6B3-0F48ADA5B23B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

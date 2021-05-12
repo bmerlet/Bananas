@@ -21,7 +21,7 @@ namespace Bananas.GUI
 {
     public partial class MainForm : Form
     {
-        private Household household;
+        private readonly Household household;
 
         public MainForm()
         {

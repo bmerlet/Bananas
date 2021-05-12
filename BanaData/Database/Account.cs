@@ -67,7 +67,7 @@ namespace BanaData.Database
                 }
 
                 // Get latest price for the securities in the portfolio
-                return portfolio.GetValuation(household);
+                return portfolio.GetValuation();
             }
         }
 

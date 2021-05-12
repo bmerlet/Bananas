@@ -14,7 +14,7 @@ namespace BanaData.Database
     class Portfolio
     {
         decimal cashBalance;
-        private List<Lot> lots;
+        private readonly List<Lot> lots;
 
         public Portfolio()
         {
@@ -141,18 +141,14 @@ namespace BanaData.Database
             // lots.Add(new Lot(date, security, -quantity));
         }
 
-        public decimal GetValuation(Household household)
+        public decimal GetValuation()
         {
             decimal val = cashBalance;
-            decimal sum = 0;
 
             foreach (var lot in lots)
             {
                 val += lot.GetValuation();
-                sum += lot.Security.Name.Contains("TOTAL STOCK") ? lot.Quantity : 0;
             }
-
-            Console.WriteLine("Sum " + sum);
 
             return val;
         }

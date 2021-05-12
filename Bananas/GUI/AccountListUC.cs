@@ -18,8 +18,8 @@ namespace Bananas.GUI
         private const int rowHeight = 20;
         private const int rowHeightMargin = 3;
         private MainForm mainForm;
-        private ToolTip toolTip;
-        private List<int> headerRows;
+        private readonly ToolTip toolTip;
+        private readonly List<int> headerRows;
 
         public AccountListUC()
         {
@@ -38,7 +38,7 @@ namespace Bananas.GUI
             // Ask to be notified of data changes
             if (this.mainForm != null)
             {
-                this.mainForm.HouseholdChanged += mainForm_HouseholdChanged;
+                this.mainForm.HouseholdChanged += MainForm_HouseholdChanged;
 
                 // Load the current dataset
                 if (mainForm.Household != null)
@@ -49,7 +49,7 @@ namespace Bananas.GUI
  
         }
 
-        void mainForm_HouseholdChanged(object sender, EventArgs e)
+        void MainForm_HouseholdChanged(object sender, EventArgs e)
         {
             AutoScrollPosition = new Point(0, 0);
             LoadAccounts();
