@@ -10,20 +10,20 @@ using Toolbox.UILogic;
 
 namespace BanaData.Logic.Main
 {
-    public class AccountGroup : LogicBase
+    public class AccountGroupLogic : LogicBase
     {
         public enum EType { Banking, Investment, Asset };
 
         #region Private members
 
-        private MainWindow mainWindow;
+        private MainWindowLogic mainWindow;
         private EType type;
 
         #endregion
 
         #region Constructor
 
-        public AccountGroup(MainWindow mainWindow, EType type)
+        public AccountGroupLogic(MainWindowLogic mainWindow, EType type)
         {
             this.mainWindow = mainWindow;
             this.type = type;

@@ -11,17 +11,17 @@ using BanaData.Logic.Dialogs;
 
 namespace BanaData.Logic.Main
 {
-    public class MainMenu
+    public class MainMenuLogic
     {
         #region Private members
 
-        private readonly MainWindow mainWindow;
+        private readonly MainWindowLogic mainWindow;
 
         #endregion
 
         #region Constructor
 
-        public MainMenu(MainWindow main)
+        public MainMenuLogic(MainWindowLogic main)
         {
             this.mainWindow = main;
 
