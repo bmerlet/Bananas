@@ -32,13 +32,15 @@ namespace WinformsUI.Forms
             accountGroup.Init(logic);
 
             // Set window to location specified by logic (if initialized)
-            //if (logic.Width > 40 && logic.Height > 40)
-                if (false)
+            if (logic.Width > 40 && logic.Height > 40)
             {
                 SetBounds(logic.LeftX, logic.TopY, logic.Width, logic.Height);
                 //splitContainerMain.SplitterDistance = logic.SplitterX;
                 accountGroup.UpdateSize();
             }
+
+            // Initial state
+            closedAccountsToolStripMenuItem.Checked = !logic.HideClosedAccounts;
 
             // Subscribe to main window events
             logic.PropertyChanged += OnPropertyChanged;
@@ -63,15 +65,22 @@ namespace WinformsUI.Forms
 
         #region Changes from user
 
+        private void OnClosedAccountsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            logic.HideClosedAccounts = !closedAccountsToolStripMenuItem.Checked;
+            accountGroup.UpdateSize();
+        }
+
         private void MainForm_SizeChanged(object sender, EventArgs e)
         {
+            logic.SplitterX = splitContainerMain.SplitterDistance;
             accountGroup.UpdateSize();
         }
 
         private void SplitContainerMain_SplitterMoved(object sender, SplitterEventArgs e)
         {
             accountGroup.UpdateSize();
-            logic.SplitterX = e.SplitX;
+            logic.SplitterX = splitContainerMain.SplitterDistance;
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)

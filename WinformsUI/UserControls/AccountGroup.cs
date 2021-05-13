@@ -234,6 +234,9 @@ namespace WinformsUI.UserControls
             UpdateSize(tableLayoutPanelInvestmentAccounts);
             UpdateSize(tableLayoutPanelAssetAccounts);
             UpdateSize(tableLayoutPanelNetWorth);
+
+            // ZZZZ Why?
+            Dock = DockStyle.Fill;
         }
 
         private void UpdateSize(TableLayoutPanel tbl)

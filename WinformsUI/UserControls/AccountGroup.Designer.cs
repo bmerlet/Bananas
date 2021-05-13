@@ -42,6 +42,8 @@ namespace WinformsUI.UserControls
             // 
             // tableLayoutPanelBankAccounts
             // 
+            this.tableLayoutPanelBankAccounts.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanelBankAccounts.ColumnCount = 2;
             this.tableLayoutPanelBankAccounts.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanelBankAccounts.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80F));
@@ -49,11 +51,13 @@ namespace WinformsUI.UserControls
             this.tableLayoutPanelBankAccounts.Name = "tableLayoutPanelBankAccounts";
             this.tableLayoutPanelBankAccounts.RowCount = 1;
             this.tableLayoutPanelBankAccounts.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 103F));
-            this.tableLayoutPanelBankAccounts.Size = new System.Drawing.Size(200, 25);
+            this.tableLayoutPanelBankAccounts.Size = new System.Drawing.Size(214, 25);
             this.tableLayoutPanelBankAccounts.TabIndex = 0;
             // 
             // tableLayoutPanelInvestmentAccounts
             // 
+            this.tableLayoutPanelInvestmentAccounts.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanelInvestmentAccounts.ColumnCount = 2;
             this.tableLayoutPanelInvestmentAccounts.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanelInvestmentAccounts.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80F));
@@ -61,11 +65,13 @@ namespace WinformsUI.UserControls
             this.tableLayoutPanelInvestmentAccounts.Name = "tableLayoutPanelInvestmentAccounts";
             this.tableLayoutPanelInvestmentAccounts.RowCount = 1;
             this.tableLayoutPanelInvestmentAccounts.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 103F));
-            this.tableLayoutPanelInvestmentAccounts.Size = new System.Drawing.Size(200, 24);
+            this.tableLayoutPanelInvestmentAccounts.Size = new System.Drawing.Size(214, 24);
             this.tableLayoutPanelInvestmentAccounts.TabIndex = 1;
             // 
             // tableLayoutPanelAssetAccounts
             // 
+            this.tableLayoutPanelAssetAccounts.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanelAssetAccounts.ColumnCount = 2;
             this.tableLayoutPanelAssetAccounts.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanelAssetAccounts.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80F));
@@ -73,7 +79,7 @@ namespace WinformsUI.UserControls
             this.tableLayoutPanelAssetAccounts.Name = "tableLayoutPanelAssetAccounts";
             this.tableLayoutPanelAssetAccounts.RowCount = 1;
             this.tableLayoutPanelAssetAccounts.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 23F));
-            this.tableLayoutPanelAssetAccounts.Size = new System.Drawing.Size(200, 23);
+            this.tableLayoutPanelAssetAccounts.Size = new System.Drawing.Size(214, 23);
             this.tableLayoutPanelAssetAccounts.TabIndex = 2;
             // 
             // tableLayoutPanelNetWorth
@@ -87,14 +93,14 @@ namespace WinformsUI.UserControls
             this.tableLayoutPanelNetWorth.Name = "tableLayoutPanelNetWorth";
             this.tableLayoutPanelNetWorth.RowCount = 1;
             this.tableLayoutPanelNetWorth.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 23F));
-            this.tableLayoutPanelNetWorth.Size = new System.Drawing.Size(200, 23);
+            this.tableLayoutPanelNetWorth.Size = new System.Drawing.Size(214, 23);
             this.tableLayoutPanelNetWorth.TabIndex = 3;
             // 
             // labelNetWorthValue
             // 
             this.labelNetWorthValue.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.labelNetWorthValue.AutoSize = true;
-            this.labelNetWorthValue.Location = new System.Drawing.Point(169, 5);
+            this.labelNetWorthValue.Location = new System.Drawing.Point(183, 5);
             this.labelNetWorthValue.Name = "labelNetWorthValue";
             this.labelNetWorthValue.Size = new System.Drawing.Size(28, 13);
             this.labelNetWorthValue.TabIndex = 1;

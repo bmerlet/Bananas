@@ -89,6 +89,12 @@ namespace BanaData.Logic.Main
                     acct.GetInvestmentValue() :
                     acct.GetBankingBalance();
 
+                // Skip closed empty accounts if required
+                if (mainWindow.HideClosedAccounts && acct.Name.StartsWith("_CLOSED") && balance == 0)
+                {
+                    continue;
+                }
+
                 if (AccountsAndBalances.Count <= ix ||
                     AccountsAndBalances[ix].AccountID != acct.ID ||
                     AccountsAndBalances[ix].AccountName != acct.Name ||
@@ -112,7 +118,7 @@ namespace BanaData.Logic.Main
             // Truncate
             while(AccountsAndBalances.Count > ix)
             {
-                AccountsAndBalances.RemoveAt(ix - 1);
+                AccountsAndBalances.RemoveAt(ix);
             }
 
             var totalBalanceStr = totalBalance.ToString("N");

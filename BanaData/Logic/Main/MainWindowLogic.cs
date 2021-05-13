@@ -87,6 +87,12 @@ namespace BanaData.Logic.Main
             set => UserSettings.AccountWidth = value;
         }
 
+        public bool HideClosedAccounts
+        {
+            get => UserSettings.HideClosedAccounts;
+            set { UserSettings.HideClosedAccounts = value; UpdateAll(); }
+        }
+
         // The accounts and balances displayed on the left side
         public AccountGroupLogic BankAccountGroup { get; private set; }
         public AccountGroupLogic InvestmentAccountGroup { get; private set; }
