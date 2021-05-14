@@ -117,7 +117,7 @@ namespace BanaData.Logic.Main
                     AccountsAndBalances[ix].AccountName != acct.Name ||
                     AccountsAndBalances[ix].DecimalBalance != balance)
                 {
-                    var aab = new AccountAndBalance(acct.ID, acct.Name, balance);
+                    var aab = new AccountAndBalance(this, acct.ID, acct.Name, balance);
                     if (ix < AccountsAndBalances.Count)
                     {
                         AccountsAndBalances[ix] = aab;
@@ -163,9 +163,7 @@ namespace BanaData.Logic.Main
 
         public class AccountAndBalance
         {
-            private readonly AccountGroupLogic accountGroup;
-
-            public AccountAndBalance(int accountID, string accountName, decimal balance)
+            public AccountAndBalance(AccountGroupLogic accountGroup, int accountID, string accountName, decimal balance)
             {
                 AccountID = accountID;
                 AccountName = accountName;
