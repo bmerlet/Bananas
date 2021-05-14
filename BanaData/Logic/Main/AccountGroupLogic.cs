@@ -107,7 +107,7 @@ namespace BanaData.Logic.Main
                     acct.GetBankingBalance();
 
                 // Skip closed empty accounts if required
-                if (!mainWindow.MainMenuLogic.ShowClosedAccounts && acct.Name.StartsWith("_CLOSED") && balance == 0)
+                if (!mainWindow.MainMenuLogic.ShowClosedAccounts && acct.Name.Contains("CLOSED") && balance == 0)
                 {
                     continue;
                 }
@@ -184,7 +184,7 @@ namespace BanaData.Logic.Main
             public string Balance { get; }
 
             // Command to execute when clicking on the account
-            public CommandBase GoToAccount;
+            public CommandBase GoToAccount { get; }
         }
 
         #endregion

@@ -62,6 +62,9 @@
     <Compile Include="UserControls\AccountGroup.xaml.cs">
       <DependentUpon>AccountGroup.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\BankRegister.xaml.cs">
+      <DependentUpon>BankRegister.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -75,6 +78,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="UserControls\AccountGroup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\BankRegister.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

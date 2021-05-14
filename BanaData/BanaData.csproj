@@ -65,6 +65,7 @@
     <Compile Include="Database\Transaction.cs" />
     <Compile Include="Logic\IGuiServices.cs" />
     <Compile Include="Logic\Main\AccountGroupLogic.cs" />
+    <Compile Include="Logic\Main\BankRegisterLogic.cs" />
     <Compile Include="Logic\Main\MainWindowLogic.cs" />
     <Compile Include="Logic\Main\MainMenuLogic.cs" />
     <Compile Include="Logic\Dialogs\OpenFileLogic.cs" />

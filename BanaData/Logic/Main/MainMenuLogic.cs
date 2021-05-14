@@ -39,12 +39,7 @@ namespace BanaData.Logic.Main
             OpenFileLogic logic = new OpenFileLogic(ZZZfile, "Banana files (*.ban)|*.ban|Quicken Interchange Format files (*.QIF)|*.QIF|Any file (*.*)|*.*");
             if (mainWindow.GuiServices.ShowDialog(logic))
             {
-                var file = logic.File;
-                if (file.EndsWith(".QIF", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    Converter.ConvertFromQIF(file, mainWindow.Household);
-                    mainWindow.UpdateAll();
-                }
+                mainWindow.OpenFile(logic.File);
             }
         }
 

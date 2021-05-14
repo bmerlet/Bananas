@@ -37,8 +37,18 @@ namespace BanaData.Logic.Main
             BankAccountGroup = new AccountGroupLogic(this, AccountGroupLogic.EType.Banking);
             InvestmentAccountGroup = new AccountGroupLogic(this, AccountGroupLogic.EType.Investment);
             AssetAccountGroup = new AccountGroupLogic(this, AccountGroupLogic.EType.Asset);
+            BankRegister = new BankRegisterLogic(this);
 
-            UpdateAll();
+            BankAccountGroup.AccountClicked += (o, e) => OnBankAccountClicked(e.AccountID);
+
+            if (UserSettings.LastFileOpened != null)
+            {
+                OpenFile(UserSettings.LastFileOpened);
+            }
+            else
+            {
+                UpdateAll();
+            }
         }
 
         // Gui services
@@ -94,7 +104,20 @@ namespace BanaData.Logic.Main
 
         public string NetWorth { get; private set; }
 
+        // The bank register
+        public BankRegisterLogic BankRegister { get; private set; }
+
         #endregion
+
+        public void OpenFile(string file)
+        {
+            if (file.EndsWith(".QIF", StringComparison.InvariantCultureIgnoreCase))
+            {
+                Converter.ConvertFromQIF(file, Household);
+                UpdateAll();
+                UserSettings.LastFileOpened = file;
+            }
+        }
 
         public void SaveUserSettings()
         {
@@ -112,6 +135,11 @@ namespace BanaData.Logic.Main
 
             NetWorth = netWorth.ToString("N");
             OnPropertyChanged(() => NetWorth);
+        }
+
+        public void OnBankAccountClicked(int accountID)
+        {
+            BankRegister.SetAccount(accountID);
         }
     }
 }
