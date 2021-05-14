@@ -33,7 +33,7 @@ namespace BanaData.Logic.Main
             UserSettings = settingsManager.Load() ?? new UserSettings();
 
             // Create logic for main window subcomponents
-            MainMenu = new MainMenuLogic(this);
+            MainMenuLogic = new MainMenuLogic(this);
             BankAccountGroup = new AccountGroupLogic(this, AccountGroupLogic.EType.Banking);
             InvestmentAccountGroup = new AccountGroupLogic(this, AccountGroupLogic.EType.Investment);
             AssetAccountGroup = new AccountGroupLogic(this, AccountGroupLogic.EType.Asset);
@@ -48,7 +48,7 @@ namespace BanaData.Logic.Main
         public readonly Household Household;
 
         // Main form sub-logics
-        public readonly MainMenuLogic MainMenu;
+        public MainMenuLogic MainMenuLogic { get; }
         // public readonly StatusBar StatusBar;
 
         // User settings
@@ -85,12 +85,6 @@ namespace BanaData.Logic.Main
         {
             get => UserSettings.AccountWidth;
             set => UserSettings.AccountWidth = value;
-        }
-
-        public bool HideClosedAccounts
-        {
-            get => UserSettings.HideClosedAccounts;
-            set { UserSettings.HideClosedAccounts = value; UpdateAll(); }
         }
 
         // The accounts and balances displayed on the left side

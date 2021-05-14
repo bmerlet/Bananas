@@ -16,8 +16,8 @@ namespace BanaData.Logic.Main
 
         #region Private members
 
-        private MainWindowLogic mainWindow;
-        private EType type;
+        private readonly MainWindowLogic mainWindow;
+        private readonly EType type;
 
         #endregion
 
@@ -90,7 +90,7 @@ namespace BanaData.Logic.Main
                     acct.GetBankingBalance();
 
                 // Skip closed empty accounts if required
-                if (mainWindow.HideClosedAccounts && acct.Name.StartsWith("_CLOSED") && balance == 0)
+                if (mainWindow.MainMenuLogic.HideClosedAccounts && acct.Name.StartsWith("_CLOSED") && balance == 0)
                 {
                     continue;
                 }

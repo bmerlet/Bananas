@@ -1,0 +1,55 @@
+﻿<Window x:Class="XamlUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:XamlUI"
+        xmlns:tools="clr-namespace:XamlUI.Tools"
+        xmlns:ucs="clr-namespace:XamlUI.UserControls"
+        mc:Ignorable="d"
+        Title="Bananas" Height="450" Width="800">
+    <Window.Resources>
+        <tools:GridLengthConverter x:Key="gridLengthConverter" />
+    </Window.Resources>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top" DataContext="{Binding MainMenuLogic}">
+            <MenuItem Header="File">
+                <MenuItem Header="Open..." Command="{Binding Open}"/>
+            </MenuItem>
+            <MenuItem Header="View">
+                <MenuItem Header="Show closed accounts" IsCheckable="True" IsChecked="{Binding HideClosedAccounts}"/>
+            </MenuItem>
+        </Menu>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="{Binding SplitterX, Mode=TwoWay, Converter={StaticResource gridLengthConverter}}"/>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <GridSplitter 
+                Grid.Column ="1"
+                Width="3"
+                ShowsPreview="True"
+                HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
+            
+            <!-- Account list-->
+            <ScrollViewer>
+                
+            <DockPanel>
+                <ucs:AccountGroup DataContext="{Binding BankAccountGroup}" DockPanel.Dock="Top"/>
+                <ucs:AccountGroup DataContext="{Binding InvestmentAccountGroup}" DockPanel.Dock="Top"/>
+                <ucs:AccountGroup DataContext="{ Binding AssetAccountGroup}" DockPanel.Dock="Top"/>
+                <Grid DockPanel.Dock="Top">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="100"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Content="Net Worth:"/>
+                    <Label Content="{Binding NetWorth}" Grid.Column="1" HorizontalAlignment="Right"/>
+                </Grid>
+                <Grid/>
+            </DockPanel>
+            </ScrollViewer>
+        </Grid>
+    </DockPanel>
+</Window>

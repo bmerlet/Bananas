@@ -40,7 +40,7 @@ namespace WinformsUI.Forms
             }
 
             // Initial state
-            closedAccountsToolStripMenuItem.Checked = !logic.HideClosedAccounts;
+            closedAccountsToolStripMenuItem.Checked = !logic.MainMenuLogic.HideClosedAccounts;
 
             // Subscribe to main window events
             logic.PropertyChanged += OnPropertyChanged;
@@ -50,7 +50,7 @@ namespace WinformsUI.Forms
 
         private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            logic.MainMenu.Open.Execute();
+            logic.MainMenuLogic.Open.Execute();
         }
 
         #endregion
@@ -67,7 +67,7 @@ namespace WinformsUI.Forms
 
         private void OnClosedAccountsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            logic.HideClosedAccounts = !closedAccountsToolStripMenuItem.Checked;
+            logic.MainMenuLogic.HideClosedAccounts = !closedAccountsToolStripMenuItem.Checked;
             accountGroup.UpdateSize();
         }
 
@@ -104,10 +104,10 @@ namespace WinformsUI.Forms
             {
                 dialog = new OpenFileDialog()
                 {
-                    FileName = System.IO.Path.GetFileName(openFileLogic.File),
-                    InitialDirectory = System.IO.Path.GetDirectoryName(openFileLogic.File),
+                    FileName = openFileLogic.File,
+                    InitialDirectory = openFileLogic.InitialDirectory,
                     RestoreDirectory = false,
-                    Filter = openFileLogic.Extensions,
+                    Filter = openFileLogic.Filter,
                     FilterIndex = 1
                 };
             }
