@@ -47,6 +47,23 @@ namespace BanaData.Logic.Main
 
         #endregion
 
+        #region Events
+
+        public class AccountClickedEventArgs : EventArgs
+        {
+            public AccountClickedEventArgs(int id)
+            {
+                AccountID = id;
+            }
+
+            public readonly int AccountID;
+        }
+
+        // Invoked when an account is clicked
+        public EventHandler<AccountClickedEventArgs> AccountClicked;
+
+        #endregion
+
         #region UI properties
 
         // Name
@@ -90,7 +107,7 @@ namespace BanaData.Logic.Main
                     acct.GetBankingBalance();
 
                 // Skip closed empty accounts if required
-                if (mainWindow.MainMenuLogic.HideClosedAccounts && acct.Name.StartsWith("_CLOSED") && balance == 0)
+                if (!mainWindow.MainMenuLogic.ShowClosedAccounts && acct.Name.StartsWith("_CLOSED") && balance == 0)
                 {
                     continue;
                 }
@@ -133,6 +150,12 @@ namespace BanaData.Logic.Main
             return totalBalance;
         }
 
+        //  Called from AccountAndBalance
+        public void OnAccountClicked(int accountID)
+        {
+            AccountClicked?.Invoke(this, new AccountClickedEventArgs(accountID));
+        }
+
 
         #endregion
 
@@ -140,19 +163,30 @@ namespace BanaData.Logic.Main
 
         public class AccountAndBalance
         {
+            private readonly AccountGroupLogic accountGroup;
+
             public AccountAndBalance(int accountID, string accountName, decimal balance)
             {
                 AccountID = accountID;
                 AccountName = accountName;
                 Balance = balance.ToString("N");
                 DecimalBalance = balance;
+                GoToAccount = new CommandBase(() => accountGroup.OnAccountClicked(accountID));
             }
 
-            public int AccountID { get; }
+            // Properties for logic
+            public readonly decimal DecimalBalance;
+            public readonly int AccountID;
+
+            // UI Properties
+            // Account name
             public string AccountName { get; }
+
+            // Account balance
             public string Balance { get; }
 
-            public readonly decimal DecimalBalance; 
+            // Command to execute when clicking on the account
+            public CommandBase GoToAccount;
         }
 
         #endregion

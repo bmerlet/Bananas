@@ -20,9 +20,9 @@
             <ColumnDefinition Width="100"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="25"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition/>
-            <RowDefinition Height="25"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Header -->
@@ -46,7 +46,11 @@
                     <GridViewColumn>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding AccountName}" TextAlignment="Left" />
+                                <TextBlock>
+                                    <Hyperlink Command="{Binding GoToAccount}">
+                                        <TextBlock Text="{Binding AccountName}"/>
+                                    </Hyperlink>
+                                </TextBlock>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

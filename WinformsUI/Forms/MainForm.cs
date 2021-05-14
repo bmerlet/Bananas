@@ -40,7 +40,7 @@ namespace WinformsUI.Forms
             }
 
             // Initial state
-            closedAccountsToolStripMenuItem.Checked = !logic.MainMenuLogic.HideClosedAccounts;
+            closedAccountsToolStripMenuItem.Checked = logic.MainMenuLogic.ShowClosedAccounts;
 
             // Subscribe to main window events
             logic.PropertyChanged += OnPropertyChanged;
@@ -67,7 +67,7 @@ namespace WinformsUI.Forms
 
         private void OnClosedAccountsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            logic.MainMenuLogic.HideClosedAccounts = !closedAccountsToolStripMenuItem.Checked;
+            logic.MainMenuLogic.ShowClosedAccounts = closedAccountsToolStripMenuItem.Checked;
             accountGroup.UpdateSize();
         }
 

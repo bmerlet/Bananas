@@ -52,10 +52,10 @@ namespace BanaData.Logic.Main
 
         #region View menu
 
-        public bool HideClosedAccounts
+        public bool ShowClosedAccounts
         {
-            get => mainWindow.UserSettings.HideClosedAccounts;
-            set { mainWindow.UserSettings.HideClosedAccounts = value; mainWindow.UpdateAll(); }
+            get => !mainWindow.UserSettings.HideClosedAccounts;
+            set { mainWindow.UserSettings.HideClosedAccounts = !value; mainWindow.UpdateAll(); }
         }
 
         #endregion

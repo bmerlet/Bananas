@@ -17,7 +17,7 @@
                 <MenuItem Header="Open..." Command="{Binding Open}"/>
             </MenuItem>
             <MenuItem Header="View">
-                <MenuItem Header="Show closed accounts" IsCheckable="True" IsChecked="{Binding HideClosedAccounts}"/>
+                <MenuItem Header="Show closed accounts" IsCheckable="True" IsChecked="{Binding ShowClosedAccounts}"/>
             </MenuItem>
         </Menu>
         <Grid>
