@@ -17,6 +17,8 @@ namespace BanaData.Logic.Main
 
         private readonly MainWindowLogic mainWindowLogic;
 
+        private readonly List<string> payees = new List<string>();
+
         #endregion
 
         #region Constructor
@@ -30,9 +32,12 @@ namespace BanaData.Logic.Main
 
         #region UI properties
 
+        // Name of the account
         public string AccountName { get; private set; }
 
-        public DataTable TransactionsDT { get; } = new DataTable();
+        // If banking account (as opposed to credit card)
+        public bool IsBank { get; private set; }
+
         public ObservableCollection<BankingTransaction> Transactions { get; } = new ObservableCollection<BankingTransaction>();
 
         #endregion
@@ -45,28 +50,19 @@ namespace BanaData.Logic.Main
             var household = mainWindowLogic.Household;
             var account = household.Accounts.FindByID(accountID);
 
+            // Export account name
             AccountName = account.Name;
             OnPropertyChanged(() => AccountName);
 
-            // Format data table
+            // Export if banking account
+            IsBank = account.Type == EAccountType.Bank;
+            OnPropertyChanged(() => IsBank);
+
+            // Build payee list
+            BuildPayeeList();
+
+            // Find transactions and put them in the transaction list
             Transactions.Clear();
-            TransactionsDT.Clear();
-            TransactionsDT.Columns.Clear();
-
-            TransactionsDT.Columns.Add("Date", typeof(DateTime));
-            if (account.Type == EAccountType.Bank)
-            {
-                TransactionsDT.Columns.Add("Type", typeof(string));
-            }
-            TransactionsDT.Columns.Add("Payee", typeof(string));
-            TransactionsDT.Columns.Add("Memo", typeof(string));
-            TransactionsDT.Columns.Add("Category", typeof(string));
-            TransactionsDT.Columns.Add("Payment", typeof(string));
-            TransactionsDT.Columns.Add("Status", typeof(string));
-            TransactionsDT.Columns.Add("Deposit", typeof(string));
-            TransactionsDT.Columns.Add("Balance", typeof(string));
-
-            // Find transactions and put them in the data table
             decimal balance = 0;
             var accTransRel = household.Relations["FK_Accounts_Transactions"];
             foreach (var transRow in account.GetChildRows(accTransRel))
@@ -110,25 +106,7 @@ namespace BanaData.Logic.Main
 
                 string memo = (lineItems.Length == 1) ? (lineItems[0].IsMemoNull() ? "" : lineItems[0].Memo) : "";
 
-                // Create new row
-                var dr = TransactionsDT.NewRow();
-
-                dr["Date"] = trans.Date;
-                if (transBank != null)
-                {
-                    dr["Type"] = transBank.GetRegisterMediumString();
-                }
-                dr["Payee"] = (trans.IsPayeeNull()) ? "" : trans.Payee;
-                dr["Memo"] = memo;
-                dr["Category"] = category;
-                dr["Payment"] = (amount >= 0) ? "" : (-amount).ToString("N");
-                dr["Status"] = (trans.Status == ETransactionStatus.Reconciled) ? "R" : ((trans.Status == ETransactionStatus.Cleared) ? "c" : " ");
-                dr["Deposit"] = (amount >= 0) ? amount.ToString("N") : "";
-                dr["Balance"] = balance.ToString("N");
-
-                TransactionsDT.Rows.Add(dr);
-
-                var bt = new BankingTransaction()
+                var bt = new BankingTransaction(payees)
                 {
                     Date = trans.Date,
                     Type = transBank == null ? "" : transBank.GetRegisterMediumString(),
@@ -145,12 +123,30 @@ namespace BanaData.Logic.Main
 
         }
 
+        private void BuildPayeeList()
+        {
+            payees.Clear();
+
+            //mainWindowLogic.Household.Transactions.PayeeColumn.
+            payees.AddRange(
+                mainWindowLogic.Household.Transactions.AsEnumerable()
+                    .Select(s => s.Field<string>("Payee"))
+                    .Distinct());
+
+            payees.Sort();
+        }
+
         #endregion
 
         #region Transaction class
 
         public class BankingTransaction
         {
+            public BankingTransaction(IEnumerable<string> payees)
+            {
+                Payees = payees;
+            }
+
             public DateTime Date { get; set; }
             public string Type { get; set; }
             public string Payee { get; set; }
@@ -160,6 +156,8 @@ namespace BanaData.Logic.Main
             public string Status { get; set; }
             public string Deposit { get; set; }
             public string Balance { get; set; }
+
+            public IEnumerable<string> Payees { get; }
         }
 
     #endregion

@@ -208,7 +208,7 @@ namespace XamlUI.UserControls
 
         private void RefreshListBox()
         {
-            if (listBox != null && popup != null)
+            if (listBox?.ItemsSource != null && popup != null)
             {
                 // Apply filter to listBox.Items.Filter
                 CollectionViewSource.GetDefaultView(listBox.ItemsSource).Refresh();

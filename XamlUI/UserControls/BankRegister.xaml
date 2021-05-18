@@ -7,6 +7,16 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
+
+        <Grid.Resources>
+            <DataTemplate x:Key="PayeeColumnTemplate">
+                <TextBlock Text="{Binding Payee}"/>
+            </DataTemplate>
+            <DataTemplate x:Key="EditingPayeeColumnTemplate">
+                <local:AutoCompleteTextBox Text="{Binding Payee}" ItemsSource="{Binding Payees}"/>
+            </DataTemplate>
+        </Grid.Resources>
+        
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -15,10 +25,23 @@
         <Label Content="{Binding AccountName}"/>
 
         <DataGrid
+            Name="dataGrid"
             Grid.Row="1"
             AlternatingRowBackground = "LightBlue" AlternationCount = "2"
-            AutoGenerateColumns="True"
+            AutoGenerateColumns="False"
             ItemsSource="{Binding Transactions}">
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Date" Binding="{Binding Date}"/>
+                <DataGridTextColumn Header="Type" Binding="{Binding Type}"/>
+                <DataGridTemplateColumn Header="Payee" CellTemplate="{StaticResource PayeeColumnTemplate}" CellEditingTemplate="{StaticResource EditingPayeeColumnTemplate}" />
+                <DataGridTextColumn Header="Memo" Binding="{Binding Memo}"/>
+                <DataGridTextColumn Header="Category" Binding="{Binding Category}"/>
+                <DataGridTextColumn Header="Payment" Binding="{Binding Payment}"/>
+                <DataGridTextColumn Header="Status" Binding="{Binding Status}"/>
+                <DataGridTextColumn Header="Deposit" Binding="{Binding Deposit}"/>
+                <DataGridTextColumn Header="Balance" Binding="{Binding Balance}"/>
+            </DataGrid.Columns>
             
         </DataGrid>
     </Grid>
