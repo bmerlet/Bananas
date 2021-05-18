@@ -1,0 +1,70 @@
+﻿<!-- 
+    This file's purpose is to define the default style for the AutoCompleteCheckBox,
+    which provide the AutoCompleteCheckBox default control template.
+    
+    WPF looks for the default style automatically in Themes\Generic.xaml, hence this
+    file's location.
+    
+    -->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ucs="clr-namespace:XamlUI.UserControls">
+
+    <!-- ZZZ why need a special color for listbox border ??? -->
+    <SolidColorBrush x:Key="ListBorder" Color="#FFA5ACB2"/>
+
+    <!-- define default style for AutoCompleteTextBox -->
+    <Style TargetType="{x:Type ucs:AutoCompleteTextBox}">
+        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource ListBorder}"/>
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+        <Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <!-- ZZZ <Setter Property="ItemContainerStyle" Value="{StaticResource ListBoxItemSelectOnMouseOverStyle}"/> -->
+        <Setter Property="Padding" Value="2"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="AllowDrop" Value="true"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <!-- define default control template for AutoCompleteTextBox -->
+                <!-- In the grid below, PART_ContentHost represents the part of the textbox where the input lives
+                    (and is defined in the Windows-provided, TextBox control template).
+                     PART_Popup is the popup which contains PART_Listbox, the listbox.
+                     -->
+                <ControlTemplate TargetType="{x:Type ucs:AutoCompleteTextBox}">
+                    <Grid>
+                        <Border x:Name="Bd" SnapsToDevicePixels="true"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ScrollViewer x:Name="PART_ContentHost" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                        </Border>
+                        <Popup x:Name="PART_Popup" StaysOpen="True">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- The listbox -->
+                                <ListBox x:Name="PART_ListBox" HorizontalContentAlignment="Stretch"/>
+                                <!-- Button underneath the listbox, collapsed by default -->
+                                <Button x:Name="PART_Button" HorizontalContentAlignment="Stretch" Grid.Row="1" Visibility="Collapsed" />
+                            </Grid>
+                        </Popup>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <!-- Appearance when disabled (note: this is not the same as regular textbox) -->
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter Property="Background" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
