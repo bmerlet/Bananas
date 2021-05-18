@@ -52,7 +52,9 @@ namespace BanaData.Database
             private static TransactionsRow UpdateTransaction(TransactionsRow transactionRow, AccountsRow accountRow, DateTime date, string payee, ETransactionStatus status)
             {
                 transactionRow.AccountID = accountRow.ID;
+
                 transactionRow.Date = date;
+
                 if (payee == null)
                 {
                     transactionRow.SetPayeeNull();

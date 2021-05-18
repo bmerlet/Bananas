@@ -129,9 +129,8 @@ namespace BanaData.Logic.Main
 
             //mainWindowLogic.Household.Transactions.PayeeColumn.
             payees.AddRange(
-                mainWindowLogic.Household.Transactions.AsEnumerable()
-                    .Select(s => s.Field<string>("Payee"))
-                    .Distinct());
+                mainWindowLogic.Household.MemorizedPayees.AsEnumerable()
+                    .Select(s => s.Field<string>("Payee")));
 
             payees.Sort();
         }
@@ -161,5 +160,5 @@ namespace BanaData.Logic.Main
         }
 
     #endregion
-}
+    }
 }

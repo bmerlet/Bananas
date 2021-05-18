@@ -85,7 +85,7 @@ namespace BanaData.Serializations
                                 ParseInvestmentTransactions(sr, household, accountRow);
                                 break;
                             case "Memorized":
-                                ParseMemorizedTransactions(sr, household, accountRow);
+                                ParseMemorizedPayees(sr, household, accountRow);
                                 break;
                             case "Prices":
                                 ParseSecurityPrices(sr, household);
@@ -476,7 +476,7 @@ namespace BanaData.Serializations
             }
         }
 
-        private static void ParseMemorizedTransactions(StreamReader sr, Household household, Household.AccountsRow account)
+        private static void ParseMemorizedPayees(StreamReader sr, Household household, Household.AccountsRow account)
         {
             if (account == null)
             {
@@ -485,11 +485,11 @@ namespace BanaData.Serializations
 
             while (sr.Peek() != '!' && !sr.EndOfStream)
             {
-                ParseOneMemorizedTransaction(sr, household, account);
+                ParseOneMemorizedPayee(sr, household, account);
             }
         }
 
-        private static void ParseOneMemorizedTransaction(TextReader sr, Household household, Household.AccountsRow account)
+        private static void ParseOneMemorizedPayee(TextReader sr, Household household, Household.AccountsRow account)
         {
             decimal amountToCheck = 0;
             decimal otherMysteriousAmount = 0;
@@ -511,6 +511,7 @@ namespace BanaData.Serializations
 
                 switch (l[0])
                 {
+                    // Amount
                     case 'T':
                     case '$':
                         decimal.TryParse(l.Substring(1), out lineItemHolder.amount);
@@ -520,27 +521,33 @@ namespace BanaData.Serializations
                         }
                         break;
 
+                    // Amount again
                     case 'U':
                         decimal.TryParse(l.Substring(1), out otherMysteriousAmount);
                         break;
 
+                    // Memo
                     case 'E':
                     case 'M':
                         lineItemHolder.memo = l.Substring(1);
                         break;
 
+                    // Payee name
                     case 'P':
                         payee = l.Substring(1);
                         break;
 
+                    // Status (none/cleared/reconciled)
                     case 'C':
                         status = ParseTransactionStatus(l.Substring(1));
                         break;
 
+                    // Category
                     case 'L':
                         lineItemHolder.target = ParseTransactionTarget(household, account, l.Substring(1), out lineItemHolder.transfer);
                         break;
 
+                    // Payment/deposit
                     case 'K':
                         type = ParseMemorizedTransactionType(l.Substring(1));
                         break;
@@ -571,20 +578,15 @@ namespace BanaData.Serializations
                 throw new InvalidDataException("QIF parser: Mysterious amount not the same as regular amount - " + amountToCheck + " - " + otherMysteriousAmount);
             }
 
-            // Create transaction
-            lineItemHodlers.Add(lineItemHolder);
-
-            // ZZZZZZZZZZZ
-            /*
-            // Create main transaction
-            var transRow = bananaSet.AddTransaction(account, mainMemo, payee, status);
+            // Create memorized payee
+            var memorizedPayees = household.MemorizedPayees.Add(payee, status);
 
             // Add the line item(s)
             lineItemHodlers.Add(lineItemHolder);
             foreach (var lih in lineItemHodlers)
             {
-                bananaSet.AddLineItem(transRow, lih.transfer, lih.target, lih.memo, lih.amount);
-            } */
+                household.MemorizedLineItems.Add(memorizedPayees, lih.transfer, lih.target, lih.memo, lih.amount);
+            }
         }
 
         private static void ParseInvestmentTransactions(StreamReader sr, Household household, Household.AccountsRow account)
