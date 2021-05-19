@@ -13,7 +13,7 @@
                 <TextBlock Text="{Binding Payee}"/>
             </DataTemplate>
             <DataTemplate x:Key="EditingPayeeColumnTemplate">
-                <local:AutoCompleteTextBox Text="{Binding Payee}" ItemsSource="{Binding Payees}"/>
+                <local:AutoCompleteTextBox Text="{Binding Payee}" ListBoxHeight="150" ListBoxWidth="200" ListBoxItemsSource="{Binding Payees}"/>
             </DataTemplate>
         </Grid.Resources>
         

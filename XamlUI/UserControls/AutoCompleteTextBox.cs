@@ -20,6 +20,8 @@ namespace XamlUI.UserControls
     //
     public class AutoCompleteTextBox : TextBox
     {
+        #region Constructors
+
         // Static constructor
         static AutoCompleteTextBox()
         {
@@ -28,45 +30,45 @@ namespace XamlUI.UserControls
             DefaultStyleKeyProperty.OverrideMetadata(typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(typeof(AutoCompleteTextBox)));
         }
 
+        #endregion
+
         #region Dependency properties
 
         //
         // Dependency properties are exported to the markup and can be used for styling, binding, ...
         //
 
-        #region ItemsSource Dependency Property
+        #region Listbox ItemsSource Dependency Property
 
         //
-        // ItemsSource represents the source of choices for autocompletion
+        // ListBoxItemsSource represents the source of choices for autocompletion
         //
 
-        public IEnumerable ItemsSource
+        public IEnumerable ListBoxItemsSource
         {
-            get { return (IEnumerable)GetValue(ItemsSourceProperty); }
-            set { SetValue(ItemsSourceProperty, value); }
+            get { return (IEnumerable)GetValue(ListBoxItemsSourceProperty); }
+            set { SetValue(ListBoxItemsSourceProperty, value); }
         }
 
-        // Register this control as an owner of the ItemControl's ItemsSource property
-        public static readonly DependencyProperty ItemsSourceProperty =
-            ItemsControl.ItemsSourceProperty.AddOwner(
-                typeof(AutoCompleteTextBox),
-                new UIPropertyMetadata(null, OnItemsSourceChanged));
+        public static readonly DependencyProperty ListBoxItemsSourceProperty =
+            DependencyProperty.Register("ListBoxItemsSource", typeof(IEnumerable), typeof(AutoCompleteTextBox),
+                new UIPropertyMetadata(Enumerable.Empty<object>(), OnListBoxItemsSourceChanged));
 
-        // Item source change dispatcher
-        private static void OnItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        // Listbox item source change dispatcher
+        private static void OnListBoxItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is AutoCompleteTextBox actb)
             {
-                actb.OnItemsSourceChanged(e.NewValue as IEnumerable);
+                actb.OnListBoxItemsSourceChanged(e.NewValue as IEnumerable);
             }
         }
 
         // Item source listener: Assign value to the list box' item source
-        protected void OnItemsSourceChanged(IEnumerable itemsSource)
+        protected void OnListBoxItemsSourceChanged(IEnumerable listBoxItemsSource)
         {
             if (listBox != null)
             {
-                listBox.ItemsSource = itemsSource;
+                listBox.ItemsSource = listBoxItemsSource;
             }
         }
 
@@ -132,6 +134,40 @@ namespace XamlUI.UserControls
 
         #endregion
 
+        #region Listbox ItemTemplate Dependency Property
+
+        //
+        // Property to access the listbox' ItemTemplate property
+        //
+        public DataTemplate ListBoxItemTemplate
+        {
+            get { return (DataTemplate)GetValue(ListBoxItemTemplateProperty); }
+            set { SetValue(ListBoxItemTemplateProperty, value); }
+        }
+
+        public static readonly DependencyProperty ListBoxItemTemplateProperty =
+            ItemsControl.ItemTemplateProperty.AddOwner(
+                typeof(AutoCompleteTextBox),
+                new UIPropertyMetadata(null, OnListBoxItemTemplateChanged));
+
+        private static void OnListBoxItemTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is AutoCompleteTextBox actb)
+            {
+                actb.OnListBoxItemTemplateChanged(e.NewValue as DataTemplate);
+            }
+        }
+
+        private void OnListBoxItemTemplateChanged(DataTemplate dataTemplate)
+        {
+            if (listBox != null)
+            {
+                listBox.ItemTemplate = dataTemplate;
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region Private members
@@ -147,10 +183,11 @@ namespace XamlUI.UserControls
         #region Overrides
 
         // Retrieve the popup and listbox from control template when it is applied
-        // And start listeneing to changes
+        // And start listening to changes
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
+
             popup = Template.FindName("PART_Popup", this) as Popup;
             listBox = Template.FindName("PART_ListBox", this) as ListBox;
             if (listBox != null)
@@ -162,15 +199,13 @@ namespace XamlUI.UserControls
                 listBox.KeyDown += OnListBoxKeyDown;
                 listBox.MouseUp += OnListBoxMouseUp;
 
-                // Make sure the listbox' item source is pointing to our ItemSource property
-                // OnItemsSourceChanged(ItemsSource); // I don't think that's necessary, the framework does this.
-
-                // Apply other listbox properties hosted by this control 
+                // Apply listbox properties hosted by this control 
+                OnListBoxItemsSourceChanged(ListBoxItemsSource);
                 OnListBoxHeightChanged(ListBoxHeight);
                 OnListBoxWidthChanged(ListBoxWidth);
+                OnListBoxItemTemplateChanged(ListBoxItemTemplate);
 
                 // ZZZ RFU
-                //OnItemTemplateChanged(ItemTemplate);
                 //OnItemContainerStyleChanged(ItemContainerStyle);
                 //OnItemTemplateSelectorChanged(ItemTemplateSelector);
             }
@@ -179,6 +214,12 @@ namespace XamlUI.UserControls
         // Filter applied to listbox' items
         private bool Filter(object o)
         {
+            if (o == null)
+            {
+                return false;
+            }
+
+            // Get current text from textbox
             var curTxt = Text;
 
             // Show everything if nothing to filter on
@@ -187,9 +228,11 @@ namespace XamlUI.UserControls
                 return true;
             }
 
-            return o is string str && str.IndexOf(curTxt, StringComparison.OrdinalIgnoreCase) >= 0;
+            // Filter on whatever is returned by o.ToString()
+            return o.ToString().IndexOf(curTxt, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
+        // React to getting focus
         protected override void OnGotFocus(RoutedEventArgs e)
         {
             base.OnGotFocus(e);
@@ -202,7 +245,6 @@ namespace XamlUI.UserControls
         {
             base.OnTextChanged(e);
 
-            //ZZZ if (suppressEvent) return;
             RefreshListBox();
         }
 
