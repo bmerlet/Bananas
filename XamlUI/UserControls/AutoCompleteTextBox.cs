@@ -308,7 +308,7 @@ namespace XamlUI.UserControls
                 // Autocomplete text if only one choice left
                 if (listBox.Items.Count == 1)
                 {
-                    Text = listBox.Items[0] as string;
+                    Text = listBox.Items[0].ToString();
                 }
             }
         }
@@ -342,7 +342,7 @@ namespace XamlUI.UserControls
         private void OnListBoxMouseUp(object sender, MouseButtonEventArgs e)
         {
             // Set text to selected list box item
-            Text = listBox.SelectedItem as string;
+            Text = listBox.SelectedItem.ToString();
 
             // Re-focus to textbox
             Focus();
@@ -352,6 +352,5 @@ namespace XamlUI.UserControls
         }
 
         #endregion
-
     }
 }

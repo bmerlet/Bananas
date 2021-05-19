@@ -17,7 +17,7 @@ namespace BanaData.Logic.Main
 
         private readonly MainWindowLogic mainWindowLogic;
 
-        private readonly List<string> payees = new List<string>();
+        private readonly List<MemorizedPayee> payees = new List<MemorizedPayee>();
 
         #endregion
 
@@ -125,12 +125,28 @@ namespace BanaData.Logic.Main
 
         private void BuildPayeeList()
         {
+            var household = mainWindowLogic.Household;
+
             payees.Clear();
 
-            //mainWindowLogic.Household.Transactions.PayeeColumn.
-            payees.AddRange(
-                mainWindowLogic.Household.MemorizedPayees.AsEnumerable()
-                    .Select(s => s.Field<string>("Payee")));
+            foreach (var mpr in mainWindowLogic.Household.MemorizedPayees)
+            {
+                // Get memorized line item(s)
+                var lineItems = household.MemorizedLineItems.GetByMemorizedPayee(mpr);
+                decimal amount = lineItems.Sum(li => li.Amount);
+
+                string memo = lineItems[0].IsMemoNull() ? "" : lineItems[0].Memo;
+                string category = "";
+
+                if (!lineItems[0].IsCategoryIDNull())
+                {
+                    var destCategory = household.Categories.FindByID(lineItems[0].CategoryID);
+                    category = destCategory.FullName;
+                }
+
+                var mp = new MemorizedPayee(mpr.Payee, amount, category, memo);
+                payees.Add(mp);
+            }
 
             payees.Sort();
         }
@@ -139,9 +155,10 @@ namespace BanaData.Logic.Main
 
         #region Transaction class
 
+        // Class representing one banking transaction
         public class BankingTransaction
         {
-            public BankingTransaction(IEnumerable<string> payees)
+            public BankingTransaction(IEnumerable<MemorizedPayee> payees)
             {
                 Payees = payees;
             }
@@ -156,9 +173,37 @@ namespace BanaData.Logic.Main
             public string Deposit { get; set; }
             public string Balance { get; set; }
 
-            public IEnumerable<string> Payees { get; }
+            public IEnumerable<MemorizedPayee> Payees { get; }
         }
 
-    #endregion
+        // Class representing memorized payees, as viewed in the autocomplete payee textbox
+        public class MemorizedPayee : IComparable<MemorizedPayee>
+        {
+            public MemorizedPayee(string payee, decimal amount, string category, string memo)
+            {
+                Payee = payee;
+                Amount = amount.ToString("N");
+                Category = category;
+                Memo = memo;
+            }
+
+            public string Payee { get; }
+            public string Amount { get; }
+            public string Category { get; }
+            public string Memo { get; }
+
+            public int CompareTo(MemorizedPayee other)
+            {
+                return Payee.CompareTo(other.Payee);
+            }
+
+            // string that is used to filter on (and to return) 
+            public override string ToString()
+            {
+                return Payee;
+            }
+        }
+
+        #endregion
     }
 }

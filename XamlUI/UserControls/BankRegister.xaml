@@ -13,7 +13,27 @@
                 <TextBlock Text="{Binding Payee}"/>
             </DataTemplate>
             <DataTemplate x:Key="EditingPayeeColumnTemplate">
-                <local:AutoCompleteTextBox Text="{Binding Payee}" ListBoxHeight="150" ListBoxWidth="200" ListBoxItemsSource="{Binding Payees}"/>
+                <local:AutoCompleteTextBox 
+                    Text="{Binding Payee}" 
+                    ListBoxHeight="150" 
+                    ListBoxItemsSource="{Binding Payees}">
+                    <local:AutoCompleteTextBox.ListBoxItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="65"/>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="100"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Payee}"/>
+                                <TextBlock Text="{Binding Amount}"   Grid.Column="1" Margin="3,0" HorizontalAlignment="Right" Foreground="Red"/>
+                                <TextBlock Text="{Binding Category}" Grid.Column="2" Foreground="Blue"/>
+                                <TextBlock Text="{Binding Memo}"     Grid.Column="3" Margin="3,0,0,0"/>
+                            </Grid>
+                        </DataTemplate>
+                    </local:AutoCompleteTextBox.ListBoxItemTemplate>
+                </local:AutoCompleteTextBox>
             </DataTemplate>
         </Grid.Resources>
         

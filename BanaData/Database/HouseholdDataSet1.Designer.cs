@@ -52,6 +52,10 @@ namespace BanaData.Database {
         
         private global::System.Data.DataRelation relationFK_Transactions_BankTransactions;
         
+        private global::System.Data.DataRelation relationFK_Accounts_MemorizedLineItems;
+        
+        private global::System.Data.DataRelation relationFK_Categories_MemorizedLineItems;
+        
         private global::System.Data.DataRelation relationFK_MemorizedPayees_MemorizedLineItems;
         
         private global::System.Data.DataRelation relationAccounts_LineItems;
@@ -432,6 +436,8 @@ namespace BanaData.Database {
             this.relationFK_Accounts_Transactions = this.Relations["FK_Accounts_Transactions"];
             this.relationFK_Transactions_LineItems = this.Relations["FK_Transactions_LineItems"];
             this.relationFK_Transactions_BankTransactions = this.Relations["FK_Transactions_BankTransactions"];
+            this.relationFK_Accounts_MemorizedLineItems = this.Relations["FK_Accounts_MemorizedLineItems"];
+            this.relationFK_Categories_MemorizedLineItems = this.Relations["FK_Categories_MemorizedLineItems"];
             this.relationFK_MemorizedPayees_MemorizedLineItems = this.Relations["FK_MemorizedPayees_MemorizedLineItems"];
             this.relationAccounts_LineItems = this.Relations["Accounts_LineItems"];
             this.relationCategories_LineItems = this.Relations["Categories_LineItems"];
@@ -496,6 +502,20 @@ namespace BanaData.Database {
             fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
             fkc.DeleteRule = global::System.Data.Rule.Cascade;
             fkc.UpdateRule = global::System.Data.Rule.Cascade;
+            fkc = new global::System.Data.ForeignKeyConstraint("FK_Accounts_MemorizedLineItems", new global::System.Data.DataColumn[] {
+                        this.tableAccounts.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableMemorizedLineItems.AccountIDColumn});
+            this.tableMemorizedLineItems.Constraints.Add(fkc);
+            fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
+            fkc.DeleteRule = global::System.Data.Rule.Cascade;
+            fkc.UpdateRule = global::System.Data.Rule.Cascade;
+            fkc = new global::System.Data.ForeignKeyConstraint("FK_Categories_MemorizedLineItems", new global::System.Data.DataColumn[] {
+                        this.tableCategories.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableMemorizedLineItems.CategoryIDColumn});
+            this.tableMemorizedLineItems.Constraints.Add(fkc);
+            fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
+            fkc.DeleteRule = global::System.Data.Rule.Cascade;
+            fkc.UpdateRule = global::System.Data.Rule.Cascade;
             fkc = new global::System.Data.ForeignKeyConstraint("FK_MemorizedPayees_MemorizedLineItems", new global::System.Data.DataColumn[] {
                         this.tableMemorizedPayees.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableMemorizedLineItems.MemorizedPayeeIDColumn});
@@ -519,6 +539,14 @@ namespace BanaData.Database {
                         this.tableTransactions.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableBankingTransactions.TransactionIDColumn}, false);
             this.Relations.Add(this.relationFK_Transactions_BankTransactions);
+            this.relationFK_Accounts_MemorizedLineItems = new global::System.Data.DataRelation("FK_Accounts_MemorizedLineItems", new global::System.Data.DataColumn[] {
+                        this.tableAccounts.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableMemorizedLineItems.AccountIDColumn}, false);
+            this.Relations.Add(this.relationFK_Accounts_MemorizedLineItems);
+            this.relationFK_Categories_MemorizedLineItems = new global::System.Data.DataRelation("FK_Categories_MemorizedLineItems", new global::System.Data.DataColumn[] {
+                        this.tableCategories.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableMemorizedLineItems.CategoryIDColumn}, false);
+            this.Relations.Add(this.relationFK_Categories_MemorizedLineItems);
             this.relationFK_MemorizedPayees_MemorizedLineItems = new global::System.Data.DataRelation("FK_MemorizedPayees_MemorizedLineItems", new global::System.Data.DataColumn[] {
                         this.tableMemorizedPayees.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableMemorizedLineItems.MemorizedPayeeIDColumn}, false);
@@ -3453,18 +3481,24 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public MemorizedLineItemsRow AddMemorizedLineItemsRow(MemorizedPayeesRow parentMemorizedPayeesRowByFK_MemorizedPayees_MemorizedLineItems, bool IsTransfer, int AccountID, int CategoryID, string Memo, decimal Amount) {
+            public MemorizedLineItemsRow AddMemorizedLineItemsRow(MemorizedPayeesRow parentMemorizedPayeesRowByFK_MemorizedPayees_MemorizedLineItems, bool IsTransfer, AccountsRow parentAccountsRowByFK_Accounts_MemorizedLineItems, CategoriesRow parentCategoriesRowByFK_Categories_MemorizedLineItems, string Memo, decimal Amount) {
                 MemorizedLineItemsRow rowMemorizedLineItemsRow = ((MemorizedLineItemsRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
                         null,
                         IsTransfer,
-                        AccountID,
-                        CategoryID,
+                        null,
+                        null,
                         Memo,
                         Amount};
                 if ((parentMemorizedPayeesRowByFK_MemorizedPayees_MemorizedLineItems != null)) {
                     columnValuesArray[1] = parentMemorizedPayeesRowByFK_MemorizedPayees_MemorizedLineItems[0];
+                }
+                if ((parentAccountsRowByFK_Accounts_MemorizedLineItems != null)) {
+                    columnValuesArray[3] = parentAccountsRowByFK_Accounts_MemorizedLineItems[0];
+                }
+                if ((parentCategoriesRowByFK_Categories_MemorizedLineItems != null)) {
+                    columnValuesArray[4] = parentCategoriesRowByFK_Categories_MemorizedLineItems[0];
                 }
                 rowMemorizedLineItemsRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowMemorizedLineItemsRow);
@@ -4074,6 +4108,17 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public MemorizedLineItemsRow[] GetMemorizedLineItemsRows() {
+                if ((this.Table.ChildRelations["FK_Accounts_MemorizedLineItems"] == null)) {
+                    return new MemorizedLineItemsRow[0];
+                }
+                else {
+                    return ((MemorizedLineItemsRow[])(base.GetChildRows(this.Table.ChildRelations["FK_Accounts_MemorizedLineItems"])));
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public TransactionsRow[] GetTransactionsRows() {
                 if ((this.Table.ChildRelations["FK_Accounts_Transactions"] == null)) {
                     return new TransactionsRow[0];
@@ -4224,6 +4269,17 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public void SetParentIDNull() {
                 this[this.tableCategories.ParentIDColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public MemorizedLineItemsRow[] GetMemorizedLineItemsRows() {
+                if ((this.Table.ChildRelations["FK_Categories_MemorizedLineItems"] == null)) {
+                    return new MemorizedLineItemsRow[0];
+                }
+                else {
+                    return ((MemorizedLineItemsRow[])(base.GetChildRows(this.Table.ChildRelations["FK_Categories_MemorizedLineItems"])));
+                }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -5102,6 +5158,28 @@ namespace BanaData.Database {
                 }
                 set {
                     this[this.tableMemorizedLineItems.AmountColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public AccountsRow AccountsRow {
+                get {
+                    return ((AccountsRow)(this.GetParentRow(this.Table.ParentRelations["FK_Accounts_MemorizedLineItems"])));
+                }
+                set {
+                    this.SetParentRow(value, this.Table.ParentRelations["FK_Accounts_MemorizedLineItems"]);
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public CategoriesRow CategoriesRow {
+                get {
+                    return ((CategoriesRow)(this.GetParentRow(this.Table.ParentRelations["FK_Categories_MemorizedLineItems"])));
+                }
+                set {
+                    this.SetParentRow(value, this.Table.ParentRelations["FK_Categories_MemorizedLineItems"]);
                 }
             }
             
