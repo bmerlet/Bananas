@@ -164,16 +164,23 @@ namespace BanaData.Logic.Main
             }
 
             public DateTime Date { get; set; }
+
             public string Type { get; set; }
+            public string[] TypeSource { get; } = new string[] { "Next Check Num", "ATM", "Deposit", "Transfer", "EFT" };
+
             public string Payee { get; set; }
+            public IEnumerable<MemorizedPayee> Payees { get; }
+
             public string Memo { get; set; }
             public string Category { get; set; }
             public string Payment { get; set; }
+
             public string Status { get; set; }
+            public string[] StatusSource { get; } = new string[] { "", "c", "R" };
+
             public string Deposit { get; set; }
             public string Balance { get; set; }
 
-            public IEnumerable<MemorizedPayee> Payees { get; }
         }
 
         // Class representing memorized payees, as viewed in the autocomplete payee textbox

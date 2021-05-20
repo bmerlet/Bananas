@@ -17,7 +17,15 @@
             <DataTemplate x:Key="DateEditingColumnTemplate">
                 <local:DateTextBox Date="{Binding Date, Mode=TwoWay}"/>
             </DataTemplate>
-            
+
+            <!-- Templates for the check number column -->
+            <DataTemplate x:Key="CheckNumberColumnTemplate">
+                <TextBlock Text="{Binding Type}"/>
+            </DataTemplate>
+            <DataTemplate x:Key="CheckNumberEditingColumnTemplate">
+                <ComboBox IsEditable="True" Text="{Binding Type, Mode=TwoWay}" ItemsSource="{Binding TypeSource}"/>
+            </DataTemplate>
+
             <!-- Templates for the payee column -->
             <DataTemplate x:Key="PayeeColumnTemplate">
                 <TextBlock Text="{Binding Payee, Mode=TwoWay}"/>
@@ -68,8 +76,11 @@
                     CellTemplate="{StaticResource DateColumnTemplate}"
                     CellEditingTemplate="{StaticResource DateEditingColumnTemplate}"/>
 
-                <!-- Type column -->
-                <DataGridTextColumn Header="Type" Binding="{Binding Type}"/>
+                <!-- Type column  -->
+                <DataGridTemplateColumn
+                    Header="Check#"
+                    CellTemplate="{StaticResource CheckNumberColumnTemplate}"
+                    CellEditingTemplate="{StaticResource CheckNumberEditingColumnTemplate}"/>
 
                 <!-- Payee column -->
                 <DataGridTemplateColumn
@@ -77,11 +88,31 @@
                     CellTemplate="{StaticResource PayeeColumnTemplate}"
                     CellEditingTemplate="{StaticResource PayeeEditingColumnTemplate}" />
 
-                <DataGridTextColumn Header="Memo" Binding="{Binding Memo}"/>
+                <DataGridTextColumn Header="Memo" Binding="{Binding Memo, Mode=TwoWay}"/>
+                
+                <!-- ZZZ make an autocomplete -->
                 <DataGridTextColumn Header="Category" Binding="{Binding Category}"/>
+
+                <!-- ZZZ need type for numbers only -->
                 <DataGridTextColumn Header="Payment" Binding="{Binding Payment}"/>
-                <DataGridTextColumn Header="Status" Binding="{Binding Status}"/>
+
+                <DataGridComboBoxColumn Header="Status" SelectedItemBinding="{Binding Status, Mode=TwoWay}">
+                    <DataGridComboBoxColumn.ElementStyle>
+                        <Style TargetType="{x:Type ComboBox}">
+                            <Setter Property="ItemsSource" Value="{Binding Path=StatusSource}" />
+                        </Style>
+                    </DataGridComboBoxColumn.ElementStyle>
+                    <DataGridComboBoxColumn.EditingElementStyle>
+                        <Style TargetType="{x:Type ComboBox}">
+                            <Setter Property="ItemsSource" Value="{Binding Path=StatusSource}" />
+                        </Style>
+                    </DataGridComboBoxColumn.EditingElementStyle>
+                    
+                </DataGridComboBoxColumn>
+
+                <!-- ZZZ need type for numbers only -->
                 <DataGridTextColumn Header="Deposit" Binding="{Binding Deposit}"/>
+
                 <DataGridTextColumn Header="Balance" Binding="{Binding Balance}" IsReadOnly="True"/>
             </DataGrid.Columns>
             
