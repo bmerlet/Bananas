@@ -156,7 +156,7 @@ namespace BanaData.Logic.Main
         #region Transaction class
 
         // Class representing one banking transaction
-        public class BankingTransaction
+        public class BankingTransaction : LogicBase
         {
             public BankingTransaction(IEnumerable<MemorizedPayee> payees)
             {

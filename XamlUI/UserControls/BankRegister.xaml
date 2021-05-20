@@ -9,10 +9,20 @@
     <Grid>
 
         <Grid.Resources>
-            <DataTemplate x:Key="PayeeColumnTemplate">
-                <TextBlock Text="{Binding Payee}"/>
+            
+            <!-- Templates for the date column -->
+            <DataTemplate x:Key="DateColumnTemplate">
+                <TextBlock Text="{Binding Date, StringFormat=MM/dd/yyyy}"/>
             </DataTemplate>
-            <DataTemplate x:Key="EditingPayeeColumnTemplate">
+            <DataTemplate x:Key="DateEditingColumnTemplate">
+                <local:DateTextBox Date="{Binding Date, Mode=TwoWay}"/>
+            </DataTemplate>
+            
+            <!-- Templates for the payee column -->
+            <DataTemplate x:Key="PayeeColumnTemplate">
+                <TextBlock Text="{Binding Payee, Mode=TwoWay}"/>
+            </DataTemplate>
+            <DataTemplate x:Key="PayeeEditingColumnTemplate">
                 <local:AutoCompleteTextBox 
                     Text="{Binding Payee}" 
                     ListBoxHeight="150" 
@@ -52,15 +62,27 @@
             ItemsSource="{Binding Transactions}">
 
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Date" Binding="{Binding Date}"/>
+                <!-- Date column -->
+                <DataGridTemplateColumn
+                    Header="Date"
+                    CellTemplate="{StaticResource DateColumnTemplate}"
+                    CellEditingTemplate="{StaticResource DateEditingColumnTemplate}"/>
+
+                <!-- Type column -->
                 <DataGridTextColumn Header="Type" Binding="{Binding Type}"/>
-                <DataGridTemplateColumn Header="Payee" CellTemplate="{StaticResource PayeeColumnTemplate}" CellEditingTemplate="{StaticResource EditingPayeeColumnTemplate}" />
+
+                <!-- Payee column -->
+                <DataGridTemplateColumn
+                    Header="Payee"
+                    CellTemplate="{StaticResource PayeeColumnTemplate}"
+                    CellEditingTemplate="{StaticResource PayeeEditingColumnTemplate}" />
+
                 <DataGridTextColumn Header="Memo" Binding="{Binding Memo}"/>
                 <DataGridTextColumn Header="Category" Binding="{Binding Category}"/>
                 <DataGridTextColumn Header="Payment" Binding="{Binding Payment}"/>
                 <DataGridTextColumn Header="Status" Binding="{Binding Status}"/>
                 <DataGridTextColumn Header="Deposit" Binding="{Binding Deposit}"/>
-                <DataGridTextColumn Header="Balance" Binding="{Binding Balance}"/>
+                <DataGridTextColumn Header="Balance" Binding="{Binding Balance}" IsReadOnly="True"/>
             </DataGrid.Columns>
             
         </DataGrid>
