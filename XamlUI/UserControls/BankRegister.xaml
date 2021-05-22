@@ -28,11 +28,11 @@
 
             <!-- Templates for the payee column -->
             <DataTemplate x:Key="PayeeColumnTemplate">
-                <TextBlock Text="{Binding Payee, Mode=TwoWay}"/>
+                <TextBlock Text="{Binding Payee}"/>
             </DataTemplate>
             <DataTemplate x:Key="PayeeEditingColumnTemplate">
                 <local:AutoCompleteTextBox 
-                    Text="{Binding Payee}" 
+                    TextBoxText="{Binding Payee, Mode=TwoWay}" 
                     ListBoxHeight="150" 
                     ListBoxItemsSource="{Binding Payees}">
                     <local:AutoCompleteTextBox.ListBoxItemTemplate>
