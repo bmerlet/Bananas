@@ -32,7 +32,7 @@
             </DataTemplate>
             <DataTemplate x:Key="PayeeEditingColumnTemplate">
                 <local:AutoCompleteTextBox 
-                    TextBoxText="{Binding Payee, Mode=TwoWay}" 
+                    Text="{Binding Payee, Mode=TwoWay}" 
                     ListBoxHeight="150" 
                     ListBoxItemsSource="{Binding Payees}">
                     <local:AutoCompleteTextBox.ListBoxItemTemplate>
