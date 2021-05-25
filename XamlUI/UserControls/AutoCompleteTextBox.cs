@@ -15,18 +15,17 @@ namespace XamlUI.UserControls
     //
     // TODO:
     // - Custom action when leaving with something that does not exist in the list
+    //    -> RESOLVED: SelectedItem is then null 
     // - Button at bottom of list
-    // - Test if custom colors are necessary
     //
-    public class AutoCompleteTextBox : TextBox
+    public class AutoCompleteTextBox : Control
     {
         #region Constructors
 
-        // Static constructor
+        // Change the metadata type of this class to AutoCompleteTextBox, so that WPF loads
+        // the proper default style (from Themes\Generic.xaml)
         static AutoCompleteTextBox()
         {
-            // Change the metadata type of this class to AutoCompleteTextBox, so that WPF loads
-            // the proper default style (from Themes\Generic.xaml)
             DefaultStyleKeyProperty.OverrideMetadata(typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(typeof(AutoCompleteTextBox)));
         }
 
@@ -35,192 +34,352 @@ namespace XamlUI.UserControls
         #region Dependency properties
 
         //
-        // Dependency properties are exported to the markup and can be used for styling, binding, ...
+        // Text (bound to the textbox' property of the same name
         //
+        public static readonly DependencyProperty TextProperty =
+            DependencyProperty.Register("Text", typeof(string), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(string.Empty));
 
-        #region Listbox ItemsSource Dependency Property
+        public string Text
+        {
+            get => (string)GetValue(TextProperty);
+            set => SetValue(TextProperty, value);
+        }
 
         //
-        // ListBoxItemsSource represents the source of choices for autocompletion
+        // ItemsSource (bound to the listbox' property of trhe same name)
         //
+        public static readonly DependencyProperty ItemsSourceProperty =
+            DependencyProperty.Register("ItemsSource", typeof(IEnumerable), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(Enumerable.Empty<object>()));
 
-        public IEnumerable ListBoxItemsSource
+        public IEnumerable ItemsSource
         {
-            get { return (IEnumerable)GetValue(ListBoxItemsSourceProperty); }
-            set { SetValue(ListBoxItemsSourceProperty, value); }
+            get => (IEnumerable)GetValue(ItemsSourceProperty);
+            set => SetValue(ItemsSourceProperty, value);
         }
 
-        public static readonly DependencyProperty ListBoxItemsSourceProperty =
-            DependencyProperty.Register("ListBoxItemsSource", typeof(IEnumerable), typeof(AutoCompleteTextBox),
-                new UIPropertyMetadata(Enumerable.Empty<object>(), OnListBoxItemsSourceChanged));
+        //
+        // Selected Item (bound to the listbox' property of trhe same name)
+        //
+        public static readonly DependencyProperty SelectedItemProperty =
+            DependencyProperty.Register("SelectedItem", typeof(object), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(null));
 
-        // Listbox item source change dispatcher
-        private static void OnListBoxItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        public string SelectedItem
         {
-            if (d is AutoCompleteTextBox actb)
-            {
-                actb.OnListBoxItemsSourceChanged(e.NewValue as IEnumerable);
-            }
+            get => (string)GetValue(SelectedItemProperty);
+            set => SetValue(SelectedItemProperty, value);
         }
 
-        // Item source listener: Assign value to the list box' item source
-        protected void OnListBoxItemsSourceChanged(IEnumerable listBoxItemsSource)
+        //
+        // Item template property (bound to the listbox' property of trhe same name)
+        //
+        public static readonly DependencyProperty ItemTemplateProperty =
+            DependencyProperty.Register("ItemTemplate", typeof(DataTemplate), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(null));
+
+        public DataTemplate ItemTemplate
         {
-            if (listBox != null)
-            {
-                listBox.ItemsSource = listBoxItemsSource;
-            }
+            get => (DataTemplate)GetValue(ItemTemplateProperty);
+            set => SetValue(ItemTemplateProperty, value);
         }
 
-        #endregion
+        //
+        // Item template selector property (bound to the listbox' property of trhe same name)
+        //
+        public static readonly DependencyProperty ItemTemplateSelectorProperty =
+            DependencyProperty.Register("ItemTemplateSelector", typeof(DataTemplateSelector), typeof(AutoCompleteTextBox));
 
-        #region Listbox Height Dependency Property
-
-        public double ListBoxHeight
+        public DataTemplateSelector ItemTemplateSelector
         {
-            get { return (double)GetValue(ListBoxHeightProperty); }
-            set { SetValue(ListBoxHeightProperty, value); }
+            get => (DataTemplateSelector)GetValue(ItemTemplateSelectorProperty);
+            set => SetValue(ItemTemplateSelectorProperty, value);
         }
 
-        public static readonly DependencyProperty ListBoxHeightProperty =
-            DependencyProperty.Register("ListBoxHeight", typeof(double), typeof(AutoCompleteTextBox), new UIPropertyMetadata(double.NaN, OnListBoxHeightChanged));
-
-        // List box height change dispatcher
-        private static void OnListBoxHeightChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (d is AutoCompleteTextBox actb)
-            {
-                actb.OnListBoxHeightChanged((double)e.NewValue);
-            }
-        }
-
-        private void OnListBoxHeightChanged(double newValue)
-        {
-            if (listBox != null)
-            {
-                listBox.Height = newValue;
-            }
-        }
-
-        #endregion
-
-        #region Listbox Width Dependency Property
+        //
+        // Listbox width (bound to the listbox' width property)
+        //
+        public static readonly DependencyProperty ListBoxWidthProperty =
+            DependencyProperty.Register("ListBoxWidth", typeof(double), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(double.NaN));
 
         public double ListBoxWidth
         {
-            get { return (double)GetValue(ListBoxWidthProperty); }
-            set { SetValue(ListBoxWidthProperty, value); }
+            get => (double)GetValue(ListBoxWidthProperty);
+            set => SetValue(ListBoxWidthProperty, value);
         }
 
-        public static readonly DependencyProperty ListBoxWidthProperty =
-            DependencyProperty.Register("ListBoxWidth", typeof(double), typeof(AutoCompleteTextBox), new UIPropertyMetadata(double.NaN, OnListBoxWidthChanged));
-
-        // List box height change dispatcher
-        private static void OnListBoxWidthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (d is AutoCompleteTextBox actb)
-            {
-                actb.OnListBoxWidthChanged((double)e.NewValue);
-            }
-        }
-
-        private void OnListBoxWidthChanged(double newValue)
-        {
-            if (listBox != null)
-            {
-                listBox.Width = newValue;
-            }
-        }
-
-        #endregion
-
-        #region Listbox ItemTemplate Dependency Property
 
         //
-        // Property to access the listbox' ItemTemplate property
+        // Listbox height (bound to the listox' Height property)
         //
-        public DataTemplate ListBoxItemTemplate
+        public static readonly DependencyProperty ListBoxHeightProperty =
+            DependencyProperty.Register("ListBoxHeight", typeof(double), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(double.NaN));
+
+        public double ListBoxHeight
         {
-            get { return (DataTemplate)GetValue(ListBoxItemTemplateProperty); }
-            set { SetValue(ListBoxItemTemplateProperty, value); }
+            get => (double)GetValue(ListBoxHeightProperty);
+            set => SetValue(ListBoxHeightProperty, value);
         }
 
-        public static readonly DependencyProperty ListBoxItemTemplateProperty =
-            ItemsControl.ItemTemplateProperty.AddOwner(
-                typeof(AutoCompleteTextBox),
-                new UIPropertyMetadata(null, OnListBoxItemTemplateChanged));
+        //
+        // Watermark property: String that appears faintly through the (transparent) textbox when it is empty
+        //
+        public static readonly DependencyProperty WatermarkProperty =
+            DependencyProperty.Register("Watermark", typeof(string), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(string.Empty));
 
-        private static void OnListBoxItemTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        public string Watermark
         {
-            if (d is AutoCompleteTextBox actb)
-            {
-                actb.OnListBoxItemTemplateChanged(e.NewValue as DataTemplate);
-            }
+            get => (string)GetValue(WatermarkProperty);
+            set => SetValue(WatermarkProperty, value);
         }
 
-        private void OnListBoxItemTemplateChanged(DataTemplate dataTemplate)
+        //
+        // Display Member: Name of the property of the listbox items which content is copied to the editor on selection.
+        //
+        public static readonly DependencyProperty DisplayMemberProperty =
+            DependencyProperty.Register("DisplayMember", typeof(string), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(string.Empty));
+
+        public string DisplayMember
         {
-            if (listBox != null)
-            {
-                listBox.ItemTemplate = dataTemplate;
-            }
+            get => (string)GetValue(DisplayMemberProperty);
+            set => SetValue(DisplayMemberProperty, value);
         }
 
         #endregion
 
-        #endregion
+        #region Private fields
 
-        #region Private members
+        //
+        // Name of the controls in the control template
+        //
+        private const string editorPartName = "PART_Editor";
+        private const string popupPartName = "PART_Popup";
+        private const string selectorPartName = "PART_Selector";
 
-        // The popup to show the listbox
+        //
+        // The components of the control we keep track of
+        //
+        private TextBox editor;
         private Popup popup;
+        private ListBox selector;
 
-        // The list box in the popup
-        private ListBox listBox;
+        //
+        // Control of popup
+        //
+        private bool IsPopupOpen
+        {
+            get => popup != null && popup.IsOpen;
+            set
+            {
+                if (popup != null)
+                {
+                    // Written this way so that one can set a breakpoint to know who is closing/opening
+                    if (value)
+                    {
+                        popup.IsOpen = true;
+                    }
+                    else
+                    {
+                        popup.IsOpen = false;
+                    }
+                }
+            }
+        }
 
         #endregion
 
-        #region Overrides
+        #region Initialization
 
-        // Retrieve the popup and listbox from control template when it is applied
-        // And start listening to changes
+        //
+        // Action when the control template is applied
+        //
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
 
-            popup = Template.FindName("PART_Popup", this) as Popup;
-            listBox = Template.FindName("PART_ListBox", this) as ListBox;
-            if (listBox != null)
+            // Find the parts defined in the control template
+            editor = Template.FindName(editorPartName, this) as TextBox;
+            popup = Template.FindName(popupPartName, this) as Popup;
+            selector = Template.FindName(selectorPartName, this) as ListBox;
+
+            //BindingEvaluator = new BindingEvaluator(new Binding(DisplayMember));
+            GotFocus += OnAutoCompleteTextBoxGotFocus;
+
+            // ZZZZ
+            if (editor != null)
             {
-                // Filter the listbox content based on the textbox content
-                listBox.Items.Filter = Filter;
+                editor.TextChanged += OnEditorTextChanged;
+                editor.LostFocus += OnEditorLostFocus;
+                editor.PreviewKeyDown += OnEditorPreviewKeyDown;
 
-                // Listen to listbox keystrokes and mouse clicks
-                listBox.KeyDown += OnListBoxKeyDown;
-                listBox.MouseUp += OnListBoxMouseUp;
+                //if (SelectedItem != null)
+                //{
+                //    editor.Text = BindingEvaluator.Evaluate(SelectedItem);
+                //}
 
-                // Apply listbox properties hosted by this control 
-                OnListBoxItemsSourceChanged(ListBoxItemsSource);
-                OnListBoxHeightChanged(ListBoxHeight);
-                OnListBoxWidthChanged(ListBoxWidth);
-                OnListBoxItemTemplateChanged(ListBoxItemTemplate);
+            }
 
-                // ZZZ RFU
-                //OnItemContainerStyleChanged(ItemContainerStyle);
-                //OnItemTemplateSelectorChanged(ItemTemplateSelector);
+            if (popup != null)
+            {
+                //popup.StaysOpen = false;
+                popup.StaysOpen = true;
+                //popup.Opened += OnPopupOpened;
+                //popup.Closed += OnPopupClosed;
+            }
+
+            if (selector != null)
+            {
+                selector.Items.Filter = Filter;
+                selector.PreviewMouseUp += OnSelectorPreviewMouseUp;
+                //SelectionAdapter = new SelectionAdapter(selector);
+                //SelectionAdapter.Commit += OnSelectionAdapterCommit;
+                //SelectionAdapter.Cancel += OnSelectionAdapterCancel;
+                //SelectionAdapter.SelectionChanged += OnSelectionAdapterSelectionChanged;
             }
         }
 
+        #endregion
+
+        #region Editor handlers
+
+        //
+        // Got focus on this control: Focus on the editor and select the text
+        //
+        private void OnAutoCompleteTextBoxGotFocus(object sender, RoutedEventArgs e)
+        {
+            if (editor != null)
+            {
+                editor.Focus();
+                editor.SelectAll(); // ZZZ Who unselects?
+                RefreshSelector();
+            }
+        }
+
+        //
+        // Lost focus: close popup if really lost focus
+        private void OnEditorLostFocus(object sender, RoutedEventArgs e)
+        {
+            if (!IsKeyboardFocusWithin)
+            {
+                IsPopupOpen = false;
+            }
+        }
+
+        //
+        // Text has changed in the editor: Update the list of choices
+        //
+        private void OnEditorTextChanged(object sender, TextChangedEventArgs e)
+        {
+            // Update autocomplete list
+            RefreshSelector();
+
+            //if (_isUpdatingText)
+            //    return;
+            // SetSelectedItem(null); Means clear listbox selection
+            //if (editor.Text.Length > 0) //ZZZZZ
+            //{
+            //    IsLoading = true;
+            //    IsDropDownOpen = true;
+            //    ItemsSelector.ItemsSource = null;
+            //    FetchTimer.IsEnabled = true;
+            //    FetchTimer.Start();
+            //}
+            //else
+            //{
+            //    IsDropDownOpen = false;
+            //}
+        }
+
+        //
+        // Manage special keystrokes
+        //
+        private void OnEditorPreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Escape:
+                    // On escape key, close popup
+                    IsPopupOpen = false;
+                    //editor.Focus(); ZZZZ Probably not needed
+                    e.Handled = true;
+                    break;
+
+                case Key.Enter:
+                case Key.Tab:
+                    // Autocomplete text if possible
+                    if (selector.Items.Count == 1)
+                    {
+                        // Only one choice left
+                        selector.SelectedIndex = 0;
+                    }
+                    // Publish selection
+                    PublishSelection();
+                    break;
+
+                case Key.Down:
+                    if (IsPopupOpen && selector.Items.Count > 0)
+                    {
+                        // Move selection down in the listbox, or select top one if none selected
+                        if (selector.SelectedIndex < 0)
+                        {
+                            selector.SelectedIndex = 0;
+                            selector.ScrollIntoView(selector.SelectedItem);
+                        }
+                        else if (selector.SelectedIndex < (selector.Items.Count - 1))
+                        {
+                            selector.SelectedIndex += 1;
+                            selector.ScrollIntoView(selector.SelectedItem);
+                        }
+                        e.Handled = true;
+                    }
+                    break;
+
+                case Key.Up:
+                    if (IsPopupOpen && selector.Items.Count > 0)
+                    {
+                        // Move selection up in the listbox, or select bottom one if none selected
+                        if (selector.SelectedIndex < 0)
+                        {
+                            selector.SelectedIndex = selector.Items.Count - 1;
+                            selector.ScrollIntoView(selector.SelectedItem);
+                        }
+                        else if (selector.SelectedIndex > 0)
+                        {
+                            selector.SelectedIndex -= 1;
+                            selector.ScrollIntoView(selector.SelectedItem);
+                        }
+                        e.Handled = true;
+                    }
+                    break;
+            }
+        }
+
+        //
+        // Evaluate text based on listbox selected item and display member
+        //
+        private void PublishSelection()
+        {
+            var item = selector.SelectedItem;
+            if (item != null)
+            {
+                if (string.IsNullOrEmpty(DisplayMember))
+                {
+                    Text = item.ToString();
+                }
+                else
+                {
+                    Text = BindingEvaluator.GetValue(item, DisplayMember);
+                }
+            }
+        }
+
+        #endregion
+
+        #region Selector handlers
+
+        //
         // Filter applied to listbox' items
+        //
         private bool Filter(object o)
         {
-            if (o == null)
-            {
-                return false;
-            }
-
-            // Get current text from textbox
-            var curTxt = Text;
+            var curTxt = editor.Text;
 
             // Show everything if nothing to filter on
             if (curTxt == null || curTxt == "")
@@ -228,129 +387,86 @@ namespace XamlUI.UserControls
                 return true;
             }
 
-            // Filter on whatever is returned by o.ToString()
-            return o.ToString().IndexOf(curTxt, StringComparison.OrdinalIgnoreCase) >= 0;
-        }
-
-        // React to getting focus
-        protected override void OnGotFocus(RoutedEventArgs e)
-        {
-            base.OnGotFocus(e);
-
-            RefreshListBox();
-        }
-
-        // React to text change
-        protected override void OnTextChanged(TextChangedEventArgs e)
-        {
-            base.OnTextChanged(e);
-
-            RefreshListBox();
-        }
-
-        private void RefreshListBox()
-        {
-            if (listBox?.ItemsSource != null && popup != null)
+            string itemString = "";
+            if (string.IsNullOrEmpty(DisplayMember))
             {
-                // Apply filter to listBox.Items.Filter
-                CollectionViewSource.GetDefaultView(listBox.ItemsSource).Refresh();
-                popup.IsOpen = listBox.Items.Count > 0;
+                itemString = o.ToString();
+            }
+            else
+            {
+                itemString = BindingEvaluator.GetValue(o, DisplayMember);
+            }
+
+            // ZZZ Display member
+            return itemString.IndexOf(curTxt, StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        //
+        // Re-apply filter to listbox item
+        //
+        private void RefreshSelector()
+        {
+            if (selector != null && popup != null)
+            {
+                // Apply filter to the listbox' items
+                CollectionViewSource.GetDefaultView(selector.ItemsSource).Refresh();
+                IsPopupOpen = selector.Items.Count > 0;
             }
         }
 
-        // Close popup on focus loss, except if the new focus is the listbox
-        protected override void OnLostFocus(RoutedEventArgs e)
+        //
+        // Mouse up on the selector: Publish selection and close up
+        //
+        private void OnSelectorPreviewMouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            base.OnLostFocus(e);
-
-            if (popup != null)
+            // Loop through the item containers
+            if (selector.ItemContainerGenerator.Status == System.Windows.Controls.Primitives.GeneratorStatus.ContainersGenerated)
             {
-                var focusScope = FocusManager.GetFocusScope(this);
-                var focusedElement = FocusManager.GetFocusedElement(focusScope);
-                bool listBoxFocus =
-                    focusedElement == listBox ||
-                    (focusedElement is ListBoxItem item && listBox.Items.Contains(item.Content));
-
-                if (!listBoxFocus)
+                foreach (var item in selector.Items)
                 {
-                    popup.IsOpen = false;
+                    ListBoxItem container = selector.ItemContainerGenerator.ContainerFromItem(item) as ListBoxItem;
+                    if (container.IsMouseOver)
+                    {
+                        // This item has the mouse over it, use it.
+                        container.IsSelected = true;
+                        PublishSelection();
+                        IsPopupOpen = false;
+                        break;
+                    }
                 }
             }
         }
 
-        // React to special keystrokes on textbox
-        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        #endregion
+
+        #region Binding evaluator
+
+        //
+        // Class to apply a binding to an arbitrary object and read the value pointed to by the binding
+        //
+        class BindingEvaluator : FrameworkElement
         {
-            base.OnPreviewKeyDown(e);
+            // Dependency property on which the binding is applied
+            static public DependencyProperty ValueProperty =
+                DependencyProperty.Register("Value", typeof(string), typeof(BindingEvaluator), new FrameworkPropertyMetadata(string.Empty));
 
-            var fs = FocusManager.GetFocusScope(this);
-            var focusedElement = FocusManager.GetFocusedElement(fs);
+            static public string GetValue(object item, string bindingPath)
+            {
+                // Create a dummy framework element, with its data context pointing to the item
+                FrameworkElement element = new FrameworkElement
+                {
+                    DataContext = item
+                };
 
-            if (e.Key == Key.Escape)
-            {
-                // On escape key, close popup and re-focus on textbox
-                if (popup != null)
-                {
-                    popup.IsOpen = false;
-                }
-                Focus();
-            }
-            else if (e.Key == Key.Down || e.Key == Key.Up)
-            {
-                // On down key, slide the focus to the listbox
-                if (listBox != null && focusedElement == this)
-                {
-                    listBox.Focus();
-                }
-            }
-            else if (e.Key == Key.Enter || e.Key == Key.Return || e.Key == Key.Tab)
-            {
-                // Autocomplete text if only one choice left
-                if (listBox.Items.Count == 1)
-                {
-                    Text = listBox.Items[0].ToString();
-                }
+                // Bind the value property using the supplied binding path
+                element.SetBinding(ValueProperty, new Binding(bindingPath));
+
+                // Read the value property's value
+                var result = element.GetValue(ValueProperty) as string;
+
+                return result;
             }
         }
-
-        // React to special keystrokes on listbox
-        private void OnListBoxKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter || e.Key == Key.Return || e.Key == Key.Tab)
-            {
-                e.Handled = true;
-
-                // Set text to selected list box item
-                Text = listBox.SelectedItem as string;
-
-                if (e.Key == Key.Tab)
-                {
-                    // For the tab key, move to the next field
-                    MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
-                }
-                else
-                {
-                    // For enter, re-focus to textbox
-                    Focus();
-                }
-
-                // Force-close the popup
-                popup.IsOpen = false;
-            }
-        }
-
-        private void OnListBoxMouseUp(object sender, MouseButtonEventArgs e)
-        {
-            // Set text to selected list box item
-            Text = listBox.SelectedItem.ToString();
-
-            // Re-focus to textbox
-            Focus();
-
-            // Force-close the popup
-            popup.IsOpen = false;
-        }
-
         #endregion
     }
 }

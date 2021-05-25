@@ -32,10 +32,12 @@
             </DataTemplate>
             <DataTemplate x:Key="PayeeEditingColumnTemplate">
                 <local:AutoCompleteTextBox 
-                    Text="{Binding Payee, Mode=TwoWay}" 
+                    Text="{Binding Payee, Mode=TwoWay}"
+                    Watermark="Payee"
+                    DisplayMember="Payee"
                     ListBoxHeight="150" 
-                    ListBoxItemsSource="{Binding Payees}">
-                    <local:AutoCompleteTextBox.ListBoxItemTemplate>
+                    ItemsSource="{Binding Payees}">
+                    <local:AutoCompleteTextBox.ItemTemplate>
                         <DataTemplate>
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -50,7 +52,7 @@
                                 <TextBlock Text="{Binding Memo}"     Grid.Column="3" Margin="3,0,0,0"/>
                             </Grid>
                         </DataTemplate>
-                    </local:AutoCompleteTextBox.ListBoxItemTemplate>
+                    </local:AutoCompleteTextBox.ItemTemplate>
                 </local:AutoCompleteTextBox>
             </DataTemplate>
         </Grid.Resources>
