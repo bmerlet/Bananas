@@ -12,10 +12,10 @@
             
             <!-- Templates for the date column -->
             <DataTemplate x:Key="DateColumnTemplate">
-                <TextBlock Text="{Binding Date, StringFormat=MM/dd/yyyy}"/>
+                <TextBlock Text="{Binding Date, StringFormat=M/d/yyyy}"/>
             </DataTemplate>
             <DataTemplate x:Key="DateEditingColumnTemplate">
-                <local:DateTextBox Date="{Binding Date, Mode=TwoWay}"/>
+                <local:DateBox Date="{Binding Date, Mode=TwoWay}"/>
             </DataTemplate>
 
             <!-- Templates for the check number column -->
@@ -71,7 +71,8 @@
             AutoGenerateColumns="False"
             SelectionMode="Single"
             SelectionUnit="FullRow"
-            CanUserAddRows="False"
+            CanUserAddRows="True"
+            CanUserDeleteRows="True"
             ItemsSource="{Binding Transactions}">
 
             <DataGrid.Columns>

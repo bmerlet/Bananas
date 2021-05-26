@@ -52,6 +52,9 @@ namespace BanaData.Logic.Main
         // Transactions. The CollectionView type enables sorting on columns
         public CollectionView Transactions { get; }
 
+        // Transaction to show
+        public BankingTransaction TransactionToScrollTo { get; private set; }
+
         #endregion
 
         #region Actions
@@ -74,6 +77,7 @@ namespace BanaData.Logic.Main
             BuildPayeeList();
 
             // Find transactions and put them in the transaction list
+            BankingTransaction bankingTransaction = null;
             transactions.Clear();
             decimal balance = 0;
             var accTransRel = household.Relations["FK_Accounts_Transactions"];
@@ -118,7 +122,7 @@ namespace BanaData.Logic.Main
 
                 string memo = (lineItems.Length == 1) ? (lineItems[0].IsMemoNull() ? "" : lineItems[0].Memo) : "";
 
-                var bt = new BankingTransaction(memorizedPayees)
+                bankingTransaction = new BankingTransaction(memorizedPayees)
                 {
                     Date = trans.Date,
                     Type = transBank == null ? "" : transBank.GetRegisterMediumString(),
@@ -130,8 +134,12 @@ namespace BanaData.Logic.Main
                     Deposit = (amount >= 0) ? amount.ToString("N") : "",
                     Balance = balance.ToString("N")
                 };
-                transactions.Add(bt);
+                transactions.Add(bankingTransaction);
             }
+
+            // Go to the bottom
+            TransactionToScrollTo = bankingTransaction;
+            OnPropertyChanged(() => TransactionToScrollTo);
 
         }
 

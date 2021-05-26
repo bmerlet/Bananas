@@ -41,12 +41,19 @@ namespace XamlUI.UserControls
 
         private void OnDataContextPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            // Show/hide type column depending on whther this is a bank account or a credit card
-            if (e.PropertyName == "IsBank" && DataContext is BankRegisterLogic brl)
+            if (DataContext is BankRegisterLogic brl)
             {
-                dataGrid.Columns[1].Visibility = brl.IsBank ? Visibility.Visible : Visibility.Collapsed;
+                // Show/hide type column depending on whether this is a bank account or a credit card
+                if (e.PropertyName == "IsBank")
+                {
+                    dataGrid.Columns[1].Visibility = brl.IsBank ? Visibility.Visible : Visibility.Collapsed;
+                }
+                else if (e.PropertyName == "TransactionToScrollTo")
+                {
+                    // Scroll to where we are supposed to
+                    dataGrid.ScrollIntoView(brl.TransactionToScrollTo);
+                }
             }
         }
-
     }
 }

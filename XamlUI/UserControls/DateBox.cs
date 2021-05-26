@@ -5,26 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace XamlUI.UserControls
 {
     /// <summary>
-    /// Interaction logic for DateTextBox.xaml
+    /// Textbox repurposed for date input
     /// </summary>
-    public partial class DateTextBox : UserControl
+    class DateBox : TextBox
     {
-        #region Private members
-
         private bool internalDateUpdate;
-
-        #endregion
 
         #region Date Dependency Property
 
@@ -35,13 +25,13 @@ namespace XamlUI.UserControls
         }
 
         public static readonly DependencyProperty DateProperty =
-            DependencyProperty.Register("Date", typeof(DateTime), typeof(DateTextBox),
+            DependencyProperty.Register("Date", typeof(DateTime), typeof(DateBox),
                 new UIPropertyMetadata(DateTime.Now, OndateChanged));
 
         // Date change dispatcher
         private static void OndateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is DateTextBox dtb)
+            if (d is DateBox dtb)
             {
                 dtb.OndateChanged((DateTime)e.NewValue);
             }
@@ -52,46 +42,52 @@ namespace XamlUI.UserControls
         {
             if (!internalDateUpdate)
             {
-                textBox.Text = date.ToShortDateString();
+                Text = date.ToShortDateString();
             }
         }
 
         #endregion
 
-        #region Constructor
+        #region Overrides
 
-        public DateTextBox()
+        // Select the first date field
+        protected override void OnGotKeyboardFocus(KeyboardFocusChangedEventArgs e)
         {
-            InitializeComponent();
-            textBox.GotFocus += OnTextBoxGotFocus;
-            textBox.PreviewLostKeyboardFocus += OnTextBoxPreviewLostKeyboardFocus;
-            textBox.PreviewTextInput += OnTextBoxPreviewTextInput;
-            textBox.TextChanged += OnTextBoxTextChanged;
+            base.OnGotKeyboardFocus(e);
+
+            if (!string.IsNullOrEmpty(Text))
+            {
+                CaretIndex = 0;
+                SelectionStart = 0;
+                SelectionLength = Text.IndexOf("/");
+            }
         }
 
-        #endregion
-
-        #region Actions
-
-        // Select first field of date when getting focus
-        private void OnTextBoxGotFocus(object sender, RoutedEventArgs e)
+        // Ignore mouse events when we don't yet have focus
+        protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
         {
-            if (textBox.Text != "")
+            base.OnPreviewMouseLeftButtonDown(e);
+
+            if (!IsKeyboardFocusWithin)
             {
-                textBox.CaretIndex = 0;
-                textBox.SelectionStart = 0;
-                textBox.SelectionLength = textBox.Text.IndexOf("/");
+                // If the text box is not yet focussed, give it the focus and
+                // stop further processing of this click event. This prevents the framework
+                // from swallowing up the selection we make when we get focus
+                Focus();
+                e.Handled = true;
             }
         }
 
         // Reformat date and update the date property when moving away
-        private void OnTextBoxPreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        protected override void OnPreviewLostKeyboardFocus(KeyboardFocusChangedEventArgs e)
         {
+            base.OnPreviewLostKeyboardFocus(e);
+
             try
             {
                 internalDateUpdate = true;
-                Date = DateTime.Parse(textBox.Text);
-                textBox.Text = Date.ToShortDateString();
+                Date = DateTime.Parse(Text);
+                Text = Date.ToShortDateString();
             }
             catch (FormatException)
             {
@@ -104,36 +100,37 @@ namespace XamlUI.UserControls
             }
         }
 
-        // Filter input
-        private void OnTextBoxPreviewTextInput(object sender, TextCompositionEventArgs e)
+        protected override void OnPreviewTextInput(TextCompositionEventArgs e)
         {
+            base.OnPreviewTextInput(e);
+
             if (e.Text == "/")
             {
                 // Find next "/" (circular)
-                int firstSlashIndex = textBox.Text.IndexOf('/');
-                int secondSlashIndex = textBox.Text.IndexOf('/', firstSlashIndex + 1);
+                int firstSlashIndex = Text.IndexOf('/');
+                int secondSlashIndex = Text.IndexOf('/', firstSlashIndex + 1);
                 if (firstSlashIndex >= 0 && secondSlashIndex >= 0)
                 {
-                    if (textBox.CaretIndex <= firstSlashIndex)
+                    if (CaretIndex <= firstSlashIndex)
                     {
                         // Select 2nd field, put caret at beginning of 2nd field
-                        textBox.CaretIndex = firstSlashIndex + 1;
-                        textBox.SelectionStart = firstSlashIndex + 1;
-                        textBox.SelectionLength = secondSlashIndex - firstSlashIndex - 1;
+                        CaretIndex = firstSlashIndex + 1;
+                        SelectionStart = firstSlashIndex + 1;
+                        SelectionLength = secondSlashIndex - firstSlashIndex - 1;
                     }
-                    else if (textBox.CaretIndex <= secondSlashIndex)
+                    else if (CaretIndex <= secondSlashIndex)
                     {
                         // Select 3rd field, put caret at beginning of 3rd field
-                        textBox.CaretIndex = secondSlashIndex + 1;
-                        textBox.SelectionStart = secondSlashIndex + 1;
-                        textBox.SelectionLength = textBox.Text.Length - secondSlashIndex - 1;
+                        CaretIndex = secondSlashIndex + 1;
+                        SelectionStart = secondSlashIndex + 1;
+                        SelectionLength = Text.Length - secondSlashIndex - 1;
                     }
                     else
                     {
                         // Select first field
-                        textBox.CaretIndex = 0;
-                        textBox.SelectionStart = 0;
-                        textBox.SelectionLength = firstSlashIndex;
+                        CaretIndex = 0;
+                        SelectionStart = 0;
+                        SelectionLength = firstSlashIndex;
                     }
                     e.Handled = true;
                 }
@@ -149,13 +146,15 @@ namespace XamlUI.UserControls
             }
         }
 
-        // Update the date dependency property on text change
-        private void OnTextBoxTextChanged(object sender, TextChangedEventArgs e)
+        // Update the date property on text change
+        protected override void OnTextChanged(TextChangedEventArgs e)
         {
+            base.OnTextChanged(e);
+
             try
             {
                 internalDateUpdate = true;
-                Date = DateTime.Parse(textBox.Text);
+                Date = DateTime.Parse(Text);
             }
             catch (FormatException)
             {
@@ -165,8 +164,8 @@ namespace XamlUI.UserControls
             {
                 internalDateUpdate = false;
             }
-        }
 
+        }
         #endregion
     }
 }

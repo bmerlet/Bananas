@@ -66,9 +66,7 @@
     <Compile Include="UserControls\BankRegister.xaml.cs">
       <DependentUpon>BankRegister.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UserControls\DateTextBox.xaml.cs">
-      <DependentUpon>DateTextBox.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="UserControls\DateBox.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -90,10 +88,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserControls\BankRegister.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UserControls\DateTextBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
