@@ -69,6 +69,9 @@
             Grid.Row="1"
             AlternatingRowBackground = "LightBlue" AlternationCount = "2"
             AutoGenerateColumns="False"
+            SelectionMode="Single"
+            SelectionUnit="FullRow"
+            CanUserAddRows="False"
             ItemsSource="{Binding Transactions}">
 
             <DataGrid.Columns>

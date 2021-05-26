@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 
 using Toolbox.UILogic;
 using BanaData.Database;
+using System.Windows.Data;
+using System.ComponentModel;
 
 namespace BanaData.Logic.Main
 {
@@ -15,9 +17,14 @@ namespace BanaData.Logic.Main
     {
         #region Private members
 
+        // Main logic
         private readonly MainWindowLogic mainWindowLogic;
 
-        private readonly List<MemorizedPayee> payees = new List<MemorizedPayee>();
+        // Actual collection of transactions backing the Transactions collection view property
+        private readonly ObservableCollection<BankingTransaction> transactions = new ObservableCollection<BankingTransaction>();
+
+        // List of memorized payees
+        private readonly List<MemorizedPayee> memorizedPayees = new List<MemorizedPayee>();
 
         #endregion
 
@@ -26,6 +33,10 @@ namespace BanaData.Logic.Main
         public BankRegisterLogic(MainWindowLogic mainWindowLogic)
         {
             this.mainWindowLogic = mainWindowLogic;
+
+            // Create transaction collection view, and sort by date
+            Transactions = (CollectionView)CollectionViewSource.GetDefaultView(transactions);
+            Transactions.SortDescriptions.Add(new SortDescription("Date", ListSortDirection.Ascending));
         }
 
         #endregion
@@ -38,7 +49,8 @@ namespace BanaData.Logic.Main
         // If banking account (as opposed to credit card)
         public bool IsBank { get; private set; }
 
-        public ObservableCollection<BankingTransaction> Transactions { get; } = new ObservableCollection<BankingTransaction>();
+        // Transactions. The CollectionView type enables sorting on columns
+        public CollectionView Transactions { get; }
 
         #endregion
 
@@ -62,7 +74,7 @@ namespace BanaData.Logic.Main
             BuildPayeeList();
 
             // Find transactions and put them in the transaction list
-            Transactions.Clear();
+            transactions.Clear();
             decimal balance = 0;
             var accTransRel = household.Relations["FK_Accounts_Transactions"];
             foreach (var transRow in account.GetChildRows(accTransRel))
@@ -106,7 +118,7 @@ namespace BanaData.Logic.Main
 
                 string memo = (lineItems.Length == 1) ? (lineItems[0].IsMemoNull() ? "" : lineItems[0].Memo) : "";
 
-                var bt = new BankingTransaction(payees)
+                var bt = new BankingTransaction(memorizedPayees)
                 {
                     Date = trans.Date,
                     Type = transBank == null ? "" : transBank.GetRegisterMediumString(),
@@ -118,7 +130,7 @@ namespace BanaData.Logic.Main
                     Deposit = (amount >= 0) ? amount.ToString("N") : "",
                     Balance = balance.ToString("N")
                 };
-                Transactions.Add(bt);
+                transactions.Add(bt);
             }
 
         }
@@ -127,7 +139,7 @@ namespace BanaData.Logic.Main
         {
             var household = mainWindowLogic.Household;
 
-            payees.Clear();
+            memorizedPayees.Clear();
 
             foreach (var mpr in mainWindowLogic.Household.MemorizedPayees)
             {
@@ -145,10 +157,10 @@ namespace BanaData.Logic.Main
                 }
 
                 var mp = new MemorizedPayee(mpr.Payee, amount, category, memo);
-                payees.Add(mp);
+                memorizedPayees.Add(mp);
             }
 
-            payees.Sort();
+            memorizedPayees.Sort();
         }
 
         #endregion
@@ -156,7 +168,7 @@ namespace BanaData.Logic.Main
         #region Transaction class
 
         // Class representing one banking transaction
-        public class BankingTransaction : LogicBase
+        public class BankingTransaction : LogicBase, IEditableObject
         {
             public BankingTransaction(IEnumerable<MemorizedPayee> payees)
             {
@@ -181,7 +193,28 @@ namespace BanaData.Logic.Main
             public string Deposit { get; set; }
             public string Balance { get; set; }
 
+            public void BeginEdit()
+            {
+                Console.WriteLine($"Begin edit transaction date {Date.ToShortDateString()} Payee {Payee} amount {Payment}");
+                // ZZZ Backup
+            }
+
+            public void CancelEdit()
+            {
+                Console.WriteLine("Cancel edit transaction");
+                // ZZZ Restore backup
+            }
+
+            public void EndEdit()
+            {
+                Console.WriteLine("End edit transaction");
+                // ZZZ Clear backup
+            }
         }
+
+        #endregion
+
+        #region Memorized payee class
 
         // Class representing memorized payees, as viewed in the autocomplete payee textbox
         public class MemorizedPayee : IComparable<MemorizedPayee>

@@ -425,7 +425,7 @@ namespace XamlUI.UserControls
                 foreach (var item in selector.Items)
                 {
                     ListBoxItem container = selector.ItemContainerGenerator.ContainerFromItem(item) as ListBoxItem;
-                    if (container.IsMouseOver)
+                    if (container != null && container.IsMouseOver)
                     {
                         // This item has the mouse over it, use it.
                         container.IsSelected = true;
