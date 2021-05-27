@@ -71,7 +71,7 @@
             AutoGenerateColumns="False"
             SelectionMode="Single"
             SelectionUnit="FullRow"
-            CanUserAddRows="True"
+            CanUserAddRows="False"
             CanUserDeleteRows="True"
             ItemsSource="{Binding Transactions}">
 

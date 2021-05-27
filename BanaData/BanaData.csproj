@@ -69,10 +69,12 @@
     <Compile Include="Database\Transaction.cs" />
     <Compile Include="Logic\IGuiServices.cs" />
     <Compile Include="Logic\Main\AccountGroupLogic.cs" />
+    <Compile Include="Logic\Main\BankingTransactionLogic.cs" />
     <Compile Include="Logic\Main\BankRegisterLogic.cs" />
     <Compile Include="Logic\Main\MainWindowLogic.cs" />
     <Compile Include="Logic\Main\MainMenuLogic.cs" />
     <Compile Include="Logic\Dialogs\OpenFileLogic.cs" />
+    <Compile Include="Logic\Main\MemorizedPayeeItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serializations\UserSettings.cs" />
     <Compile Include="Serializations\Converter.cs" />

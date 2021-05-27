@@ -64,6 +64,10 @@ namespace BanaData.Logic.Main
         // User settings
         public readonly UserSettings UserSettings;
 
+        // List of memorized payees
+        public readonly List<MemorizedPayeeItem> MemorizedPayees = new List<MemorizedPayeeItem>();
+
+
         #region UI properties
 
         // Main window position and size
@@ -135,11 +139,44 @@ namespace BanaData.Logic.Main
 
             NetWorth = netWorth.ToString("N");
             OnPropertyChanged(() => NetWorth);
+
+            // Compute the memorized payees
+            BuildMemorizedPayeeList();
         }
 
         public void OnBankAccountClicked(int accountID)
         {
             BankRegister.SetAccount(accountID);
         }
+
+        // Builds or rebuilds the list of memorized payees
+        private void BuildMemorizedPayeeList()
+        {
+            var household = Household;
+
+            MemorizedPayees.Clear();
+
+            foreach (var mpr in Household.MemorizedPayees)
+            {
+                // Get memorized line item(s)
+                var lineItems = household.MemorizedLineItems.GetByMemorizedPayee(mpr);
+                decimal amount = lineItems.Sum(li => li.Amount);
+
+                string memo = lineItems[0].IsMemoNull() ? "" : lineItems[0].Memo;
+                string category = "";
+
+                if (!lineItems[0].IsCategoryIDNull())
+                {
+                    var destCategory = household.Categories.FindByID(lineItems[0].CategoryID);
+                    category = destCategory.FullName;
+                }
+
+                var mp = new MemorizedPayeeItem(mpr.Payee, amount, category, memo);
+                MemorizedPayees.Add(mp);
+            }
+
+            MemorizedPayees.Sort();
+        }
+
     }
 }

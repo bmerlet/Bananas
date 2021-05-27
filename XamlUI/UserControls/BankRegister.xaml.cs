@@ -26,6 +26,22 @@ namespace XamlUI.UserControls
         public BankRegister()
         {
             InitializeComponent();
+
+            // Hook to initialize new transaction
+            dataGrid.InitializingNewItem += OnDataGridInitializingNewItem;
+
+            // Programatically start edit
+            // dataGrid.BeginEdit()
+            // Events whe editing
+            // dataGrid.BeginningEdit += ...
+            // dataGrid.PreparingCellForEdit += ...
+            // dataGrid.CellEditEnding +=
+            // dataGrid.RowEditEnding +=
+        }
+
+        private void OnDataGridInitializingNewItem(object sender, InitializingNewItemEventArgs e)
+        {
+            Console.WriteLine("OnDataGridInitializingNewItem");
         }
 
         protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)

@@ -21,10 +21,7 @@ namespace BanaData.Logic.Main
         private readonly MainWindowLogic mainWindowLogic;
 
         // Actual collection of transactions backing the Transactions collection view property
-        private readonly ObservableCollection<BankingTransaction> transactions = new ObservableCollection<BankingTransaction>();
-
-        // List of memorized payees
-        private readonly List<MemorizedPayee> memorizedPayees = new List<MemorizedPayee>();
+        private readonly ObservableCollection<BankingTransactionLogic> transactions = new ObservableCollection<BankingTransactionLogic>();
 
         #endregion
 
@@ -53,7 +50,7 @@ namespace BanaData.Logic.Main
         public CollectionView Transactions { get; }
 
         // Transaction to show
-        public BankingTransaction TransactionToScrollTo { get; private set; }
+        public BankingTransactionLogic TransactionToScrollTo { get; private set; }
 
         #endregion
 
@@ -73,11 +70,8 @@ namespace BanaData.Logic.Main
             IsBank = account.Type == EAccountType.Bank;
             OnPropertyChanged(() => IsBank);
 
-            // Build payee list
-            BuildPayeeList();
-
             // Find transactions and put them in the transaction list
-            BankingTransaction bankingTransaction = null;
+            BankingTransactionLogic bankingTransaction = null;
             transactions.Clear();
             decimal balance = 0;
             var accTransRel = household.Relations["FK_Accounts_Transactions"];
@@ -122,134 +116,28 @@ namespace BanaData.Logic.Main
 
                 string memo = (lineItems.Length == 1) ? (lineItems[0].IsMemoNull() ? "" : lineItems[0].Memo) : "";
 
-                bankingTransaction = new BankingTransaction(memorizedPayees)
-                {
-                    Date = trans.Date,
-                    Type = transBank == null ? "" : transBank.GetRegisterMediumString(),
-                    Payee = trans.IsPayeeNull() ? "" : trans.Payee,
-                    Memo = memo,
-                    Category = category,
-                    Payment = (amount >= 0) ? "" : (-amount).ToString("N"),
-                    Status = (trans.Status == ETransactionStatus.Reconciled) ? "R" : ((trans.Status == ETransactionStatus.Cleared) ? "c" : " "),
-                    Deposit = (amount >= 0) ? amount.ToString("N") : "",
-                    Balance = balance.ToString("N")
-                };
+                var transactionData = new BankingTransactionLogic.BankTransactionData(
+                    trans.Date,
+                    transBank == null ? ETransactionMedium.None : transBank.Medium,
+                    transBank == null ? 0 : (transBank.IsCheckNumberNull() ? 0 : transBank.CheckNumber),
+                    trans.IsPayeeNull() ? "" : trans.Payee,
+                    memo,
+                    category,
+                    trans.Status,
+                    amount);
+
+                bankingTransaction = new BankingTransactionLogic(mainWindowLogic, trans.ID, transactionData, balance);
                 transactions.Add(bankingTransaction);
             }
+
+            // Add new empty transaction at the bottom
+            bankingTransaction = new BankingTransactionLogic(mainWindowLogic);
+            transactions.Add(bankingTransaction);
 
             // Go to the bottom
             TransactionToScrollTo = bankingTransaction;
             OnPropertyChanged(() => TransactionToScrollTo);
 
-        }
-
-        private void BuildPayeeList()
-        {
-            var household = mainWindowLogic.Household;
-
-            memorizedPayees.Clear();
-
-            foreach (var mpr in mainWindowLogic.Household.MemorizedPayees)
-            {
-                // Get memorized line item(s)
-                var lineItems = household.MemorizedLineItems.GetByMemorizedPayee(mpr);
-                decimal amount = lineItems.Sum(li => li.Amount);
-
-                string memo = lineItems[0].IsMemoNull() ? "" : lineItems[0].Memo;
-                string category = "";
-
-                if (!lineItems[0].IsCategoryIDNull())
-                {
-                    var destCategory = household.Categories.FindByID(lineItems[0].CategoryID);
-                    category = destCategory.FullName;
-                }
-
-                var mp = new MemorizedPayee(mpr.Payee, amount, category, memo);
-                memorizedPayees.Add(mp);
-            }
-
-            memorizedPayees.Sort();
-        }
-
-        #endregion
-
-        #region Transaction class
-
-        // Class representing one banking transaction
-        public class BankingTransaction : LogicBase, IEditableObject
-        {
-            public BankingTransaction(IEnumerable<MemorizedPayee> payees)
-            {
-                Payees = payees;
-            }
-
-            public DateTime Date { get; set; }
-
-            public string Type { get; set; }
-            public string[] TypeSource { get; } = new string[] { "Next Check Num", "ATM", "Deposit", "Transfer", "EFT" };
-
-            public string Payee { get; set; }
-            public IEnumerable<MemorizedPayee> Payees { get; }
-
-            public string Memo { get; set; }
-            public string Category { get; set; }
-            public string Payment { get; set; }
-
-            public string Status { get; set; }
-            public string[] StatusSource { get; } = new string[] { "", "c", "R" };
-
-            public string Deposit { get; set; }
-            public string Balance { get; set; }
-
-            public void BeginEdit()
-            {
-                Console.WriteLine($"Begin edit transaction date {Date.ToShortDateString()} Payee {Payee} amount {Payment}");
-                // ZZZ Backup
-            }
-
-            public void CancelEdit()
-            {
-                Console.WriteLine("Cancel edit transaction");
-                // ZZZ Restore backup
-            }
-
-            public void EndEdit()
-            {
-                Console.WriteLine("End edit transaction");
-                // ZZZ Clear backup
-            }
-        }
-
-        #endregion
-
-        #region Memorized payee class
-
-        // Class representing memorized payees, as viewed in the autocomplete payee textbox
-        public class MemorizedPayee : IComparable<MemorizedPayee>
-        {
-            public MemorizedPayee(string payee, decimal amount, string category, string memo)
-            {
-                Payee = payee;
-                Amount = amount.ToString("N");
-                Category = category;
-                Memo = memo;
-            }
-
-            public string Payee { get; }
-            public string Amount { get; }
-            public string Category { get; }
-            public string Memo { get; }
-
-            public int CompareTo(MemorizedPayee other)
-            {
-                return Payee.CompareTo(other.Payee);
-            }
-
-            // string that is used to filter on (and to return) 
-            public override string ToString()
-            {
-                return Payee;
-            }
         }
 
         #endregion
