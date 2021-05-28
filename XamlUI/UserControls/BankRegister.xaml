@@ -55,6 +55,23 @@
                     </local:AutoCompleteTextBox.ItemTemplate>
                 </local:AutoCompleteTextBox>
             </DataTemplate>
+
+            <!-- Templates for the payment column -->
+            <DataTemplate x:Key="PaymentColumnTemplate">
+                <TextBlock Text="{Binding PaymentString}" TextAlignment="Right"/>
+            </DataTemplate>
+            <DataTemplate x:Key="PaymentEditingColumnTemplate">
+                <local:AmountBox Amount="{Binding Payment, Mode=TwoWay}" TextAlignment="Right"/>
+            </DataTemplate>
+
+            <!-- Templates for the deposit column -->
+            <DataTemplate x:Key="DepositColumnTemplate">
+                <TextBlock Text="{Binding DepositString}" TextAlignment="Right"/>
+            </DataTemplate>
+            <DataTemplate x:Key="DepositEditingColumnTemplate">
+                <local:AmountBox Amount="{Binding Deposit, Mode=TwoWay}" TextAlignment="Right"/>
+            </DataTemplate>
+
         </Grid.Resources>
         
         <Grid.RowDefinitions>
@@ -94,14 +111,19 @@
                     CellTemplate="{StaticResource PayeeColumnTemplate}"
                     CellEditingTemplate="{StaticResource PayeeEditingColumnTemplate}" />
 
+                <!-- Memo column -->
                 <DataGridTextColumn Header="Memo" Binding="{Binding Memo, Mode=TwoWay}"/>
                 
                 <!-- ZZZ make an autocomplete -->
                 <DataGridTextColumn Header="Category" Binding="{Binding Category}"/>
 
-                <!-- ZZZ need type for numbers only -->
-                <DataGridTextColumn Header="Payment" Binding="{Binding Payment}"/>
+                <!-- Payment column  -->
+                <DataGridTemplateColumn
+                    Header="Payment"
+                    CellTemplate="{StaticResource PaymentColumnTemplate}"
+                    CellEditingTemplate="{StaticResource PaymentEditingColumnTemplate}"/>
 
+                <!-- Status column  -->
                 <DataGridComboBoxColumn Header="Status" SelectedItemBinding="{Binding Status, Mode=TwoWay}">
                     <DataGridComboBoxColumn.ElementStyle>
                         <Style TargetType="{x:Type ComboBox}">
@@ -116,10 +138,15 @@
                     
                 </DataGridComboBoxColumn>
 
-                <!-- ZZZ need type for numbers only -->
-                <DataGridTextColumn Header="Deposit" Binding="{Binding Deposit}"/>
+                <!-- Deposit column  -->
+                <DataGridTemplateColumn
+                    Header="Deposit"
+                    CellTemplate="{StaticResource DepositColumnTemplate}"
+                    CellEditingTemplate="{StaticResource DepositEditingColumnTemplate}"/>
 
+                <!-- Balance column  -->
                 <DataGridTextColumn Header="Balance" Binding="{Binding Balance}" IsReadOnly="True"/>
+
             </DataGrid.Columns>
             
         </DataGrid>

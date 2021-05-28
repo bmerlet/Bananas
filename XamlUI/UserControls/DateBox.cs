@@ -26,10 +26,10 @@ namespace XamlUI.UserControls
 
         public static readonly DependencyProperty DateProperty =
             DependencyProperty.Register("Date", typeof(DateTime), typeof(DateBox),
-                new UIPropertyMetadata(DateTime.Now, OndateChanged));
+                new UIPropertyMetadata(DateTime.Today, OnDateChanged));
 
         // Date change dispatcher
-        private static void OndateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnDateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is DateBox dtb)
             {

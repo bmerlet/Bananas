@@ -130,10 +130,20 @@ namespace BanaData.Logic.Main
         }
 
         // Payment
-        public string Payment
+        public string PaymentString => data.Amount > 0 ? "" : (-data.Amount).ToString("N");
+        public decimal Payment
         {
-            get => data.Amount > 0 ? "" : (-data.Amount).ToString("N");
-            set => data.Amount = -decimal.Parse(value);
+            get => -data.Amount;
+            set
+            {
+                if (data.Amount != -value)
+                {
+                    data.Amount = -value;
+                    OnPropertyChanged(() => PaymentString);
+                    OnPropertyChanged(() => DepositString);
+                    OnPropertyChanged(() => Deposit);
+                }
+            }
         }
 
         public string Status
@@ -144,10 +154,21 @@ namespace BanaData.Logic.Main
 
         public string[] StatusSource { get; } = new string[] { "", "c", "R" };
 
-        public string Deposit
+        // Deposit
+        public string DepositString => data.Amount <= 0 ? "" : data.Amount.ToString("N");
+        public decimal Deposit
         {
-            get => data.Amount <= 0 ? "" : data.Amount.ToString("N");
-            set => data.Amount = decimal.Parse(value);
+            get => data.Amount;
+            set
+            {
+                if (data.Amount != value)
+                {
+                    data.Amount = value;
+                    OnPropertyChanged(() => PaymentString);
+                    OnPropertyChanged(() => DepositString);
+                    OnPropertyChanged(() => Payment);
+                }
+            }
         }
 
         // Balance: How? ZZZZZ
@@ -216,7 +237,9 @@ namespace BanaData.Logic.Main
                 if (data.Amount != backup.Amount)
                 {
                     data.Amount = backup.Amount;
+                    OnPropertyChanged(() => PaymentString);
                     OnPropertyChanged(() => Payment);
+                    OnPropertyChanged(() => DepositString);
                     OnPropertyChanged(() => Deposit);
                 }
             }
