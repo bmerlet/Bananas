@@ -145,7 +145,13 @@
                     CellEditingTemplate="{StaticResource DepositEditingColumnTemplate}"/>
 
                 <!-- Balance column  -->
-                <DataGridTextColumn Header="Balance" Binding="{Binding Balance}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Balance" Binding="{Binding Balance}" IsReadOnly="True">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}">
+                            <Setter Property="HorizontalAlignment" Value="Right" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
 
             </DataGrid.Columns>
             
