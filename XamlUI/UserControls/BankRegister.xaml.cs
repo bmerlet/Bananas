@@ -37,6 +37,8 @@ namespace XamlUI.UserControls
             // dataGrid.PreparingCellForEdit += ...
             // dataGrid.CellEditEnding +=
             // dataGrid.RowEditEnding +=
+
+            dataGrid.Sorting += OnDataGridSorting;
         }
 
         private void OnDataGridInitializingNewItem(object sender, InitializingNewItemEventArgs e)
@@ -71,5 +73,21 @@ namespace XamlUI.UserControls
                 }
             }
         }
+
+        // Recompute balances after sorting
+        private void OnDataGridSorting(object sender, DataGridSortingEventArgs e)
+        {
+            //Console.WriteLine(string.Format("sorting grid by '{0}' column in {1} order", e.Column.SortMemberPath, e.Column.SortDirection));
+
+            if (DataContext is BankRegisterLogic brl)
+            {
+                Dispatcher.BeginInvoke((Action)delegate ()
+                {
+                    // Hopefully runs after the sorting is done (??)
+                    brl.RecomputeBalances();
+                }, null); 
+            }
+        }
+
     }
 }

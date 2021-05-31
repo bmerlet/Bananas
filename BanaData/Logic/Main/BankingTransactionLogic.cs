@@ -69,12 +69,11 @@ namespace BanaData.Logic.Main
         private readonly BankTransactionData data;
         private BankTransactionData backup;
 
-        public BankingTransactionLogic(MainWindowLogic mainWindowLogic, int transID, BankTransactionData data, decimal balance)
+        public BankingTransactionLogic(MainWindowLogic mainWindowLogic, int transID, BankTransactionData data)
         {
             this.mainWindowLogic = mainWindowLogic;
             this.transID = transID;
             this.data = data;
-            Balance = balance.ToString("N");
         }
 
         // To create new transactions (not in DB yet)
@@ -83,7 +82,6 @@ namespace BanaData.Logic.Main
             this.mainWindowLogic = mainWindowLogic;
             this.transID = -1;
             this.data = new BankTransactionData(DateTime.Today, ETransactionMedium.None, 0, "", "", "", ETransactionStatus.Pending, 0);
-            Balance = "";
         }
 
         #region UI properties
@@ -129,6 +127,9 @@ namespace BanaData.Logic.Main
             set => data.Category = value;
         }
 
+        // Amount (not a UI property, needed to recompute balance)
+        public decimal Amount => data.Amount;
+
         // Payment
         public string PaymentString => data.Amount > 0 ? "" : (-data.Amount).ToString("N");
         public decimal Payment
@@ -171,8 +172,24 @@ namespace BanaData.Logic.Main
             }
         }
 
-        // Balance: How? ZZZZZ
-        public string Balance { get; set; }
+        // Balance
+        // BalanceString is the UI property, Balance is updated by the logic
+        private decimal balance = decimal.MinValue;
+        public decimal Balance
+        {
+            get => balance;
+            set
+            {
+                if (balance != value)
+                {
+                    balance = value;
+                    BalanceString = balance.ToString("N");
+                    OnPropertyChanged(() => BalanceString);
+                }
+            }
+        }
+
+        public string BalanceString { get; private set; } = "";
 
         #endregion
 

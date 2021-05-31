@@ -96,18 +96,21 @@
                 <!-- Date column -->
                 <DataGridTemplateColumn
                     Header="Date"
+                    SortMemberPath="Date"
                     CellTemplate="{StaticResource DateColumnTemplate}"
                     CellEditingTemplate="{StaticResource DateEditingColumnTemplate}"/>
 
                 <!-- Type column  -->
                 <DataGridTemplateColumn
                     Header="Check#"
+                    SortMemberPath="Type"
                     CellTemplate="{StaticResource CheckNumberColumnTemplate}"
                     CellEditingTemplate="{StaticResource CheckNumberEditingColumnTemplate}"/>
 
                 <!-- Payee column -->
                 <DataGridTemplateColumn
                     Header="Payee"
+                    SortMemberPath="Payee"
                     CellTemplate="{StaticResource PayeeColumnTemplate}"
                     CellEditingTemplate="{StaticResource PayeeEditingColumnTemplate}" />
 
@@ -120,6 +123,7 @@
                 <!-- Payment column  -->
                 <DataGridTemplateColumn
                     Header="Payment"
+                    SortMemberPath="Payment"
                     CellTemplate="{StaticResource PaymentColumnTemplate}"
                     CellEditingTemplate="{StaticResource PaymentEditingColumnTemplate}"/>
 
@@ -141,11 +145,12 @@
                 <!-- Deposit column  -->
                 <DataGridTemplateColumn
                     Header="Deposit"
+                    SortMemberPath="Deposit"
                     CellTemplate="{StaticResource DepositColumnTemplate}"
                     CellEditingTemplate="{StaticResource DepositEditingColumnTemplate}"/>
 
                 <!-- Balance column  -->
-                <DataGridTextColumn Header="Balance" Binding="{Binding Balance}" IsReadOnly="True">
+                <DataGridTextColumn Header="Balance" Binding="{Binding BalanceString}" IsReadOnly="True" CanUserSort="False">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="{x:Type TextBlock}">
                             <Setter Property="HorizontalAlignment" Value="Right" />

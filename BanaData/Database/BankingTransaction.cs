@@ -17,45 +17,8 @@ namespace BanaData.Database
             // Bridges to local enum types
             public ETransactionMedium Medium
             {
-                get { return (ETransactionMedium)IMedium; }
-                set { IMedium = (int)value; }
-            }
-
-            public string GetRegisterMediumString()
-            {
-                string rs = "???";
-
-                switch (Medium)
-                {
-                    case ETransactionMedium.Check:
-                        if (!IsCheckNumberNull())
-                        {
-                            rs = CheckNumber.ToString();
-                        }
-                        break;
-                    case ETransactionMedium.PrintCheck:
-                        rs = "PrtCk";
-                        break;
-                    case ETransactionMedium.ATM:
-                        rs = "ATM";
-                        break;
-                    case ETransactionMedium.Cash:
-                        rs = "Cash";
-                        break;
-                    case ETransactionMedium.Deposit:
-                        rs = "DEP";
-                        break;
-                    case ETransactionMedium.Dividend:
-                        rs = "Div";
-                        break;
-                    case ETransactionMedium.EFT:
-                        rs = "EFT";
-                        break;
-                    case ETransactionMedium.None:
-                        rs = "";
-                        break;
-                }
-                return rs;
+                get => (ETransactionMedium)IMedium;
+                set => IMedium = (int)value;
             }
         }
 

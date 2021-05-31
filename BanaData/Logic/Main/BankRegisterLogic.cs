@@ -73,7 +73,6 @@ namespace BanaData.Logic.Main
             // Find transactions and put them in the transaction list
             BankingTransactionLogic bankingTransaction = null;
             transactions.Clear();
-            decimal balance = 0;
             var accTransRel = household.Relations["FK_Accounts_Transactions"];
             foreach (var transRow in account.GetChildRows(accTransRel))
             {
@@ -90,7 +89,6 @@ namespace BanaData.Logic.Main
                 // Get line item(s)
                 var lineItems = household.LineItems.GetByTransaction(trans);
                 decimal amount = lineItems.Sum(li => li.Amount);
-                balance += amount;
                 string category = "";
 
                 if (lineItems.Length > 1)
@@ -126,7 +124,7 @@ namespace BanaData.Logic.Main
                     trans.Status,
                     amount);
 
-                bankingTransaction = new BankingTransactionLogic(mainWindowLogic, trans.ID, transactionData, balance);
+                bankingTransaction = new BankingTransactionLogic(mainWindowLogic, trans.ID, transactionData);
                 transactions.Add(bankingTransaction);
             }
 
@@ -134,10 +132,29 @@ namespace BanaData.Logic.Main
             bankingTransaction = new BankingTransactionLogic(mainWindowLogic);
             transactions.Add(bankingTransaction);
 
+            // Compute balances
+            RecomputeBalances();
+
             // Go to the bottom
             TransactionToScrollTo = bankingTransaction;
             OnPropertyChanged(() => TransactionToScrollTo);
 
+        }
+
+        public void RecomputeBalances()
+        {
+            decimal balance = 0;
+            foreach (var o in Transactions)
+            {
+                if (o is BankingTransactionLogic btl)
+                {
+                    // Update running balance
+                    balance += btl.Amount;
+
+                    // Update balance in transaction
+                    btl.Balance = balance;
+                }
+            }
         }
 
         #endregion
