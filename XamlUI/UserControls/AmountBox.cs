@@ -93,10 +93,13 @@ namespace XamlUI.UserControls
         {
             base.OnPreviewLostKeyboardFocus(e);
 
-            internalAmountUpdate = true;
-            Amount = decimal.Parse(Text);
-            Text = Amount.ToString("N");
-            internalAmountUpdate = false;
+            if (!string.IsNullOrEmpty(Text))
+            {
+                internalAmountUpdate = true;
+                Amount = decimal.Parse(Text);
+                Text = Amount.ToString("N");
+                internalAmountUpdate = false;
+            }
         }
 
         #endregion

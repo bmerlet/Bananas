@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -38,12 +39,10 @@ namespace XamlUI.UserControls
             // dataGrid.CellEditEnding +=
             // dataGrid.RowEditEnding +=
 
+            // Listen to sorting on columns
             dataGrid.Sorting += OnDataGridSorting;
-        }
 
-        private void OnDataGridInitializingNewItem(object sender, InitializingNewItemEventArgs e)
-        {
-            Console.WriteLine("OnDataGridInitializingNewItem");
+            dataGrid.PreparingCellForEdit += OnDataGridPreparingCellForEdit;
         }
 
         protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -70,6 +69,9 @@ namespace XamlUI.UserControls
                 {
                     // Scroll to where we are supposed to
                     dataGrid.ScrollIntoView(brl.TransactionToScrollTo);
+
+                    // ZZZ
+                    SetRowToEditMode(brl.TransactionToScrollTo);
                 }
             }
         }
@@ -85,9 +87,84 @@ namespace XamlUI.UserControls
                 {
                     // Hopefully runs after the sorting is done (??)
                     brl.RecomputeBalances();
-                }, null); 
+                }, null);
             }
         }
 
+        private void OnDataGridInitializingNewItem(object sender, InitializingNewItemEventArgs e)
+        {
+            Console.WriteLine("OnDataGridInitializingNewItem");
+        }
+
+        private void OnDataGridPreparingCellForEdit(object sender, DataGridPreparingCellForEditEventArgs e)
+        {
+            Console.WriteLine("OnDataGridPreparingCellForEdit");
+        }
+
+        private void SetRowToEditMode(BankingTransactionLogic btl)
+        {
+            // Get row
+            DataGridRow row = (DataGridRow)dataGrid.ItemContainerGenerator.ContainerFromItem(btl);
+            if (row == null)
+            {
+                dataGrid.UpdateLayout();
+                row = (DataGridRow)dataGrid.ItemContainerGenerator.ContainerFromItem(btl);
+            }
+
+
+            var presenter = FindVisualChild<DataGridCellsPresenter>(row);
+            if (presenter == null)
+            {
+                return;
+            }
+
+            // try to get the cells but it may possibly be virtualized
+            for (int column = 0; column < dataGrid.Columns.Count; column++)
+            {
+                var cell = (DataGridCell)presenter.ItemContainerGenerator.ContainerFromIndex(column);
+                if (cell == null)
+                {
+                    // now try to bring into view and retreive the cell
+                    //ScrollIntoView(rowContainer, Columns[column]);
+                    cell = (DataGridCell)presenter.ItemContainerGenerator.ContainerFromIndex(column);
+                }
+
+                cell.IsEditing = true;
+            }
+        }
+
+        // ZZZZ Somewhere else
+        public static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj)
+               where T : DependencyObject
+        {
+            if (depObj != null)
+            {
+                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
+                {
+                    DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
+                    if (child != null && child is T)
+                    {
+                        yield return (T)child;
+                    }
+
+                    foreach (T childOfChild in FindVisualChildren<T>(child))
+                    {
+                        yield return childOfChild;
+                    }
+                }
+            }
+        }
+
+        public static childItem FindVisualChild<childItem>(DependencyObject obj)
+            where childItem : DependencyObject
+        {
+            foreach (childItem child in FindVisualChildren<childItem>(obj))
+            {
+                return child;
+            }
+
+            return null;
+        }
+        // ZZZZ End
     }
 }

@@ -17,6 +17,7 @@ namespace BanaData.Logic.Main
     {
         public class BankTransactionData
         {
+            // Construct from scratch
             public BankTransactionData(
                 DateTime date,
                 ETransactionMedium type,
@@ -25,30 +26,16 @@ namespace BanaData.Logic.Main
                 string memo,
                 string category,
                 ETransactionStatus status,
-                decimal amount)
-            {
-                Date = date;
-                Type = type;
-                CheckNumber = checkNumber;
-                Payee = payee;
-                Memo = memo;
-                Category = category;
-                Status = status;
-                Amount = amount;
-            }
+                decimal amount) => 
+                (Date, Type, CheckNumber, Payee, Memo, Category, Status, Amount) =
+                (date, type, checkNumber, payee, memo, category, status, amount);
 
-            public BankTransactionData(BankTransactionData src)
-            {
-                Date = src.Date;
-                Type = src.Type;
-                CheckNumber = src.CheckNumber;
-                Payee = src.Payee;
-                Memo = src.Memo;
-                Category = src.Category;
-                Status = src.Status;
-                Amount = src.Amount;
-            }
+            // Clone
+            public BankTransactionData(BankTransactionData src) =>
+                (Date, Type, CheckNumber, Payee, Memo, Category, Status, Amount) =
+                (src.Date, src.Type, src.CheckNumber, src.Payee, src.Memo, src.Category, src.Status, src.Amount);
 
+            // Properties
             public DateTime Date;
             public ETransactionMedium Type;
             public decimal CheckNumber;
@@ -57,11 +44,11 @@ namespace BanaData.Logic.Main
             public string Category;
             public ETransactionStatus Status;
             public decimal Amount;
-
         }
 
-        // Main logic
+        // Parent logic
         private readonly MainWindowLogic mainWindowLogic;
+        private readonly BankRegisterLogic bankRegisterLogic;
 
         // ZZZ
         public readonly int transID;
@@ -69,19 +56,22 @@ namespace BanaData.Logic.Main
         private readonly BankTransactionData data;
         private BankTransactionData backup;
 
-        public BankingTransactionLogic(MainWindowLogic mainWindowLogic, int transID, BankTransactionData data)
+        public BankingTransactionLogic(MainWindowLogic mainWindowLogic, BankRegisterLogic bankRegisterLogic, int transID, BankTransactionData data)
         {
             this.mainWindowLogic = mainWindowLogic;
+            this.bankRegisterLogic = bankRegisterLogic;
             this.transID = transID;
             this.data = data;
         }
 
         // To create new transactions (not in DB yet)
-        public BankingTransactionLogic(MainWindowLogic mainWindowLogic)
+        public BankingTransactionLogic(MainWindowLogic mainWindowLogic, BankRegisterLogic bankRegisterLogic)
         {
             this.mainWindowLogic = mainWindowLogic;
+            this.bankRegisterLogic = bankRegisterLogic;
             this.transID = -1;
             this.data = new BankTransactionData(DateTime.Today, ETransactionMedium.None, 0, "", "", "", ETransactionStatus.Pending, 0);
+            // this.data = new BankTransactionData(DateTime.Today, ETransactionMedium.ATM, 0, "Payee", "Bug spray", "Home:Supplies", ETransactionStatus.Reconciled, (decimal)10.01);
         }
 
         #region UI properties
@@ -261,15 +251,21 @@ namespace BanaData.Logic.Main
                 }
             }
 
-            Console.WriteLine("Cancel edit transaction  date {Date.ToShortDateString()} Payee {Payee} amount {Payment}");
+            Console.WriteLine($"Cancel edit transaction date {Date.ToShortDateString()} Payee {Payee} amount {Payment}");
         }
 
         public void EndEdit()
         {
-            // just clear the backup
-            backup = null;
+            Console.WriteLine($"End edit transaction date {Date.ToShortDateString()} Payee {Payee} amount {Payment}");
 
-            Console.WriteLine("End edit transaction");
+            // Recompute the balances (THIS iS TOO EARLY) ZZZZZ
+            if (backup == null)
+            {
+                bankRegisterLogic.RecomputeBalances();
+            }
+
+            // Clear the backup
+            backup = null;
         }
 
         private string GetTypeString()
@@ -382,6 +378,16 @@ namespace BanaData.Logic.Main
                     data.Status = ETransactionStatus.Reconciled;
                     break;
             }
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is BankingTransactionLogic o && transID == o.transID;
+        }
+
+        public override int GetHashCode()
+        {
+            return transID.GetHashCode();
         }
     }
 }

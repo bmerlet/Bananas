@@ -90,6 +90,7 @@
             SelectionUnit="FullRow"
             CanUserAddRows="False"
             CanUserDeleteRows="True"
+            VirtualizingStackPanel.IsVirtualizing="False" 
             ItemsSource="{Binding Transactions}">
 
             <DataGrid.Columns>
@@ -150,7 +151,7 @@
                     CellEditingTemplate="{StaticResource DepositEditingColumnTemplate}"/>
 
                 <!-- Balance column  -->
-                <DataGridTextColumn Header="Balance" Binding="{Binding BalanceString}" IsReadOnly="True" CanUserSort="False">
+                <DataGridTextColumn Header="Balance" Binding="{Binding BalanceString, Mode=OneWay}" IsReadOnly="True" CanUserSort="False">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="{x:Type TextBlock}">
                             <Setter Property="HorizontalAlignment" Value="Right" />

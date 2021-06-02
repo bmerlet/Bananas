@@ -124,12 +124,12 @@ namespace BanaData.Logic.Main
                     trans.Status,
                     amount);
 
-                bankingTransaction = new BankingTransactionLogic(mainWindowLogic, trans.ID, transactionData);
+                bankingTransaction = new BankingTransactionLogic(mainWindowLogic, this, trans.ID, transactionData);
                 transactions.Add(bankingTransaction);
             }
 
             // Add new empty transaction at the bottom
-            bankingTransaction = new BankingTransactionLogic(mainWindowLogic);
+            bankingTransaction = new BankingTransactionLogic(mainWindowLogic, this);
             transactions.Add(bankingTransaction);
 
             // Compute balances
