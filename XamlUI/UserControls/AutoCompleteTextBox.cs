@@ -199,7 +199,6 @@ namespace XamlUI.UserControls
             popup = Template.FindName(popupPartName, this) as Popup;
             selector = Template.FindName(selectorPartName, this) as ListBox;
 
-            //BindingEvaluator = new BindingEvaluator(new Binding(DisplayMember));
             GotFocus += OnAutoCompleteTextBoxGotFocus;
 
             // ZZZZ
@@ -208,30 +207,17 @@ namespace XamlUI.UserControls
                 editor.TextChanged += OnEditorTextChanged;
                 editor.LostFocus += OnEditorLostFocus;
                 editor.PreviewKeyDown += OnEditorPreviewKeyDown;
-
-                //if (SelectedItem != null)
-                //{
-                //    editor.Text = BindingEvaluator.Evaluate(SelectedItem);
-                //}
-
             }
 
             if (popup != null)
             {
                 //popup.StaysOpen = false;
                 popup.StaysOpen = true;
-                //popup.Opened += OnPopupOpened;
-                //popup.Closed += OnPopupClosed;
             }
 
             if (selector != null)
             {
-                selector.Items.Filter = Filter;
                 selector.PreviewMouseUp += OnSelectorPreviewMouseUp;
-                //SelectionAdapter = new SelectionAdapter(selector);
-                //SelectionAdapter.Commit += OnSelectionAdapterCommit;
-                //SelectionAdapter.Cancel += OnSelectionAdapterCancel;
-                //SelectionAdapter.SelectionChanged += OnSelectionAdapterSelectionChanged;
             }
         }
 
@@ -246,6 +232,11 @@ namespace XamlUI.UserControls
         {
             if (editor != null)
             {
+                // Set the filter on the collection to the filter for THIS autocomplete text box.
+                // The selector's item collection may be shared by multiple autocomplete text box,
+                // the one with the focus should impose its own filter
+                selector.Items.Filter = Filter;
+
                 editor.Focus();
                 editor.SelectAll(); // ZZZ Who unselects?
                 RefreshSelector();
@@ -259,6 +250,7 @@ namespace XamlUI.UserControls
             if (!IsKeyboardFocusWithin)
             {
                 IsPopupOpen = false;
+                selector.Items.Filter = null;
             }
         }
 
@@ -269,22 +261,6 @@ namespace XamlUI.UserControls
         {
             // Update autocomplete list
             RefreshSelector();
-
-            //if (_isUpdatingText)
-            //    return;
-            // SetSelectedItem(null); Means clear listbox selection
-            //if (editor.Text.Length > 0) //ZZZZZ
-            //{
-            //    IsLoading = true;
-            //    IsDropDownOpen = true;
-            //    ItemsSelector.ItemsSource = null;
-            //    FetchTimer.IsEnabled = true;
-            //    FetchTimer.Start();
-            //}
-            //else
-            //{
-            //    IsDropDownOpen = false;
-            //}
         }
 
         //
@@ -387,7 +363,8 @@ namespace XamlUI.UserControls
                 return true;
             }
 
-            string itemString = "";
+            // Get string to filter on from input object 
+            string itemString;
             if (string.IsNullOrEmpty(DisplayMember))
             {
                 itemString = o.ToString();
@@ -397,7 +374,6 @@ namespace XamlUI.UserControls
                 itemString = BindingEvaluator.GetValue(o, DisplayMember);
             }
 
-            // ZZZ Display member
             return itemString.IndexOf(curTxt, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
