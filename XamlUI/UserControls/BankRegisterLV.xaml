@@ -1,0 +1,307 @@
+﻿<UserControl x:Class="XamlUI.UserControls.BankRegisterLV"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:XamlUI.UserControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+
+        <Grid.Resources>
+            
+            <!-- Templates for the date column -->
+            <DataTemplate x:Key="DateColumnTemplate">
+                <TextBlock Text="{Binding Date, StringFormat=M/d/yyyy}"/>
+            </DataTemplate>
+            <DataTemplate x:Key="DateEditingColumnTemplate">
+                <local:DateBox Date="{Binding Date, Mode=TwoWay}"/>
+            </DataTemplate>
+
+            <!-- Templates for the check number column -->
+            <DataTemplate x:Key="CheckNumberColumnTemplate">
+                <TextBlock Text="{Binding Type}"/>
+            </DataTemplate>
+            <DataTemplate x:Key="CheckNumberEditingColumnTemplate">
+                <ComboBox IsEditable="True" Text="{Binding Type, Mode=TwoWay}" ItemsSource="{Binding TypeSource}"/>
+            </DataTemplate>
+
+            <!-- Templates for the payee column -->
+            <DataTemplate x:Key="PayeeColumnTemplate">
+                <TextBlock Text="{Binding Payee}"/>
+            </DataTemplate>
+            <DataTemplate x:Key="PayeeEditingColumnTemplate">
+                <local:AutoCompleteTextBox 
+                    Text="{Binding Payee, Mode=TwoWay}"
+                    Watermark="Payee"
+                    DisplayMember="Payee"
+                    ListBoxHeight="150" 
+                    ItemsSource="{Binding Payees}">
+                    <local:AutoCompleteTextBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="65"/>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="100"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Payee}"/>
+                                <TextBlock Text="{Binding Amount}"   Grid.Column="1" Margin="3,0" HorizontalAlignment="Right" Foreground="Red"/>
+                                <TextBlock Text="{Binding Category}" Grid.Column="2" Foreground="Blue"/>
+                                <TextBlock Text="{Binding Memo}"     Grid.Column="3" Margin="3,0,0,0"/>
+                            </Grid>
+                        </DataTemplate>
+                    </local:AutoCompleteTextBox.ItemTemplate>
+                </local:AutoCompleteTextBox>
+            </DataTemplate>
+
+            <!-- Templates for the payment column -->
+            <DataTemplate x:Key="PaymentColumnTemplate">
+                <TextBlock Text="{Binding PaymentString}" TextAlignment="Right"/>
+            </DataTemplate>
+            <DataTemplate x:Key="PaymentEditingColumnTemplate">
+                <local:AmountBox Amount="{Binding Payment, Mode=TwoWay}" TextAlignment="Right"/>
+            </DataTemplate>
+
+            <!-- Templates for the deposit column -->
+            <DataTemplate x:Key="DepositColumnTemplate">
+                <TextBlock Text="{Binding DepositString}" TextAlignment="Right"/>
+            </DataTemplate>
+            <DataTemplate x:Key="DepositEditingColumnTemplate">
+                <local:AmountBox Amount="{Binding Deposit, Mode=TwoWay}" TextAlignment="Right"/>
+            </DataTemplate>
+
+        </Grid.Resources>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <Label Content="{Binding AccountName}"/>
+
+        <ListView
+            Name="listView"
+            Grid.Row="1"
+            AlternationCount="2"
+            SelectionMode="Single"
+            ItemsSource="{Binding Transactions}">
+
+            <!-- Make the list view items use all the horizontal space -->
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListView.ItemContainerStyle>
+            
+            <ListView.View>
+                <GridView>
+
+                    <!-- Date column -->
+                    <GridViewColumn Width="{Binding WidthOfDateColumn, Mode=TwoWay}">
+
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Date" Tag="Date" Click="OnColumnHeaderClicked"/>
+                        </GridViewColumn.Header>
+                        
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <TextBlock x:Name="dateTextBlock" Text="{Binding Path=Date, StringFormat=M/d/yyyy}"/>
+                                    <local:DateBox x:Name="dateBox" Date="{Binding Path=Date, Mode=TwoWay}"/>
+                                </Grid>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
+                                        <Setter TargetName="dateTextBlock" Property="Visibility" Value="Collapsed"/>
+                                        <Setter TargetName="dateBox" Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="False">
+                                        <Setter TargetName="dateTextBlock" Property="Visibility" Value="Visible"/>
+                                        <Setter TargetName="dateBox" Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <!-- Medium column -->
+                    <GridViewColumn Width="{Binding WidthOfMediumColumn, Mode=TwoWay}">
+
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Type" Tag="Medium" Click="OnColumnHeaderClicked"/>
+                        </GridViewColumn.Header>
+
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <TextBlock x:Name="mediumTextBlock" Text="{Binding Medium}"/>
+                                    <ComboBox x:Name="mediumComboBox" ItemsSource="{Binding MediumSource}" SelectedItem="{Binding Path=Medium, Mode=TwoWay}"/>
+                                </Grid>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
+                                        <Setter TargetName="mediumTextBlock" Property="Visibility" Value="Collapsed"/>
+                                        <Setter TargetName="mediumComboBox" Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="False">
+                                        <Setter TargetName="mediumTextBlock" Property="Visibility" Value="Visible"/>
+                                        <Setter TargetName="mediumComboBox" Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    
+                    <!-- Payee column -->
+                    <GridViewColumn Width="{Binding WidthOfPayeeColumn, Mode=TwoWay}">
+
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Payee" Tag="Payee" Click="OnColumnHeaderClicked"/>
+                        </GridViewColumn.Header>
+
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <TextBlock x:Name="payeeTextBlock" Text="{Binding Path=Payee}"/>
+                                    <local:AutoCompleteTextBox 
+                                        x:Name="payeeACBox"
+                                        Text="{Binding Payee, Mode=TwoWay}"
+                                        Watermark="Payee"
+                                        DisplayMember="Payee"
+                                        ListBoxHeight="150" 
+                                        ItemsSource="{Binding Payees}">
+                                        <local:AutoCompleteTextBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="120"/>
+                                                        <ColumnDefinition Width="65"/>
+                                                        <ColumnDefinition Width="120"/>
+                                                        <ColumnDefinition Width="100"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{Binding Payee}"/>
+                                                    <TextBlock Text="{Binding Amount}"   Grid.Column="1" Margin="3,0" HorizontalAlignment="Right" Foreground="Red"/>
+                                                    <TextBlock Text="{Binding Category}" Grid.Column="2" Foreground="Blue"/>
+                                                    <TextBlock Text="{Binding Memo}"     Grid.Column="3" Margin="3,0,0,0"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </local:AutoCompleteTextBox.ItemTemplate>
+                                    </local:AutoCompleteTextBox>
+                                </Grid>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
+                                        <Setter TargetName="payeeTextBlock" Property="Visibility" Value="Collapsed"/>
+                                        <Setter TargetName="payeeACBox" Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="False">
+                                        <Setter TargetName="payeeTextBlock" Property="Visibility" Value="Visible"/>
+                                        <Setter TargetName="payeeACBox" Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    
+                    <!-- Memo column-->
+                    <!-- Category column-->
+                    <!-- Payment column-->
+                    <!-- Status column-->
+                    <!-- Deposit column-->
+
+                    <!-- Balance column-->
+                    <GridViewColumn Header="Balance" Width="{Binding WidthOfBalanceColumn, Mode=TwoWay}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding BalanceString, Mode=OneWay}" HorizontalAlignment="Right"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <!--
+        <DataGrid
+            Name="dataGrid"
+            Grid.Row="1"
+            AlternatingRowBackground = "LightBlue" AlternationCount = "2"
+            AutoGenerateColumns="False"
+            SelectionMode="Single"
+            SelectionUnit="FullRow"
+            CanUserAddRows="False"
+            CanUserDeleteRows="True"
+            VirtualizingStackPanel.IsVirtualizing="False" 
+            ItemsSource="{Binding Transactions}">
+
+            <DataGrid.Columns>
+                <! Date column >
+                <DataGridTemplateColumn
+                    Header="Date"
+                    SortMemberPath="Date"
+                    CellTemplate="{StaticResource DateColumnTemplate}"
+                    CellEditingTemplate="{StaticResource DateEditingColumnTemplate}"/>
+
+                <! Type column  >
+                <DataGridTemplateColumn
+                    Header="Check#"
+                    SortMemberPath="Type"
+                    CellTemplate="{StaticResource CheckNumberColumnTemplate}"
+                    CellEditingTemplate="{StaticResource CheckNumberEditingColumnTemplate}"/>
+
+                <! Payee column >
+                <DataGridTemplateColumn
+                    Header="Payee"
+                    SortMemberPath="Payee"
+                    CellTemplate="{StaticResource PayeeColumnTemplate}"
+                    CellEditingTemplate="{StaticResource PayeeEditingColumnTemplate}" />
+
+                <! Memo column >
+                <DataGridTextColumn Header="Memo" Binding="{Binding Memo, Mode=TwoWay}"/>
+                
+                <! ZZZ make an autocomplete >
+                <DataGridTextColumn Header="Category" Binding="{Binding Category}"/>
+
+                <! Payment column  >
+                <DataGridTemplateColumn
+                    Header="Payment"
+                    SortMemberPath="Payment"
+                    CellTemplate="{StaticResource PaymentColumnTemplate}"
+                    CellEditingTemplate="{StaticResource PaymentEditingColumnTemplate}"/>
+
+                <! Status column >
+                <DataGridComboBoxColumn Header="Status" SelectedItemBinding="{Binding Status, Mode=TwoWay}">
+                    <DataGridComboBoxColumn.ElementStyle>
+                        <Style TargetType="{x:Type ComboBox}">
+                            <Setter Property="ItemsSource" Value="{Binding Path=StatusSource}" />
+                        </Style>
+                    </DataGridComboBoxColumn.ElementStyle>
+                    <DataGridComboBoxColumn.EditingElementStyle>
+                        <Style TargetType="{x:Type ComboBox}">
+                            <Setter Property="ItemsSource" Value="{Binding Path=StatusSource}" />
+                        </Style>
+                    </DataGridComboBoxColumn.EditingElementStyle>
+                    
+                </DataGridComboBoxColumn>
+
+                <! Deposit column >
+                <DataGridTemplateColumn
+                    Header="Deposit"
+                    SortMemberPath="Deposit"
+                    CellTemplate="{StaticResource DepositColumnTemplate}"
+                    CellEditingTemplate="{StaticResource DepositEditingColumnTemplate}"/>
+
+                <! Balance column >
+                <DataGridTextColumn Header="Balance" Binding="{Binding BalanceString, Mode=OneWay}" IsReadOnly="True" CanUserSort="False">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}">
+                            <Setter Property="HorizontalAlignment" Value="Right" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+            </DataGrid.Columns>
+            
+        </DataGrid>
+        -->
+    </Grid>
+</UserControl>
