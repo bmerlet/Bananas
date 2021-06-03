@@ -52,6 +52,97 @@ namespace BanaData.Logic.Main
         // Transaction to show
         public BankingTransactionLogic TransactionToScrollTo { get; private set; }
 
+        // Column widths
+        public double WidthOfDateColumn
+        {
+            get => mainWindowLogic.UserSettings.WidthOfDateColumn;
+            set
+            {
+                mainWindowLogic.UserSettings.WidthOfDateColumn = value;
+                mainWindowLogic.SaveUserSettings();
+            }
+        }
+
+        public double WidthOfMediumColumn
+        {
+            get => mainWindowLogic.UserSettings.WidthOfMediumColumn;
+            set
+            {
+                mainWindowLogic.UserSettings.WidthOfMediumColumn = value;
+                mainWindowLogic.SaveUserSettings();
+            }
+        }
+
+        public double WidthOfPayeeColumn
+        {
+            get => mainWindowLogic.UserSettings.WidthOfPayeeColumn;
+            set
+            {
+                mainWindowLogic.UserSettings.WidthOfPayeeColumn = value;
+                mainWindowLogic.SaveUserSettings();
+            }
+        }
+
+        public double WidthOfMemoColumn
+        {
+            get => mainWindowLogic.UserSettings.WidthOfMemoColumn;
+            set
+            {
+                mainWindowLogic.UserSettings.WidthOfMemoColumn = value;
+                mainWindowLogic.SaveUserSettings();
+            }
+        }
+
+        public double WidthOfCategoryColumn
+        {
+            get => mainWindowLogic.UserSettings.WidthOfCategoryColumn;
+            set
+            {
+                mainWindowLogic.UserSettings.WidthOfCategoryColumn = value;
+                mainWindowLogic.SaveUserSettings();
+            }
+        }
+
+        public double WidthOfPaymentColumn
+        {
+            get => mainWindowLogic.UserSettings.WidthOfPaymentColumn;
+            set
+            {
+                mainWindowLogic.UserSettings.WidthOfPaymentColumn = value;
+                mainWindowLogic.SaveUserSettings();
+            }
+        }
+
+        public double WidthOfStatusColumn
+        {
+            get => mainWindowLogic.UserSettings.WidthOfStatusColumn;
+            set
+            {
+                mainWindowLogic.UserSettings.WidthOfStatusColumn = value;
+                mainWindowLogic.SaveUserSettings();
+            }
+        }
+
+        public double WidthOfDepositColumn
+        {
+            get => mainWindowLogic.UserSettings.WidthOfDepositColumn;
+            set
+            {
+                mainWindowLogic.UserSettings.WidthOfDepositColumn = value;
+                mainWindowLogic.SaveUserSettings();
+            }
+        }
+
+        public double WidthOfBalanceColumn
+        {
+            get => mainWindowLogic.UserSettings.WidthOfBalanceColumn;
+            set
+            {
+                mainWindowLogic.UserSettings.WidthOfBalanceColumn = value;
+                mainWindowLogic.SaveUserSettings();
+            }
+        }
+
         #endregion
 
         #region Actions
