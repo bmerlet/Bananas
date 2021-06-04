@@ -63,12 +63,26 @@
                 <local:WatermarkTextBox Text="{Binding Memo, Mode=TwoWay}" Watermark="Memo"/>
             </DataTemplate>
 
+            <!-- Templates for the category column -->
+            <DataTemplate x:Key="CategoryColumnTemplate">
+                <TextBlock Text="{Binding Category}"/>
+            </DataTemplate>
+            <DataTemplate x:Key="CategoryEditingColumnTemplate">
+                <local:AutoCompleteTextBox 
+                    Text="{Binding Category, Mode=TwoWay}"
+                    Watermark="Category"
+                    DisplayMember="CategoryFullName"
+                    ListBoxHeight="150" 
+                    ItemsSource="{Binding Categories}">
+                </local:AutoCompleteTextBox>
+            </DataTemplate>
+
             <!-- Templates for the payment column -->
             <DataTemplate x:Key="PaymentColumnTemplate">
                 <TextBlock Text="{Binding PaymentString}" TextAlignment="Right"/>
             </DataTemplate>
             <DataTemplate x:Key="PaymentEditingColumnTemplate">
-                <local:AmountBox Amount="{Binding Payment, Mode=TwoWay}" TextAlignment="Right"/>
+                <local:AmountBox Watermark="Payment" Amount="{Binding Payment, Mode=TwoWay}" TextAlignment="Right"/>
             </DataTemplate>
 
             <!-- Templates for the deposit column -->
@@ -76,7 +90,7 @@
                 <TextBlock Text="{Binding DepositString}" TextAlignment="Right"/>
             </DataTemplate>
             <DataTemplate x:Key="DepositEditingColumnTemplate">
-                <local:AmountBox Amount="{Binding Deposit, Mode=TwoWay}" TextAlignment="Right"/>
+                <local:AmountBox Watermark="Deposit" Amount="{Binding Deposit, Mode=TwoWay}" TextAlignment="Right"/>
             </DataTemplate>
 
         </Grid.Resources>
@@ -129,8 +143,12 @@
                     CellTemplate="{StaticResource MemoColumnTemplate}"
                     CellEditingTemplate="{StaticResource MemoEditingColumnTemplate}" />
                 
-                <!-- ZZZ make an autocomplete -->
-                <DataGridTextColumn Header="Category" Binding="{Binding Category}"/>
+                <!-- Category column -->
+                <DataGridTemplateColumn
+                    Header="Category"
+                    SortMemberPath="Category"
+                    CellTemplate="{StaticResource CategoryColumnTemplate}"
+                    CellEditingTemplate="{StaticResource CategoryEditingColumnTemplate}" />
 
                 <!-- Payment column  -->
                 <DataGridTemplateColumn

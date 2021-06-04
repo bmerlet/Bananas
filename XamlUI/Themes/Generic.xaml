@@ -48,8 +48,9 @@
                                     VerticalAlignment="Center"
                                     HorizontalAlignment="Left"
                                     Focusable="False"
+                                    FontStyle="Italic" 
                                     Foreground="LightGray"
-                                    Margin="3,0" />
+                                    Margin="3,0"/>
                         <TextBox x:Name="PART_Editor"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"

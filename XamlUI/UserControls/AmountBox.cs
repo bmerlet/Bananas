@@ -9,7 +9,7 @@ using System.Windows.Input;
 
 namespace XamlUI.UserControls
 {
-    class AmountBox : TextBox
+    class AmountBox : WatermarkTextBox
     {
         private bool internalAmountUpdate;
 

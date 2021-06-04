@@ -67,6 +67,8 @@ namespace BanaData.Logic.Main
         // List of memorized payees
         public readonly List<MemorizedPayeeItem> MemorizedPayees = new List<MemorizedPayeeItem>();
 
+        // List of categories, as displayed in the UI
+        public readonly List<CategoryItem> Categories = new List<CategoryItem>();
 
         #region UI properties
 
@@ -142,6 +144,9 @@ namespace BanaData.Logic.Main
 
             // Compute the memorized payees
             BuildMemorizedPayeeList();
+
+            // Comppute the known categories
+            BuildCategoriesList();
         }
 
         public void OnBankAccountClicked(int accountID)
@@ -178,5 +183,17 @@ namespace BanaData.Logic.Main
             MemorizedPayees.Sort();
         }
 
+        // Builds or rebuilds the list of categories
+        private void BuildCategoriesList()
+        {
+            Categories.Clear();
+
+            foreach (var category in Household.Categories)
+            {
+                Categories.Add(new CategoryItem(category.FullName));
+            }
+
+            MemorizedPayees.Sort();
+        }
     }
 }

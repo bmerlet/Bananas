@@ -110,12 +110,14 @@ namespace BanaData.Logic.Main
             set => data.Memo = value;
         }
 
-        // Category ZZZ
+        // Category
         public string Category 
         {
             get => data.Category;
             set => data.Category = value;
         }
+
+        public IEnumerable<CategoryItem> Categories => mainWindowLogic.Categories;
 
         // Amount (not a UI property, needed to recompute balance)
         public decimal Amount => data.Amount;

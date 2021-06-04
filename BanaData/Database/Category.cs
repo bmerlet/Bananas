@@ -16,10 +16,7 @@ namespace BanaData.Database
         {
             private string fullName = null;
 
-            public string FullName
-            {
-                get { return GetFullName(); }
-            }
+            public string FullName => GetFullName();
 
             public void ResetFullName()
             {
