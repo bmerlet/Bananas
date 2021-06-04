@@ -28,14 +28,6 @@ namespace XamlUI.UserControls
         {
             InitializeComponent();
 
-            // Programatically start edit
-            // dataGrid.BeginEdit()
-            // Events whe editing
-            // dataGrid.BeginningEdit += ...
-            // dataGrid.PreparingCellForEdit += ...
-            // dataGrid.CellEditEnding +=
-            // dataGrid.RowEditEnding +=
-
             listView.SelectionChanged += OnListViewSelectionChanged;
         }
 
@@ -51,6 +43,7 @@ namespace XamlUI.UserControls
         }
 
         private GridViewColumn maroonedColumn;
+
         private void OnDataContextPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (DataContext is BankRegisterLogic brl)
@@ -58,7 +51,6 @@ namespace XamlUI.UserControls
                 // Show/hide type column depending on whether this is a bank account or a credit card
                 if (e.PropertyName == "IsBank")
                 {
-                    //dataGrid.Columns[1].Visibility = brl.IsBank ? Visibility.Visible : Visibility.Collapsed;
                     GridView gridview = listView.View as GridView;
                     if (brl.IsBank)
                     {
@@ -189,55 +181,5 @@ namespace XamlUI.UserControls
         }
 
         #endregion
-
-        // Recompute balances after sorting
-        private void OnDataGridSorting(object sender, DataGridSortingEventArgs e)
-        {
-            //Console.WriteLine(string.Format("sorting grid by '{0}' column in {1} order", e.Column.SortMemberPath, e.Column.SortDirection));
-
-            if (DataContext is BankRegisterLogic brl)
-            {
-                Dispatcher.BeginInvoke((Action)delegate ()
-                {
-                    // Hopefully runs after the sorting is done (??)
-                    brl.RecomputeBalances();
-                }, null);
-            }
-        }
-
-        // ZZZZ Somewhere else
-        public static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj)
-               where T : DependencyObject
-        {
-            if (depObj != null)
-            {
-                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
-                {
-                    DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
-                    if (child != null && child is T t)
-                    {
-                        yield return t;
-                    }
-
-                    foreach (T childOfChild in FindVisualChildren<T>(child))
-                    {
-                        yield return childOfChild;
-                    }
-                }
-            }
-        }
-
-        public static childItem FindVisualChild<childItem>(DependencyObject obj)
-            where childItem : DependencyObject
-        {
-            foreach (childItem child in FindVisualChildren<childItem>(obj))
-            {
-                return child;
-            }
-
-            return null;
-        }
-        // ZZZZ End
-
     }
 }
