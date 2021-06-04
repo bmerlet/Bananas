@@ -12,10 +12,8 @@
     xmlns:ucs="clr-namespace:XamlUI.UserControls">
 
     <!-- Transparent text box style, to see the watermark -->
-    <Style TargetType="{x:Type TextBox}"
-           x:Key="TransparentTextBoxStyle">
-        <Setter Property="FocusVisualStyle"
-                Value="{x:Null}" />
+    <Style TargetType="{x:Type TextBox}" x:Key="TransparentTextBoxStyle">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TextBox}">
@@ -31,7 +29,46 @@
         </Setter>
     </Style>
 
-    
+
+    <!-- define default style for WatermarkTextBox -->
+    <Style TargetType="{x:Type ucs:WatermarkTextBox}">
+        <!-- Default values -->
+        <Setter Property="Focusable"        Value="False" />
+        <Setter Property="IsTabStop"        Value="True"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="Validation.ErrorTemplate" Value="{x:Null}"/>
+        <!-- Default control template -->
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ucs:WatermarkTextBox}">
+                    <Grid>
+                        <TextBlock x:Name="PART_Watermark"
+                                    Text="{TemplateBinding Watermark}"
+                                    Visibility="Collapsed"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Left"
+                                    Focusable="False"
+                                    Foreground="LightGray"
+                                    Margin="3,0" />
+                        <TextBox x:Name="PART_Editor"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Center"
+                                    Focusable="True"
+                                    TabIndex="{TemplateBinding TabIndex}"
+                                    Style="{StaticResource ResourceKey=TransparentTextBoxStyle}"
+                                    Text="{Binding Path=Text, RelativeSource={RelativeSource Mode=TemplatedParent}, Mode=TwoWay}" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <!-- Make watermark visible when there is no text in the editor -->
+                        <Trigger Property="Text" Value="" SourceName="PART_Editor">
+                            <Setter Property="Visibility" Value="Visible" TargetName="PART_Watermark" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- define default style for AutoCompleteTextBox -->
     <Style TargetType="{x:Type ucs:AutoCompleteTextBox}">
         <!-- Default values -->

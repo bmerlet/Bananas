@@ -71,6 +71,7 @@
       <DependentUpon>BankRegisterLV.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\DateBox.cs" />
+    <Compile Include="UserControls\WatermarkTextBox.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

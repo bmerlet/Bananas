@@ -56,6 +56,13 @@
                 </local:AutoCompleteTextBox>
             </DataTemplate>
 
+            <DataTemplate x:Key="MemoColumnTemplate">
+                <TextBlock Text="{Binding Memo}"/>
+            </DataTemplate>
+            <DataTemplate x:Key="MemoEditingColumnTemplate">
+                <local:WatermarkTextBox Text="{Binding Memo, Mode=TwoWay}" Watermark="Memo"/>
+            </DataTemplate>
+
             <!-- Templates for the payment column -->
             <DataTemplate x:Key="PaymentColumnTemplate">
                 <TextBlock Text="{Binding PaymentString}" TextAlignment="Right"/>
@@ -116,7 +123,11 @@
                     CellEditingTemplate="{StaticResource PayeeEditingColumnTemplate}" />
 
                 <!-- Memo column -->
-                <DataGridTextColumn Header="Memo" Binding="{Binding Memo, Mode=TwoWay}"/>
+                <DataGridTemplateColumn
+                    Header="Memo"
+                    SortMemberPath="Memo"
+                    CellTemplate="{StaticResource MemoColumnTemplate}"
+                    CellEditingTemplate="{StaticResource MemoEditingColumnTemplate}" />
                 
                 <!-- ZZZ make an autocomplete -->
                 <DataGridTextColumn Header="Category" Binding="{Binding Category}"/>
