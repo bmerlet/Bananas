@@ -12,7 +12,7 @@
             
             <!-- Templates for the date column -->
             <DataTemplate x:Key="DateColumnTemplate">
-                <TextBlock Text="{Binding Date, StringFormat=M/d/yyyy}"/>
+                <TextBlock Text="{Binding Date, StringFormat=M/d/yyyy}" HorizontalAlignment="Right"/>
             </DataTemplate>
             <DataTemplate x:Key="DateEditingColumnTemplate">
                 <local:DateBox Date="{Binding Date, Mode=TwoWay}"/>
@@ -20,10 +20,10 @@
 
             <!-- Templates for the check number column -->
             <DataTemplate x:Key="CheckNumberColumnTemplate">
-                <TextBlock Text="{Binding Type}"/>
+                <TextBlock Text="{Binding Medium}"/>
             </DataTemplate>
             <DataTemplate x:Key="CheckNumberEditingColumnTemplate">
-                <ComboBox IsEditable="True" Text="{Binding Type, Mode=TwoWay}" ItemsSource="{Binding TypeSource}"/>
+                <ComboBox IsEditable="True" Text="{Binding Medium, Mode=TwoWay}" ItemsSource="{Binding MediumSource}"/>
             </DataTemplate>
 
             <!-- Templates for the payee column -->
@@ -114,18 +114,25 @@
             VirtualizingStackPanel.IsVirtualizing="False" 
             ItemsSource="{Binding Transactions}">
 
+            <DataGrid.Resources>
+                <local:BindingProxy x:Key="proxy" Data="{Binding}" />
+                <local:DataGridLengthConverter x:Key="dglConverter"/>
+            </DataGrid.Resources>
+
             <DataGrid.Columns>
                 <!-- Date column -->
                 <DataGridTemplateColumn
                     Header="Date"
                     SortMemberPath="Date"
+                    Width="{Binding Source={StaticResource proxy}, Path=Data.WidthOfDateColumn, Mode=TwoWay, Converter={StaticResource dglConverter}}"
                     CellTemplate="{StaticResource DateColumnTemplate}"
                     CellEditingTemplate="{StaticResource DateEditingColumnTemplate}"/>
 
-                <!-- Type column  -->
+                <!-- Medium column  -->
                 <DataGridTemplateColumn
                     Header="Check#"
-                    SortMemberPath="Type"
+                    SortMemberPath="Medium"
+                    Width="{Binding Source={StaticResource proxy}, Path=Data.WidthOfMediumColumn, Mode=TwoWay, Converter={StaticResource dglConverter}}"
                     CellTemplate="{StaticResource CheckNumberColumnTemplate}"
                     CellEditingTemplate="{StaticResource CheckNumberEditingColumnTemplate}"/>
 
@@ -133,6 +140,7 @@
                 <DataGridTemplateColumn
                     Header="Payee"
                     SortMemberPath="Payee"
+                    Width="{Binding Source={StaticResource proxy}, Path=Data.WidthOfPayeeColumn, Mode=TwoWay, Converter={StaticResource dglConverter}}"
                     CellTemplate="{StaticResource PayeeColumnTemplate}"
                     CellEditingTemplate="{StaticResource PayeeEditingColumnTemplate}" />
 
@@ -140,6 +148,7 @@
                 <DataGridTemplateColumn
                     Header="Memo"
                     SortMemberPath="Memo"
+                    Width="{Binding Source={StaticResource proxy}, Path=Data.WidthOfMemoColumn, Mode=TwoWay, Converter={StaticResource dglConverter}}"
                     CellTemplate="{StaticResource MemoColumnTemplate}"
                     CellEditingTemplate="{StaticResource MemoEditingColumnTemplate}" />
                 
@@ -147,6 +156,7 @@
                 <DataGridTemplateColumn
                     Header="Category"
                     SortMemberPath="Category"
+                    Width="{Binding Source={StaticResource proxy}, Path=Data.WidthOfCategoryColumn, Mode=TwoWay, Converter={StaticResource dglConverter}}"
                     CellTemplate="{StaticResource CategoryColumnTemplate}"
                     CellEditingTemplate="{StaticResource CategoryEditingColumnTemplate}" />
 
@@ -154,11 +164,15 @@
                 <DataGridTemplateColumn
                     Header="Payment"
                     SortMemberPath="Payment"
+                    Width="{Binding Source={StaticResource proxy}, Path=Data.WidthOfPaymentColumn, Mode=TwoWay, Converter={StaticResource dglConverter}}"
                     CellTemplate="{StaticResource PaymentColumnTemplate}"
                     CellEditingTemplate="{StaticResource PaymentEditingColumnTemplate}"/>
 
                 <!-- Status column  -->
-                <DataGridComboBoxColumn Header="Status" SelectedItemBinding="{Binding Status, Mode=TwoWay}">
+                <DataGridComboBoxColumn
+                    Header="Status"
+                    SelectedItemBinding="{Binding Status, Mode=TwoWay}"
+                    Width="{Binding Source={StaticResource proxy}, Path=Data.WidthOfStatusColumn, Mode=TwoWay, Converter={StaticResource dglConverter}}">
                     <DataGridComboBoxColumn.ElementStyle>
                         <Style TargetType="{x:Type ComboBox}">
                             <Setter Property="ItemsSource" Value="{Binding Path=StatusSource}" />
@@ -169,18 +183,23 @@
                             <Setter Property="ItemsSource" Value="{Binding Path=StatusSource}" />
                         </Style>
                     </DataGridComboBoxColumn.EditingElementStyle>
-                    
                 </DataGridComboBoxColumn>
 
                 <!-- Deposit column  -->
                 <DataGridTemplateColumn
                     Header="Deposit"
                     SortMemberPath="Deposit"
+                    Width="{Binding Source={StaticResource proxy}, Path=Data.WidthOfDepositColumn, Mode=TwoWay, Converter={StaticResource dglConverter}}"
                     CellTemplate="{StaticResource DepositColumnTemplate}"
                     CellEditingTemplate="{StaticResource DepositEditingColumnTemplate}"/>
 
                 <!-- Balance column  -->
-                <DataGridTextColumn Header="Balance" Binding="{Binding BalanceString, Mode=OneWay}" IsReadOnly="True" CanUserSort="False">
+                <DataGridTextColumn
+                    Header="Balance" 
+                    Binding="{Binding BalanceString, Mode=OneWay}"
+                    Width="{Binding Source={StaticResource proxy}, Path=Data.WidthOfBalanceColumn, Mode=TwoWay, Converter={StaticResource dglConverter}}"
+                    IsReadOnly="True"
+                    CanUserSort="False">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="{x:Type TextBlock}">
                             <Setter Property="HorizontalAlignment" Value="Right" />

@@ -20,24 +20,24 @@ namespace BanaData.Logic.Main
             // Construct from scratch
             public BankTransactionData(
                 DateTime date,
-                ETransactionMedium type,
+                ETransactionMedium medium,
                 decimal checkNumber,
                 string payee,
                 string memo,
                 string category,
                 ETransactionStatus status,
                 decimal amount) => 
-                (Date, Type, CheckNumber, Payee, Memo, Category, Status, Amount) =
-                (date, type, checkNumber, payee, memo, category, status, amount);
+                (Date, Medium, CheckNumber, Payee, Memo, Category, Status, Amount) =
+                (date, medium, checkNumber, payee, memo, category, status, amount);
 
             // Clone
             public BankTransactionData(BankTransactionData src) =>
-                (Date, Type, CheckNumber, Payee, Memo, Category, Status, Amount) =
-                (src.Date, src.Type, src.CheckNumber, src.Payee, src.Memo, src.Category, src.Status, src.Amount);
+                (Date, Medium, CheckNumber, Payee, Memo, Category, Status, Amount) =
+                (src.Date, src.Medium, src.CheckNumber, src.Payee, src.Memo, src.Category, src.Status, src.Amount);
 
             // Properties
             public DateTime Date;
-            public ETransactionMedium Type;
+            public ETransactionMedium Medium;
             public decimal CheckNumber;
             public string Payee;
             public string Memo;
@@ -84,14 +84,14 @@ namespace BanaData.Logic.Main
         }
 
         // Medium of transaction
-        public string Type 
+        public string Medium 
         {
-            get => GetTypeString();
-            set => ParseTypeString(value);
+            get => GetMediumString();
+            set => ParseMediumString(value);
         }
 
         // ZZZ
-        public string[] TypeSource { get; } = new string[] { "Next Check Num", "ATM", "Deposit", "Transfer", "EFT" };
+        public string[] MediumSource { get; } = new string[] { "Next Check Num", "ATM", "Deposit", "Transfer", "EFT" };
 
         // Payee
         public string Payee
@@ -207,16 +207,16 @@ namespace BanaData.Logic.Main
                     OnPropertyChanged(() => Date);
                 }
 
-                if (data.Type != backup.Type)
+                if (data.Medium != backup.Medium)
                 {
-                    data.Type = backup.Type;
-                    OnPropertyChanged(() => Type);
+                    data.Medium = backup.Medium;
+                    OnPropertyChanged(() => Medium);
                 }
 
                 if (data.CheckNumber != backup.CheckNumber)
                 {
                     data.CheckNumber = backup.CheckNumber;
-                    OnPropertyChanged(() => Type);
+                    OnPropertyChanged(() => Medium);
                 }
 
                 if (data.Payee != backup.Payee)
@@ -270,11 +270,11 @@ namespace BanaData.Logic.Main
             backup = null;
         }
 
-        private string GetTypeString()
+        private string GetMediumString()
         {
             string rs = "???";
 
-            switch (data.Type)
+            switch (data.Medium)
             {
                 case ETransactionMedium.Check:
                     if (data.CheckNumber > 0)
@@ -307,42 +307,42 @@ namespace BanaData.Logic.Main
             return rs;
         }
 
-        private void ParseTypeString(string type)
+        private void ParseMediumString(string type)
         {
             data.CheckNumber = 0;
 
             switch (type)
             {
                 case "PrtCk":
-                    data.Type = ETransactionMedium.PrintCheck;
+                    data.Medium = ETransactionMedium.PrintCheck;
                     break;
                 case "ATM":
-                    data.Type = ETransactionMedium.ATM;
+                    data.Medium = ETransactionMedium.ATM;
                     break;
                 case "Cash":
-                    data.Type = ETransactionMedium.Cash;
+                    data.Medium = ETransactionMedium.Cash;
                     break;
                 case "DEP":
-                    data.Type = ETransactionMedium.Deposit;
+                    data.Medium = ETransactionMedium.Deposit;
                     break;
                 case "Div":
-                    data.Type = ETransactionMedium.Dividend;
+                    data.Medium = ETransactionMedium.Dividend;
                     break;
                 case "EFT":
-                    data.Type = ETransactionMedium.EFT;
+                    data.Medium = ETransactionMedium.EFT;
                     break;
                 case "":
-                    data.Type = ETransactionMedium.None;
+                    data.Medium = ETransactionMedium.None;
                     break;
                 default:
                     if (decimal.TryParse(type, out decimal checkNum))
                     {
-                        data.Type = ETransactionMedium.Check;
+                        data.Medium = ETransactionMedium.Check;
                         data.CheckNumber = checkNum;
                     }
                     else
                     {
-                        data.Type = ETransactionMedium.None;
+                        data.Medium = ETransactionMedium.None;
                     }
                     break;
             }
