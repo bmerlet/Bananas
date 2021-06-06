@@ -234,7 +234,7 @@ namespace XamlUI.UserControls
             {
                 // Set the filter on the collection to the filter for THIS autocomplete text box.
                 // The selector's item collection may be shared by multiple autocomplete text box,
-                // the one with the focus should impose its own filter
+                // the one with the focus needs to impose its own filter
                 selector.Items.Filter = Filter;
 
                 editor.Focus();
@@ -287,6 +287,12 @@ namespace XamlUI.UserControls
                     }
                     // Publish selection
                     PublishSelection();
+
+                    // ZZZZ Doesn't work
+                    //if (e.Key == Key.Tab)
+                    //{
+                    //    editor.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+                    //}
                     break;
 
                 case Key.Down:

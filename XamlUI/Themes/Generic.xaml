@@ -11,6 +11,12 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ucs="clr-namespace:XamlUI.UserControls">
 
+    <!-- Suppress some debug messages-->
+    <Style TargetType="ListBoxItem">
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+
     <!-- Transparent text box style, to see the watermark underneath it -->
     <Style TargetType="{x:Type TextBox}" x:Key="TransparentTextBoxStyle">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
@@ -87,6 +93,7 @@
                         <ucs:WatermarkTextBox x:Name="PART_Editor"
                             Watermark="{TemplateBinding Watermark}"
                             Focusable="True"
+                            IsTabStop="True"
                             TabIndex="{TemplateBinding TabIndex}"
                             Text="{Binding Path=Text, RelativeSource={RelativeSource Mode=TemplatedParent}, Mode=TwoWay}" />
                         
