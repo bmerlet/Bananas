@@ -6,7 +6,11 @@
         xmlns:local="clr-namespace:XamlUI.Dialogs"
         xmlns:w="clr-namespace:XamlUI.UserControls"
         mc:Ignorable="d"
-        Title="Edit Memorized Payees" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" SizeToContent="WidthAndHeight">
+        Title="Edit Memorized Payees"
+        Icon="/XamlUI;component/Images/Bananas.ico"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        SizeToContent="WidthAndHeight">
     <Window.Resources>
         <Style TargetType="Button">
             <Setter Property="Width" Value="90"/>
@@ -31,16 +35,16 @@
 
             <!-- Row 0: Listbox of memorized payees -->
             <ListBox 
-                Height="200" Grid.ColumnSpan="3" 
+                Height="300" Grid.ColumnSpan="3" 
                 ItemsSource="{Binding MemorizedPayeesSource}" 
                 SelectedItem="{Binding SelectedMemorizedPayee, Mode=TwoWay}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="140"/>
+                                <ColumnDefinition Width="200"/>
                                 <ColumnDefinition Width="80"/>
-                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="160"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="{Binding Name}"/>
                             <TextBlock Text="{Binding Amount}"   Grid.Column="1" Margin="3,0" HorizontalAlignment="Right" Foreground="Red"/>
