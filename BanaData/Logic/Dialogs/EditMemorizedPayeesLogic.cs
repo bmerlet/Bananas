@@ -12,6 +12,9 @@ using Toolbox.UILogic.Dialogs;
 
 namespace BanaData.Logic.Dialogs
 {
+    /// <summary>
+    /// Logic to edit the list of memorized payees
+    /// </summary>
     public class EditMemorizedPayeesLogic : LogicDialogBase
     {
         #region Private members
