@@ -26,6 +26,7 @@ namespace BanaData.Logic.Main
             this.mainWindow = main;
 
             Open = new CommandBase(OnOpen);
+            EditMemorizedPayees = new CommandBase(OnEditMemorizedPayees);
         }
 
         #endregion
@@ -33,6 +34,7 @@ namespace BanaData.Logic.Main
         #region File memu
 
         public CommandBase Open { get; }
+
         private void OnOpen()
         {
             string ZZZfile = @"C:\Users\bmerlet\Documents\Lab\Projects\C#\Bananas\sgbjm.qif";
@@ -40,6 +42,24 @@ namespace BanaData.Logic.Main
             if (mainWindow.GuiServices.ShowDialog(logic))
             {
                 mainWindow.OpenFile(logic.File);
+            }
+        }
+
+        #endregion
+
+        #region Edit menu
+
+        //
+        // Edit memorized Payees
+        //
+        public CommandBase EditMemorizedPayees { get; }
+
+        private void OnEditMemorizedPayees()
+        {
+            var logic = new EditMemorizedPayeesLogic(mainWindow);
+            if (mainWindow.GuiServices.ShowDialog(logic))
+            {
+                mainWindow.UpdateMemorizedPayees();
             }
         }
 

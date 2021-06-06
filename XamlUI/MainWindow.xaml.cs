@@ -12,12 +12,13 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.Win32;
 
+using Toolbox.UILogic;
 using BanaData.Logic;
 using BanaData.Logic.Dialogs;
 using BanaData.Logic.Main;
-using Microsoft.Win32;
-using Toolbox.UILogic;
+using XamlUI.Dialogs;
 
 namespace XamlUI
 {
@@ -72,15 +73,41 @@ namespace XamlUI
             Closed += (o, e) => logic.SaveUserSettings();
         }
 
+        //
+        // Show a dialog
+        //
         public bool ShowDialog(LogicBase logic)
         {
+            //
             // Windows-provided dialogs
+            //
             if (logic is OpenFileLogic openFileLogic)
             {
                 return ShowOpenFileDialog(openFileLogic);
             }
 
-            throw new NotImplementedException();
+            //
+            // Our own dialogs
+            //
+            Window dialog;
+            if (logic is EditMemorizedPayeesLogic editMemorizedPayeesLogic)
+            {
+                dialog = new EditMemorizedPayees(editMemorizedPayeesLogic);
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+
+            // Set the owner
+            dialog.Owner = this;
+
+            bool change = dialog.ShowDialog() == true;
+
+            // See comments in Harmony checker ScoreWindow.ShowDialog
+            dialog.DataContext = null;
+
+            return change;
         }
 
         // Show open file dialog

@@ -149,6 +149,13 @@ namespace BanaData.Logic.Main
             BuildCategoriesList();
         }
 
+        // Action after memorized payees are changed
+        public void UpdateMemorizedPayees()
+        {
+            // Rebuild list
+            BuildMemorizedPayeeList();
+        }
+
         public void OnBankAccountClicked(int accountID)
         {
             BankRegister.SetAccount(accountID);

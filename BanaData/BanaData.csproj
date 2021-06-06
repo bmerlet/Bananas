@@ -67,6 +67,7 @@
     <Compile Include="Database\Security.cs" />
     <Compile Include="Database\SecurityPrice.cs" />
     <Compile Include="Database\Transaction.cs" />
+    <Compile Include="Logic\Dialogs\EditMemorizedPayeesLogic.cs" />
     <Compile Include="Logic\IGuiServices.cs" />
     <Compile Include="Logic\Main\AccountGroupLogic.cs" />
     <Compile Include="Logic\Main\BankingTransactionLogic.cs" />

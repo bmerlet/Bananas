@@ -58,6 +58,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Dialogs\EditMemorizedPayees.xaml.cs">
+      <DependentUpon>EditMemorizedPayees.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tools\GridLengthConverter.cs" />
     <Compile Include="UserControls\AccountGroup.xaml.cs">
       <DependentUpon>AccountGroup.xaml</DependentUpon>
@@ -71,7 +74,14 @@
       <DependentUpon>BankRegisterLV.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\DateBox.cs" />
+    <Compile Include="UserControls\OKCancel.xaml.cs">
+      <DependentUpon>OKCancel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\WatermarkTextBox.cs" />
+    <Page Include="Dialogs\EditMemorizedPayees.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -99,6 +109,10 @@
     <Page Include="UserControls\BankRegisterLV.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UserControls\OKCancel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>

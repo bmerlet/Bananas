@@ -16,6 +16,9 @@
             <MenuItem Header="File">
                 <MenuItem Header="Open..." Command="{Binding Open}"/>
             </MenuItem>
+            <MenuItem Header="Edit">
+                <MenuItem Header="Memorized Payees..." Command="{Binding EditMemorizedPayees}"/>
+            </MenuItem>
             <MenuItem Header="View">
                 <MenuItem Header="Show closed accounts" IsCheckable="True" IsChecked="{Binding ShowClosedAccounts}"/>
             </MenuItem>
