@@ -201,12 +201,67 @@ namespace BanaData.Logic.Main
         {
             Categories.Clear();
 
+            // Add all top-level categories
             foreach (var category in Household.Categories)
             {
-                Categories.Add(new CategoryItem(category.FullName));
+                if (category.IsParentIDNull())
+                {
+                    Categories.Add(new CategoryItem(category.ID, category.Name, null));
+                }
             }
 
-            MemorizedPayees.Sort();
+            // Add children as long as there are children to be added
+            bool categoryNotFound;
+            do
+            {
+                categoryNotFound = false;
+
+                foreach (var category in Household.Categories)
+                {
+                    // If category has a parent
+                    if (!category.IsParentIDNull())
+                    {
+                        // If this category is not in the list yet
+                        if (Categories.FirstOrDefault(c => c.ID == category.ID) == null)
+                        {
+                            categoryNotFound = true;
+
+                            // Find parent in list
+                            var parent = Categories.FirstOrDefault(c => c.ID == category.ParentID);
+                            if (parent != null)
+                            {
+                                // Find index of parent
+                                int indexOfParent = Categories.IndexOf(parent);
+
+                                // Find index of last category with this parent
+                                while (Categories[indexOfParent + 1].Parent == parent)
+                                {
+                                    indexOfParent++;
+                                }
+
+                                // Create category
+                                var categoryItem = new CategoryItem(category.ID, category.Name, parent);
+                                if (indexOfParent == Categories.Count - 1)
+                                {
+                                    Categories.Add(categoryItem);
+                                }
+                                else
+                                {
+                                    Categories.Insert(indexOfParent + 1, categoryItem);
+                                }
+                            }
+                        }                        
+                    }
+                }
+            } while (categoryNotFound);
+
+            // Add all possible transfers
+            foreach (var account in Household.Accounts)
+            {
+                Categories.Add(new CategoryItem(account.ID, account.Name));
+            }
+
+            //Categories.Sort();
         }
     }
 }

@@ -53,8 +53,16 @@
 
             <!-- Row 2: Category -->
             <TextBlock Text="Category:" Grid.Row="2"/>
-            <TextBox Text="{Binding Category}" IsEnabled="{Binding CategoryEnabled}" Grid.Row="2" Grid.Column="1"/>
-            <Button Content="Split..." Command="{Binding EditSplit}" Grid.Row="2" Grid.Column="2"/>
+            <w:AutoCompleteTextBox 
+                Text="{Binding Category, Mode=TwoWay}"
+                Watermark="Category"
+                DisplayMember="FullName"
+                ListBoxHeight="150" 
+                ListBoxWidth="200"
+                IsEnabled="{Binding CategoryEnabled}"
+                ItemsSource="{Binding Categories}"
+                Grid.Row="2" Grid.Column="1">
+            </w:AutoCompleteTextBox>
 
             <!-- Row 3: Type -->
             <TextBlock Text="Type:" Grid.Row="3"/>

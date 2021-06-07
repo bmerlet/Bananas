@@ -70,12 +70,12 @@
     <Compile Include="Logic\Dialogs\EditMemorizedPayeeLogic.cs" />
     <Compile Include="Logic\Dialogs\EditMemorizedPayeesLogic.cs" />
     <Compile Include="Logic\IGuiServices.cs" />
+    <Compile Include="Logic\Items\CategoryItem.cs" />
     <Compile Include="Logic\Items\LineItem.cs" />
     <Compile Include="Logic\Items\MemorizedPayeeItem.cs" />
     <Compile Include="Logic\Main\AccountGroupLogic.cs" />
     <Compile Include="Logic\Main\BankingTransactionLogic.cs" />
     <Compile Include="Logic\Main\BankRegisterLogic.cs" />
-    <Compile Include="Logic\Main\CategoryItem.cs" />
     <Compile Include="Logic\Main\MainWindowLogic.cs" />
     <Compile Include="Logic\Main\MainMenuLogic.cs" />
     <Compile Include="Logic\Dialogs\OpenFileLogic.cs" />

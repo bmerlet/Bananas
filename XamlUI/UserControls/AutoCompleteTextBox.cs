@@ -211,8 +211,8 @@ namespace XamlUI.UserControls
 
             if (popup != null)
             {
-                //popup.StaysOpen = false;
-                popup.StaysOpen = true;
+                popup.StaysOpen = false;
+                //popup.StaysOpen = true;
             }
 
             if (selector != null)

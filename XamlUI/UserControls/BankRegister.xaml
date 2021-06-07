@@ -71,8 +71,9 @@
                 <local:AutoCompleteTextBox 
                     Text="{Binding Category, Mode=TwoWay}"
                     Watermark="Category"
-                    DisplayMember="CategoryFullName"
+                    DisplayMember="FullName"
                     ListBoxHeight="150" 
+                    ListBoxWidth="200"
                     ItemsSource="{Binding Categories}">
                 </local:AutoCompleteTextBox>
             </DataTemplate>

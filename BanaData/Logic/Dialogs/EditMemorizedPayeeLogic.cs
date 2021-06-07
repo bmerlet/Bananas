@@ -36,9 +36,8 @@ namespace BanaData.Logic.Dialogs
 
             // Setup UI properties
             Payee = item.Payee;
-            IsSplit = item.IsSplit;
             
-            if (IsSplit == true)
+            if (item.IsSplit == true)
             {
                 Category = "<Split>";
                 CategoryEnabled = false;
@@ -77,6 +76,7 @@ namespace BanaData.Logic.Dialogs
         // Category (when not split)
         public string Category { get; set; }
         public bool? CategoryEnabled { get; private set; }
+        public IEnumerable<CategoryItem> Categories => mainWindowLogic.Categories;
 
         // Type (when not split)
         public string[] TypeSource { get; } = new string[] { DEPOSIT, PAYMENT };
@@ -86,9 +86,6 @@ namespace BanaData.Logic.Dialogs
         // Amount (when not split)
         public decimal AbsoluteAmount { get; set; }
         public bool? AbsoluteAmountEnabled { get; private set; }
-
-        // If split
-        public bool? IsSplit { get; private set; }
 
         // Split button
         public CommandBase EditSplit { get; }
