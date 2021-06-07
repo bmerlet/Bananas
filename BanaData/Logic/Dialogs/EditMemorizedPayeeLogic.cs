@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Toolbox.UILogic.Dialogs;
 using BanaData.Logic.Main;
 using BanaData.Database;
+using BanaData.Logic.Items;
+using Toolbox.UILogic;
 
 namespace BanaData.Logic.Dialogs
 {
@@ -18,30 +20,47 @@ namespace BanaData.Logic.Dialogs
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
-        private readonly int id;
+        private readonly MemorizedPayeeItem item;
         private readonly bool add;
+
+        private const string DEPOSIT = "Deposit";
+        private const string PAYMENT = "Payment";
 
         #endregion
 
         #region Constructor
 
-        public EditMemorizedPayeeLogic(MainWindowLogic _mainWindowLogic, int _id, bool _add)
+        public EditMemorizedPayeeLogic(MainWindowLogic _mainWindowLogic, MemorizedPayeeItem _item, bool _add)
         {
-            mainWindowLogic = _mainWindowLogic;
-            id = _id;
-            add = _add;
+            (mainWindowLogic, item, add) = (_mainWindowLogic, _item, _add);
 
-            var household = mainWindowLogic.Household;
-            Household.MemorizedPayeesRow payee = null;
-            Household.MemorizedLineItemsRow[] lineItems = new Household.MemorizedLineItemsRow[0];
-            if (!add)
+            // Setup UI properties
+            Payee = item.Payee;
+            IsSplit = item.IsSplit;
+            
+            if (IsSplit == true)
             {
-                payee = household.MemorizedPayees.FindByID(id);
-                lineItems = household.MemorizedLineItems.GetByMemorizedPayee(payee);
+                Category = "<Split>";
+                CategoryEnabled = false;
+                Memo = "";
+                MemoEnabled = false;
+                TypeEnabled = false;
+                AbsoluteAmountEnabled = false;
+            }
+            else
+            {
+                Category = item.Category;
+                CategoryEnabled = true;
+                Memo = item.Memo;
+                MemoEnabled = true;
+                TypeEnabled = true;
+                AbsoluteAmountEnabled = true;
             }
 
-            Name = add ? "" : payee.Payee;
-            Status = add ? ETransactionStatus.Pending : payee.Status;
+            AbsoluteAmount = Math.Abs(item.Amount);
+            Type = item.Amount > 0 ? DEPOSIT: PAYMENT;
+
+            EditSplit = new CommandBase(OnEditSplit);
         }
 
         #endregion
@@ -49,68 +68,43 @@ namespace BanaData.Logic.Dialogs
         #region UI properties
 
         // Name of payee
-        public string Name { get; set; }
+        public string Payee { get; set; }
 
-        // Status of the transaction
-        public ETransactionStatus Status { get; set; }
+        // Memo (when not split)
+        public string Memo { get; set; }
+        public bool? MemoEnabled { get; private set; }
 
-        // Line items
+        // Category (when not split)
+        public string Category { get; set; }
+        public bool? CategoryEnabled { get; private set; }
 
-        // MemorizedLineItemsRow
-        // Per line item:
-        // AccountID (for tx)
-        // Amount
-        // Category
-        // Memo
+        // Type (when not split)
+        public string[] TypeSource { get; } = new string[] { DEPOSIT, PAYMENT };
+        public bool? TypeEnabled { get; private set; }
+        public string Type { get; set; }
+
+        // Amount (when not split)
+        public decimal AbsoluteAmount { get; set; }
+        public bool? AbsoluteAmountEnabled { get; private set; }
+
+        // If split
+        public bool? IsSplit { get; private set; }
+
+        // Split button
+        public CommandBase EditSplit { get; }
 
         #endregion
 
         #region Actions
 
-        private void BuildMemorizedPayeesList()
+        private void OnEditSplit()
         {
-            var household = mainWindowLogic.Household;
-
-            foreach (var mpr in household.MemorizedPayees)
-            {
-                // Get memorized line item(s)
-                var lineItems = household.MemorizedLineItems.GetByMemorizedPayee(mpr);
-                decimal amount = lineItems.Sum(li => li.Amount);
-
-                string category = "";
-
-                if (lineItems.Length > 1)
-                {
-                    category = "<Split>";
-                }
-                else if (!lineItems[0].IsCategoryIDNull())
-                {
-                    var destCategory = household.Categories.FindByID(lineItems[0].CategoryID);
-                    category = destCategory.FullName;
-                }
-
-                //var mpi = new MemorizedPayeeItem(mpr.ID, mpr.Payee, amount, category);
-                //memorizedPayeesSource.Add(mpi);
-            }
+            throw new NotImplementedException();
         }
 
         protected override bool? Commit()
         {
             throw new NotImplementedException();
-        }
-
-        #endregion
-
-        #region Line item class
-
-        public class LineItem
-        {
-
-            // UI properties
-            public string CategoryStr { get; set; }
-            public string Memo { get; set; }
-            public decimal Amount { get; set; }
-
         }
 
         #endregion

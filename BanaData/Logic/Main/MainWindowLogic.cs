@@ -10,6 +10,7 @@ using Toolbox.UILogic;
 using Toolbox.Models;
 using BanaData.Database;
 using BanaData.Serializations;
+using BanaData.Logic.Items;
 
 namespace BanaData.Logic.Main
 {
@@ -171,19 +172,24 @@ namespace BanaData.Logic.Main
             foreach (var mpr in Household.MemorizedPayees)
             {
                 // Get memorized line item(s)
-                var lineItems = household.MemorizedLineItems.GetByMemorizedPayee(mpr);
-                decimal amount = lineItems.Sum(li => li.Amount);
-
-                string memo = lineItems[0].IsMemoNull() ? "" : lineItems[0].Memo;
-                string category = "";
-
-                if (!lineItems[0].IsCategoryIDNull())
+                var dbLineItems = household.MemorizedLineItems.GetByMemorizedPayee(mpr);
+                var lineItems = new List<LineItem>(dbLineItems.Length);
+                foreach (var dbli in dbLineItems)
                 {
-                    var destCategory = household.Categories.FindByID(lineItems[0].CategoryID);
-                    category = destCategory.FullName;
+                    string category = "";
+                    if (!dbli.IsCategoryIDNull())
+                    {
+                        var destCategory = household.Categories.FindByID(dbLineItems[0].CategoryID);
+                        category = destCategory.FullName;
+                    }
+
+                    string memo = dbli.IsMemoNull() ? "" : dbli.Memo;
+
+                    lineItems.Add(new LineItem(dbli.ID, category, memo, dbli.Amount));
                 }
 
-                var mp = new MemorizedPayeeItem(mpr.Payee, amount, category, memo);
+                var mp = new MemorizedPayeeItem(mpr.ID, mpr.Payee, lineItems.ToArray());
+
                 MemorizedPayees.Add(mp);
             }
 

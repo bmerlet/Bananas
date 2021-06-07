@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 using Toolbox.UILogic;
 using BanaData.Database;
+using BanaData.Logic.Items;
 
 namespace BanaData.Logic.Main
 {

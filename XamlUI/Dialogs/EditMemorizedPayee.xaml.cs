@@ -17,11 +17,12 @@ using BanaData.Logic.Dialogs;
 namespace XamlUI.Dialogs
 {
     /// <summary>
-    /// Interaction logic for EditMemorizedPayees.xaml
+    /// Interaction logic for EditMemorizedPayee.xaml
     /// </summary>
-    public partial class EditMemorizedPayees : Window
+    public partial class EditMemorizedPayee : Window
     {
-        public EditMemorizedPayees(EditMemorizedPayeesLogic logic)
+
+        public EditMemorizedPayee(EditMemorizedPayeeLogic logic)
         {
             // Use the view model as data context
             this.DataContext = logic;
@@ -30,15 +31,6 @@ namespace XamlUI.Dialogs
             logic.CloseView = result => DialogResult = result;
 
             InitializeComponent();
-        }
-
-
-        private void OnListboxDoubleClick(object sender, EventArgs e)
-        {
-            if (DataContext is EditMemorizedPayeesLogic logic)
-            {
-                logic.EditMemorizedPayee.Execute();
-            }
         }
     }
 }

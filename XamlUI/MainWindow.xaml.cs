@@ -94,6 +94,10 @@ namespace XamlUI
             {
                 dialog = new EditMemorizedPayees(editMemorizedPayeesLogic);
             }
+            else if (logic is EditMemorizedPayeeLogic editMemorizedPayeeLogic)
+            {
+                dialog = new EditMemorizedPayee(editMemorizedPayeeLogic);
+            }
             else
             {
                 throw new NotImplementedException();

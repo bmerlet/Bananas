@@ -17,7 +17,6 @@
             <Setter Property="Margin" Value="3"/>
         </Style>
     </Window.Resources>
-    <!-- SizeToContent="WidthAndHeight" -->
     <DockPanel>
         <!-- OK/Cancel panel -->
         <w:OKCancel DockPanel.Dock="Bottom"/>
@@ -36,6 +35,7 @@
             <!-- Row 0: Listbox of memorized payees -->
             <ListBox 
                 Height="300" Grid.ColumnSpan="3" 
+                MouseDoubleClick="OnListboxDoubleClick"
                 ItemsSource="{Binding MemorizedPayeesSource}" 
                 SelectedItem="{Binding SelectedMemorizedPayee, Mode=TwoWay}">
                 <ListBox.ItemTemplate>
@@ -46,7 +46,7 @@
                                 <ColumnDefinition Width="80"/>
                                 <ColumnDefinition Width="160"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding Name}"/>
+                            <TextBlock Text="{Binding Payee}"/>
                             <TextBlock Text="{Binding Amount}"   Grid.Column="1" Margin="3,0" HorizontalAlignment="Right" Foreground="Red"/>
                             <TextBlock Text="{Binding Category}" Grid.Column="2" Foreground="Blue"/>
                         </Grid>
