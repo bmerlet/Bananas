@@ -19,7 +19,7 @@
         <Style TargetType="w:WatermarkTextBox">
             <Setter Property="Margin" Value="5"/>
         </Style>
-        <Style TargetType="TextBox">
+        <Style TargetType="w:AmountBox">
             <Setter Property="Margin" Value="5"/>
         </Style>
         <Style TargetType="ComboBox">
@@ -49,11 +49,11 @@
 
             <!-- Row 0: Payee name -->
             <TextBlock Text="Payee name:"/>
-            <w:WatermarkTextBox Text="{Binding Payee, Mode=TwoWay}" Watermark="Payee"  Grid.Column="1"/>
+            <w:WatermarkTextBox Text="{Binding Payee, Mode=TwoWay}" Watermark="Payee" Grid.Column="1"/>
 
             <!-- Row 1: Memo -->
             <TextBlock Text="Memo:" Grid.Row="1"/>
-            <TextBox Text="{Binding Memo, Mode=TwoWay}" IsEnabled="{Binding MemoEnabled}" Grid.Row="1" Grid.Column="1"/>
+            <w:WatermarkTextBox Text="{Binding Memo, Mode=TwoWay}" IsEnabled="{Binding MemoEnabled}" Watermark="Memo" Grid.Row="1" Grid.Column="1"/>
 
             <!-- Row 2: Category -->
             <TextBlock Text="Category:" Grid.Row="2"/>
@@ -74,7 +74,7 @@
 
             <!-- Row 4: Amount -->
             <TextBlock Text="Amount:" Grid.Row="4"/>
-                <w:AmountBox Amount="{Binding AbsoluteAmount}" IsEnabled="{Binding AbsoluteAmountEnabled}" Grid.Row="4" Grid.Column="1" HorizontalContentAlignment="Right"/>
+                <w:AmountBox Amount="{Binding AbsoluteAmount, Mode=TwoWay}" IsEnabled="{Binding AbsoluteAmountEnabled}" Grid.Row="4" Grid.Column="1" HorizontalContentAlignment="Right"/>
 
         </Grid>
     </DockPanel>

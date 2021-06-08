@@ -21,6 +21,7 @@ namespace BanaData.Logic.Dialogs
 
         private readonly MainWindowLogic mainWindowLogic;
         private readonly MemorizedPayeeItem item;
+        private LineItem[] lineItems;
         private readonly bool add;
 
         private const string DEPOSIT = "Deposit";
@@ -32,34 +33,12 @@ namespace BanaData.Logic.Dialogs
 
         public EditMemorizedPayeeLogic(MainWindowLogic _mainWindowLogic, MemorizedPayeeItem _item, bool _add)
         {
-            (mainWindowLogic, item, add) = (_mainWindowLogic, _item, _add);
+            (mainWindowLogic, item, add, lineItems) = (_mainWindowLogic, _item, _add, _item.LineItems);
 
             // Setup UI properties
-            Payee = item.Payee;
-            
-            if (item.IsSplit == true)
-            {
-                Category = "<Split>";
-                CategoryEnabled = false;
-                Memo = "";
-                MemoEnabled = false;
-                TypeEnabled = false;
-                AbsoluteAmountEnabled = false;
-            }
-            else
-            {
-                Category = item.Category;
-                CategoryEnabled = true;
-                Memo = item.Memo;
-                MemoEnabled = true;
-                TypeEnabled = true;
-                AbsoluteAmountEnabled = true;
-            }
-
-            AbsoluteAmount = Math.Abs(item.Amount);
-            Type = item.Amount > 0 ? DEPOSIT: PAYMENT;
-
             EditSplit = new CommandBase(OnEditSplit);
+            Payee = item.Payee;
+            UpdateAfterLineItemChanges();
         }
 
         #endregion
@@ -92,16 +71,118 @@ namespace BanaData.Logic.Dialogs
 
         #endregion
 
+        #region Result
+
+        public MemorizedPayeeItem NewMemorizedPayeeItem => BuildNewItem();
+
+        #endregion
+
         #region Actions
 
         private void OnEditSplit()
         {
-            throw new NotImplementedException();
+            var logic = new EditSplitLogic(mainWindowLogic, lineItems);
+            if (mainWindowLogic.GuiServices.ShowDialog(logic))
+            {
+                // Get new line items from logic
+                lineItems = logic.NewLineItems;
+
+                // Update this dialog
+                throw new NotImplementedException();
+            }
+        }
+
+        private void UpdateAfterLineItemChanges()
+        {
+            if (lineItems.Length > 1)
+            {
+                Category = "<Split>";
+                CategoryEnabled = false;
+                Memo = "";
+                MemoEnabled = false;
+                TypeEnabled = false;
+                AbsoluteAmountEnabled = false;
+            }
+            else
+            {
+                Category = item.Category;
+                CategoryEnabled = true;
+                Memo = item.Memo;
+                MemoEnabled = true;
+                TypeEnabled = true;
+                AbsoluteAmountEnabled = true;
+            }
+
+            decimal amount = lineItems.Sum(li => li.Amount);
+            AbsoluteAmount = Math.Abs(amount);
+            Type = amount > 0 ? DEPOSIT : PAYMENT;
+
+            OnPropertyChanged(() => Category);
+            OnPropertyChanged(() => CategoryEnabled);
+            OnPropertyChanged(() => Memo);
+            OnPropertyChanged(() => MemoEnabled);
+            OnPropertyChanged(() => Type);
+            OnPropertyChanged(() => TypeEnabled);
+            OnPropertyChanged(() => AbsoluteAmount);
+            OnPropertyChanged(() => AbsoluteAmountEnabled);
         }
 
         protected override bool? Commit()
         {
-            throw new NotImplementedException();
+            bool change
+                = add || item.Payee != Payee || item.LineItems.Length != lineItems.Length;
+
+            if (!change)
+            {
+                if (lineItems.Length > 1)
+                {
+                    // Look to see if any of the line items has changed
+                    for (int i = 0; i < lineItems.Length; i++)
+                    {
+                        if (item.LineItems[i].Category != lineItems[i].Category ||
+                            item.LineItems[i].Memo != lineItems[i].Memo ||
+                            item.LineItems[i].Amount != lineItems[i].Amount)
+                        {
+                            change = true;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    // non split case - see if anything is different
+                    if (item.Category != Category ||
+                        item.Memo != Memo ||
+                        item.Amount != GetAmountFromControls())
+                    {
+                        change = true;
+                    }
+                }
+            }
+
+            return change;
+        }
+
+        private decimal GetAmountFromControls()
+        {
+            decimal amount = AbsoluteAmount;
+            if (Type == PAYMENT)
+            {
+                amount *= -1;
+            }
+            return amount;
+        }
+
+        private MemorizedPayeeItem BuildNewItem()
+        {
+            if (lineItems.Length == 1)
+            {
+                lineItems[0] = new LineItem(lineItems[0].ID, Category, Memo, GetAmountFromControls());
+            }
+
+            var result = new MemorizedPayeeItem(item.ID, Payee, lineItems);
+
+            return result;
         }
 
         #endregion

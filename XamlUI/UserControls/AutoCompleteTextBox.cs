@@ -211,8 +211,8 @@ namespace XamlUI.UserControls
 
             if (popup != null)
             {
-                popup.StaysOpen = false;
-                //popup.StaysOpen = true;
+                //popup.StaysOpen = false;
+                popup.StaysOpen = true;
             }
 
             if (selector != null)
@@ -237,7 +237,7 @@ namespace XamlUI.UserControls
                 // the one with the focus needs to impose its own filter
                 selector.Items.Filter = Filter;
 
-                editor.Focus();
+                //editor.Focus();
                 editor.SelectAll(); // ZZZ Who unselects?
                 RefreshSelector();
             }

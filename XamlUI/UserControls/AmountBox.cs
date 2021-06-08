@@ -83,9 +83,12 @@ namespace XamlUI.UserControls
             base.OnTextChanged(e);
 
             // Update amount property
-            internalAmountUpdate = true;
-            Amount = decimal.Parse(Text);
-            internalAmountUpdate = false;
+            if (!string.IsNullOrWhiteSpace(Text))
+            {
+                internalAmountUpdate = true;
+                Amount = decimal.Parse(Text);
+                internalAmountUpdate = false;
+            }
         }
 
         // Reformat amount and update the amount property when moving away
