@@ -35,6 +35,18 @@ namespace XamlUI.UserControls
             set => SetValue(WatermarkProperty, value);
         }
 
+        //
+        // Watermark template (how to display the watermark)
+        //
+        public static readonly DependencyProperty WatermarkTemplateProperty =
+            DependencyProperty.Register("WatermarkTemplate", typeof(DataTemplate), typeof(WatermarkTextBox), new UIPropertyMetadata(null));
+
+        public DataTemplate WatermarkTemplate
+        {
+            get => (DataTemplate)GetValue(WatermarkTemplateProperty);
+            set => SetValue(WatermarkTemplateProperty, value);
+        }
+
         #endregion
     }
 }

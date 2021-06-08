@@ -1,6 +1,11 @@
 ﻿<!-- 
-    This file's purpose is to define the default style for the AutoCompleteCheckBox,
-    which provide the AutoCompleteCheckBox default control template.
+    This file's purpose is to define the default style for the following controls:
+    
+    WatermarkTextBox: Textbox with a watermark
+    
+    AutoCompleteCheckBox: Watermark textbox with autocomplete capabilty
+    
+    The default style provides the default control template for the controls.
     
     WPF looks for the default style automatically in Themes\Generic.xaml, hence this
     file's location.
@@ -17,69 +22,112 @@
         <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
 
-    <!-- Transparent text box style, to see the watermark underneath it -->
-    <Style TargetType="{x:Type TextBox}" x:Key="TransparentTextBoxStyle">
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type TextBox}">
-                    <Grid>
-                        <ScrollViewer x:Name="PART_ContentHost"
-                                      Background="Transparent"
-                                      Focusable="True"
-                                      HorizontalScrollBarVisibility="Hidden"
-                                      VerticalScrollBarVisibility="Hidden" />
-                    </Grid>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
+    <!-- Define the colors for the text box borders (same as mfst) -->
+    <SolidColorBrush x:Key="TextBoxBorder" Color="#ABADB3" Opacity="1"/>
+    <SolidColorBrush x:Key="TextBoxBorderMouseOver" Color="#5794BF" Opacity="1"/>
+    <SolidColorBrush x:Key="TextBoxBorderFocused" Color="#3D7BAD" Opacity="1"/>
 
+    <!-- define default data template to control the Watermark display in WatermarkTextBox -->
+    <DataTemplate x:Key="DefaultWatermarkTemplate">
+        <ContentControl Content="{Binding}" Foreground="Gray" Focusable="False" />
+    </DataTemplate>
 
+    <!-- ========================================= -->
     <!-- define default style for WatermarkTextBox -->
+    <!-- ========================================= -->
     <Style TargetType="{x:Type ucs:WatermarkTextBox}">
+
         <!-- Default values -->
-        <Setter Property="Focusable"        Value="False" />
-        <Setter Property="IsTabStop"        Value="True"/>
-        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-        <Setter Property="Validation.ErrorTemplate" Value="{x:Null}"/>
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
+        <Setter Property="BorderBrush" Value="{StaticResource TextBoxBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="1" />
+        <Setter Property="AllowDrop" Value="true" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="ScrollViewer.PanningMode" Value="VerticalFirst" />
+        <Setter Property="Stylus.IsFlicksEnabled" Value="False" />
+        <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
+        
         <!-- Default control template -->
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ucs:WatermarkTextBox}">
                     <Grid>
-                        <TextBlock x:Name="PART_Watermark"
-                                    Text="{TemplateBinding Watermark}"
-                                    Visibility="Collapsed"
-                                    VerticalAlignment="Center"
-                                    HorizontalAlignment="Left"
-                                    Focusable="False"
-                                    FontStyle="Italic" 
-                                    Foreground="LightGray"
-                                    Margin="3,0"/>
-                        <TextBox x:Name="PART_Editor"
-                                    HorizontalAlignment="Stretch"
-                                    VerticalAlignment="Center"
+                        <!-- Default border -->
+                        <Border x:Name="Border"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            CornerRadius="1"
+                            Background="{TemplateBinding Background}">
+                            
+                            <Grid>
+
+                                <!-- Content presenter containing the watermark -->
+                                <ContentPresenter x:Name="PART_WatermarkHost"
+                                    Content="{TemplateBinding Watermark}"
+                                    ContentTemplate="{Binding WatermarkTemplate, RelativeSource={RelativeSource TemplatedParent}, TargetNullValue={StaticResource DefaultWatermarkTemplate}}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    IsHitTestVisible="False"
+                                    Margin="{TemplateBinding Padding}"
+                                    Visibility="Collapsed" />
+
+                                <!-- Viewer containing the text of the textbox -->
+                                <ScrollViewer x:Name="PART_ContentHost"
                                     Focusable="True"
-                                    TabIndex="{TemplateBinding TabIndex}"
-                                    Style="{StaticResource ResourceKey=TransparentTextBoxStyle}"
-                                    Text="{Binding Path=Text, RelativeSource={RelativeSource Mode=TemplatedParent}, Mode=TwoWay}" />
+                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Border when mouse is over -->
+                        <Border x:Name="MouseOverVisual"
+                            Opacity="0"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            BorderBrush="{StaticResource TextBoxBorderMouseOver}"
+                            CornerRadius="1" />
+
+                        <!-- Border when focused -->
+                        <Border x:Name="FocusVisual"
+                            Opacity="0"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            BorderBrush="{StaticResource TextBoxBorderFocused}"
+                            CornerRadius="1" />
                     </Grid>
                     <ControlTemplate.Triggers>
+
                         <!-- Make watermark visible when there is no text in the editor -->
-                        <Trigger Property="Text" Value="" SourceName="PART_Editor">
-                            <Setter Property="Visibility" Value="Visible" TargetName="PART_Watermark" />
+                        <Trigger Property="Text" Value="">
+                            <Setter Property="Visibility" Value="Visible" TargetName="PART_WatermarkHost" />
                         </Trigger>
+
+                        <!-- Change border color when mouse is over -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="MouseOverVisual" Property="Opacity" Value="1" />
+                        </Trigger>
+
+                        <!-- Change border color when focused -->
+                        <Trigger Property="IsFocused" Value="True">
+                            <Setter TargetName="FocusVisual" Property="Opacity" Value="1" />
+                        </Trigger>
+
+                        <!-- Change foreground when control is disabled -->
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                        </Trigger>
+                        
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
+    <!-- ============================================ -->
     <!-- define default style for AutoCompleteTextBox -->
+    <!-- ============================================ -->
     <Style TargetType="{x:Type ucs:AutoCompleteTextBox}">
         <!-- Default values -->
-        <Setter Property="Focusable"        Value="False" />
         <Setter Property="IsTabStop"        Value="True"/>
         <Setter Property="BorderThickness"  Value="1" />
         <Setter Property="BorderBrush"      Value="Gray" />
