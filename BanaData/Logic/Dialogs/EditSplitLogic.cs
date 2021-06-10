@@ -36,7 +36,7 @@ namespace BanaData.Logic.Dialogs
             var categories = mainWindowLogic.Categories;
             foreach (var li in lineItems)
             {
-                gridViewLineItems.Add(new GridViewLineItem(li, categories));
+                gridViewLineItems.Add(new GridViewLineItem(li));
             }
             GridViewLineItems = (CollectionView)CollectionViewSource.GetDefaultView(gridViewLineItems);
 
@@ -81,9 +81,15 @@ namespace BanaData.Logic.Dialogs
         // A line item, as presented in the edit split dialog
         class GridViewLineItem : LogicBase, IEditableObject
         {
-            public GridViewLineItem(LineItem lineItem, IEnumerable<CategoryItem> categories) =>
+            // Default constructor (when invoked from the datagrid to create a new row)
+            public GridViewLineItem() =>
                 (ID, Memo, Category, Categories, Amount) = 
-                (lineItem.ID, lineItem.Memo, lineItem.Category, categories, lineItem.Amount);
+                (-1, "", "", MainWindowLogic.Instance.Categories, 0);
+
+            // Explicit constructor
+            public GridViewLineItem(LineItem lineItem) =>
+                (ID, Memo, Category, Categories, Amount) = 
+                (lineItem.ID, lineItem.Memo, lineItem.Category, MainWindowLogic.Instance.Categories, lineItem.Amount);
 
             public readonly int ID;
 

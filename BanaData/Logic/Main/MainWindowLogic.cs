@@ -57,6 +57,9 @@ namespace BanaData.Logic.Main
             {
                 UpdateAll();
             }
+
+            // Export this instance
+            Instance = this;
         }
 
         #endregion
@@ -84,6 +87,9 @@ namespace BanaData.Logic.Main
 
         // List of categories, as displayed in the UI
         public readonly List<CategoryItem> Categories = new List<CategoryItem>();
+
+        // Only instance of this class, made static and public to be acccessed from anywhere
+        public static MainWindowLogic Instance { get; private set; }
 
         #endregion
 

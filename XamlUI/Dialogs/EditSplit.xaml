@@ -73,7 +73,7 @@
 
                     <!-- Category column -->
                     <DataGridTemplateColumn
-                        Header="Category" Width="210"
+                        Header="Category" Width="*"
                         SortMemberPath="Category"
                         CellTemplate="{StaticResource CategoryColumnTemplate}"
                         CellEditingTemplate="{StaticResource CategoryEditingColumnTemplate}" />
