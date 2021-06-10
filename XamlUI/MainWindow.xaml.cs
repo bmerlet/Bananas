@@ -85,6 +85,11 @@ namespace XamlUI
             {
                 return ShowOpenFileDialog(openFileLogic);
             }
+            if (logic is ErrorLogic errorLogic)
+            {
+                MessageBox.Show(errorLogic.Error, "Error");
+                return false;
+            }
 
             //
             // Our own dialogs
@@ -97,6 +102,10 @@ namespace XamlUI
             else if (logic is EditMemorizedPayeeLogic editMemorizedPayeeLogic)
             {
                 dialog = new EditMemorizedPayee(editMemorizedPayeeLogic);
+            }
+            else if (logic is EditSplitLogic editSplitLogic)
+            {
+                dialog = new EditSplit(editSplitLogic);
             }
             else
             {

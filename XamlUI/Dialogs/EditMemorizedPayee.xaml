@@ -67,6 +67,10 @@
                 ItemsSource="{Binding Categories}"
                 Grid.Row="2" Grid.Column="1">
             </w:AutoCompleteTextBox>
+            <Button
+                Content="Split..." 
+                Command="{Binding EditSplit}"
+                Grid.Row="2" Grid.Column="2"/>
 
             <!-- Row 3: Type -->
             <TextBlock Text="Type:" Grid.Row="3"/>

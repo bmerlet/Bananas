@@ -11,11 +11,13 @@ namespace BanaData.Logic.Items
     /// </summary>
     public class LineItem
     {
-        public LineItem(int id, string category, string memo, decimal amount) =>
-            (ID, Category, Memo, Amount, AmountString, Payment, Deposit, AbsoluteAmount, AbsoluteAmountString) =
-            (id, category, memo, amount, amount.ToString("N"), amount < 0, amount >= 0, Math.Abs(amount), Math.Abs(amount).ToString("N"));
+        public LineItem(int id, string category, int categoryID, int categoryAccountID, string memo, decimal amount) =>
+            (ID, Category, CategoryID, CategoryAccountID, Memo, Amount, AmountString, Payment, Deposit, AbsoluteAmount, AbsoluteAmountString) =
+            (id, category, categoryID, categoryAccountID, memo, amount, amount.ToString("N"), amount < 0, amount >= 0, Math.Abs(amount), Math.Abs(amount).ToString("N"));
 
         public readonly int ID;
+        public readonly int CategoryID;
+        public readonly int CategoryAccountID;
 
         public string Category { get; }
         public string Memo { get; }

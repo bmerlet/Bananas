@@ -70,6 +70,7 @@
     <Compile Include="Logic\Dialogs\EditMemorizedPayeeLogic.cs" />
     <Compile Include="Logic\Dialogs\EditMemorizedPayeesLogic.cs" />
     <Compile Include="Logic\Dialogs\EditSplitLogic.cs" />
+    <Compile Include="Logic\Dialogs\ErrorLogic.cs" />
     <Compile Include="Logic\IGuiServices.cs" />
     <Compile Include="Logic\Items\CategoryItem.cs" />
     <Compile Include="Logic\Items\LineItem.cs" />

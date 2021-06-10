@@ -177,7 +177,8 @@ namespace BanaData.Logic.Dialogs
         {
             if (lineItems.Length == 1)
             {
-                lineItems[0] = new LineItem(lineItems[0].ID, Category, Memo, GetAmountFromControls());
+                var categoryItem = Categories.First(c => c.FullName == Category);
+                lineItems[0] = new LineItem(lineItems[0].ID, Category, categoryItem.ID, categoryItem.AccountID, Memo, GetAmountFromControls());
             }
 
             var result = new MemorizedPayeeItem(item.ID, Payee, lineItems);

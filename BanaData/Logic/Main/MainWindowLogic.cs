@@ -11,6 +11,7 @@ using Toolbox.Models;
 using BanaData.Database;
 using BanaData.Serializations;
 using BanaData.Logic.Items;
+using BanaData.Logic.Dialogs;
 
 namespace BanaData.Logic.Main
 {
@@ -19,8 +20,14 @@ namespace BanaData.Logic.Main
     /// </summary>
     public class MainWindowLogic : LogicBase
     {
+        #region Private members
+
         // User settings manager
         private readonly SettingsManager<UserSettings> settingsManager = new SettingsManager<UserSettings>("Sarabande Inc.", "Bananas");
+
+        #endregion
+
+        #region Constructor 
 
         public MainWindowLogic(IGuiServices guiServices)
         {
@@ -52,11 +59,18 @@ namespace BanaData.Logic.Main
             }
         }
 
+        #endregion
+
+        #region Public properties
+
         // Gui services
         public readonly IGuiServices GuiServices;
 
         // The database
         public readonly Household Household;
+
+        // If household needs to be saved to disk
+        public bool Dirty { get; private set; }
 
         // Main form sub-logics
         public MainMenuLogic MainMenuLogic { get; }
@@ -70,6 +84,8 @@ namespace BanaData.Logic.Main
 
         // List of categories, as displayed in the UI
         public readonly List<CategoryItem> Categories = new List<CategoryItem>();
+
+        #endregion
 
         #region UI properties
 
@@ -116,6 +132,8 @@ namespace BanaData.Logic.Main
 
         #endregion
 
+        #region Services
+
         public void OpenFile(string file)
         {
             if (file.EndsWith(".QIF", StringComparison.InvariantCultureIgnoreCase))
@@ -124,6 +142,17 @@ namespace BanaData.Logic.Main
                 UpdateAll();
                 UserSettings.LastFileOpened = file;
             }
+        }
+
+        // Commit changes to household data set
+        public void CommitChanges()
+        {
+            Household.AcceptChanges();
+            if (Household.HasErrors)
+            {
+                GuiServices.ShowDialog(new ErrorLogic("Error in dataset"));
+            }
+            Dirty = true;
         }
 
         public void SaveUserSettings()
@@ -162,6 +191,10 @@ namespace BanaData.Logic.Main
             BankRegister.SetAccount(accountID);
         }
 
+        #endregion
+
+        #region Utilities
+
         // Builds or rebuilds the list of memorized payees
         private void BuildMemorizedPayeeList()
         {
@@ -177,15 +210,22 @@ namespace BanaData.Logic.Main
                 foreach (var dbli in dbLineItems)
                 {
                     string category = "";
+                    int categoryID = -1;
+                    int categoryAccountID = -1;
                     if (!dbli.IsCategoryIDNull())
                     {
-                        var destCategory = household.Categories.FindByID(dbLineItems[0].CategoryID);
+                        var destCategory = household.Categories.FindByID(dbli.CategoryID);
                         category = destCategory.FullName;
+                        categoryID = destCategory.ID;
+                    }
+                    else if (!dbli.IsAccountIDNull())
+                    {
+                        categoryAccountID = dbli.AccountID;
                     }
 
                     string memo = dbli.IsMemoNull() ? "" : dbli.Memo;
 
-                    lineItems.Add(new LineItem(dbli.ID, category, memo, dbli.Amount));
+                    lineItems.Add(new LineItem(dbli.ID, category, categoryID, categoryAccountID, memo, dbli.Amount));
                 }
 
                 var mp = new MemorizedPayeeItem(mpr.ID, mpr.Payee, lineItems.ToArray());
@@ -263,5 +303,7 @@ namespace BanaData.Logic.Main
 
             //Categories.Sort();
         }
+
+        #endregion
     }
 }
