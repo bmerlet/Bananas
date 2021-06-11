@@ -22,7 +22,10 @@ namespace BanaData.Logic.Dialogs
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
-        private readonly LineItem[] lineItems;
+        private readonly LineItem[] oldLineItems;
+
+        private const string PAYMENT = "Payment";
+        private const string DEPOSIT = "Deposit";
 
         #endregion
 
@@ -30,13 +33,20 @@ namespace BanaData.Logic.Dialogs
 
         public EditSplitLogic(MainWindowLogic _mainWindowLogic, LineItem[] _lineItems)
         {
-            (mainWindowLogic, lineItems) = (_mainWindowLogic, _lineItems);
+            (mainWindowLogic, oldLineItems) = (_mainWindowLogic, _lineItems);
 
+            // Deposit or payment?
+            decimal total = oldLineItems.Sum(li => li.Amount);
+            bool isDeposit = total > 0;
+            Type = isDeposit ? DEPOSIT : PAYMENT;
+            Total = Math.Abs(total).ToString("N");
+
+            // Build line item collection
             gridViewLineItems = new ObservableCollection<GridViewLineItem>();
             var categories = mainWindowLogic.Categories;
-            foreach (var li in lineItems)
+            foreach (var li in oldLineItems)
             {
-                gridViewLineItems.Add(new GridViewLineItem(li));
+                gridViewLineItems.Add(new GridViewLineItem(this, li, isDeposit, mainWindowLogic.Categories));
             }
             GridViewLineItems = (CollectionView)CollectionViewSource.GetDefaultView(gridViewLineItems);
 
@@ -51,18 +61,40 @@ namespace BanaData.Logic.Dialogs
         private readonly ObservableCollection<GridViewLineItem> gridViewLineItems;
         public CollectionView GridViewLineItems { get; }
 
+        // Deposit/payment Combobox
+        public string Type { get; set; }
+        public string[] TypeSource { get; } = new string[] { DEPOSIT, PAYMENT };
+
         // Adjust button
         public CommandBase AdjustAmount { get; }
+
+        // Total
+        public string Total { get; private set; }
 
         #endregion
 
         #region Result
 
-        public LineItem[] NewLineItems => lineItems; // ZZZ For now
+        public LineItem[] NewLineItems { get; private set; }
 
         #endregion
 
         #region Actions
+
+        public GridViewLineItem BuildNewLineItem()
+        {
+            var lineItem = new LineItem(-1, "", -1, -1, "", 0);
+            var result = new GridViewLineItem(this, lineItem, false, mainWindowLogic.Categories);
+
+            return result;
+        }
+
+        // Called by line item when amount changes
+        public void UpdateTotal()
+        {
+            Total = gridViewLineItems.Sum(gvli => gvli.Amount).ToString("N");
+            OnPropertyChanged(() => Total);
+        }
 
         private void OnAdjustAmount()
         {
@@ -71,7 +103,40 @@ namespace BanaData.Logic.Dialogs
 
         protected override bool? Commit()
         {
-            throw new NotImplementedException();
+            // Build the new line items
+            var newLineItems = new List<LineItem>();
+
+            foreach (var gvli in gridViewLineItems)
+            {
+                var category = mainWindowLogic.Categories.Find(c => c.FullName == gvli.Category);
+                if (category == null)
+                {
+                    mainWindowLogic.ErrorMessage($"Category {gvli.Category} does not exist");
+                    return null; // Stay on dialog
+                }
+                decimal amount = Type == DEPOSIT ? gvli.Amount : -gvli.Amount;
+
+                var li = new LineItem(gvli.ID, category.FullName, category.ID, category.AccountID, gvli.Memo, amount);
+                newLineItems.Add(li);
+            }
+
+            // Publish them
+            NewLineItems = newLineItems.ToArray();
+
+            // Any change?
+            bool change = oldLineItems.Length != NewLineItems.Length;
+            if (!change)
+            {
+                for(int i = 0; i < oldLineItems.Length; i++)
+                {
+                    change |=
+                        oldLineItems[i].Category != NewLineItems[i].Category ||
+                        oldLineItems[i].Memo != NewLineItems[i].Memo ||
+                        oldLineItems[i].Amount != NewLineItems[i].Amount;
+                }
+            }
+
+            return change;
         }
 
         #endregion
@@ -79,17 +144,30 @@ namespace BanaData.Logic.Dialogs
         #region Supporting classes
 
         // A line item, as presented in the edit split dialog
-        class GridViewLineItem : LogicBase, IEditableObject
+        public class GridViewLineItem : LogicBase, IEditableObject
         {
-            // Default constructor (when invoked from the datagrid to create a new row)
-            public GridViewLineItem() =>
-                (ID, Memo, Category, Categories, Amount) = 
-                (-1, "", "", MainWindowLogic.Instance.Categories, 0);
+            private struct GridViewLineItemData
+            {
+                public string Memo;
+                public string Category;
+                public decimal Amount;
+            }
+
+            private GridViewLineItemData data;
+            private GridViewLineItemData backup;
+            private bool editing;
+            private readonly EditSplitLogic logic;
+
+            // Default constructor
+            // It is needed because when UserCanAddRows is set, the datagrid verifies that there is
+            // a default constructor. But it is actually not used since we hijack the AddingNewItem
+            // datagrid event.
+            public GridViewLineItem() => throw new NotImplementedException();
 
             // Explicit constructor
-            public GridViewLineItem(LineItem lineItem) =>
-                (ID, Memo, Category, Categories, Amount) = 
-                (lineItem.ID, lineItem.Memo, lineItem.Category, MainWindowLogic.Instance.Categories, lineItem.Amount);
+            public GridViewLineItem(EditSplitLogic _logic, LineItem lineItem, bool deposit, IEnumerable<CategoryItem> categories) =>
+                (logic, ID, data.Memo, data.Category, Categories, data.Amount) = 
+                (_logic, lineItem.ID, lineItem.Memo, lineItem.Category, categories, deposit ? lineItem.Amount : -lineItem.Amount);
 
             public readonly int ID;
 
@@ -98,38 +176,68 @@ namespace BanaData.Logic.Dialogs
             //
 
             // Memo
-            public string Memo { get; set; }
+            public string Memo
+            { 
+                get => data.Memo;
+                set => data.Memo = value;
+            }
 
             // Category and the supporting categories
-            public string Category { get; set; }
+            public string Category 
+            {
+                get => data.Category;
+                set => data.Category = value;
+            }
             public IEnumerable<CategoryItem> Categories { get; }
 
             // Amount, and its string representation
-            private decimal amount;
             public decimal Amount
             {
-                get => amount;
+                get => data.Amount;
                 set
                 {
-                    amount = value;
+                    data.Amount = value;
                     OnPropertyChanged(() => AmountString);
+                    logic.UpdateTotal();
                 }
             }
-            public string AmountString => amount.ToString("N");
+            public string AmountString => data.Amount.ToString("N");
 
             public void BeginEdit()
             {
-                //throw new NotImplementedException();
+                if (!editing)
+                {
+                    // Backup the data
+                    backup = data;
+                    editing = true;
+                }
             }
 
             public void EndEdit()
             {
-                //throw new NotImplementedException();
+                if (editing)
+                {
+                    // Publish data (not sure it's needed)
+                    editing = false;
+                    OnPropertyChanged(() => Category);
+                    OnPropertyChanged(() => Memo);
+                    OnPropertyChanged(() => Amount);
+                    OnPropertyChanged(() => AmountString);
+                }
             }
 
             public void CancelEdit()
             {
-                //throw new NotImplementedException();
+                if (editing)
+                {
+                    // Recover from backup data
+                    editing = false;
+                    data = backup;
+                    OnPropertyChanged(() => Category);
+                    OnPropertyChanged(() => Memo);
+                    OnPropertyChanged(() => Amount);
+                    OnPropertyChanged(() => AmountString);
+                }
             }
         }
 

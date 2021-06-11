@@ -31,5 +31,14 @@ namespace XamlUI.Dialogs
 
             InitializeComponent();
         }
+
+        // When adding a row
+        private void OnAddingNewDataGridItem(object sender, AddingNewItemEventArgs e)
+        {
+            if (DataContext is EditSplitLogic logic)
+            {
+                e.NewItem = logic.BuildNewLineItem();
+            }
+        }
     }
 }

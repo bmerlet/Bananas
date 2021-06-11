@@ -88,7 +88,7 @@ namespace BanaData.Logic.Dialogs
                 lineItems = logic.NewLineItems;
 
                 // Update this dialog
-                throw new NotImplementedException();
+                UpdateAfterLineItemChanges();
             }
         }
 
@@ -105,9 +105,9 @@ namespace BanaData.Logic.Dialogs
             }
             else
             {
-                Category = item.Category;
+                Category = lineItems[0].Category;
                 CategoryEnabled = true;
-                Memo = item.Memo;
+                Memo = lineItems[0].Memo;
                 MemoEnabled = true;
                 TypeEnabled = true;
                 AbsoluteAmountEnabled = true;

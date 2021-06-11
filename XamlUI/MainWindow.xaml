@@ -22,6 +22,7 @@
             <MenuItem Header="View">
                 <MenuItem Header="Show closed accounts" IsCheckable="True" IsChecked="{Binding ShowClosedAccounts}"/>
             </MenuItem>
+            <MenuItem Header="Test" Command="{Binding Test}"/>
         </Menu>
         <Grid>
             <Grid.ColumnDefinitions>

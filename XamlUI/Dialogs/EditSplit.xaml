@@ -57,16 +57,18 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <DataGrid
-                Width="500" Height="300" Grid.ColumnSpan="2"
+                Width="500" Height="300" Grid.ColumnSpan="3"
                 AutoGenerateColumns="False"
                 SelectionMode="Single"
                 SelectionUnit="FullRow"
                 CanUserAddRows="True"
                 CanUserDeleteRows="True"
+                AddingNewItem="OnAddingNewDataGridItem"
                 ItemsSource="{Binding GridViewLineItems}">
 
                 <DataGrid.Columns>
@@ -95,12 +97,16 @@
                 </DataGrid.Columns>
             </DataGrid>
 
+            <ComboBox
+                SelectedItem="{Binding Type}" ItemsSource="{Binding TypeSource}" Width="80"
+                Grid.Row="1" Grid.Column="0" Margin="5" HorizontalAlignment="Right"/>
             <Button
                 Content="Adjust Amount"
                 Command="{Binding AdjustAmount}"
-                Grid.Row="1" Grid.Column="0" Width="90" Margin="5" HorizontalAlignment="Right"/>
-            <w:AmountBox
-                Grid.Row="1" Grid.Column="1" Width="80" Margin="5" HorizontalAlignment="Right"/>
+                Grid.Row="1" Grid.Column="1" Width="90" Margin="5" HorizontalAlignment="Right"/>
+            <TextBlock
+                Text="{Binding Total}"
+                Grid.Row="1" Grid.Column="2" Width="80" Margin="5" TextAlignment="Right"/>
         </Grid>
     </DockPanel>
 </Window>

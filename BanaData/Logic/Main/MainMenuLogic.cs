@@ -27,6 +27,8 @@ namespace BanaData.Logic.Main
 
             Open = new CommandBase(OnOpen);
             EditMemorizedPayees = new CommandBase(OnEditMemorizedPayees);
+
+            Test = new CommandBase(OnTest);
         }
 
         #endregion
@@ -71,6 +73,21 @@ namespace BanaData.Logic.Main
         {
             get => !mainWindow.UserSettings.HideClosedAccounts;
             set { mainWindow.UserSettings.HideClosedAccounts = !value; mainWindow.UpdateAll(); }
+        }
+
+        #endregion
+
+        #region Test button
+
+        public CommandBase Test { get; }
+
+        private void OnTest()
+        {
+            var logic = new EditSplitLogic(mainWindow, mainWindow.MemorizedPayees[4].LineItems);
+            if (mainWindow.GuiServices.ShowDialog(logic))
+            {
+                var newLineItems = logic.NewLineItems;
+            }
         }
 
         #endregion
