@@ -69,8 +69,12 @@ namespace XamlUI
                 logic.TopY = (int)Top;
             };
 
-            // Save settings on close
-            Closed += (o, e) => logic.SaveUserSettings();
+            // Save settings and data on close
+            Closed += (o, e) =>
+            {
+                logic.SaveUserSettings();
+                logic.Save();
+            };
         }
 
         //

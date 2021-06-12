@@ -7,7 +7,7 @@
         xmlns:tools="clr-namespace:XamlUI.Tools"
         xmlns:ucs="clr-namespace:XamlUI.UserControls"
         mc:Ignorable="d"
-        Title="Bananas" Icon="/XamlUI;component/Images/Bananas.ico" Height="450" Width="800">
+        Title="{Binding Title}" Icon="/XamlUI;component/Images/Bananas.ico" Height="450" Width="800">
     <Window.Resources>
         <tools:GridLengthConverter x:Key="gridLengthConverter" />
     </Window.Resources>
@@ -15,6 +15,7 @@
         <Menu DockPanel.Dock="Top" DataContext="{Binding MainMenuLogic}">
             <MenuItem Header="File">
                 <MenuItem Header="Open..." Command="{Binding Open}"/>
+                <MenuItem Header="Save" Command="{Binding Save}"/>
             </MenuItem>
             <MenuItem Header="Edit">
                 <MenuItem Header="Memorized Payees..." Command="{Binding EditMemorizedPayees}"/>

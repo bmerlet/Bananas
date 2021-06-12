@@ -12,6 +12,7 @@ using BanaData.Database;
 using BanaData.Serializations;
 using BanaData.Logic.Items;
 using BanaData.Logic.Dialogs;
+using System.Timers;
 
 namespace BanaData.Logic.Main
 {
@@ -22,8 +23,15 @@ namespace BanaData.Logic.Main
     {
         #region Private members
 
+        // Application name
+        private const string APPNAME = "Bananas"; 
+
         // User settings manager
-        private readonly SettingsManager<UserSettings> settingsManager = new SettingsManager<UserSettings>("Sarabande Inc.", "Bananas");
+        private readonly SettingsManager<UserSettings> settingsManager = new SettingsManager<UserSettings>("Sarabande Inc.", APPNAME);
+
+        // Save timer and lock
+        private readonly Timer saveTimer = new Timer(300 * 1000);
+        private readonly object householdLock = new object();
 
         #endregion
 
@@ -57,6 +65,10 @@ namespace BanaData.Logic.Main
             {
                 UpdateAll();
             }
+
+            // Setup timer to save to disk every 5 minutes
+            saveTimer.Elapsed += OnSaveTimerElapsed;
+            saveTimer.Enabled = true;
         }
 
         #endregion
@@ -88,6 +100,9 @@ namespace BanaData.Logic.Main
         #endregion
 
         #region UI properties
+
+        // Title
+        public string Title { get; private set; } = APPNAME;
 
         // Main window position and size
         public int LeftX
@@ -145,25 +160,45 @@ namespace BanaData.Logic.Main
             if (file.EndsWith(".QIF", StringComparison.InvariantCultureIgnoreCase))
             {
                 Converter.ConvertFromQIF(file, Household);
-                UpdateAll();
+
+                // Save to a .XBAN (ZZZ Revisit later)
+                file = file.Substring(0, file.Length - 3) + "xban";
                 UserSettings.LastFileOpened = file;
+
+                SaveToFile(file);
             }
+            else if (file.EndsWith(".XBAN", StringComparison.InvariantCultureIgnoreCase))
+            {
+                ReadFromFile(file);
+            }
+
+            UpdateAll();
         }
 
         // Commit changes to household data set
         public void CommitChanges()
         {
-            Household.AcceptChanges();
-            if (Household.HasErrors)
+            lock (householdLock)
             {
-                GuiServices.ShowDialog(new ErrorLogic("Error in dataset"));
+                Household.AcceptChanges();
+                if (Household.HasErrors)
+                {
+                    GuiServices.ShowDialog(new ErrorLogic("Error in dataset"));
+                }
+
+                Dirty = true;
+                UpdateTitle();
             }
-            Dirty = true;
         }
 
         public void SaveUserSettings()
         {
             settingsManager.Save(UserSettings);
+        }
+
+        public void Save()
+        {
+            SaveToFile(UserSettings.LastFileOpened);
         }
 
         public void UpdateAll()
@@ -200,6 +235,53 @@ namespace BanaData.Logic.Main
         #endregion
 
         #region Utilities
+
+        // Builds title
+        private void UpdateTitle()
+        {
+            Title = APPNAME;
+
+            if (!string.IsNullOrWhiteSpace(UserSettings.LastFileOpened))
+            {
+                Title += " " + System.IO.Path.GetFileName(UserSettings.LastFileOpened);
+            }
+            if (Dirty)
+            {
+                Title += " *";
+            }
+
+            OnPropertyChanged(() => Title);
+        }
+
+        // Save dataset to file in XML
+        private void SaveToFile(string file)
+        {
+            lock (householdLock)
+            {
+                Household.WriteXml(file);
+                Dirty = false;
+            }
+
+            UpdateTitle();
+        }
+
+        private void ReadFromFile(string file)
+        {
+            Household.ReadXml(file);
+
+            UserSettings.LastFileOpened = file;
+            Dirty = false;
+            UpdateTitle();
+        }
+
+        // Save to disk every 5 minutes
+        private void OnSaveTimerElapsed(object sender, ElapsedEventArgs e)
+        {
+            if (Dirty)
+            {
+                SaveToFile(UserSettings.LastFileOpened);
+            }
+        }
 
         // Builds or rebuilds the list of memorized payees
         private void BuildMemorizedPayeeList()

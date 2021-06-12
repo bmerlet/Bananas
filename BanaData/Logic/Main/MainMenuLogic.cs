@@ -26,6 +26,7 @@ namespace BanaData.Logic.Main
             this.mainWindow = main;
 
             Open = new CommandBase(OnOpen);
+            Save = new CommandBase(OnSave);
             EditMemorizedPayees = new CommandBase(OnEditMemorizedPayees);
 
             Test = new CommandBase(OnTest);
@@ -45,6 +46,13 @@ namespace BanaData.Logic.Main
             {
                 mainWindow.OpenFile(logic.File);
             }
+        }
+
+        public CommandBase Save { get; }
+
+        private void OnSave()
+        {
+            mainWindow.Save();
         }
 
         #endregion
