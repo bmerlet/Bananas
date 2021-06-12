@@ -107,7 +107,7 @@ namespace BanaData.Logic.Main
                     acct.GetBankingBalance();
 
                 // Skip closed empty accounts if required
-                if (!mainWindow.MainMenuLogic.ShowClosedAccounts && acct.Name.Contains("CLOSED") && balance == 0)
+                if (!mainWindow.IsAccountVisible(acct.Name, balance))
                 {
                     continue;
                 }

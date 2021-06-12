@@ -58,6 +58,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Dialogs\EditAccount.xaml.cs">
+      <DependentUpon>EditAccount.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\EditAccounts.xaml.cs">
+      <DependentUpon>EditAccounts.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\EditMemorizedPayee.xaml.cs">
       <DependentUpon>EditMemorizedPayee.xaml</DependentUpon>
     </Compile>
@@ -87,6 +93,14 @@
       <DependentUpon>OKCancel.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\WatermarkTextBox.cs" />
+    <Page Include="Dialogs\EditAccount.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\EditAccounts.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\EditMemorizedPayee.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

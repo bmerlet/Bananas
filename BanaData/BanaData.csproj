@@ -67,11 +67,14 @@
     <Compile Include="Database\Security.cs" />
     <Compile Include="Database\SecurityPrice.cs" />
     <Compile Include="Database\Transaction.cs" />
+    <Compile Include="Logic\Dialogs\EditAccountLogic.cs" />
+    <Compile Include="Logic\Dialogs\EditAccountsLogic.cs" />
     <Compile Include="Logic\Dialogs\EditMemorizedPayeeLogic.cs" />
     <Compile Include="Logic\Dialogs\EditMemorizedPayeesLogic.cs" />
     <Compile Include="Logic\Dialogs\EditSplitLogic.cs" />
     <Compile Include="Logic\Dialogs\ErrorLogic.cs" />
     <Compile Include="Logic\IGuiServices.cs" />
+    <Compile Include="Logic\Items\AccountItem.cs" />
     <Compile Include="Logic\Items\CategoryItem.cs" />
     <Compile Include="Logic\Items\LineItem.cs" />
     <Compile Include="Logic\Items\MemorizedPayeeItem.cs" />

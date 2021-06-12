@@ -12,5 +12,8 @@ namespace BanaData.Logic
     {
         // Show a dialog
         bool ShowDialog(LogicBase logic);
+
+        // Exit the application
+        void Exit();
     }
 }

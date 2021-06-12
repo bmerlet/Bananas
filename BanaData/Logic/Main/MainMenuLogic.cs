@@ -27,6 +27,9 @@ namespace BanaData.Logic.Main
 
             Open = new CommandBase(OnOpen);
             Save = new CommandBase(OnSave);
+            Exit = new CommandBase(OnExit);
+
+            EditAccounts = new CommandBase(OnEditAccounts);
             EditMemorizedPayees = new CommandBase(OnEditMemorizedPayees);
 
             Test = new CommandBase(OnTest);
@@ -36,6 +39,9 @@ namespace BanaData.Logic.Main
 
         #region File memu
 
+        //
+        // Open
+        //
         public CommandBase Open { get; }
 
         private void OnOpen()
@@ -48,6 +54,9 @@ namespace BanaData.Logic.Main
             }
         }
 
+        //
+        // Save
+        //
         public CommandBase Save { get; }
 
         private void OnSave()
@@ -55,9 +64,30 @@ namespace BanaData.Logic.Main
             mainWindow.Save();
         }
 
+        //
+        // Exit
+        //
+        public CommandBase Exit { get; }
+
+        private void OnExit()
+        {
+            mainWindow.GuiServices.Exit();
+        }
+
         #endregion
 
         #region Edit menu
+
+        //
+        // Edit accounts
+        //
+        public CommandBase EditAccounts { get; }
+
+        private void OnEditAccounts()
+        {
+            var logic = new EditAccountsLogic(mainWindow);
+            mainWindow.GuiServices.ShowDialog(logic);
+        }
 
         //
         // Edit memorized Payees
@@ -67,16 +97,16 @@ namespace BanaData.Logic.Main
         private void OnEditMemorizedPayees()
         {
             var logic = new EditMemorizedPayeesLogic(mainWindow);
-            if (mainWindow.GuiServices.ShowDialog(logic))
-            {
-                mainWindow.UpdateMemorizedPayees();
-            }
+            mainWindow.GuiServices.ShowDialog(logic);
         }
 
         #endregion
 
         #region View menu
 
+        //
+        // Show closed accounts toggle
+        //
         public bool ShowClosedAccounts
         {
             get => !mainWindow.UserSettings.HideClosedAccounts;

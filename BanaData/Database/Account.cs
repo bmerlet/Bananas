@@ -38,6 +38,16 @@ namespace BanaData.Database
                 return IsIKindNull();
             }
 
+            // Are there transactions associated with this account?
+            public bool HasTransactions
+            {
+                get
+                {
+                    var accountToTransactions = Table.ChildRelations["FK_Accounts_Transactions"];
+                    return GetChildRows(accountToTransactions).Length > 0;
+                }
+            }
+
             // Get the balance of a banking account
             public decimal GetBankingBalance()
             {

@@ -16,8 +16,10 @@
             <MenuItem Header="File">
                 <MenuItem Header="Open..." Command="{Binding Open}"/>
                 <MenuItem Header="Save" Command="{Binding Save}"/>
+                <MenuItem Header="Exit" Command="{Binding Exit}"/>
             </MenuItem>
             <MenuItem Header="Edit">
+                <MenuItem Header="Accounts..." Command="{Binding EditAccounts}"/>
                 <MenuItem Header="Memorized Payees..." Command="{Binding EditMemorizedPayees}"/>
             </MenuItem>
             <MenuItem Header="View">

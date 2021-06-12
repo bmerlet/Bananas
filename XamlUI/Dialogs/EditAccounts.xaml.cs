@@ -11,17 +11,16 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-
 using BanaData.Logic.Dialogs;
 
 namespace XamlUI.Dialogs
 {
     /// <summary>
-    /// Interaction logic for EditMemorizedPayees.xaml
+    /// Interaction logic for EditAccounts.xaml
     /// </summary>
-    public partial class EditMemorizedPayees : Window
+    public partial class EditAccounts : Window
     {
-        public EditMemorizedPayees(EditMemorizedPayeesLogic logic)
+        public EditAccounts(EditAccountsLogic logic)
         {
             // Use the view model as data context
             this.DataContext = logic;
@@ -34,21 +33,21 @@ namespace XamlUI.Dialogs
 
         private void OnLogicPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (DataContext is EditMemorizedPayeesLogic logic)
+            if (DataContext is EditAccountsLogic logic)
             {
-                if (e.PropertyName == "MemorizedPayeeToScrollTo")
+                if (e.PropertyName == "AccountToScrollTo")
                 {
-                    listBox.ScrollIntoView(logic.MemorizedPayeeToScrollTo);
+                    listBox.ScrollIntoView(logic.AccountToScrollTo);
                 }
             }
         }
 
         private void OnListboxDoubleClick(object sender, EventArgs e)
         {
-            if (DataContext is EditMemorizedPayeesLogic logic)
+            if (DataContext is EditAccountsLogic logic)
             {
-                logic.EditMemorizedPayee.Execute();
+                logic.EditAccount.Execute();
             }
-        }
+}
     }
 }

@@ -18,7 +18,7 @@ namespace BanaData.Logic.Dialogs
     /// <summary>
     /// Logic to edit the list of memorized payees
     /// </summary>
-    public class EditMemorizedPayeesLogic : LogicDialogBase
+    public class EditMemorizedPayeesLogic : LogicBase
     {
         #region Private members
 
@@ -246,13 +246,6 @@ namespace BanaData.Logic.Dialogs
 
             mainWindowLogic.CommitChanges();
             mainWindowLogic.UpdateMemorizedPayees();
-        }
-
-        protected override bool? Commit()
-        {
-            // Not really anything to do - should only have a "Done" button ZZZZ
-            //throw new NotImplementedException();
-            return false;
         }
 
         #endregion

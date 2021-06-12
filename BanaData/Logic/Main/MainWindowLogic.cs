@@ -216,7 +216,7 @@ namespace BanaData.Logic.Main
             // Compute the memorized payees
             BuildMemorizedPayeeList();
 
-            // Comppute the known categories
+            // Compute the known categories
             BuildCategoriesList();
         }
 
@@ -230,6 +230,11 @@ namespace BanaData.Logic.Main
         public void OnBankAccountClicked(int accountID)
         {
             BankRegister.SetAccount(accountID);
+        }
+
+        public bool IsAccountVisible(string accountName, decimal balance)
+        {
+            return MainMenuLogic.ShowClosedAccounts || !accountName.Contains("CLOSED") || balance != 0;
         }
 
         #endregion

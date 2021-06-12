@@ -77,6 +77,8 @@ namespace XamlUI
             };
         }
 
+        #region Gui services implementation
+
         //
         // Show a dialog
         //
@@ -99,7 +101,15 @@ namespace XamlUI
             // Our own dialogs
             //
             Window dialog;
-            if (logic is EditMemorizedPayeesLogic editMemorizedPayeesLogic)
+            if (logic is EditAccountsLogic editAccountsLogic)
+            {
+                dialog = new EditAccounts(editAccountsLogic);
+            }
+            else if (logic is EditAccountLogic editAccountLogic)
+            {
+                dialog = new EditAccount(editAccountLogic);
+            }
+            else if (logic is EditMemorizedPayeesLogic editMemorizedPayeesLogic)
             {
                 dialog = new EditMemorizedPayees(editMemorizedPayeesLogic);
             }
@@ -151,5 +161,11 @@ namespace XamlUI
             return result;
         }
 
+        public void Exit()
+        {
+            Application.Current.Shutdown();
+        }
+
+        #endregion
     }
 }

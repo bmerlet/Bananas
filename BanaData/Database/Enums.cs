@@ -4,13 +4,49 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Toolbox.Attributes;
+
 namespace BanaData.Database
 {
     // Account type
-    public enum EAccountType { Cash, Bank, CreditCard, Investment, OtherAsset, OtherLiability, Invalid };
+    public enum EAccountType
+    {
+        [EnumDescription("Cash")]
+        Cash,
+
+        [EnumDescription("Bank account")]
+        Bank,
+
+        [EnumDescription("Credit card")]
+        CreditCard,
+
+        [EnumDescription("Investment")]
+        Investment,
+
+        [EnumDescription("Asset")]
+        OtherAsset,
+
+        [EnumDescription("Liability")]
+        OtherLiability, 
+
+        Invalid 
+    };
 
     // Kind of investment, for investment accounts
-    public enum EInvestmentKind { Brokerage, SingleMutualFund, _401k, Invalid };
+    public enum EInvestmentKind 
+    {
+        [EnumDescription("Brokerage")]
+        Brokerage,
+
+        [EnumDescription("Single Security")]
+        SingleMutualFund,
+
+        [EnumDescription("401k")]
+        _401k,
+
+        [EnumDescription("N/A")]
+        Invalid
+    };
 
     // Security type
     public enum ESecurityType { Stock, MutualFund, MarketIndex, EmployeeStockOption, Invalid }
