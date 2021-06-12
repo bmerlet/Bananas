@@ -80,6 +80,9 @@
       <DependentUpon>BankRegisterLV.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\DateBox.cs" />
+    <Compile Include="UserControls\DonePanel.xaml.cs">
+      <DependentUpon>DonePanel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\OKCancel.xaml.cs">
       <DependentUpon>OKCancel.xaml</DependentUpon>
     </Compile>
@@ -123,6 +126,10 @@
     <Page Include="UserControls\BankRegisterLV.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UserControls\DonePanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserControls\OKCancel.xaml">
       <SubType>Designer</SubType>

@@ -388,7 +388,7 @@ namespace XamlUI.UserControls
         //
         private void RefreshSelector()
         {
-            if (selector != null && popup != null)
+            if (selector != null && popup != null && IsKeyboardFocusWithin)
             {
                 // Apply filter to the listbox' items
                 CollectionViewSource.GetDefaultView(selector.ItemsSource).Refresh();

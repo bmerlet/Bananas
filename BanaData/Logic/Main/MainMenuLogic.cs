@@ -83,11 +83,8 @@ namespace BanaData.Logic.Main
 
         private void OnTest()
         {
-            var logic = new EditSplitLogic(mainWindow, mainWindow.MemorizedPayees[4].LineItems);
-            if (mainWindow.GuiServices.ShowDialog(logic))
-            {
-                var newLineItems = logic.NewLineItems;
-            }
+            var logic = new EditMemorizedPayeeLogic(mainWindow, mainWindow.MemorizedPayees[4], false);
+            mainWindow.GuiServices.ShowDialog(logic);
         }
 
         #endregion

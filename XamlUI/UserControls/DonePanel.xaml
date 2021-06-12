@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="XamlUI.UserControls.OKCancel"
+﻿<UserControl x:Class="XamlUI.UserControls.DonePanel"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -8,7 +8,6 @@
     <UserControl.Resources>
     </UserControl.Resources>
     <WrapPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="0,8" >
-        <Button Style="{StaticResource OKButton}" Command="{Binding CommitCommand}"/>
-        <Button Style="{StaticResource CancelButton}"/>
+        <Button Style="{StaticResource DoneButton}"/>
     </WrapPanel>
 </UserControl>

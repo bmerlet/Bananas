@@ -129,6 +129,13 @@ namespace BanaData.Logic.Dialogs
 
         protected override bool? Commit()
         {
+            // We require a payee name
+            if (string.IsNullOrWhiteSpace(Payee))
+            {
+                mainWindowLogic.ErrorMessage("Payee name cannot be blank");
+                return null;
+            }
+
             bool change
                 = add || item.Payee != Payee || item.LineItems.Length != lineItems.Length;
 
@@ -177,8 +184,15 @@ namespace BanaData.Logic.Dialogs
         {
             if (lineItems.Length == 1)
             {
-                var categoryItem = Categories.First(c => c.FullName == Category);
-                lineItems[0] = new LineItem(lineItems[0].ID, Category, categoryItem.ID, categoryItem.AccountID, Memo, GetAmountFromControls());
+                if (string.IsNullOrWhiteSpace(Category))
+                {
+                    lineItems[0] = new LineItem(lineItems[0].ID, "", -1, -1, Memo, GetAmountFromControls());
+                }
+                else
+                {
+                    var categoryItem = Categories.First(c => c.FullName == Category);
+                    lineItems[0] = new LineItem(lineItems[0].ID, Category, categoryItem.ID, categoryItem.AccountID, Memo, GetAmountFromControls());
+                }
             }
 
             var result = new MemorizedPayeeItem(item.ID, Payee, lineItems);

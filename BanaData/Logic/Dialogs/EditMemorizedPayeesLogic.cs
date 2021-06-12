@@ -47,6 +47,7 @@ namespace BanaData.Logic.Dialogs
         #region UI properties
 
         public MemorizedPayeeItem SelectedMemorizedPayee { get; set; }
+        public MemorizedPayeeItem MemorizedPayeeToScrollTo { get; private set; }
 
         private readonly ObservableCollection<MemorizedPayeeItem> memorizedPayeesSource;
         public CollectionView MemorizedPayeesSource { get; }
@@ -78,6 +79,9 @@ namespace BanaData.Logic.Dialogs
                 // Update UI
                 memorizedPayeesSource.Add(newPayee);
                 SelectedMemorizedPayee = newPayee;
+                MemorizedPayeeToScrollTo = newPayee;
+                OnPropertyChanged(() => SelectedMemorizedPayee);
+                OnPropertyChanged(() => MemorizedPayeeToScrollTo);
             }
         }
 
@@ -96,6 +100,9 @@ namespace BanaData.Logic.Dialogs
                 memorizedPayeesSource.Remove(SelectedMemorizedPayee);
                 memorizedPayeesSource.Add(newPayee);
                 SelectedMemorizedPayee = newPayee;
+                MemorizedPayeeToScrollTo = newPayee;
+                OnPropertyChanged(() => SelectedMemorizedPayee);
+                OnPropertyChanged(() => MemorizedPayeeToScrollTo);
             }
         }
 
@@ -115,6 +122,15 @@ namespace BanaData.Logic.Dialogs
         {
             var household = mainWindowLogic.Household;
 
+            var newPayeeRow = mainWindowLogic.Household.MemorizedPayees.NewRow() as Household.MemorizedPayeesRow;
+
+            // Commit new payee
+            newPayeeRow.ID = newPayee.ID;
+            newPayeeRow.Payee = newPayee.Payee;
+            newPayeeRow.Status = ETransactionStatus.Pending;
+
+            household.MemorizedPayees.Rows.Add(newPayeeRow);
+
             // Commit all line items
             foreach (var lineItem in newPayee.LineItems)
             {
@@ -128,15 +144,8 @@ namespace BanaData.Logic.Dialogs
                 household.MemorizedLineItems.Rows.Add(newRow);
             }
 
-            var newPayeeRow = mainWindowLogic.Household.MemorizedPayees.NewRow() as Household.MemorizedPayeesRow;
-
-            newPayeeRow.ID = newPayee.ID;
-            newPayeeRow.Payee = newPayee.Payee;
-            newPayeeRow.Status = ETransactionStatus.Pending;
-
-            household.MemorizedPayees.Rows.Add(newPayeeRow);
-
             mainWindowLogic.CommitChanges();
+            mainWindowLogic.UpdateMemorizedPayees();
         }
 
         private void UpdateMemorizedPayeeInDataSet(MemorizedPayeeItem newPayee)
@@ -167,9 +176,10 @@ namespace BanaData.Logic.Dialogs
                     UpdateOneDataSetLineItem(newLineItem, oldLineItem);
                 }
             }
+            mainWindowLogic.CommitChanges();
 
             // Create the line items that don't exist
-            foreach(var newLineItem in newPayee.LineItems)
+            foreach (var newLineItem in newPayee.LineItems)
             {
                 if (oldLineItems.FirstOrDefault(oli => oli.ID == newLineItem.ID) == null)
                 {
@@ -186,6 +196,7 @@ namespace BanaData.Logic.Dialogs
             }
 
             mainWindowLogic.CommitChanges();
+            mainWindowLogic.UpdateMemorizedPayees();
         }
 
         private void UpdateOneDataSetLineItem(LineItem lineItem, Household.MemorizedLineItemsRow row)
@@ -224,16 +235,17 @@ namespace BanaData.Logic.Dialogs
         {
             var household = mainWindowLogic.Household;
 
-            // Remove the memorized payee
-            household.MemorizedPayees.FindByID(payee.ID).Delete();
-
             // Remove the corresponding memorized line items
             foreach (var lineItem in payee.LineItems)
             {
                 household.MemorizedLineItems.FindByID(lineItem.ID).Delete();
             }
 
+            // Remove the memorized payee
+            household.MemorizedPayees.FindByID(payee.ID).Delete();
+
             mainWindowLogic.CommitChanges();
+            mainWindowLogic.UpdateMemorizedPayees();
         }
 
         protected override bool? Commit()

@@ -30,8 +30,21 @@ namespace XamlUI.Dialogs
             logic.CloseView = result => DialogResult = result;
 
             InitializeComponent();
+
+            // Get norifications from logic
+            logic.PropertyChanged += OnLogicPropertyChanged;
         }
 
+        private void OnLogicPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (DataContext is EditMemorizedPayeesLogic logic)
+            {
+                if (e.PropertyName == "MemorizedPayeeToScrollTo")
+                {
+                    listBox.ScrollIntoView(logic.MemorizedPayeeToScrollTo);
+                }
+            }
+        }
 
         private void OnListboxDoubleClick(object sender, EventArgs e)
         {

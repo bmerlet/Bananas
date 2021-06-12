@@ -4,6 +4,41 @@
              xmlns:local="clr-namespace:XamlUI"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+
+        <!--
+          == Buttons ==
+          -->
+
+        <!-- OK button -->
+        <Style TargetType="Button" x:Key="OKButton">
+            <Setter Property="Content" Value="OK"/>
+            <Setter Property="IsDefault" Value="True"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property ="VerticalAlignment" Value="Center"/>
+            <Setter Property="Width" Value="75" />
+            <Setter Property="Margin" Value="0,0,10,0" />
+        </Style>
+
+        <!-- Cancel button -->
+        <Style TargetType="Button" x:Key="CancelButton">
+            <Setter Property="Content" Value="Cancel"/>
+            <Setter Property="IsCancel" Value="True"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property ="VerticalAlignment" Value="Center"/>
+            <Setter Property="Width" Value="75" />
+            <Setter Property="Margin" Value="0,0,10,0" />
+        </Style>
+
+        <!-- Done button -->
+        <Style TargetType="Button" x:Key="DoneButton">
+            <Setter Property="Content" Value="Done"/>
+            <Setter Property="IsDefault" Value="True"/>
+            <Setter Property="IsCancel" Value="True"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property ="VerticalAlignment" Value="Center"/>
+            <Setter Property="Width" Value="75" />
+            <Setter Property="Margin" Value="0,0,10,0" />
+        </Style>
+
     </Application.Resources>
 </Application>

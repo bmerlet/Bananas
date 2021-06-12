@@ -13,13 +13,13 @@
         SizeToContent="WidthAndHeight">
     <Window.Resources>
         <Style TargetType="Button">
-            <Setter Property="Width" Value="90"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="Margin" Value="3"/>
         </Style>
     </Window.Resources>
     <DockPanel>
-        <!-- OK/Cancel panel -->
-        <w:OKCancel DockPanel.Dock="Bottom"/>
+        <!-- Done panel -->
+        <w:DonePanel DockPanel.Dock="Bottom"/>
         <!-- Main panel -->
         <Grid>
             <Grid.RowDefinitions>
@@ -34,7 +34,8 @@
 
             <!-- Row 0: Listbox of memorized payees -->
             <ListBox 
-                Height="300" Grid.ColumnSpan="3" 
+                Height="300" Grid.ColumnSpan="3"
+                x:Name="listBox"
                 MouseDoubleClick="OnListboxDoubleClick"
                 ItemsSource="{Binding MemorizedPayeesSource}" 
                 SelectedItem="{Binding SelectedMemorizedPayee, Mode=TwoWay}">

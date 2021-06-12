@@ -23,6 +23,7 @@ namespace BanaData.Logic.Dialogs
 
         private readonly MainWindowLogic mainWindowLogic;
         private readonly LineItem[] oldLineItems;
+        private readonly List<CategoryItem> categories;
 
         private const string PAYMENT = "Payment";
         private const string DEPOSIT = "Deposit";
@@ -35,6 +36,9 @@ namespace BanaData.Logic.Dialogs
         {
             (mainWindowLogic, oldLineItems) = (_mainWindowLogic, _lineItems);
 
+            // Create our own copy of the category list, to avoid filter issue on nested dialogs
+            categories = new List<CategoryItem>(mainWindowLogic.Categories);
+
             // Deposit or payment?
             decimal total = oldLineItems.Sum(li => li.Amount);
             bool isDeposit = total > 0;
@@ -43,14 +47,16 @@ namespace BanaData.Logic.Dialogs
 
             // Build line item collection
             gridViewLineItems = new ObservableCollection<GridViewLineItem>();
-            var categories = mainWindowLogic.Categories;
             foreach (var li in oldLineItems)
             {
-                gridViewLineItems.Add(new GridViewLineItem(this, li, isDeposit, mainWindowLogic.Categories));
+                gridViewLineItems.Add(new GridViewLineItem(this, li, isDeposit, categories));
             }
-            GridViewLineItems = (CollectionView)CollectionViewSource.GetDefaultView(gridViewLineItems);
 
-            AdjustAmount = new CommandBase(OnAdjustAmount);
+            // Update total wjhen a line is deleted
+            gridViewLineItems.CollectionChanged += (o, e) => UpdateTotal();
+
+            // Give the default view to the UI
+            GridViewLineItems = (CollectionView)CollectionViewSource.GetDefaultView(gridViewLineItems);
         }
 
         #endregion
@@ -64,9 +70,6 @@ namespace BanaData.Logic.Dialogs
         // Deposit/payment Combobox
         public string Type { get; set; }
         public string[] TypeSource { get; } = new string[] { DEPOSIT, PAYMENT };
-
-        // Adjust button
-        public CommandBase AdjustAmount { get; }
 
         // Total
         public string Total { get; private set; }
@@ -83,22 +86,18 @@ namespace BanaData.Logic.Dialogs
 
         public GridViewLineItem BuildNewLineItem()
         {
-            var lineItem = new LineItem(-1, "", -1, -1, "", 0);
-            var result = new GridViewLineItem(this, lineItem, false, mainWindowLogic.Categories);
+            int id = gridViewLineItems.Max(gvli => gvli.ID) + 1;
+            var lineItem = new LineItem(id, "", -1, -1, "", 0);
+            var result = new GridViewLineItem(this, lineItem, false, categories);
 
             return result;
         }
 
-        // Called by line item when amount changes
+        // Called by line item when amount changes and also when the collection of line items changes
         public void UpdateTotal()
         {
             Total = gridViewLineItems.Sum(gvli => gvli.Amount).ToString("N");
             OnPropertyChanged(() => Total);
-        }
-
-        private void OnAdjustAmount()
-        {
-            throw new NotImplementedException();
         }
 
         protected override bool? Commit()
@@ -161,7 +160,7 @@ namespace BanaData.Logic.Dialogs
             // Default constructor
             // It is needed because when UserCanAddRows is set, the datagrid verifies that there is
             // a default constructor. But it is actually not used since we hijack the AddingNewItem
-            // datagrid event.
+            // datagrid event and create the object ourself using the explicit constructor.
             public GridViewLineItem() => throw new NotImplementedException();
 
             // Explicit constructor
