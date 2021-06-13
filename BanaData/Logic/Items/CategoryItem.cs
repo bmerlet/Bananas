@@ -8,28 +8,44 @@ namespace BanaData.Logic.Items
 {
     public class CategoryItem
     {
-        public CategoryItem(int id, string name, CategoryItem parent)
-        {
-            (ID, Name, Parent, FullName, AccountID) = (id, name, parent, parent == null ? name : $"{parent.FullName}:{name}", -1);
-        }
+        public CategoryItem(int id, string name, string description, bool isIncome, string taxInfo, CategoryItem parent) =>
+            (ID, Name, Description, IsIncome, TaxInfo, Parent, FullName, AccountID) =
+            (id, name, description, isIncome, taxInfo, parent, parent == null ? name : $"{parent.FullName}:{name}", -1);
 
         public CategoryItem (int accountID, string accountName)
         {
             string name = $"[{accountName}]";
-            (ID, Name, Parent, FullName, AccountID) = (-1, name, null, name, accountID);
+            (ID, Name, Description, IsIncome, TaxInfo, Parent, FullName, AccountID) = 
+                (-1, name, null, false, null, null, name, accountID);
         }
 
-        public readonly int ID = -1;
-        public readonly CategoryItem Parent = null;
-        public readonly int AccountID = -1;
+        // IDs
+        public readonly int ID;
+        public readonly CategoryItem Parent;
+        public readonly int AccountID;
 
+        // UI properties
         public string Name { get; }
         public string FullName { get; }
-        public bool IsBold => Parent == null;
+        public string Description { get; }
+        public bool IsIncome { get; }
+        public string TaxInfo { get; }
 
-        public override string ToString()
+        private string indentedName;
+        public string IndentedName => GetIndentedName();
+        public bool FontWeight => Parent == null;
+
+        private string GetIndentedName()
         {
-            return (Parent != null ? "  " : "") + Name;
+            if (indentedName == null)
+            {
+                indentedName = Name;
+                for(var p = Parent; p != null; p = p.Parent)
+                {
+                    indentedName = "  " + indentedName;
+                }
+            }
+            return indentedName;
         }
 
         public override bool Equals(object obj)

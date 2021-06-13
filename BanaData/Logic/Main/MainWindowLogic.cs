@@ -341,7 +341,9 @@ namespace BanaData.Logic.Main
             {
                 if (category.IsParentIDNull())
                 {
-                    Categories.Add(new CategoryItem(category.ID, category.Name, null));
+                    var description = category.IsDescriptionNull() ? "" : category.Description;
+                    var taxInfo = category.IsTaxInfoNull() ? "" : category.TaxInfo;
+                    Categories.Add(new CategoryItem(category.ID, category.Name, description, category.IsIncome, taxInfo, null));
                 }
             }
 
@@ -375,7 +377,9 @@ namespace BanaData.Logic.Main
                                 }
 
                                 // Create category
-                                var categoryItem = new CategoryItem(category.ID, category.Name, parent);
+                                var description = category.IsDescriptionNull() ? "" : category.Description;
+                                var taxInfo = category.IsTaxInfoNull() ? "" : category.TaxInfo;
+                                var categoryItem = new CategoryItem(category.ID, category.Name, description, category.IsIncome, taxInfo, parent);
                                 if (indexOfParent == Categories.Count - 1)
                                 {
                                     Categories.Add(categoryItem);

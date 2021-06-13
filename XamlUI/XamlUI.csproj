@@ -73,6 +73,9 @@
     <Compile Include="Dialogs\EditSplit.xaml.cs">
       <DependentUpon>EditSplit.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tools\BindingProxy.cs" />
+    <Compile Include="Tools\DataGridLengthConverter.cs" />
+    <Compile Include="Tools\FontWeightConverter.cs" />
     <Compile Include="Tools\GridLengthConverter.cs" />
     <Compile Include="UserControls\AccountGroup.xaml.cs">
       <DependentUpon>AccountGroup.xaml</DependentUpon>
