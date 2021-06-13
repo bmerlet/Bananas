@@ -32,17 +32,16 @@ namespace BanaData.Database
                 return memorizedPayeeRow;
             }
 
+            public MemorizedPayeesRow Update(MemorizedPayeesRow memorizedPayeeRow, string payee, ETransactionStatus status)
+            {
+                UpdateMemorisedPayee(memorizedPayeeRow, payee, status);
+
+                return memorizedPayeeRow;
+            }
+
             private static MemorizedPayeesRow UpdateMemorisedPayee(MemorizedPayeesRow memorizedPayeesRow, string payee, ETransactionStatus status)
             {
-                if (payee == null)
-                {
-                    memorizedPayeesRow.SetPayeeNull();
-                }
-                else
-                {
-                    memorizedPayeesRow.Payee = payee;
-                }
-
+                memorizedPayeesRow.Payee = payee;
                 memorizedPayeesRow.Status = status;
 
                 return memorizedPayeesRow;

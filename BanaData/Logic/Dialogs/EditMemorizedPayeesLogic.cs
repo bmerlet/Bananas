@@ -63,9 +63,7 @@ namespace BanaData.Logic.Dialogs
         private void OnAddMemorizedPayee()
         {
             // Create new memorized payee
-            int mpid = memorizedPayeesSource.Max(mpi => mpi.ID) + 1;
-            int liid = memorizedPayeesSource.Max(mpi => mpi.LineItems.Max(liiid => liiid.ID)) + 1;
-            var newMemorizedPayee = new MemorizedPayeeItem(mpid, "", new LineItem[1] { new LineItem(liid, "", -1, -1, "", 0) });
+            var newMemorizedPayee = new MemorizedPayeeItem(-1, "", new LineItem[1] { new LineItem(-1, "", -1, -1, "", 0) });
 
             var logic = new EditMemorizedPayeeLogic(mainWindowLogic, newMemorizedPayee, true);
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
@@ -74,7 +72,7 @@ namespace BanaData.Logic.Dialogs
                 var newPayee = logic.NewMemorizedPayeeItem;
 
                 // Commit change
-                AddMemorizedPayeeToDataSet(newPayee);
+                newPayee = AddMemorizedPayeeToDataSet(newPayee);
 
                 // Update UI
                 memorizedPayeesSource.Add(newPayee);
@@ -96,7 +94,7 @@ namespace BanaData.Logic.Dialogs
                     var newPayee = logic.NewMemorizedPayeeItem;
 
                     // Commit change
-                    UpdateMemorizedPayeeInDataSet(newPayee);
+                    newPayee = UpdateMemorizedPayeeInDataSet(newPayee);
 
                     // Update UI
                     memorizedPayeesSource.Remove(SelectedMemorizedPayee);
@@ -121,52 +119,44 @@ namespace BanaData.Logic.Dialogs
             }
         }
 
-        private void AddMemorizedPayeeToDataSet(MemorizedPayeeItem newPayee)
+        private MemorizedPayeeItem AddMemorizedPayeeToDataSet(MemorizedPayeeItem newPayee)
         {
             var household = mainWindowLogic.Household;
 
-            var newPayeeRow = mainWindowLogic.Household.MemorizedPayees.NewRow() as Household.MemorizedPayeesRow;
-
             // Commit new payee
-            newPayeeRow.ID = newPayee.ID;
-            newPayeeRow.Payee = newPayee.Payee;
-            newPayeeRow.Status = ETransactionStatus.Pending;
-
-            household.MemorizedPayees.Rows.Add(newPayeeRow);
+            var newPayeeRow = household.MemorizedPayees.Add(newPayee.Payee, ETransactionStatus.Pending);
 
             // Commit all line items
+            var newLineItems = new List<LineItem>();
             foreach (var lineItem in newPayee.LineItems)
             {
-                var newRow = household.MemorizedLineItems.NewRow() as Household.MemorizedLineItemsRow;
+                var newRow = household.MemorizedLineItems.Add(newPayeeRow, lineItem.CategoryID, lineItem.CategoryAccountID, lineItem.Memo, lineItem.Amount);
 
-                newRow.ID = lineItem.ID;
-                newRow.MemorizedPayeeID = newPayee.ID;
-
-                UpdateOneDataSetLineItem(lineItem, newRow);
-
-                household.MemorizedLineItems.Rows.Add(newRow);
+                // Recreate line item with correct ID
+                newLineItems.Add(new LineItem(lineItem, newRow.ID));
             }
 
             mainWindowLogic.CommitChanges();
             mainWindowLogic.UpdateMemorizedPayees();
+
+            // Recreate memorized payee with correct ID
+            return new MemorizedPayeeItem(newPayeeRow.ID, newPayeeRow.Payee, newLineItems.ToArray());
         }
 
-        private void UpdateMemorizedPayeeInDataSet(MemorizedPayeeItem newPayee)
+        private MemorizedPayeeItem UpdateMemorizedPayeeInDataSet(MemorizedPayeeItem newPayee)
         {
             var household = mainWindowLogic.Household;
 
             // Update the memorized payee
             var payeeRow = household.MemorizedPayees.FindByID(newPayee.ID);
-            if (payeeRow.Payee != newPayee.Payee)
-            {
-                payeeRow.Payee = newPayee.Payee;
-            }
+            household.MemorizedPayees.Update(payeeRow, newPayee.Payee, ETransactionStatus.Pending);
 
             // Get existing line items
             var oldLineItems = household.MemorizedLineItems.GetByMemorizedPayee(payeeRow);
 
             // Delete line items that don't exist in the new payee
             // Modify the other ones
+            var newMemorizedLineItems = new List<LineItem>();
             foreach (var oldLineItem in oldLineItems)
             {
                 var newLineItem = newPayee.LineItems.FirstOrDefault(li => li.ID == oldLineItem.ID);
@@ -176,62 +166,30 @@ namespace BanaData.Logic.Dialogs
                 }
                 else
                 {
-                    UpdateOneDataSetLineItem(newLineItem, oldLineItem);
+                    household.MemorizedLineItems.Update(oldLineItem, payeeRow, newLineItem.CategoryID, newLineItem.CategoryAccountID, newLineItem.Memo, newLineItem.Amount);
+                    newMemorizedLineItems.Add(newLineItem);
                 }
             }
             mainWindowLogic.CommitChanges();
 
             // Create the line items that don't exist
+            oldLineItems = household.MemorizedLineItems.GetByMemorizedPayee(payeeRow);
             foreach (var newLineItem in newPayee.LineItems)
             {
                 if (oldLineItems.FirstOrDefault(oli => oli.ID == newLineItem.ID) == null)
                 {
-                    var newRow = household.MemorizedLineItems.NewRow() as Household.MemorizedLineItemsRow;
+                    var newRow = household.MemorizedLineItems.Add(payeeRow, newLineItem.CategoryID, newLineItem.CategoryAccountID, newLineItem.Memo, newLineItem.Amount);
 
-                    newRow.ID = newLineItem.ID;
-
-                    newRow.MemorizedPayeeID = newPayee.ID;
-
-                    UpdateOneDataSetLineItem(newLineItem, newRow);
-
-                    household.MemorizedLineItems.Rows.Add(newRow);
+                    // Recreate line item with correct ID
+                    newMemorizedLineItems.Add(new LineItem(newLineItem, newRow.ID));
                 }
             }
 
             mainWindowLogic.CommitChanges();
             mainWindowLogic.UpdateMemorizedPayees();
-        }
 
-        private void UpdateOneDataSetLineItem(LineItem lineItem, Household.MemorizedLineItemsRow row)
-        {
-            if (string.IsNullOrWhiteSpace(lineItem.Memo))
-            {
-                row.SetMemoNull();
-            }
-            else
-            {
-                row.Memo = lineItem.Memo;
-            }
-
-            row.IsTransfer = false;
-            if (lineItem.CategoryID >= 0)
-            {
-                row.CategoryID = lineItem.CategoryID;
-                row.SetAccountIDNull();
-            }
-            else if (lineItem.CategoryAccountID >= 0)
-            {
-                row.SetCategoryIDNull();
-                row.AccountID = lineItem.CategoryAccountID;
-                row.IsTransfer = true;
-            }
-            else
-            {
-                row.SetCategoryIDNull();
-                row.SetAccountIDNull();
-            }
-
-            row.Amount = lineItem.Amount;
+            // Recreate memorized payee with correct line item ID
+            return new MemorizedPayeeItem(payeeRow.ID, payeeRow.Payee, newMemorizedLineItems.ToArray());
         }
 
         private void RemoveMemorizedPayeeFromDataSet(MemorizedPayeeItem payee)

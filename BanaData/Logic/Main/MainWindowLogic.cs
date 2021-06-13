@@ -267,7 +267,14 @@ namespace BanaData.Logic.Main
 
         private void ReadFromFile(string file)
         {
-            Household.ReadXml(file);
+            try
+            {
+                Household.ReadXml(file);
+            }
+            catch (Exception e)
+            {
+                ErrorMessage($"Error reading file {System.IO.Path.GetFileName(file)}: {e.Message}");
+            }
 
             UserSettings.LastFileOpened = file;
             Dirty = false;

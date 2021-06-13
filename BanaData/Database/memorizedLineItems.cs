@@ -28,6 +28,24 @@ namespace BanaData.Database
                 return memorizedLineItemRow;
             }
 
+            public MemorizedLineItemsRow Add(MemorizedPayeesRow memorizedPayeesRow, int categoryId, int categoryAccountId, string memo, decimal amount)
+            {
+                var memorizedLineItemRow = NewMemorizedLineItemsRow();
+
+                UpdateMemorizedLineItem(memorizedLineItemRow, memorizedPayeesRow, categoryId, categoryAccountId, memo, amount);
+
+                Rows.Add(memorizedLineItemRow);
+
+                return memorizedLineItemRow;
+            }
+
+            public MemorizedLineItemsRow Update(MemorizedLineItemsRow memorizedLineItemRow, MemorizedPayeesRow memorizedPayeesRow, int categoryId, int categoryAccountId, string memo, decimal amount)
+            {
+                UpdateMemorizedLineItem(memorizedLineItemRow, memorizedPayeesRow, categoryId, categoryAccountId, memo, amount);
+
+                return memorizedLineItemRow;
+            }
+
             private static MemorizedLineItemsRow UpdateMemorizedLineItem(MemorizedLineItemsRow memorizedLineItemsRow, MemorizedPayeesRow memorizedPayeesRow, bool transfer, DataRow AccountOrCategory, string memo, decimal amount)
             {
                 memorizedLineItemsRow.MemorizedPayeeID = memorizedPayeesRow.ID;
@@ -49,7 +67,42 @@ namespace BanaData.Database
                     memorizedLineItemsRow.CategoryID = (int)AccountOrCategory["ID"];
                 }
 
-                if (memo == null)
+                if (string.IsNullOrWhiteSpace(memo))
+                {
+                    memorizedLineItemsRow.SetMemoNull();
+                }
+                else
+                {
+                    memorizedLineItemsRow.Memo = memo;
+                }
+
+                memorizedLineItemsRow.Amount = amount;
+
+                return memorizedLineItemsRow;
+            }
+
+            private static MemorizedLineItemsRow UpdateMemorizedLineItem(MemorizedLineItemsRow memorizedLineItemsRow, MemorizedPayeesRow memorizedPayeesRow, int categoryId, int categoryAccountId, string memo, decimal amount)
+            {
+                memorizedLineItemsRow.MemorizedPayeeID = memorizedPayeesRow.ID;
+
+                memorizedLineItemsRow.IsTransfer = categoryAccountId >= 0;
+                if (categoryId >= 0)
+                {
+                    memorizedLineItemsRow.SetAccountIDNull();
+                    memorizedLineItemsRow.CategoryID = categoryId;
+                }
+                else if (categoryAccountId >= 0)
+                {
+                    memorizedLineItemsRow.AccountID = categoryAccountId;
+                    memorizedLineItemsRow.SetCategoryIDNull();
+                }
+                else
+                {
+                    memorizedLineItemsRow.SetAccountIDNull();
+                    memorizedLineItemsRow.SetCategoryIDNull();
+                }
+
+                if (string.IsNullOrWhiteSpace(memo))
                 {
                     memorizedLineItemsRow.SetMemoNull();
                 }

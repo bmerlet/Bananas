@@ -3577,6 +3577,9 @@ namespace BanaData.Database {
                 this.columnID.AllowDBNull = false;
                 this.columnID.ReadOnly = true;
                 this.columnID.Unique = true;
+                this.columnMemorizedPayeeID.AllowDBNull = false;
+                this.columnIsTransfer.AllowDBNull = false;
+                this.columnAmount.AllowDBNull = false;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -3865,6 +3868,7 @@ namespace BanaData.Database {
                 this.columnID.AllowDBNull = false;
                 this.columnID.ReadOnly = true;
                 this.columnID.Unique = true;
+                this.columnPayee.AllowDBNull = false;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -5096,12 +5100,7 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public int MemorizedPayeeID {
                 get {
-                    try {
-                        return ((int)(this[this.tableMemorizedLineItems.MemorizedPayeeIDColumn]));
-                    }
-                    catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'MemorizedPayeeID\' in table \'MemorizedLineItems\' is DBNull.", e);
-                    }
+                    return ((int)(this[this.tableMemorizedLineItems.MemorizedPayeeIDColumn]));
                 }
                 set {
                     this[this.tableMemorizedLineItems.MemorizedPayeeIDColumn] = value;
@@ -5112,12 +5111,7 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public bool IsTransfer {
                 get {
-                    try {
-                        return ((bool)(this[this.tableMemorizedLineItems.IsTransferColumn]));
-                    }
-                    catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'IsTransfer\' in table \'MemorizedLineItems\' is DBNull.", e);
-                    }
+                    return ((bool)(this[this.tableMemorizedLineItems.IsTransferColumn]));
                 }
                 set {
                     this[this.tableMemorizedLineItems.IsTransferColumn] = value;
@@ -5176,12 +5170,7 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public decimal Amount {
                 get {
-                    try {
-                        return ((decimal)(this[this.tableMemorizedLineItems.AmountColumn]));
-                    }
-                    catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'Amount\' in table \'MemorizedLineItems\' is DBNull.", e);
-                    }
+                    return ((decimal)(this[this.tableMemorizedLineItems.AmountColumn]));
                 }
                 set {
                     this[this.tableMemorizedLineItems.AmountColumn] = value;
@@ -5223,30 +5212,6 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public bool IsMemorizedPayeeIDNull() {
-                return this.IsNull(this.tableMemorizedLineItems.MemorizedPayeeIDColumn);
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public void SetMemorizedPayeeIDNull() {
-                this[this.tableMemorizedLineItems.MemorizedPayeeIDColumn] = global::System.Convert.DBNull;
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public bool IsIsTransferNull() {
-                return this.IsNull(this.tableMemorizedLineItems.IsTransferColumn);
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public void SetIsTransferNull() {
-                this[this.tableMemorizedLineItems.IsTransferColumn] = global::System.Convert.DBNull;
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public bool IsAccountIDNull() {
                 return this.IsNull(this.tableMemorizedLineItems.AccountIDColumn);
             }
@@ -5280,18 +5245,6 @@ namespace BanaData.Database {
             public void SetMemoNull() {
                 this[this.tableMemorizedLineItems.MemoColumn] = global::System.Convert.DBNull;
             }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public bool IsAmountNull() {
-                return this.IsNull(this.tableMemorizedLineItems.AmountColumn);
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public void SetAmountNull() {
-                this[this.tableMemorizedLineItems.AmountColumn] = global::System.Convert.DBNull;
-            }
         }
         
         /// <summary>
@@ -5323,12 +5276,7 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public string Payee {
                 get {
-                    try {
-                        return ((string)(this[this.tableMemorizedPayees.PayeeColumn]));
-                    }
-                    catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'Payee\' in table \'MemorizedPayees\' is DBNull.", e);
-                    }
+                    return ((string)(this[this.tableMemorizedPayees.PayeeColumn]));
                 }
                 set {
                     this[this.tableMemorizedPayees.PayeeColumn] = value;
@@ -5349,18 +5297,6 @@ namespace BanaData.Database {
                 set {
                     this[this.tableMemorizedPayees.IStatusColumn] = value;
                 }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public bool IsPayeeNull() {
-                return this.IsNull(this.tableMemorizedPayees.PayeeColumn);
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public void SetPayeeNull() {
-                this[this.tableMemorizedPayees.PayeeColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
