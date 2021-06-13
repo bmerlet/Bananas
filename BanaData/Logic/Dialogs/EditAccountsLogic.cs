@@ -98,22 +98,25 @@ namespace BanaData.Logic.Dialogs
 
         private void OnEditAccount()
         {
-            var logic = new EditAccountLogic(mainWindowLogic, SelectedAccount, false);
-            if (mainWindowLogic.GuiServices.ShowDialog(logic))
+            if (SelectedAccount != null)
             {
-                // Get modified account
-                var newAccount = logic.NewAccountItem;
+                var logic = new EditAccountLogic(mainWindowLogic, SelectedAccount, false);
+                if (mainWindowLogic.GuiServices.ShowDialog(logic))
+                {
+                    // Get modified account
+                    var newAccount = logic.NewAccountItem;
 
-                // Commit change
-                UpdateAccountInDataSet(newAccount);
+                    // Commit change
+                    UpdateAccountInDataSet(newAccount);
 
-                // Update UI
-                accountsSource.Remove(SelectedAccount);
-                accountsSource.Add(newAccount);
-                SelectedAccount = newAccount;
-                AccountToScrollTo = newAccount;
-                OnPropertyChanged(() => SelectedAccount);
-                OnPropertyChanged(() => AccountToScrollTo);
+                    // Update UI
+                    accountsSource.Remove(SelectedAccount);
+                    accountsSource.Add(newAccount);
+                    SelectedAccount = newAccount;
+                    AccountToScrollTo = newAccount;
+                    OnPropertyChanged(() => SelectedAccount);
+                    OnPropertyChanged(() => AccountToScrollTo);
+                }
             }
         }
 

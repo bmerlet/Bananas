@@ -31,6 +31,7 @@ namespace BanaData.Logic.Items
         public string TypeString => EnumDescriptionAttribute.GetDescription(Type);
         public decimal CreditLimit { get; }
         public EInvestmentKind InvestmentKind { get; }
+        public string InvestmentKindString => EnumDescriptionAttribute.GetDescription(InvestmentKind);
         public bool Hidden { get; }
     }
 }

@@ -37,12 +37,12 @@ namespace XamlUI.Dialogs
             {
                 if (e.PropertyName == "AccountToScrollTo")
                 {
-                    listBox.ScrollIntoView(logic.AccountToScrollTo);
+                    listView.ScrollIntoView(logic.AccountToScrollTo);
                 }
             }
         }
 
-        private void OnListboxDoubleClick(object sender, EventArgs e)
+        private void OnListviewDoubleClick(object sender, EventArgs e)
         {
             if (DataContext is EditAccountsLogic logic)
             {

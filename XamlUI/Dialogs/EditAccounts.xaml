@@ -32,28 +32,30 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Row 0: Listbox of memorized payees -->
-            <ListBox 
+            <!-- Row 0: Listbox of accounts -->
+            <ListView
+                x:Name="listView"
                 Height="300" Grid.ColumnSpan="3"
-                x:Name="listBox"
-                MouseDoubleClick="OnListboxDoubleClick"
-                ItemsSource="{Binding AccountsSource}" 
-                SelectedItem="{Binding SelectedAccount, Mode=TwoWay}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="200"/>
-                                <ColumnDefinition Width="200"/>
-                                <ColumnDefinition Width="85"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding Name}"/>
-                            <TextBlock Text="{Binding Description}"   Grid.Column="1" Margin="3,0"/>
-                            <TextBlock Text="{Binding Type}" Grid.Column="2" Foreground="Blue"/>
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                AlternationCount="2"
+                SelectionMode="Single"
+                ItemsSource="{Binding AccountsSource}"
+                SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"
+                MouseDoubleClick="OnListviewDoubleClick">
+
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Name" Width="200" DisplayMemberBinding="{Binding Name}"/>
+                        <GridViewColumn Header="Description" Width="200" DisplayMemberBinding="{Binding Description}"/>
+                        <GridViewColumn Header="Type" Width="85">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding TypeString}" Foreground="Blue" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
 
             <!-- Row 1: Control buttons -->
             <Button
