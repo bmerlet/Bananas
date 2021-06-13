@@ -38,12 +38,12 @@ namespace XamlUI.Dialogs
             {
                 if (e.PropertyName == "MemorizedPayeeToScrollTo")
                 {
-                    listBox.ScrollIntoView(logic.MemorizedPayeeToScrollTo);
+                    listView.ScrollIntoView(logic.MemorizedPayeeToScrollTo);
                 }
             }
         }
 
-        private void OnListboxDoubleClick(object sender, EventArgs e)
+        private void OnListviewDoubleClick(object sender, EventArgs e)
         {
             if (DataContext is EditMemorizedPayeesLogic logic)
             {

@@ -32,28 +32,42 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Row 0: Listbox of memorized payees -->
-            <ListBox 
+            <!-- Row 0: Listview of memorized payees -->
+            <ListView
+                x:Name="listView"
                 Height="300" Grid.ColumnSpan="3"
-                x:Name="listBox"
-                MouseDoubleClick="OnListboxDoubleClick"
-                ItemsSource="{Binding MemorizedPayeesSource}" 
-                SelectedItem="{Binding SelectedMemorizedPayee, Mode=TwoWay}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="200"/>
-                                <ColumnDefinition Width="80"/>
-                                <ColumnDefinition Width="160"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding Payee}"/>
-                            <TextBlock Text="{Binding Amount}"   Grid.Column="1" Margin="3,0" HorizontalAlignment="Right" Foreground="Red"/>
-                            <TextBlock Text="{Binding Category}" Grid.Column="2" Foreground="Blue"/>
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                SelectionMode="Single"
+                ItemsSource="{Binding MemorizedPayeesSource}"
+                SelectedItem="{Binding SelectedMemorizedPayee, Mode=TwoWay}"
+                MouseDoubleClick="OnListviewDoubleClick">
+
+                <!-- Make the list view items use all the horizontal space -->
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Payee" Width="200" DisplayMemberBinding="{Binding Payee}"/>
+                        <GridViewColumn Header="Amount" Width="80">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Amount}" HorizontalAlignment="Right" Foreground="Red" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Category" Width="160">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Category}" Foreground="Blue" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
 
             <!-- Row 1: Control buttons -->
             <Button

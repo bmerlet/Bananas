@@ -87,22 +87,25 @@ namespace BanaData.Logic.Dialogs
 
         private void OnEditMemorizedPayee()
         {
-            var logic = new EditMemorizedPayeeLogic(mainWindowLogic, SelectedMemorizedPayee, false);
-            if (mainWindowLogic.GuiServices.ShowDialog(logic))
+            if (SelectedMemorizedPayee != null)
             {
-                // Get modified payee
-                var newPayee = logic.NewMemorizedPayeeItem;
+                var logic = new EditMemorizedPayeeLogic(mainWindowLogic, SelectedMemorizedPayee, false);
+                if (mainWindowLogic.GuiServices.ShowDialog(logic))
+                {
+                    // Get modified payee
+                    var newPayee = logic.NewMemorizedPayeeItem;
 
-                // Commit change
-                UpdateMemorizedPayeeInDataSet(newPayee);
+                    // Commit change
+                    UpdateMemorizedPayeeInDataSet(newPayee);
 
-                // Update UI
-                memorizedPayeesSource.Remove(SelectedMemorizedPayee);
-                memorizedPayeesSource.Add(newPayee);
-                SelectedMemorizedPayee = newPayee;
-                MemorizedPayeeToScrollTo = newPayee;
-                OnPropertyChanged(() => SelectedMemorizedPayee);
-                OnPropertyChanged(() => MemorizedPayeeToScrollTo);
+                    // Update UI
+                    memorizedPayeesSource.Remove(SelectedMemorizedPayee);
+                    memorizedPayeesSource.Add(newPayee);
+                    SelectedMemorizedPayee = newPayee;
+                    MemorizedPayeeToScrollTo = newPayee;
+                    OnPropertyChanged(() => SelectedMemorizedPayee);
+                    OnPropertyChanged(() => MemorizedPayeeToScrollTo);
+                }
             }
         }
 
