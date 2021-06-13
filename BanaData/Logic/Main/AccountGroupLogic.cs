@@ -101,16 +101,16 @@ namespace BanaData.Logic.Main
             decimal totalBalance = 0;
             foreach(var acct in accounts)
             {
+                // Skip closed accounts if required
+                if (acct.Hidden && mainWindow.UserSettings.HideClosedAccounts)
+                {
+                    continue;
+                }
+
                 decimal balance =
                     type == EType.Investment ?
                     acct.GetInvestmentValue() :
                     acct.GetBankingBalance();
-
-                // Skip closed empty accounts if required
-                if (!mainWindow.IsAccountVisible(acct.Name, balance))
-                {
-                    continue;
-                }
 
                 if (AccountsAndBalances.Count <= ix ||
                     AccountsAndBalances[ix].AccountID != acct.ID ||

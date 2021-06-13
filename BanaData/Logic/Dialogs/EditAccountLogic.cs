@@ -36,6 +36,8 @@ namespace BanaData.Logic.Dialogs
             CreditLimit = accountItem.CreditLimit;
 
             investmentKind = accountItem.InvestmentKind;
+
+            IsHidden = accountItem.Hidden;
         }
 
         #endregion
@@ -77,11 +79,15 @@ namespace BanaData.Logic.Dialogs
         public string[] InvestmentKindSource { get; } = EnumDescriptionAttribute.GetDescriptions<EInvestmentKind>();
         public bool? InvestmentKindEnabled => type == EAccountType.Investment;
 
+        // Hidden account
+        public bool? IsHidden { get; set; }
+        public bool? IsHiddenEnabled => true;
+
         #endregion
 
         #region Result
 
-        public AccountItem NewAccountItem => new AccountItem(oldAccountItem.ID, Name, Description, type, CreditLimit, investmentKind); 
+        public AccountItem NewAccountItem => new AccountItem(oldAccountItem.ID, Name, Description, type, CreditLimit, investmentKind, IsHidden == true); 
 
         #endregion
 
@@ -116,7 +122,8 @@ namespace BanaData.Logic.Dialogs
                 oldAccountItem.Description != Description ||
                 oldAccountItem.Type != type ||
                 oldAccountItem.CreditLimit != CreditLimit ||
-                oldAccountItem.InvestmentKind != investmentKind;
+                oldAccountItem.InvestmentKind != investmentKind ||
+                oldAccountItem.Hidden != (IsHidden == true);
 
             return change;
         }

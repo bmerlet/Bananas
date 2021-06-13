@@ -33,10 +33,9 @@ namespace BanaData.Logic.Dialogs
             foreach (Household.AccountsRow acct in mainWindowLogic.Household.Accounts.Rows)
             {
                 bool investment = acct.Type == EAccountType.Investment;
-                decimal balance = investment ? acct.GetInvestmentValue() : acct.GetBankingBalance();
 
-                // Skip closed empty accounts if required
-                if (!mainWindowLogic.IsAccountVisible(acct.Name, balance))
+                // Skip hidden accounts if required
+                if (acct.Hidden && mainWindowLogic.UserSettings.HideClosedAccounts)
                 {
                     continue;
                 }
@@ -45,7 +44,7 @@ namespace BanaData.Logic.Dialogs
                 decimal creditLimit = acct.IsCreditLimitNull() ? 0 : acct.CreditLimit;
                 EInvestmentKind kind = acct.IsIKindNull() ? EInvestmentKind.Invalid : acct.Kind;
 
-                accountsSource.Add(new AccountItem(acct.ID, acct.Name, desc, acct.Type, creditLimit, kind));
+                accountsSource.Add(new AccountItem(acct.ID, acct.Name, desc, acct.Type, creditLimit, kind, acct.Hidden));
             }
 
             AccountsSource = (CollectionView)CollectionViewSource.GetDefaultView(accountsSource);
@@ -77,7 +76,7 @@ namespace BanaData.Logic.Dialogs
         private void OnAddAccount()
         {
             // Create new account
-            var account = new AccountItem(-1, "", "", EAccountType.Bank, 0, EInvestmentKind.Invalid);
+            var account = new AccountItem(-1, "", "", EAccountType.Bank, 0, EInvestmentKind.Invalid, false);
 
             var logic = new EditAccountLogic(mainWindowLogic, account, true);
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
@@ -141,18 +140,14 @@ namespace BanaData.Logic.Dialogs
         {
             var household = mainWindowLogic.Household;
 
-            // Note that a new ID is created automatically, so we need to update
-            // the account item with it
-            var newAccountRow = household.Accounts.NewRow() as Household.AccountsRow;
-
             // Create and commit new account
-            UpdateAccountRow(newAccount, newAccountRow);
-            household.Accounts.Rows.Add(newAccountRow);
+            var newAccountRow = household.Accounts.Add(newAccount.Name, newAccount.Description, newAccount.Type, newAccount.CreditLimit, newAccount.InvestmentKind, newAccount.Hidden);
 
             mainWindowLogic.CommitChanges();
             mainWindowLogic.UpdateAll();
 
-            return new AccountItem(newAccountRow.ID, newAccount.Name, newAccount.Description, newAccount.Type, newAccount.CreditLimit, newAccount.InvestmentKind);
+            // Note that a new ID is created automatically, so we need to update the account item with it
+            return new AccountItem(newAccount, newAccountRow.ID);
         }
 
         private void UpdateAccountInDataSet(AccountItem newAccount)
@@ -160,45 +155,11 @@ namespace BanaData.Logic.Dialogs
             var household = mainWindowLogic.Household;
 
             // Update the row
-            var accountRow = household.Accounts.FindByID(newAccount.ID);
-            UpdateAccountRow(newAccount, accountRow);
+            household.Accounts.Update(newAccount.ID, newAccount.Name, newAccount.Description, newAccount.Type, newAccount.CreditLimit, newAccount.InvestmentKind, newAccount.Hidden);
 
             // Commit
             mainWindowLogic.CommitChanges();
             mainWindowLogic.UpdateAll();
-        }
-
-        private void UpdateAccountRow(AccountItem newAccount, Household.AccountsRow newAccountRow)
-        {
-            newAccountRow.Name = newAccount.Name;
-            newAccountRow.Type = newAccount.Type;
-
-            if (string.IsNullOrWhiteSpace(newAccount.Description))
-            {
-                newAccountRow.SetDescriptionNull();
-            }
-            else
-            {
-                newAccountRow.Description = newAccount.Description;
-            }
-
-            if (newAccount.Type == EAccountType.CreditCard && newAccount.CreditLimit != 0)
-            {
-                newAccountRow.CreditLimit = newAccount.CreditLimit;
-            }
-            else
-            {
-                newAccountRow.SetCreditLimitNull();
-            }
-
-            if (newAccount.Type == EAccountType.Investment)
-            {
-                newAccountRow.Kind = newAccount.InvestmentKind;
-            }
-            else
-            {
-                newAccountRow.SetIKindNull();
-            }
         }
 
         private void RemoveAccountFromDataSet(AccountItem account)

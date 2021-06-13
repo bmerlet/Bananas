@@ -124,22 +124,41 @@ namespace BanaData.Database
 
 
             // Adding/updating rows
-            public AccountsRow Add(string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind)
+            public AccountsRow Add(string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind, bool hidden)
             {
                 var accRow = NewAccountsRow();
 
-                UpdateAccount(accRow, name, description, type, creditLimit, kind);
+                UpdateAccount(accRow, name, description, type, creditLimit, kind, hidden);
 
                 Rows.Add(accRow);
 
                 return accRow;
             }
 
-            private static void UpdateAccount(AccountsRow accRow, string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind)
+            public AccountsRow Update(int id, string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind, bool hidden)
+            {
+                var accRow = FindByID(id);
+
+                UpdateAccount(accRow, name, description, type, creditLimit, kind, hidden);
+
+                return accRow;
+            }
+
+            private static void UpdateAccount(AccountsRow accRow, string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind, bool hidden)
             {
                 accRow.Name = name;
-                accRow.Description = description;
                 accRow.Type = type;
+                accRow.Hidden = hidden;
+
+                // Description is optional
+                if (string.IsNullOrWhiteSpace(description))
+                {
+                    accRow.SetDescriptionNull();
+                }
+                else
+                {
+                    accRow.Description = description;
+                }
 
                 // Credit-card specific
                 if (type == EAccountType.CreditCard)

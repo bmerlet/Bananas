@@ -232,11 +232,6 @@ namespace BanaData.Logic.Main
             BankRegister.SetAccount(accountID);
         }
 
-        public bool IsAccountVisible(string accountName, decimal balance)
-        {
-            return MainMenuLogic.ShowClosedAccounts || !accountName.Contains("CLOSED") || balance != 0;
-        }
-
         #endregion
 
         #region Utilities

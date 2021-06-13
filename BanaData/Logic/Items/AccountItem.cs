@@ -14,8 +14,14 @@ namespace BanaData.Logic.Items
     /// </summary>
     public class AccountItem
     {
-        public AccountItem(int id, string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind) =>
-            (ID, Name, Description, Type, CreditLimit, InvestmentKind) = (id, name, description, type, creditLimit, kind);
+        // Explicit constructor
+        public AccountItem(int id, string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind, bool hidden) =>
+            (ID, Name, Description, Type, CreditLimit, InvestmentKind, Hidden) = (id, name, description, type, creditLimit, kind, hidden);
+
+        // Clone with a new ID
+        public AccountItem(AccountItem src, int id) =>
+            (ID, Name, Description, Type, CreditLimit, InvestmentKind, Hidden) = 
+            (id, src.Name, src.Description, src.Type, src.CreditLimit, src.InvestmentKind, src.Hidden);
 
         public readonly int ID;
 
@@ -25,5 +31,6 @@ namespace BanaData.Logic.Items
         public string TypeString => EnumDescriptionAttribute.GetDescription(Type);
         public decimal CreditLimit { get; }
         public EInvestmentKind InvestmentKind { get; }
+        public bool Hidden { get; }
     }
 }

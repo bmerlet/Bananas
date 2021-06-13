@@ -282,7 +282,10 @@ namespace BanaData.Serializations
             curAccount = household.Accounts.GetByName(name);
             if (curAccount == null)
             {
-                household.Accounts.Add(name, description, type, creditLimit, kind);
+                // By convention ,accounts with a name starting with _CLOSED are hidden
+                // (QIF does not have a flag for hidden accounts)
+                bool hidden = name.StartsWith("_CLOSED");
+                household.Accounts.Add(name, description, type, creditLimit, kind, hidden);
             }
         }
 
