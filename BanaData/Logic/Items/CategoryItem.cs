@@ -35,6 +35,8 @@ namespace BanaData.Logic.Items
         public string IndentedName => GetIndentedName();
         public bool FontWeight => Parent == null;
 
+        public string TypeString => (ID >= 0) ? (IsIncome ? "Income" : "Expense") : (AccountID >= 0 ? "Transfer" : "");
+
         private string GetIndentedName()
         {
             if (indentedName == null)
@@ -46,6 +48,20 @@ namespace BanaData.Logic.Items
                 }
             }
             return indentedName;
+        }
+
+
+        public bool IsDescendantOf(CategoryItem presumedParent)
+        {
+            for (CategoryItem cat = Parent; cat != null; cat = cat.Parent)
+            {
+                if (cat.ID == presumedParent.ID)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public override bool Equals(object obj)

@@ -332,7 +332,7 @@ namespace BanaData.Logic.Main
         }
 
         // Builds or rebuilds the list of categories
-        private void BuildCategoriesList()
+        public void BuildCategoriesList()
         {
             Categories.Clear();
 

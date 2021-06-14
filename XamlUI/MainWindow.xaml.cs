@@ -109,6 +109,10 @@ namespace XamlUI
             {
                 dialog = new EditAccount(editAccountLogic);
             }
+            else if (logic is EditCategoriesLogic editCategoriesLogic)
+            {
+                dialog = new EditCategories(editCategoriesLogic);
+            }
             else if (logic is EditMemorizedPayeesLogic editMemorizedPayeesLogic)
             {
                 dialog = new EditMemorizedPayees(editMemorizedPayeesLogic);

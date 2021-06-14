@@ -69,6 +69,7 @@
     <Compile Include="Database\Transaction.cs" />
     <Compile Include="Logic\Dialogs\EditAccountLogic.cs" />
     <Compile Include="Logic\Dialogs\EditAccountsLogic.cs" />
+    <Compile Include="Logic\Dialogs\EditCategoriesLogic.cs" />
     <Compile Include="Logic\Dialogs\EditMemorizedPayeeLogic.cs" />
     <Compile Include="Logic\Dialogs\EditMemorizedPayeesLogic.cs" />
     <Compile Include="Logic\Dialogs\EditSplitLogic.cs" />
