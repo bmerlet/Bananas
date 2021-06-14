@@ -42,7 +42,7 @@ namespace BanaData.Logic.Dialogs
 
             CategoriesSource = (CollectionView)CollectionViewSource.GetDefaultView(categoriesSource);
             CategoriesSource.Filter = InUseFilter;
-            CategoriesSource.SortDescriptions.Add(new SortDescription("FullName", ListSortDirection.Ascending));
+            CategoriesSource.SortDescriptions.Add(new SortDescription("CategoryItem.FullName", ListSortDirection.Ascending));
 
             AddCategory = new CommandBase(OnAddCategory);
             EditCategory = new CommandBase(OnEditCategory);
@@ -124,23 +124,21 @@ namespace BanaData.Logic.Dialogs
 
         private void OnAddCategory()
         {
-            var logic = new EditCategoryLogic(mainWindowLogic, SelectedCategory.CategoryItem, true);
+            var logic = new EditCategoryLogic(mainWindowLogic, new CategoryItem(-1, "", "", false, "", null));
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
             {
                 // Update DB
                 var newCategory = logic.NewCategoryItem;
                 newCategory = AddCategoryToDataSet(newCategory);
 
-                // Update dialog UI
+                // Update UI
+                mainWindowLogic.Categories.Add(newCategory);
                 var newEditCategory = new EditCategoryItem(newCategory, false);
                 categoriesSource.Add(newEditCategory);
                 SelectedCategory = newEditCategory;
                 CategoryToScrollTo = newEditCategory;
                 OnPropertyChanged(() => SelectedCategory);
                 OnPropertyChanged(() => CategoryToScrollTo);
-
-                // Update core list
-                mainWindowLogic.BuildCategoriesList();
             }
         }
 
@@ -148,16 +146,20 @@ namespace BanaData.Logic.Dialogs
         {
             if (SelectedCategory != null)
             {
-                var logic = new EditCategoryLogic(mainWindowLogic, SelectedCategory.CategoryItem, false);
+                var logic = new EditCategoryLogic(mainWindowLogic, SelectedCategory.CategoryItem);
                 if (mainWindowLogic.GuiServices.ShowDialog(logic))
                 {
                     // Update DB
                     var updatedCategory = logic.NewCategoryItem;
+                    bool oldIsInUse = SelectedCategory.IsInUse;
                     UpdateCategoryInDataSet(updatedCategory);
 
-                    // Update dialog UI
+                    // Update UI
+                    mainWindowLogic.Categories.Remove(SelectedCategory.CategoryItem);
                     categoriesSource.Remove(SelectedCategory);
-                    var updatedEditCategory = new EditCategoryItem(updatedCategory, SelectedCategory.IsInUse);
+
+                    mainWindowLogic.Categories.Add(updatedCategory);
+                    var updatedEditCategory = new EditCategoryItem(updatedCategory, oldIsInUse);
                     categoriesSource.Add(updatedEditCategory);
                     SelectedCategory = updatedEditCategory;
                     CategoryToScrollTo = updatedEditCategory;
@@ -172,29 +174,30 @@ namespace BanaData.Logic.Dialogs
 
         private void OnDeleteCategory()
         {
-            if (SelectedCategory != null)
+            var categoryToDelete = SelectedCategory;
+            if (categoryToDelete != null)
             {
-                if (SelectedCategory.CategoryItem.AccountID >= 0)
+                if (categoryToDelete.CategoryItem.AccountID >= 0)
                 {
                     mainWindowLogic.ErrorMessage("Transfers cannot be deleted");
                     return;
                 }
 
-                if (SelectedCategory.IsInUse)
+                if (categoryToDelete.IsInUse)
                 {
                     mainWindowLogic.ErrorMessage("This category cannot be deleted because it is used by some transactions");
                     return;
                 }
 
-                if (IsCategoryOrDescendantInUse(SelectedCategory))
+                if (IsCategoryOrDescendantInUse(categoryToDelete))
                 {
                     mainWindowLogic.ErrorMessage("This category cannot be deleted because its descendants are used by some transactions");
                     return;
                 }
 
-                DeleteCategoryFromDataSet(SelectedCategory.CategoryItem);
-                categoriesSource.Remove(SelectedCategory);
-                mainWindowLogic.Categories.Remove(SelectedCategory.CategoryItem);
+                DeleteCategoryFromDataSet(categoryToDelete.CategoryItem);
+                categoriesSource.Remove(categoryToDelete);
+                mainWindowLogic.Categories.Remove(categoryToDelete.CategoryItem);
             }
         }
 

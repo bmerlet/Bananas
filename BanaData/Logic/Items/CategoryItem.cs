@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BanaData.Logic.Items
 {
-    public class CategoryItem
+    public class CategoryItem : IComparable<CategoryItem>
     {
         // Explicitely build a regular category
         public CategoryItem(int id, string name, string description, bool isIncome, string taxInfo, CategoryItem parent) =>
@@ -84,5 +84,10 @@ namespace BanaData.Logic.Items
             return ID.GetHashCode() + AccountID.GetHashCode();
         }
 
+        // Sort on full name
+        public int CompareTo(CategoryItem other)
+        {
+            return FullName.CompareTo(other.FullName);
+        }
     }
 }

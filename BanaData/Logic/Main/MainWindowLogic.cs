@@ -367,27 +367,11 @@ namespace BanaData.Logic.Main
                             var parent = Categories.FirstOrDefault(c => c.ID == category.ParentID);
                             if (parent != null)
                             {
-                                // Find index of parent
-                                int indexOfParent = Categories.IndexOf(parent);
-
-                                // Find index of last category with this parent
-                                while (Categories[indexOfParent + 1].Parent == parent)
-                                {
-                                    indexOfParent++;
-                                }
-
                                 // Create category
                                 var description = category.IsDescriptionNull() ? "" : category.Description;
                                 var taxInfo = category.IsTaxInfoNull() ? "" : category.TaxInfo;
                                 var categoryItem = new CategoryItem(category.ID, category.Name, description, category.IsIncome, taxInfo, parent);
-                                if (indexOfParent == Categories.Count - 1)
-                                {
-                                    Categories.Add(categoryItem);
-                                }
-                                else
-                                {
-                                    Categories.Insert(indexOfParent + 1, categoryItem);
-                                }
+                                Categories.Add(categoryItem);
                             }
                         }                        
                     }
@@ -400,7 +384,7 @@ namespace BanaData.Logic.Main
                 Categories.Add(new CategoryItem(account.ID, account.Name));
             }
 
-            //Categories.Sort();
+            Categories.Sort();
         }
 
         #endregion
