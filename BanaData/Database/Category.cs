@@ -81,12 +81,37 @@ namespace BanaData.Database
                 return catRow;
             }
 
+            public CategoriesRow Update(CategoriesRow catRow, string name, string description, CategoriesRow parent, bool income, string taxInfo)
+            {
+                UpdateCategory(catRow, name, description, parent, income, taxInfo);
+
+                return catRow;
+            }
+
             private static CategoriesRow UpdateCategory(CategoriesRow catRow, string name, string description, CategoriesRow parent, bool income, string taxInfo)
             {
                 catRow.Name = name;
-                catRow.Description = description;
+
+                if (string.IsNullOrWhiteSpace(description))
+                {
+                    catRow.SetDescriptionNull();
+                }
+                else
+                {
+                    catRow.Description = description;
+                }
+
                 catRow.IsIncome = income;
-                catRow.TaxInfo = taxInfo;
+
+                if (string.IsNullOrWhiteSpace(taxInfo))
+                {
+                    catRow.SetTaxInfoNull();
+                }
+                else
+                {
+                    catRow.TaxInfo = taxInfo;
+                }
+
                 if (parent == null)
                 {
                     catRow.SetParentIDNull();

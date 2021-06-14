@@ -8,16 +8,23 @@ namespace BanaData.Logic.Items
 {
     public class CategoryItem
     {
+        // Explicitely build a regular category
         public CategoryItem(int id, string name, string description, bool isIncome, string taxInfo, CategoryItem parent) =>
             (ID, Name, Description, IsIncome, TaxInfo, Parent, FullName, AccountID) =
             (id, name, description, isIncome, taxInfo, parent, parent == null ? name : $"{parent.FullName}:{name}", -1);
 
+        // Explicitely build a transfer category
         public CategoryItem (int accountID, string accountName)
         {
             string name = $"[{accountName}]";
             (ID, Name, Description, IsIncome, TaxInfo, Parent, FullName, AccountID) = 
                 (-1, name, null, false, null, null, name, accountID);
         }
+
+        // Clone a regular category changing the ID
+        public CategoryItem(CategoryItem src, int id) =>
+            (ID, Name, Description, IsIncome, TaxInfo, Parent, FullName, AccountID) =
+            (id, src.Name, src.Description, src.IsIncome, src.TaxInfo, src.Parent, src.FullName, -1);
 
         // IDs
         public readonly int ID;

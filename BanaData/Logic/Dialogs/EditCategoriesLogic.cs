@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,7 +29,7 @@ namespace BanaData.Logic.Dialogs
             var household = mainWindowLogic.Household;
 
             categoriesSource = new ObservableCollection<EditCategoryItem>();
-            foreach(var cat in mainWindowLogic.Categories)
+            foreach (var cat in mainWindowLogic.Categories.Where(c => c.ID >= 0))
             {
                 bool inUse = false;
 
@@ -41,6 +42,7 @@ namespace BanaData.Logic.Dialogs
 
             CategoriesSource = (CollectionView)CollectionViewSource.GetDefaultView(categoriesSource);
             CategoriesSource.Filter = InUseFilter;
+            CategoriesSource.SortDescriptions.Add(new SortDescription("FullName", ListSortDirection.Ascending));
 
             AddCategory = new CommandBase(OnAddCategory);
             EditCategory = new CommandBase(OnEditCategory);
@@ -51,16 +53,22 @@ namespace BanaData.Logic.Dialogs
 
         #region UI properties
 
+        // List of categories
         private readonly ObservableCollection<EditCategoryItem> categoriesSource;
         public CollectionView CategoriesSource { get; }
 
+        // Selected category
         public EditCategoryItem SelectedCategory { get; set; }
+
+        // Category we want to show
         public EditCategoryItem CategoryToScrollTo { get; private set; }
 
+        // Commands
         public CommandBase AddCategory { get; }
         public CommandBase EditCategory { get; }
         public CommandBase DeleteCategory { get; }
 
+        // What to show
         private const string SHOW_ALL = "All categories";
         private const string SHOW_USED = "Used categories";
         private const string SHOW_UNUSED = "Unused categories";
@@ -77,26 +85,14 @@ namespace BanaData.Logic.Dialogs
 
         #region Actions
 
+        // Filter what to show based on "Show" value
         private bool InUseFilter(object item)
         {
             bool result = false;
 
             if (item is EditCategoryItem category)
             {
-                bool inUse = category.IsInUse;
-
-                // parent categories are considered in use if any child is in use
-                if (!inUse)
-                {
-                    foreach (EditCategoryItem cat in categoriesSource)
-                    {
-                        if (cat.CategoryItem.IsDescendantOf(category.CategoryItem) && cat.IsInUse)
-                        {
-                            inUse = true;
-                            break;
-                        }
-                    }
-                }
+                bool inUse = IsCategoryOrDescendantInUse(category);
 
                 result =
                     (show == SHOW_ALL) ||
@@ -107,19 +103,132 @@ namespace BanaData.Logic.Dialogs
             return result;
         }
 
+        // parent categories are considered in use if any child is in use
+        private bool IsCategoryOrDescendantInUse(EditCategoryItem category)
+        {
+            if (category.IsInUse)
+            {
+                return true;
+            }
+
+            foreach (EditCategoryItem cat in categoriesSource)
+            {
+                if (cat.CategoryItem.IsDescendantOf(category.CategoryItem) && cat.IsInUse)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private void OnAddCategory()
         {
+            var logic = new EditCategoryLogic(mainWindowLogic, SelectedCategory.CategoryItem, true);
+            if (mainWindowLogic.GuiServices.ShowDialog(logic))
+            {
+                // Update DB
+                var newCategory = logic.NewCategoryItem;
+                newCategory = AddCategoryToDataSet(newCategory);
 
+                // Update dialog UI
+                var newEditCategory = new EditCategoryItem(newCategory, false);
+                categoriesSource.Add(newEditCategory);
+                SelectedCategory = newEditCategory;
+                CategoryToScrollTo = newEditCategory;
+                OnPropertyChanged(() => SelectedCategory);
+                OnPropertyChanged(() => CategoryToScrollTo);
+
+                // Update core list
+                mainWindowLogic.BuildCategoriesList();
+            }
         }
 
         private void OnEditCategory()
         {
+            if (SelectedCategory != null)
+            {
+                var logic = new EditCategoryLogic(mainWindowLogic, SelectedCategory.CategoryItem, false);
+                if (mainWindowLogic.GuiServices.ShowDialog(logic))
+                {
+                    // Update DB
+                    var updatedCategory = logic.NewCategoryItem;
+                    UpdateCategoryInDataSet(updatedCategory);
 
+                    // Update dialog UI
+                    categoriesSource.Remove(SelectedCategory);
+                    var updatedEditCategory = new EditCategoryItem(updatedCategory, SelectedCategory.IsInUse);
+                    categoriesSource.Add(updatedEditCategory);
+                    SelectedCategory = updatedEditCategory;
+                    CategoryToScrollTo = updatedEditCategory;
+                    OnPropertyChanged(() => SelectedCategory);
+                    OnPropertyChanged(() => CategoryToScrollTo);
+
+                    // Update core list
+                    mainWindowLogic.BuildCategoriesList();
+                }
+            }
         }
 
         private void OnDeleteCategory()
         {
+            if (SelectedCategory != null)
+            {
+                if (SelectedCategory.CategoryItem.AccountID >= 0)
+                {
+                    mainWindowLogic.ErrorMessage("Transfers cannot be deleted");
+                    return;
+                }
 
+                if (SelectedCategory.IsInUse)
+                {
+                    mainWindowLogic.ErrorMessage("This category cannot be deleted because it is used by some transactions");
+                    return;
+                }
+
+                if (IsCategoryOrDescendantInUse(SelectedCategory))
+                {
+                    mainWindowLogic.ErrorMessage("This category cannot be deleted because its descendants are used by some transactions");
+                    return;
+                }
+
+                DeleteCategoryFromDataSet(SelectedCategory.CategoryItem);
+                categoriesSource.Remove(SelectedCategory);
+                mainWindowLogic.Categories.Remove(SelectedCategory.CategoryItem);
+            }
+        }
+
+        private CategoryItem AddCategoryToDataSet(CategoryItem category)
+        {
+            var household = mainWindowLogic.Household;
+
+            var parentRow = category.Parent ==  null ? null : household.Categories.FindByID(category.Parent.ID);
+            var catRow = household.Categories.Add(category.Name, category.Description, parentRow, category.IsIncome, category.TaxInfo);
+
+            mainWindowLogic.CommitChanges();
+
+            return new CategoryItem(category, catRow.ID);
+        }
+
+        private void UpdateCategoryInDataSet(CategoryItem category)
+        {
+            var household = mainWindowLogic.Household;
+
+            var catRow = household.Categories.FindByID(category.ID);
+            var parentRow = category.Parent == null ? null : household.Categories.FindByID(category.Parent.ID);
+            household.Categories.Update(catRow, category.Name, category.Description, parentRow, category.IsIncome, category.TaxInfo);
+
+            mainWindowLogic.CommitChanges();
+        }
+
+        private void DeleteCategoryFromDataSet(CategoryItem category)
+        {
+            var household = mainWindowLogic.Household;
+
+            var row = household.Categories.FindByID(category.ID);
+            row.Delete();
+
+            mainWindowLogic.CommitChanges();
         }
 
         #endregion
