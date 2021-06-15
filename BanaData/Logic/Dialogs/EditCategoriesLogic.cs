@@ -179,9 +179,6 @@ namespace BanaData.Logic.Dialogs
                     CategoryToScrollTo = updatedEditCategory;
                     OnPropertyChanged(() => SelectedCategory);
                     OnPropertyChanged(() => CategoryToScrollTo);
-
-                    // Update core list
-                    mainWindowLogic.BuildCategoriesList();
                 }
             }
         }
