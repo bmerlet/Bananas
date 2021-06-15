@@ -52,6 +52,14 @@ namespace BanaData.Logic.Main
         // Transaction to show
         public BankingTransactionLogic TransactionToScrollTo { get; private set; }
 
+        // Transaction being edited
+        private BankingTransactionLogic editedTransaction;
+        public BankingTransactionLogic EditedTransaction
+        {
+            get => editedTransaction;
+            set { editedTransaction = value; OnPropertyChanged(() => EditedTransaction); }
+        }
+
         // Column widths
         public double WidthOfDateColumn
         {
@@ -220,8 +228,9 @@ namespace BanaData.Logic.Main
             }
 
             // Add new empty transaction at the bottom
-            bankingTransaction = new BankingTransactionLogic(mainWindowLogic, this);
-            transactions.Add(bankingTransaction);
+            editedTransaction = new BankingTransactionLogic(mainWindowLogic, this);
+            transactions.Add(editedTransaction);
+            OnPropertyChanged(() => EditedTransaction);
 
             // Compute balances
             RecomputeBalances();

@@ -79,22 +79,25 @@ namespace XamlUI.UserControls
 
         #region Selection
 
-        private BankingTransactionLogic currentSelection;
-        
         private void OnListViewSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (DataContext is BankRegisterLogic)
+            if (DataContext is BankRegisterLogic logic)
             {
-                if (currentSelection != null)
+                if (logic.EditedTransaction != null)
                 {
-                    currentSelection.EndEdit();
-                    currentSelection = null;
+                    logic.EditedTransaction.EndEdit();
+                    logic.EditedTransaction = null;
                 }
 
                 if (listView.SelectedItem is BankingTransactionLogic btl)
                 {
-                    currentSelection = btl;
+                    logic.EditedTransaction = btl;
                     btl.BeginEdit();
+
+                    ListViewItem lvi = (ListViewItem)listView.ItemContainerGenerator.ContainerFromItem(btl);
+                    var pos = lvi.TranslatePoint(new Point(0, 0), Window.GetWindow(lvi));
+
+                    overlay.Margin = new Thickness(3, pos.X, 0, 0);
                 }
             }
         }

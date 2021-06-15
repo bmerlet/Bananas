@@ -60,7 +60,7 @@
             </ScrollViewer>
             
             <!-- Registers -->
-            <ucs:BankRegister DataContext="{Binding BankRegister}" Grid.Column="2"/>
+            <ucs:BankRegisterLV DataContext="{Binding BankRegister}" Grid.Column="2"/>
         </Grid>
     </DockPanel>
 </Window>
