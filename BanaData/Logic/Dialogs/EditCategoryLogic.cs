@@ -33,7 +33,7 @@ namespace BanaData.Logic.Dialogs
             Parent = categoryItem.Parent == null ? "" : categoryItem.Parent.FullName;
             Categories = mainWindowLogic.Categories;
 
-            //TypeEnabled = add;
+            TaxInfo = categoryItem.TaxInfo;
         }
 
         #endregion
@@ -57,7 +57,7 @@ namespace BanaData.Logic.Dialogs
         public IEnumerable<CategoryItem> Categories { get; }
 
         // Tax info
-        public string[] TaxInfoSource { get; } = new string[] { "???" };
+        public IEnumerable<string> TaxInfoSource { get; } = CategoryItem.TaxInfoDictionary.Values;
         public string TaxInfo { get; set; }
 
         #endregion
@@ -70,7 +70,7 @@ namespace BanaData.Logic.Dialogs
                 Name,
                 Description,
                 Type == INCOME,
-                oldCategoryItem.TaxInfo, // ZZZ
+                GetTaxInfoKey(),
                 GetParent());
 
         #endregion
@@ -82,6 +82,12 @@ namespace BanaData.Logic.Dialogs
             if (string.IsNullOrWhiteSpace(Name))
             {
                 mainWindowLogic.ErrorMessage("Category name cannot be blank");
+                return null;
+            }
+
+            if (Name.StartsWith("_"))
+            {
+                mainWindowLogic.ErrorMessage("Category name starting with an underscore are reserved");
                 return null;
             }
 
@@ -97,11 +103,11 @@ namespace BanaData.Logic.Dialogs
                 }
             }
 
-            // ZZZZ Tax info missing for now
             bool change =
                 oldCategoryItem.Name != Name ||
                 oldCategoryItem.Description != Description ||
                 oldCategoryItem.IsIncome != (Type == INCOME) ||
+                oldCategoryItem.TaxInfo != TaxInfo ||
                 oldCategoryItem.Parent != parent;
 
             return change;
@@ -110,6 +116,24 @@ namespace BanaData.Logic.Dialogs
         private CategoryItem GetParent()
         {
             return string.IsNullOrWhiteSpace(Parent) ? null : Categories.FirstOrDefault(c => c.FullName == Parent);
+        }
+
+        private string GetTaxInfoKey()
+        {
+            if (string.IsNullOrWhiteSpace(TaxInfo))
+            {
+                return "";
+            }
+
+            foreach (string key in CategoryItem.TaxInfoDictionary.Keys)
+            {
+                if (CategoryItem.TaxInfoDictionary[key] == TaxInfo)
+                {
+                    return key;
+                }
+            }
+
+            return "";
         }
 
         #endregion

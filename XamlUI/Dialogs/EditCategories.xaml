@@ -28,18 +28,29 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Row 0: Listbox of categories -->
+            <!-- Row 0: What to show-->
+            <StackPanel
+                Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Stretch">
+                <TextBlock Text="Show:" VerticalAlignment="Center" Margin="5,0"/>
+                <ComboBox 
+                    HorizontalAlignment="Stretch" Margin="0,3" Width="150"
+                    ItemsSource="{Binding ShowSource, Mode=OneTime}" SelectedItem="{Binding Show, Mode=TwoWay}" />
+                <CheckBox
+                    VerticalAlignment="Center" Margin="5,0"
+                    Content="Show hidden categories" IsChecked="{Binding ShowHidden}"/>
+            </StackPanel>
+            <!-- Row 1: Listbox of categories -->
             <ListView
                 x:Name="listView"
-                Height="300" Width="670" Grid.ColumnSpan="4"
+                Height="300" Width="670" Grid.Row="1" Grid.ColumnSpan="4"
                 SelectionMode="Single"
                 ItemsSource="{Binding CategoriesSource}"
                 SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
@@ -67,23 +78,16 @@
                 </ListView.View>
             </ListView>
 
-            <!-- Row 1: Control buttons -->
+            <!-- Row 2: Control buttons -->
             <Button
-                Grid.Column="0" Grid.Row="1"
+                Grid.Column="0" Grid.Row="2"
                 Content="Add..." Command="{Binding AddCategory}"/>
             <Button
-                Grid.Column="1" Grid.Row="1"
+                Grid.Column="1" Grid.Row="2"
                 Content="Edit..." Command="{Binding EditCategory}"/>
             <Button
-                Grid.Column="2" Grid.Row="1"
+                Grid.Column="2" Grid.Row="2"
                 Content="Delete" Command="{Binding DeleteCategory}"/>
-            <StackPanel
-                Grid.Column="3" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Stretch">
-                <TextBlock Text="Show:" VerticalAlignment="Center" Margin="5,0"/>
-                <ComboBox 
-                    HorizontalAlignment="Stretch" Margin="0,3" Width="150"
-                    ItemsSource="{Binding ShowSource, Mode=OneTime}" SelectedItem="{Binding Show, Mode=TwoWay}" />
-            </StackPanel>
         </Grid>
     </DockPanel>
 </Window>

@@ -11,8 +11,8 @@ namespace BanaData.Logic.Items
         // Explicitely build a regular category
         public CategoryItem(int id, string name, string description, bool isIncome, string taxInfoKey, CategoryItem parent)
         {
-            (ID, Name, Description, IsIncome, Parent, FullName, AccountID) =
-                (id, name, description, isIncome, parent, parent == null ? name : $"{parent.FullName}:{name}", -1);
+            (ID, Name, Description, IsIncome, TaxInfoKey, Parent, FullName, AccountID) =
+                (id, name, description, isIncome, taxInfoKey, parent, parent == null ? name : $"{parent.FullName}:{name}", -1);
 
             TaxInfo = TaxInfoDictionary.TryGetValue(taxInfoKey, out string taxInfoVal) ? taxInfoVal : taxInfoKey;
         }
@@ -34,9 +34,11 @@ namespace BanaData.Logic.Items
         public readonly int ID;
         public readonly CategoryItem Parent;
         public readonly int AccountID;
+        public readonly string TaxInfoKey;
 
         // UI properties
         public string Name { get; }
+        public bool Hidden => Name.StartsWith("_");
         public string FullName { get; }
         public string Description { get; }
         public bool IsIncome { get; }

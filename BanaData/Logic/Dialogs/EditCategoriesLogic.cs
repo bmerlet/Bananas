@@ -81,6 +81,13 @@ namespace BanaData.Logic.Dialogs
             set { show = value; CategoriesSource.Refresh(); }
         }
 
+        private bool showHidden = false;
+        public bool? ShowHidden 
+        {
+            get => showHidden;
+            set { showHidden = value == true; CategoriesSource.Refresh(); }
+        }
+
         #endregion
 
         #region Actions
@@ -90,7 +97,8 @@ namespace BanaData.Logic.Dialogs
         {
             bool result = false;
 
-            if (item is EditCategoryItem category)
+            if (item is EditCategoryItem category &&
+                (!category.CategoryItem.Hidden || showHidden))
             {
                 bool inUse = IsCategoryOrDescendantInUse(category);
 
@@ -146,6 +154,12 @@ namespace BanaData.Logic.Dialogs
         {
             if (SelectedCategory != null)
             {
+                if (SelectedCategory.CategoryItem.Hidden)
+                {
+                    mainWindowLogic.ErrorMessage("This category is used internally and cannot be edited");
+                    return;
+                }
+
                 var logic = new EditCategoryLogic(mainWindowLogic, SelectedCategory.CategoryItem);
                 if (mainWindowLogic.GuiServices.ShowDialog(logic))
                 {
@@ -192,6 +206,12 @@ namespace BanaData.Logic.Dialogs
                 if (IsCategoryOrDescendantInUse(categoryToDelete))
                 {
                     mainWindowLogic.ErrorMessage("This category cannot be deleted because its descendants are used by some transactions");
+                    return;
+                }
+
+                if (categoryToDelete.CategoryItem.Hidden)
+                {
+                    mainWindowLogic.ErrorMessage("This category is used internally and cannot be deleted");
                     return;
                 }
 
