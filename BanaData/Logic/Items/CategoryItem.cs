@@ -9,9 +9,13 @@ namespace BanaData.Logic.Items
     public class CategoryItem : IComparable<CategoryItem>
     {
         // Explicitely build a regular category
-        public CategoryItem(int id, string name, string description, bool isIncome, string taxInfo, CategoryItem parent) =>
-            (ID, Name, Description, IsIncome, TaxInfo, Parent, FullName, AccountID) =
-            (id, name, description, isIncome, taxInfo, parent, parent == null ? name : $"{parent.FullName}:{name}", -1);
+        public CategoryItem(int id, string name, string description, bool isIncome, string taxInfoKey, CategoryItem parent)
+        {
+            (ID, Name, Description, IsIncome, Parent, FullName, AccountID) =
+                (id, name, description, isIncome, parent, parent == null ? name : $"{parent.FullName}:{name}", -1);
+
+            TaxInfo = TaxInfoDictionary.TryGetValue(taxInfoKey, out string taxInfoVal) ? taxInfoVal : taxInfoKey;
+        }
 
         // Explicitely build a transfer category
         public CategoryItem (int accountID, string accountName)
@@ -88,6 +92,48 @@ namespace BanaData.Logic.Items
         public int CompareTo(CategoryItem other)
         {
             return FullName.CompareTo(other.FullName);
+        }
+
+        // Tax info
+        static public IReadOnlyDictionary<string, string> TaxInfoDictionary => taxInfoDictionary;
+        static private readonly Dictionary<string, string> taxInfoDictionary = new Dictionary<string, string>();
+
+        static CategoryItem()
+        {
+            taxInfoDictionary.Add("", "");
+            taxInfoDictionary.Add("257", "Form 1040: Other income, misc.");
+            taxInfoDictionary.Add("262", "Form 1040: IRA contribution, self");
+            taxInfoDictionary.Add("273", "Schedule A: Medecine and drugs");
+            taxInfoDictionary.Add("274", "Schedule A: Medical travel and lodging");
+            taxInfoDictionary.Add("276", "Schedule A: Real estate taxes");
+            taxInfoDictionary.Add("280", "Schedule A: Cash charity contributions");
+            taxInfoDictionary.Add("282", "Schedule A: Investment management fee");
+            taxInfoDictionary.Add("283", "Schedule A: Home mortgage interest (1098)");
+            taxInfoDictionary.Add("286", "Schedule B: Dividend income");
+            taxInfoDictionary.Add("287", "Schedule B: Interest income");
+            taxInfoDictionary.Add("331", "Schedule E: Commision");
+            taxInfoDictionary.Add("332", "Schedule E: Insurance");
+            taxInfoDictionary.Add("336", "Schedule E: Repairs");
+            taxInfoDictionary.Add("337", "Schedule E: Supplies");
+            taxInfoDictionary.Add("338", "Schedule E: Taxes");
+            taxInfoDictionary.Add("339", "Schedule E: Utilities");
+            taxInfoDictionary.Add("341", "Schedule E: Other expenses");
+            taxInfoDictionary.Add("401", "Form 2441: Qualifying childcare expenses");
+            taxInfoDictionary.Add("426", "Form 4952: Investment interest expense");
+            taxInfoDictionary.Add("460", "W-2: Salary or wages, self");
+            taxInfoDictionary.Add("461", "W-2: Federal tax withheld, self");
+            taxInfoDictionary.Add("462", "W-2: Soc. Sec. tax withheld, self");
+            taxInfoDictionary.Add("464", "W-2: State tax withheld, self");
+            taxInfoDictionary.Add("480", "W-2: Medicare tax withheld, self");
+            taxInfoDictionary.Add("484", "Schedule A: Doctors, dentists, hospitals");
+            taxInfoDictionary.Add("488", "Schedule D: Dividend income, cap gain distribution");
+            taxInfoDictionary.Add("489", "Schedule B: Interest income, non-taxable");
+            taxInfoDictionary.Add("487", "Schedule B: Dividend income, non-taxable");
+            taxInfoDictionary.Add("502", "Schedule E: Management fees");
+            taxInfoDictionary.Add("506", "W-2: Salary or wages, spouse");
+            taxInfoDictionary.Add("521", "Form 1040: Federal estimated taxes, quarterly");
+            taxInfoDictionary.Add("535", "Schedule A: Personal property taxes");
+            taxInfoDictionary.Add("1003", "Schedule E: Unspecified rental income");
         }
     }
 }
