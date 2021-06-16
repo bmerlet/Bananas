@@ -49,6 +49,9 @@ namespace BanaData.Logic.Main
         // Transactions. The CollectionView type enables sorting on columns
         public CollectionView Transactions { get; }
 
+        // Selected transaction
+        public BankingTransactionLogic SelectedTransaction { get; set; }
+
         // Transaction to show
         public BankingTransactionLogic TransactionToScrollTo { get; private set; }
 
@@ -232,12 +235,17 @@ namespace BanaData.Logic.Main
             transactions.Add(editedTransaction);
             OnPropertyChanged(() => EditedTransaction);
 
+            // Select it
+            SelectedTransaction = editedTransaction;
+            OnPropertyChanged(() => SelectedTransaction);
+
             // Compute balances
             RecomputeBalances();
 
             // Go to the bottom
-            TransactionToScrollTo = bankingTransaction;
-            OnPropertyChanged(() => TransactionToScrollTo);
+            //TransactionToScrollTo = bankingTransaction;
+            //OnPropertyChanged(() => TransactionToScrollTo);
+            OnPropertyChanged("ScrollToBottom");
 
         }
 

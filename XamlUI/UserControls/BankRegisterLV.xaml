@@ -22,6 +22,8 @@
             Grid.Row="1"
             AlternationCount="2"
             SelectionMode="Single"
+            SelectedItem="{Binding SelectedTransaction, Mode=TwoWay}"
+            ScrollViewer.ScrollChanged="OnListViewScrollChanged"
             ItemsSource="{Binding Transactions}">
 
             <!-- Make the list view items use all the horizontal space -->

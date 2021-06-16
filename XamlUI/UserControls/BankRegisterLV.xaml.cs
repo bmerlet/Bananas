@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 using BanaData.Logic.Main;
 
@@ -72,7 +73,21 @@ namespace XamlUI.UserControls
                 else if (e.PropertyName == "TransactionToScrollTo")
                 {
                     // Scroll to where we are supposed to
-                    listView.ScrollIntoView(brl.TransactionToScrollTo);
+                    var where = brl.TransactionToScrollTo;
+                    Dispatcher.BeginInvoke((Action)delegate ()
+                    {
+                        listView.UpdateLayout();
+                        listView.ScrollIntoView(where);
+                    }, DispatcherPriority.ContextIdle, null);
+                }
+                else if (e.PropertyName == "ScrollToBottom")
+                {
+                    if (VisualTreeHelper.GetChildrenCount(listView) > 0)
+                    {
+                        var elt = (FrameworkElement)VisualTreeHelper.GetChild(listView, 0);
+                        ScrollViewer scrollViewer = (ScrollViewer)VisualTreeHelper.GetChild(elt, 0);
+                        scrollViewer.ScrollToBottom();
+                    }
                 }
             }
         }
@@ -94,12 +109,31 @@ namespace XamlUI.UserControls
                     logic.EditedTransaction = btl;
                     btl.BeginEdit();
 
-                    ListViewItem lvi = (ListViewItem)listView.ItemContainerGenerator.ContainerFromItem(btl);
-                    var pos = lvi.TranslatePoint(new Point(0, 0), listView);
-
-                    overlay.Margin = new Thickness(3, pos.Y, 0, 0);
+                    SetOverlayPosition();
                 }
             }
+        }
+
+        private void SetOverlayPosition()
+        {
+            if (listView.SelectedItem is BankingTransactionLogic btl)
+            {
+                Dispatcher.BeginInvoke((Action)delegate ()
+                {
+                    listView.UpdateLayout();
+                    ListViewItem lvi = (ListViewItem)listView.ItemContainerGenerator.ContainerFromItem(btl);
+                    if (lvi != null)
+                    {
+                        var pos = lvi.TranslatePoint(new Point(0, 0), listView);
+                        overlay.Margin = new Thickness(3, pos.Y, 0, 0);
+                    }
+                }, DispatcherPriority.ContextIdle, null);
+            }
+        }
+
+        private void OnListViewScrollChanged(object source, ScrollChangedEventArgs e)
+        {
+            SetOverlayPosition();
         }
 
         #endregion
