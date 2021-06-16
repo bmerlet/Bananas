@@ -78,7 +78,7 @@
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Path=Payment}" HorizontalAlignment="Right"/>
+                                <TextBlock Text="{Binding Path=PaymentString}" HorizontalAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -97,7 +97,7 @@
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Path=Deposit}" HorizontalAlignment="Right"/>
+                                <TextBlock Text="{Binding Path=DepositString}" HorizontalAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -119,7 +119,8 @@
         <Grid
             x:Name="overlay"
             Margin="3,0,0,0"
-            Grid.Row="1">
+            Grid.Row="1"
+            Visibility="Hidden">
 
             <Grid.Resources>
                 <t:FontWeightConverter x:Key="fontWeightConverter"/>

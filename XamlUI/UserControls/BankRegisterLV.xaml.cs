@@ -25,6 +25,8 @@ namespace XamlUI.UserControls
     /// </summary>
     public partial class BankRegisterLV : UserControl
     {
+        #region Construction
+
         public BankRegisterLV()
         {
             InitializeComponent();
@@ -43,13 +45,19 @@ namespace XamlUI.UserControls
             }
         }
 
+        #endregion
+
+        #region Process events from logic
+
         private GridViewColumn maroonedColumn;
 
         private void OnDataContextPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (DataContext is BankRegisterLogic brl)
             {
-                // Show/hide type column depending on whether this is a bank account or a credit card
+                //
+                // IsBank: Show/hide medium column depending on whether this is a bank account or a credit card
+                //
                 if (e.PropertyName == "IsBank")
                 {
                     GridView gridview = listView.View as GridView;
@@ -70,16 +78,18 @@ namespace XamlUI.UserControls
                         }
                     }
                 }
+                //
+                // TransactionToScrollTo: Ensure a specific transaction is visible
+                // ZZZ Currently unused
+                //
                 else if (e.PropertyName == "TransactionToScrollTo")
                 {
-                    // Scroll to where we are supposed to
-                    var where = brl.TransactionToScrollTo;
-                    Dispatcher.BeginInvoke((Action)delegate ()
-                    {
-                        listView.UpdateLayout();
-                        listView.ScrollIntoView(where);
-                    }, DispatcherPriority.ContextIdle, null);
+                    listView.UpdateLayout();
+                    listView.ScrollIntoView(brl.TransactionToScrollTo);
                 }
+                //
+                // Scroll to bottom: Go to the bottom of the listview
+                //
                 else if (e.PropertyName == "ScrollToBottom")
                 {
                     if (VisualTreeHelper.GetChildrenCount(listView) > 0)
@@ -89,10 +99,22 @@ namespace XamlUI.UserControls
                         scrollViewer.ScrollToBottom();
                     }
                 }
+                //
+                // Move selection down one row
+                //
+                else if (e.PropertyName == "MoveSelectionDownOneRow")
+                {
+                    if (listView.SelectedIndex >= 0 && listView.SelectedIndex < listView.Items.Count - 1)
+                    {
+                        listView.SelectedIndex += 1;
+                    }
+                }
             }
         }
 
-        #region Selection
+        #endregion
+
+        #region Selection and overlay
 
         private void OnListViewSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -100,7 +122,11 @@ namespace XamlUI.UserControls
             {
                 if (logic.EditedTransaction != null)
                 {
-                    logic.EditedTransaction.EndEdit();
+                    // Don't try to update deleted transactions... 
+                    if (logic.Transactions.Contains(logic.EditedTransaction))
+                    {
+                        logic.EditedTransaction.EndEdit();
+                    }
                     logic.EditedTransaction = null;
                 }
 
@@ -125,6 +151,7 @@ namespace XamlUI.UserControls
                     if (lvi != null)
                     {
                         var pos = lvi.TranslatePoint(new Point(0, 0), listView);
+                        overlay.Visibility = Visibility.Visible;
                         overlay.Margin = new Thickness(3, pos.Y, 0, 0);
                     }
                 }, DispatcherPriority.ContextIdle, null);
@@ -134,6 +161,36 @@ namespace XamlUI.UserControls
         private void OnListViewScrollChanged(object source, ScrollChangedEventArgs e)
         {
             SetOverlayPosition();
+        }
+
+        #endregion
+
+        #region Keyboard input
+
+        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        {
+            base.OnPreviewKeyDown(e);
+
+            if (DataContext is BankRegisterLogic brl && listView.SelectedItem is BankingTransactionLogic btl)
+            {
+                if (e.Key == Key.Escape)
+                {
+                    btl.CancelEdit();
+                    btl.BeginEdit();
+                    e.Handled = true;
+                }
+                else if (e.Key == Key.Enter || e.Key == Key.Return)
+                {
+                    btl.EndEdit();
+                    e.Handled = true;
+                }
+                else if (e.Key == Key.Delete)
+                {
+                    listView.SelectedItem = null;
+                    brl.DeleteTransaction(btl);
+                    e.Handled = true;
+                }
+            }
         }
 
         #endregion

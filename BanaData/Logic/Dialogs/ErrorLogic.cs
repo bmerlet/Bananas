@@ -14,4 +14,11 @@ namespace BanaData.Logic.Dialogs
 
         public string Error { get; }
     }
+
+    public class QuestionLogic : LogicBase
+    {
+        public QuestionLogic(string question) => Question = question;
+
+        public string Question { get; }
+    }
 }

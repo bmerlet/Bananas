@@ -40,6 +40,15 @@ namespace BanaData.Database
                 return bankTransRow;
             }
 
+            public BankingTransactionsRow Update(TransactionsRow transactionRow, ETransactionMedium medium, uint checkNumber)
+            {
+                var bankTransRow = GetByTransaction(transactionRow);
+
+                UpdateBankTransaction(bankTransRow, transactionRow, medium, checkNumber);
+
+                return bankTransRow;
+            }
+
             private static BankingTransactionsRow UpdateBankTransaction(BankingTransactionsRow bankTransRow, TransactionsRow transactionRow, ETransactionMedium medium, uint checkNumber)
             {
                 bankTransRow.TransactionID = transactionRow.ID;

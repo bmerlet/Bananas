@@ -51,25 +51,27 @@ namespace BanaData.Logic.Main
         private readonly MainWindowLogic mainWindowLogic;
         private readonly BankRegisterLogic bankRegisterLogic;
 
-        // ZZZ
-        public readonly int transID;
+        private readonly int accountID;
+        public int transID;
 
         private readonly BankTransactionData data;
         private BankTransactionData backup;
 
-        public BankingTransactionLogic(MainWindowLogic mainWindowLogic, BankRegisterLogic bankRegisterLogic, int transID, BankTransactionData data)
+        public BankingTransactionLogic(MainWindowLogic mainWindowLogic, BankRegisterLogic bankRegisterLogic, int accountID, int transID, BankTransactionData data)
         {
             this.mainWindowLogic = mainWindowLogic;
             this.bankRegisterLogic = bankRegisterLogic;
+            this.accountID = accountID;
             this.transID = transID;
             this.data = data;
         }
 
         // To create new transactions (not in DB yet)
-        public BankingTransactionLogic(MainWindowLogic mainWindowLogic, BankRegisterLogic bankRegisterLogic)
+        public BankingTransactionLogic(MainWindowLogic mainWindowLogic, BankRegisterLogic bankRegisterLogic, int accountID)
         {
             this.mainWindowLogic = mainWindowLogic;
             this.bankRegisterLogic = bankRegisterLogic;
+            this.accountID = accountID;
             this.transID = -1;
             this.data = new BankTransactionData(DateTime.Today, ETransactionMedium.None, 0, "", "", "", ETransactionStatus.Pending, 0);
             // this.data = new BankTransactionData(DateTime.Today, ETransactionMedium.ATM, 0, "Payee", "Bug spray", "Home:Supplies", ETransactionStatus.Reconciled, (decimal)10.01);
@@ -259,16 +261,93 @@ namespace BanaData.Logic.Main
 
         public void EndEdit()
         {
-            Console.WriteLine($"End edit transaction date {Date.ToShortDateString()} Payee {Payee} amount {Payment}");
-
-            // Recompute the balances (THIS iS TOO EARLY) ZZZZZ
             if (backup == null)
             {
-                bankRegisterLogic.RecomputeBalances();
+                return;
             }
+
+            Console.WriteLine($"End edit transaction date {Date.ToShortDateString()} Payee {Payee} amount {Payment}");
+
+            // Check the changes
+            if (backup.Status == ETransactionStatus.Reconciled && data.Status != ETransactionStatus.Reconciled)
+            {
+                if (!mainWindowLogic.YesNoQuestion("Are you sure you want to un-reconcile this transaction"))
+                {
+                    CancelEdit();
+                    BeginEdit();
+                }
+            }
+
+            if (backup.Status == ETransactionStatus.Reconciled && backup.Amount != data.Amount)
+            {
+                if (!mainWindowLogic.YesNoQuestion("Are you sure you want to change the amount of this reconciled transaction"))
+                {
+                    CancelEdit();
+                    BeginEdit();
+                }
+            }
+
+            // Commit the changes
+            bool wasEmptyTransaction = transID < 0;
+            CommitTransactionToDataSet();
+
+            // Recompute the balances
+            bankRegisterLogic.RecomputeBalances();
 
             // Clear the backup
             backup = null;
+
+            // Ask the register to move to the next transaction,
+            // creating an empty one if needed
+            bankRegisterLogic.MoveDownOneTransaction(wasEmptyTransaction);
+        }
+
+        private void CommitTransactionToDataSet()
+        {
+            var household = mainWindowLogic.Household;
+            var accountRow = household.Accounts.FindByID(accountID);
+
+            if (transID < 0)
+            {
+                // Create new transaction row
+                var transactionRow = household.Transactions.Add(accountRow, data.Date, data.Payee, data.Status);
+                transID = transactionRow.ID;
+
+                // Create new banking transaction row if needed
+                if (bankRegisterLogic.IsBank)
+                {
+                    household.BankingTransactions.Add(transactionRow, data.Medium, (uint)data.CheckNumber);
+                }
+
+                // Create all line items (ZZZ only one for now)
+                var category = mainWindowLogic.Categories.FirstOrDefault(c => c.FullName == data.Category);
+                int categoryId = category == null ? -1 : category.ID;
+                int categoryAccountId = category == null ? -1 : category.AccountID;
+
+                household.LineItems.Add(transactionRow, categoryId, categoryAccountId, data.Memo, data.Amount);
+            }
+            else
+            {
+                // Update transaction row
+                var transactionRow = household.Transactions.Update(transID, accountRow, data.Date, data.Payee, data.Status);
+
+                // Update banking transaction if needed
+                if (bankRegisterLogic.IsBank)
+                {
+                    household.BankingTransactions.Update(transactionRow, data.Medium, (uint)data.CheckNumber);
+                }
+
+                // Update lineItem (ZZZ only one for now)
+                var category = mainWindowLogic.Categories.FirstOrDefault(c => c.FullName == data.Category);
+                int categoryId = category == null ? -1 : category.ID;
+                int categoryAccountId = category == null ? -1 : category.AccountID;
+
+                var lineItems = household.LineItems.GetByTransaction(transactionRow);
+                var lineItem = lineItems[0]; // ZZZZZZZZZZZ
+                household.LineItems.Update(lineItem, transactionRow, categoryId, categoryAccountId, data.Memo, data.Amount);
+            }
+
+            mainWindowLogic.CommitChanges();
         }
 
         private string GetMediumString()

@@ -155,6 +155,13 @@ namespace BanaData.Logic.Main
             GuiServices.ShowDialog(logic);
         }
 
+        // returns true if answer is yes
+        public bool YesNoQuestion(string question)
+        {
+            var logic = new QuestionLogic(question);
+            return GuiServices.ShowDialog(logic);
+        }
+
         public void OpenFile(string file)
         {
             if (file.EndsWith(".QIF", StringComparison.InvariantCultureIgnoreCase))

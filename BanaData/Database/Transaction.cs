@@ -49,6 +49,15 @@ namespace BanaData.Database
                 return transactionRow;
             }
 
+            public TransactionsRow Update(int transactionID, AccountsRow accountRow, DateTime date, string payee, ETransactionStatus status)
+            {
+                var transactionRow = FindByID(transactionID);
+
+                UpdateTransaction(transactionRow, accountRow, date, payee, status);
+
+                return transactionRow;
+            }
+
             private static TransactionsRow UpdateTransaction(TransactionsRow transactionRow, AccountsRow accountRow, DateTime date, string payee, ETransactionStatus status)
             {
                 transactionRow.AccountID = accountRow.ID;

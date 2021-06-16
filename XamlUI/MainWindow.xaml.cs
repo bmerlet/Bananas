@@ -96,6 +96,10 @@ namespace XamlUI
                 MessageBox.Show(errorLogic.Error, "Error");
                 return false;
             }
+            if (logic is QuestionLogic questionLogic)
+            {
+                return MessageBox.Show(questionLogic.Question, "Question", MessageBoxButton.YesNo) == MessageBoxResult.Yes;
+            }
 
             //
             // Our own dialogs

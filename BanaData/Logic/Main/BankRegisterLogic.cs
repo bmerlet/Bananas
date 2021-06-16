@@ -23,6 +23,9 @@ namespace BanaData.Logic.Main
         // Actual collection of transactions backing the Transactions collection view property
         private readonly ObservableCollection<BankingTransactionLogic> transactions = new ObservableCollection<BankingTransactionLogic>();
 
+        // Account ID
+        private int accountID;
+
         #endregion
 
         #region Constructor
@@ -69,8 +72,12 @@ namespace BanaData.Logic.Main
             get => mainWindowLogic.UserSettings.WidthOfDateColumn;
             set
             {
-                mainWindowLogic.UserSettings.WidthOfDateColumn = value;
-                mainWindowLogic.SaveUserSettings();
+                if (mainWindowLogic.UserSettings.WidthOfDateColumn != value)
+                {
+                    mainWindowLogic.UserSettings.WidthOfDateColumn = value;
+                    mainWindowLogic.SaveUserSettings();
+                    OnPropertyChanged(() => WidthOfDateColumn);
+                }
             }
         }
 
@@ -79,8 +86,12 @@ namespace BanaData.Logic.Main
             get => mainWindowLogic.UserSettings.WidthOfMediumColumn;
             set
             {
-                mainWindowLogic.UserSettings.WidthOfMediumColumn = value;
-                mainWindowLogic.SaveUserSettings();
+                if (mainWindowLogic.UserSettings.WidthOfMediumColumn != value)
+                {
+                    mainWindowLogic.UserSettings.WidthOfMediumColumn = value;
+                    mainWindowLogic.SaveUserSettings();
+                    OnPropertyChanged(() => WidthOfMediumColumn);
+                }
             }
         }
 
@@ -89,8 +100,12 @@ namespace BanaData.Logic.Main
             get => mainWindowLogic.UserSettings.WidthOfPayeeColumn;
             set
             {
-                mainWindowLogic.UserSettings.WidthOfPayeeColumn = value;
-                mainWindowLogic.SaveUserSettings();
+                if (mainWindowLogic.UserSettings.WidthOfPayeeColumn != value)
+                {
+                    mainWindowLogic.UserSettings.WidthOfPayeeColumn = value;
+                    mainWindowLogic.SaveUserSettings();
+                    OnPropertyChanged(() => WidthOfPayeeColumn);
+                }
             }
         }
 
@@ -99,8 +114,12 @@ namespace BanaData.Logic.Main
             get => mainWindowLogic.UserSettings.WidthOfMemoColumn;
             set
             {
-                mainWindowLogic.UserSettings.WidthOfMemoColumn = value;
-                mainWindowLogic.SaveUserSettings();
+                if (mainWindowLogic.UserSettings.WidthOfMemoColumn != value)
+                {
+                    mainWindowLogic.UserSettings.WidthOfMemoColumn = value;
+                    mainWindowLogic.SaveUserSettings();
+                    OnPropertyChanged(() => WidthOfMemoColumn);
+                }
             }
         }
 
@@ -109,8 +128,12 @@ namespace BanaData.Logic.Main
             get => mainWindowLogic.UserSettings.WidthOfCategoryColumn;
             set
             {
-                mainWindowLogic.UserSettings.WidthOfCategoryColumn = value;
-                mainWindowLogic.SaveUserSettings();
+                if (mainWindowLogic.UserSettings.WidthOfCategoryColumn != value)
+                {
+                    mainWindowLogic.UserSettings.WidthOfCategoryColumn = value;
+                    mainWindowLogic.SaveUserSettings();
+                    OnPropertyChanged(() => WidthOfCategoryColumn);
+                }
             }
         }
 
@@ -119,8 +142,12 @@ namespace BanaData.Logic.Main
             get => mainWindowLogic.UserSettings.WidthOfPaymentColumn;
             set
             {
-                mainWindowLogic.UserSettings.WidthOfPaymentColumn = value;
-                mainWindowLogic.SaveUserSettings();
+                if (mainWindowLogic.UserSettings.WidthOfPaymentColumn != value)
+                {
+                    mainWindowLogic.UserSettings.WidthOfPaymentColumn = value;
+                    mainWindowLogic.SaveUserSettings();
+                    OnPropertyChanged(() => WidthOfPaymentColumn);
+                }
             }
         }
 
@@ -129,8 +156,12 @@ namespace BanaData.Logic.Main
             get => mainWindowLogic.UserSettings.WidthOfStatusColumn;
             set
             {
-                mainWindowLogic.UserSettings.WidthOfStatusColumn = value;
-                mainWindowLogic.SaveUserSettings();
+                if (mainWindowLogic.UserSettings.WidthOfStatusColumn != value)
+                {
+                    mainWindowLogic.UserSettings.WidthOfStatusColumn = value;
+                    mainWindowLogic.SaveUserSettings();
+                    OnPropertyChanged(() => WidthOfStatusColumn);
+                }
             }
         }
 
@@ -139,8 +170,12 @@ namespace BanaData.Logic.Main
             get => mainWindowLogic.UserSettings.WidthOfDepositColumn;
             set
             {
-                mainWindowLogic.UserSettings.WidthOfDepositColumn = value;
-                mainWindowLogic.SaveUserSettings();
+                if (mainWindowLogic.UserSettings.WidthOfDepositColumn != value)
+                {
+                    mainWindowLogic.UserSettings.WidthOfDepositColumn = value;
+                    mainWindowLogic.SaveUserSettings();
+                    OnPropertyChanged(() => WidthOfDepositColumn);
+                }
             }
         }
 
@@ -149,8 +184,12 @@ namespace BanaData.Logic.Main
             get => mainWindowLogic.UserSettings.WidthOfBalanceColumn;
             set
             {
-                mainWindowLogic.UserSettings.WidthOfBalanceColumn = value;
-                mainWindowLogic.SaveUserSettings();
+                if (mainWindowLogic.UserSettings.WidthOfBalanceColumn != value)
+                {
+                    mainWindowLogic.UserSettings.WidthOfBalanceColumn = value;
+                    mainWindowLogic.SaveUserSettings();
+                    OnPropertyChanged(() => WidthOfBalanceColumn);
+                }
             }
         }
 
@@ -160,6 +199,9 @@ namespace BanaData.Logic.Main
 
         public void SetAccount(int accountID)
         {
+            // Remember
+            this.accountID = accountID;
+
             // Get the account details
             var household = mainWindowLogic.Household;
             var account = household.Accounts.FindByID(accountID);
@@ -226,27 +268,90 @@ namespace BanaData.Logic.Main
                     trans.Status,
                     amount);
 
-                bankingTransaction = new BankingTransactionLogic(mainWindowLogic, this, trans.ID, transactionData);
+                bankingTransaction = new BankingTransactionLogic(mainWindowLogic, this, accountID, trans.ID, transactionData);
                 transactions.Add(bankingTransaction);
             }
 
             // Add new empty transaction at the bottom
-            editedTransaction = new BankingTransactionLogic(mainWindowLogic, this);
-            transactions.Add(editedTransaction);
-            OnPropertyChanged(() => EditedTransaction);
-
-            // Select it
-            SelectedTransaction = editedTransaction;
-            OnPropertyChanged(() => SelectedTransaction);
+            AddEmptyTransactionAtBottom();
 
             // Compute balances
             RecomputeBalances();
+        }
+
+        public void MoveDownOneTransaction(bool wasEmptyTransaction)
+        {
+            if (wasEmptyTransaction)
+            {
+                // Create an empty transaction if we consumed the previous one
+                AddEmptyTransactionAtBottom();
+            }
+            else
+            {
+                // Move the selection down one row otherwise
+                OnPropertyChanged("MoveSelectionDownOneRow");
+            }
+        }
+
+        public void DeleteTransaction(BankingTransactionLogic btl)
+        {
+            if (btl.transID < 0)
+            {
+                // Can't remove the empty transaction
+                return;
+            }
+
+            // Cancel all changes
+            btl.CancelEdit();
+
+            // Delete from dataset
+            var household = mainWindowLogic.Household;
+            var transactionRow = household.Transactions.FindByID(btl.transID);
+
+            // Delete all line items
+            var lineItems = household.LineItems.GetByTransaction(transactionRow);
+            foreach(var lineItem in lineItems)
+            {
+                lineItem.Delete();
+            }
+
+            // Delete banking transaction
+            if (IsBank)
+            {
+                household.BankingTransactions.GetByTransaction(transactionRow).Delete();
+            }
+
+            // Finally delete the transaction
+            transactionRow.Delete();
+            mainWindowLogic.CommitChanges();
+
+            // Delete from list
+            transactions.Remove(btl);
+            Transactions.Refresh();
+
+            // Move away
+            //MoveDownOneTransaction(false);
+
+            // Compute balances
+            RecomputeBalances();
+        }
+
+        private void AddEmptyTransactionAtBottom()
+        {
+            // Add new empty transaction at the bottom
+            var emptyTransaction = new BankingTransactionLogic(mainWindowLogic, this, accountID);
+            transactions.Add(emptyTransaction);
+            Transactions.Refresh();
+            //OnPropertyChanged(() => EditedTransaction);
+
+            // Select it
+            SelectedTransaction = emptyTransaction;
+            OnPropertyChanged(() => SelectedTransaction);
 
             // Go to the bottom
             //TransactionToScrollTo = bankingTransaction;
             //OnPropertyChanged(() => TransactionToScrollTo);
             OnPropertyChanged("ScrollToBottom");
-
         }
 
         public void RecomputeBalances()

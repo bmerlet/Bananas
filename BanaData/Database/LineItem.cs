@@ -21,20 +21,38 @@ namespace BanaData.Database
                 return transactionRow.GetChildRows(transToLineItem).Cast<Household.LineItemsRow>().ToArray();
             }
 
-            public LineItemsRow Add(TransactionsRow bankTransRow, bool transfer, DataRow AccountOrCategory, string memo, decimal amount)
+            public LineItemsRow Add(TransactionsRow transactionRow, bool transfer, DataRow AccountOrCategory, string memo, decimal amount)
             {
                 var lineItemRow = NewLineItemsRow();
 
-                UpdateLineItem(lineItemRow, bankTransRow, transfer, AccountOrCategory, memo, amount);
+                UpdateLineItem(lineItemRow, transactionRow, transfer, AccountOrCategory, memo, amount);
 
                 Rows.Add(lineItemRow);
 
                 return lineItemRow;
             }
 
-            private static LineItemsRow UpdateLineItem(LineItemsRow lineItemRow, TransactionsRow bankTransRow, bool transfer, DataRow AccountOrCategory, string memo, decimal amount)
+            public LineItemsRow Add(TransactionsRow transactionRow, int categoryId, int categoryAccountId, string memo, decimal amount)
             {
-                lineItemRow.TransactionID = bankTransRow.ID;
+                var lineItemRow = NewLineItemsRow();
+
+                UpdateLineItem(lineItemRow, transactionRow, categoryId, categoryAccountId, memo, amount);
+
+                Rows.Add(lineItemRow);
+
+                return lineItemRow;
+            }
+
+            public LineItemsRow Update(LineItemsRow lineItemRow, TransactionsRow transactionRow, int categoryId, int categoryAccountId, string memo, decimal amount)
+            {
+                UpdateLineItem(lineItemRow, transactionRow, categoryId, categoryAccountId, memo, amount);
+
+                return lineItemRow;
+            }
+
+            private static LineItemsRow UpdateLineItem(LineItemsRow lineItemRow, TransactionsRow transactionRow, bool transfer, DataRow AccountOrCategory, string memo, decimal amount)
+            {
+                lineItemRow.TransactionID = transactionRow.ID;
 
                 lineItemRow.IsTransfer = transfer;
                 if (AccountOrCategory == null)
@@ -54,6 +72,41 @@ namespace BanaData.Database
                 }
 
                 if (memo == null)
+                {
+                    lineItemRow.SetMemoNull();
+                }
+                else
+                {
+                    lineItemRow.Memo = memo;
+                }
+
+                lineItemRow.Amount = amount;
+
+                return lineItemRow;
+            }
+
+            private static LineItemsRow UpdateLineItem(LineItemsRow lineItemRow, TransactionsRow transactionRow, int categoryId, int categoryAccountId, string memo, decimal amount)
+            {
+                lineItemRow.TransactionID = transactionRow.ID;
+
+                lineItemRow.IsTransfer = categoryAccountId >= 0;
+                if (categoryId >= 0)
+                {
+                    lineItemRow.SetAccountIDNull();
+                    lineItemRow.CategoryID = categoryId;
+                }
+                else if (categoryAccountId >= 0)
+                {
+                    lineItemRow.AccountID = categoryAccountId;
+                    lineItemRow.SetCategoryIDNull();
+                }
+                else
+                {
+                    lineItemRow.SetAccountIDNull();
+                    lineItemRow.SetCategoryIDNull();
+                }
+
+                if (string.IsNullOrWhiteSpace(memo))
                 {
                     lineItemRow.SetMemoNull();
                 }
