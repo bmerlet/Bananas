@@ -95,9 +95,9 @@ namespace XamlUI.UserControls
                     btl.BeginEdit();
 
                     ListViewItem lvi = (ListViewItem)listView.ItemContainerGenerator.ContainerFromItem(btl);
-                    var pos = lvi.TranslatePoint(new Point(0, 0), Window.GetWindow(lvi));
+                    var pos = lvi.TranslatePoint(new Point(0, 0), listView);
 
-                    overlay.Margin = new Thickness(3, pos.X, 0, 0);
+                    overlay.Margin = new Thickness(3, pos.Y, 0, 0);
                 }
             }
         }
