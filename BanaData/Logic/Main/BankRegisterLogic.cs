@@ -300,7 +300,8 @@ namespace BanaData.Logic.Main
 
         private void OnDeleteTransaction(object arg)
         {
-            if (!(arg is BankingTransactionLogic btl))
+            BankingTransactionLogic btl = arg == null ? EditedTransaction : arg as BankingTransactionLogic;
+            if (btl == null)
             {
                 return;
             }

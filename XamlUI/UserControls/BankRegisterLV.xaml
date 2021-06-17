@@ -133,9 +133,31 @@
             Visibility="Hidden">
 
             <Grid.Resources>
+
                 <t:FontWeightConverter x:Key="fontWeightConverter"/>
+                
+                <ContextMenu x:Key="TransactionContextMenu">
+                    <MenuItem Header="Delete" Command="{Binding DeleteTransaction}"/>
+                </ContextMenu>
+
+                <Style TargetType="{x:Type local:DateBox}">
+                    <Setter Property="ContextMenu" Value="{StaticResource TransactionContextMenu}" />
+                </Style>
+
+                <Style TargetType="{x:Type local:WatermarkTextBox}">
+                    <Setter Property="ContextMenu" Value="{StaticResource TransactionContextMenu}" />
+                </Style>
+
+                <Style TargetType="ComboBox">
+                    <Setter Property="ContextMenu" Value="{StaticResource TransactionContextMenu}" />
+                </Style>
+
+                <Style TargetType="{x:Type local:AmountBox}">
+                    <Setter Property="ContextMenu" Value="{StaticResource TransactionContextMenu}" />
+                </Style>
+
             </Grid.Resources>
-            
+
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
