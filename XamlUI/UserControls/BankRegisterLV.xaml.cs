@@ -125,7 +125,7 @@ namespace XamlUI.UserControls
                     // Don't try to update deleted transactions... 
                     if (logic.Transactions.Contains(logic.EditedTransaction))
                     {
-                        logic.EditedTransaction.EndEdit();
+                        logic.EditedTransaction.CancelEdit();
                     }
                     logic.EditedTransaction = null;
                 }
@@ -182,12 +182,6 @@ namespace XamlUI.UserControls
                 else if (e.Key == Key.Enter || e.Key == Key.Return)
                 {
                     btl.EndEdit();
-                    e.Handled = true;
-                }
-                else if (e.Key == Key.Delete)
-                {
-                    listView.SelectedItem = null;
-                    brl.DeleteTransaction(btl);
                     e.Handled = true;
                 }
             }

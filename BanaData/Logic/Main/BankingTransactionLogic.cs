@@ -45,6 +45,25 @@ namespace BanaData.Logic.Main
             public string Category;
             public ETransactionStatus Status;
             public decimal Amount;
+
+            public override bool Equals(object obj)
+            {
+                return
+                    obj is BankTransactionData o &&
+                    o.Date.Equals(Date) &&
+                    o.Medium == Medium &&
+                    o.CheckNumber == CheckNumber &&
+                    o.Payee == Payee &&
+                    o.Memo == Memo &&
+                    o.Category == Category &&
+                    o.Status == Status &&
+                    o.Amount == Amount;
+            }
+
+            public override int GetHashCode()
+            {
+                return base.GetHashCode();
+            }
         }
 
         // Parent logic
@@ -261,7 +280,14 @@ namespace BanaData.Logic.Main
 
         public void EndEdit()
         {
+            // Out of sequence
             if (backup == null)
+            {
+                return;
+            }
+
+            // No change
+            if (backup.Equals(data))
             {
                 return;
             }
@@ -293,6 +319,50 @@ namespace BanaData.Logic.Main
 
             // Recompute the balances
             bankRegisterLogic.RecomputeBalances();
+
+            // Notify the UI
+            if (data.Date != backup.Date)
+            {
+                OnPropertyChanged(() => Date);
+            }
+
+            if (data.Medium != backup.Medium)
+            {
+                OnPropertyChanged(() => Medium);
+            }
+
+            if (data.CheckNumber != backup.CheckNumber)
+            {
+                OnPropertyChanged(() => Medium);
+            }
+
+            if (data.Payee != backup.Payee)
+            {
+                OnPropertyChanged(() => Payee);
+            }
+
+            if (data.Memo != backup.Memo)
+            {
+                OnPropertyChanged(() => Memo);
+            }
+
+            if (data.Category != backup.Category)
+            {
+                OnPropertyChanged(() => Category);
+            }
+
+            if (data.Status != backup.Status)
+            {
+                OnPropertyChanged(() => Status);
+            }
+
+            if (data.Amount != backup.Amount)
+            {
+                OnPropertyChanged(() => PaymentString);
+                OnPropertyChanged(() => Payment);
+                OnPropertyChanged(() => DepositString);
+                OnPropertyChanged(() => Deposit);
+            }
 
             // Clear the backup
             backup = null;
@@ -349,6 +419,7 @@ namespace BanaData.Logic.Main
 
             mainWindowLogic.CommitChanges();
         }
+
 
         private string GetMediumString()
         {

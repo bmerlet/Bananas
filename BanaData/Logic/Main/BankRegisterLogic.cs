@@ -37,6 +37,8 @@ namespace BanaData.Logic.Main
             // Create transaction collection view, and sort by date
             Transactions = (CollectionView)CollectionViewSource.GetDefaultView(transactions);
             Transactions.SortDescriptions.Add(new SortDescription("Date", ListSortDirection.Ascending));
+
+            DeleteTransaction = new CommandBase(OnDeleteTransaction);
         }
 
         #endregion
@@ -65,6 +67,9 @@ namespace BanaData.Logic.Main
             get => editedTransaction;
             set { editedTransaction = value; OnPropertyChanged(() => EditedTransaction); }
         }
+
+        // Contect menu commands
+        public CommandBase DeleteTransaction { get; }
 
         // Column widths
         public double WidthOfDateColumn
@@ -293,8 +298,13 @@ namespace BanaData.Logic.Main
             }
         }
 
-        public void DeleteTransaction(BankingTransactionLogic btl)
+        private void OnDeleteTransaction(object arg)
         {
+            if (!(arg is BankingTransactionLogic btl))
+            {
+                return;
+            }
+
             if (btl.transID < 0)
             {
                 // Can't remove the empty transaction
