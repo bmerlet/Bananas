@@ -315,7 +315,20 @@ namespace BanaData.Logic.Main
 
             // Commit the changes
             bool wasEmptyTransaction = transID < 0;
+            if (wasEmptyTransaction)
+            {
+                // Remove from the list since we are going to change the ID, which is the equality criteria,
+                // and the listview will get mightily confused
+                bankRegisterLogic.RemoveTransactionFromList(this);
+            }
+
             CommitTransactionToDataSet();
+
+            if (wasEmptyTransaction)
+            {
+                // Put the re-id'd transaction back in the list
+                bankRegisterLogic.AddTransactionBackToList(this);
+            }
 
             // Recompute the balances
             bankRegisterLogic.RecomputeBalances();

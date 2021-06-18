@@ -173,6 +173,12 @@ namespace XamlUI
             return result;
         }
 
+        public void ExecuteAsync(Delegate method, params object[] args)
+        {
+            Dispatcher.BeginInvoke(method, System.Windows.Threading.DispatcherPriority.ContextIdle, args);
+        }
+
+
         public void Exit()
         {
             Application.Current.Shutdown();

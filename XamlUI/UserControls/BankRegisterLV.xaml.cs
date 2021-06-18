@@ -30,8 +30,6 @@ namespace XamlUI.UserControls
         public BankRegisterLV()
         {
             InitializeComponent();
-
-            listView.SelectionChanged += OnListViewSelectionChanged;
         }
 
         protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -43,6 +41,7 @@ namespace XamlUI.UserControls
             {
                 brl.PropertyChanged += OnDataContextPropertyChanged;
             }
+
         }
 
         #endregion
@@ -106,8 +105,18 @@ namespace XamlUI.UserControls
                 {
                     if (listView.SelectedIndex >= 0 && listView.SelectedIndex < listView.Items.Count - 1)
                     {
-                        listView.SelectedIndex += 1;
+                        // NOOOOOOOOOO - This breaks the binding.
+                        //listView.SelectedIndex += 1;
+
+                        listView.SetCurrentValue(ListView.SelectedIndexProperty, listView.SelectedIndex + 1);
                     }
+                }
+                //
+                // Update overlay position
+                //
+                else if (e.PropertyName == "UpdateOverlayPosition")
+                {
+                    SetOverlayPosition();
                 }
             }
         }
@@ -116,35 +125,11 @@ namespace XamlUI.UserControls
 
         #region Selection and overlay
 
-        private void OnListViewSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (DataContext is BankRegisterLogic logic)
-            {
-                if (logic.EditedTransaction != null)
-                {
-                    // Don't try to update deleted transactions... 
-                    if (logic.Transactions.Contains(logic.EditedTransaction))
-                    {
-                        logic.EditedTransaction.CancelEdit();
-                    }
-                    logic.EditedTransaction = null;
-                }
-
-                if (listView.SelectedItem is BankingTransactionLogic btl)
-                {
-                    logic.EditedTransaction = btl;
-                    btl.BeginEdit();
-
-                    SetOverlayPosition();
-                }
-            }
-        }
-
         private void SetOverlayPosition()
         {
-            if (listView.SelectedItem is BankingTransactionLogic btl)
+            Dispatcher.BeginInvoke((Action)delegate ()
             {
-                Dispatcher.BeginInvoke((Action)delegate ()
+                if (listView.SelectedItem is BankingTransactionLogic btl)
                 {
                     listView.UpdateLayout();
                     ListViewItem lvi = (ListViewItem)listView.ItemContainerGenerator.ContainerFromItem(btl);
@@ -154,8 +139,8 @@ namespace XamlUI.UserControls
                         overlay.Visibility = Visibility.Visible;
                         overlay.Margin = new Thickness(3, pos.Y, 0, 0);
                     }
-                }, DispatcherPriority.ContextIdle, null);
-            }
+                }
+            }, DispatcherPriority.ContextIdle, null);
         }
 
         private void OnListViewScrollChanged(object source, ScrollChangedEventArgs e)

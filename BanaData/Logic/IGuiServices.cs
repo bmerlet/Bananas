@@ -13,6 +13,9 @@ namespace BanaData.Logic
         // Show a dialog
         bool ShowDialog(LogicBase logic);
 
+        // Execute async on UI thread
+        void ExecuteAsync(Delegate method, params object[] args);
+
         // Exit the application
         void Exit();
     }

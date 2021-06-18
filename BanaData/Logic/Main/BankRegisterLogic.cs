@@ -55,7 +55,42 @@ namespace BanaData.Logic.Main
         public CollectionView Transactions { get; }
 
         // Selected transaction
-        public BankingTransactionLogic SelectedTransaction { get; set; }
+        private BankingTransactionLogic selectedTransaction;
+        private bool logicIsChangingSelection;
+        public BankingTransactionLogic SelectedTransaction
+        {
+            get => selectedTransaction;
+            set
+            {
+                if (value != selectedTransaction)
+                {
+                    if (logicIsChangingSelection)
+                    {
+                        // This logic is changing the selection (e.g. processing of return key)
+                        selectedTransaction = value;
+                        editedTransaction = value;
+                        OnPropertyChanged(() => SelectedTransaction);
+                    }
+                    else
+                    {
+                        // User changed selection (e.g. by clicking on a row)
+                        if (editedTransaction != null && transactions.Contains(editedTransaction))
+                        {
+                            editedTransaction.CancelEdit();
+                        }
+                        selectedTransaction = value;
+                        editedTransaction = value;
+                    }
+
+                    if (selectedTransaction != null)
+                    {
+                        selectedTransaction.BeginEdit();
+                    }
+                    OnPropertyChanged(() => EditedTransaction);
+                    OnPropertyChanged("UpdateOverlayPosition");
+                }
+            }
+        }
 
         // Transaction to show
         public BankingTransactionLogic TransactionToScrollTo { get; private set; }
@@ -294,8 +329,47 @@ namespace BanaData.Logic.Main
             else
             {
                 // Move the selection down one row otherwise
+                logicIsChangingSelection = true;
                 OnPropertyChanged("MoveSelectionDownOneRow");
+                logicIsChangingSelection = false;
             }
+        }
+
+        public void RemoveTransactionFromList(BankingTransactionLogic btl)
+        {
+            if (SelectedTransaction == btl)
+            {
+                logicIsChangingSelection = true;
+                SelectedTransaction = null;
+                logicIsChangingSelection = false;
+            }
+            transactions.Remove(btl);
+        }
+
+        public void AddTransactionBackToList(BankingTransactionLogic btl)
+        {
+            transactions.Add(btl);
+        }
+
+        private void AddEmptyTransactionAtBottom()
+        {
+            // Add new empty transaction at the bottom
+            var emptyTransaction = new BankingTransactionLogic(mainWindowLogic, this, accountID);
+            transactions.Add(emptyTransaction);
+            //Transactions.Refresh();
+
+            // Select it
+            mainWindowLogic.GuiServices.ExecuteAsync((Action)delegate ()
+            {
+                logicIsChangingSelection = true;
+                SelectedTransaction = emptyTransaction;
+                logicIsChangingSelection = false;
+
+                // Go to the bottom
+                //TransactionToScrollTo = bankingTransaction;
+                //OnPropertyChanged(() => TransactionToScrollTo);
+                OnPropertyChanged("ScrollToBottom");
+            });
         }
 
         private void OnDeleteTransaction(object arg)
@@ -345,24 +419,6 @@ namespace BanaData.Logic.Main
 
             // Compute balances
             RecomputeBalances();
-        }
-
-        private void AddEmptyTransactionAtBottom()
-        {
-            // Add new empty transaction at the bottom
-            var emptyTransaction = new BankingTransactionLogic(mainWindowLogic, this, accountID);
-            transactions.Add(emptyTransaction);
-            Transactions.Refresh();
-            //OnPropertyChanged(() => EditedTransaction);
-
-            // Select it
-            SelectedTransaction = emptyTransaction;
-            OnPropertyChanged(() => SelectedTransaction);
-
-            // Go to the bottom
-            //TransactionToScrollTo = bankingTransaction;
-            //OnPropertyChanged(() => TransactionToScrollTo);
-            OnPropertyChanged("ScrollToBottom");
         }
 
         public void RecomputeBalances()
