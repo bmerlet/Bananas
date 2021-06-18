@@ -205,6 +205,12 @@ namespace BanaData.Logic.Main
 
         public string BalanceString { get; private set; } = "";
 
+        // Group sorter
+        // To have the uncommitted transaction in a different group than the others
+        // And always displayed at the bottom of the listview
+        // (see PropertyGroupDescription in BankRegisterLogic constructor)
+        public string GroupSorter => (transID < 0) ? "Z" : "A";
+
         #endregion
 
         public void BeginEdit()
@@ -273,6 +279,8 @@ namespace BanaData.Logic.Main
                     OnPropertyChanged(() => DepositString);
                     OnPropertyChanged(() => Deposit);
                 }
+
+                backup = null;
             }
 
             Console.WriteLine($"Cancel edit transaction date {Date.ToShortDateString()} Payee {Payee} amount {Payment}");
@@ -289,6 +297,8 @@ namespace BanaData.Logic.Main
             // No change
             if (backup.Equals(data))
             {
+                backup = null;
+                bankRegisterLogic.MoveDownOneTransaction(transID < 0);
                 return;
             }
 

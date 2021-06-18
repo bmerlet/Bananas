@@ -152,11 +152,11 @@ namespace XamlUI.UserControls
 
         #region Keyboard input
 
-        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        protected override void OnKeyDown(KeyEventArgs e)
         {
-            base.OnPreviewKeyDown(e);
+            base.OnKeyDown(e);
 
-            if (DataContext is BankRegisterLogic brl && listView.SelectedItem is BankingTransactionLogic btl)
+            if (DataContext is BankRegisterLogic && listView.SelectedItem is BankingTransactionLogic btl)
             {
                 if (e.Key == Key.Escape)
                 {

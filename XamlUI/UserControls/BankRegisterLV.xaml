@@ -175,15 +175,19 @@
             </Grid.ColumnDefinitions>
 
             <!-- Date-->
-            <local:DateBox Date="{Binding EditedTransaction.Date, Mode=TwoWay}"/>
+            <local:DateBox Date="{Binding EditedTransaction.Date, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             
             <!-- Medium-->
-            <ComboBox IsEditable="True" Text="{Binding EditedTransaction.Medium, Mode=TwoWay}" ItemsSource="{Binding EditedTransaction.MediumSource}" Grid.Column="1"/>
+            <ComboBox 
+                Grid.Column="1"
+                IsEditable="True" 
+                Text="{Binding EditedTransaction.Medium, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                ItemsSource="{Binding EditedTransaction.MediumSource}"/>
 
             <!-- Payee -->
             <local:AutoCompleteTextBox 
                 Grid.Column="2"
-                Text="{Binding EditedTransaction.Payee, Mode=TwoWay}"
+                Text="{Binding EditedTransaction.Payee, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 Watermark="Payee"
                 DisplayMember="Payee"
                 ListBoxHeight="150" 
@@ -207,12 +211,15 @@
             </local:AutoCompleteTextBox>
             
             <!-- Memo -->
-            <local:WatermarkTextBox Text="{Binding EditedTransaction.Memo, Mode=TwoWay}" Watermark="Memo" Grid.Column="3"/>
+            <local:WatermarkTextBox
+                Grid.Column="3"
+                Text="{Binding EditedTransaction.Memo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                Watermark="Memo"/>
             
             <!-- Category -->
             <local:AutoCompleteTextBox
                 Grid.Column="4"
-                Text="{Binding EditedTransaction.Category, Mode=TwoWay}"
+                Text="{Binding EditedTransaction.Category, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 Watermark="Category"
                 DisplayMember="FullName"
                 ListBoxHeight="150" 
@@ -226,13 +233,24 @@
             </local:AutoCompleteTextBox>
             
             <!-- Payment -->
-            <local:AmountBox Watermark="Payment" Amount="{Binding EditedTransaction.Payment, Mode=TwoWay}" TextAlignment="Right" Grid.Column="5"/>
+            <local:AmountBox
+                Grid.Column="5"
+                Watermark="Payment"
+                TextAlignment="Right"
+                Amount="{Binding EditedTransaction.Payment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             
             <!-- Status -->
-            <ComboBox ItemsSource="{Binding EditedTransaction.StatusSource}" SelectedItem="{Binding EditedTransaction.Status, Mode=TwoWay}" Grid.Column="6"/>
+            <ComboBox
+                Grid.Column="6"
+                ItemsSource="{Binding EditedTransaction.StatusSource}"
+                SelectedItem="{Binding EditedTransaction.Status, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
             <!-- Deposit -->
-                <local:AmountBox Watermark="Deposit" Amount="{Binding EditedTransaction.Deposit, Mode=TwoWay}" TextAlignment="Right" Grid.Column="7"/>
+                <local:AmountBox
+                    Grid.Column="7"
+                    Watermark="Deposit" 
+                    TextAlignment="Right"
+                    Amount="{Binding EditedTransaction.Deposit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         </Grid>
     </Grid>
 </UserControl>

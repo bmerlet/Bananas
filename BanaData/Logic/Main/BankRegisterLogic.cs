@@ -37,6 +37,7 @@ namespace BanaData.Logic.Main
             // Create transaction collection view, and sort by date
             Transactions = (CollectionView)CollectionViewSource.GetDefaultView(transactions);
             Transactions.SortDescriptions.Add(new SortDescription("Date", ListSortDirection.Ascending));
+            Transactions.GroupDescriptions.Add(new PropertyGroupDescription("GroupSorter"));
 
             DeleteTransaction = new CommandBase(OnDeleteTransaction);
         }
