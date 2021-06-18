@@ -16,6 +16,8 @@ namespace BanaData.Logic.Main
     /// </summary>
     public class BankingTransactionLogic : LogicBase, IEditableObject
     {
+        #region Supporting data class
+
         public class BankTransactionData
         {
             // Construct from scratch
@@ -66,35 +68,45 @@ namespace BanaData.Logic.Main
             }
         }
 
+        #endregion
+
+        #region Private members
+
         // Parent logic
         private readonly MainWindowLogic mainWindowLogic;
         private readonly BankRegisterLogic bankRegisterLogic;
 
+        // Account this transaction is for
         private readonly int accountID;
+
+        // Transaction id, -1 if not in DB yet
         public int transID;
 
+        // Transaction data
         private readonly BankTransactionData data;
+
+        // Backup of data (taken at edit start)
         private BankTransactionData backup;
 
-        public BankingTransactionLogic(MainWindowLogic mainWindowLogic, BankRegisterLogic bankRegisterLogic, int accountID, int transID, BankTransactionData data)
+        #endregion
+
+        #region Constructor
+
+        public BankingTransactionLogic(MainWindowLogic _mainWindowLogic, BankRegisterLogic _bankRegisterLogic, int _accountID, int _transID, BankTransactionData _data)
         {
-            this.mainWindowLogic = mainWindowLogic;
-            this.bankRegisterLogic = bankRegisterLogic;
-            this.accountID = accountID;
-            this.transID = transID;
-            this.data = data;
+            (mainWindowLogic, bankRegisterLogic, accountID, transID, data) = (_mainWindowLogic, _bankRegisterLogic, _accountID, _transID, _data);
+
+            PayeeSelected = new CommandBase(OnPayeeSelected);
         }
 
         // To create new transactions (not in DB yet)
-        public BankingTransactionLogic(MainWindowLogic mainWindowLogic, BankRegisterLogic bankRegisterLogic, int accountID)
+        public BankingTransactionLogic(MainWindowLogic _mainWindowLogic, BankRegisterLogic _bankRegisterLogic, int _accountID)
+            : this(_mainWindowLogic, _bankRegisterLogic, _accountID, -1,
+                  new BankTransactionData(DateTime.Today, ETransactionMedium.None, 0, "", "", "", ETransactionStatus.Pending, 0))
         {
-            this.mainWindowLogic = mainWindowLogic;
-            this.bankRegisterLogic = bankRegisterLogic;
-            this.accountID = accountID;
-            this.transID = -1;
-            this.data = new BankTransactionData(DateTime.Today, ETransactionMedium.None, 0, "", "", "", ETransactionStatus.Pending, 0);
-            // this.data = new BankTransactionData(DateTime.Today, ETransactionMedium.ATM, 0, "Payee", "Bug spray", "Home:Supplies", ETransactionStatus.Reconciled, (decimal)10.01);
         }
+
+        #endregion
 
         #region UI properties
 
@@ -121,9 +133,11 @@ namespace BanaData.Logic.Main
             get => data.Payee;
             set => data.Payee = value;
         }
-
         // Memorized payees
         public IEnumerable<MemorizedPayeeItem> Payees => mainWindowLogic.MemorizedPayees;
+
+        // Activated when a payee is selected from the drop down list
+        public CommandBase PayeeSelected { get; }
 
         // Memo
         public string Memo
@@ -212,6 +226,8 @@ namespace BanaData.Logic.Main
         public string GroupSorter => (transID < 0) ? "Z" : "A";
 
         #endregion
+
+        #region IEditable interface implementation
 
         public void BeginEdit()
         {
@@ -443,6 +459,39 @@ namespace BanaData.Logic.Main
             mainWindowLogic.CommitChanges();
         }
 
+        #endregion
+
+        #region Actions
+
+        //
+        // Fill out fields when a memorized payee is selected
+        //
+        private void OnPayeeSelected(object arg)
+        {
+            if (arg is MemorizedPayeeItem memorizedPayee && backup != null)
+            {
+                if (!string.IsNullOrWhiteSpace(memorizedPayee.Memo))
+                {
+                    data.Memo = memorizedPayee.Memo;
+                    OnPropertyChanged(() => Memo);
+                }
+
+                if (!string.IsNullOrWhiteSpace(memorizedPayee.Category))
+                {
+                    data.Category = memorizedPayee.Category;
+                    OnPropertyChanged(() => Category);
+                }
+
+                if (memorizedPayee.Amount != 0)
+                {
+                    data.Amount = memorizedPayee.Amount;
+                    OnPropertyChanged(() => PaymentString);
+                    OnPropertyChanged(() => Payment);
+                    OnPropertyChanged(() => DepositString);
+                    OnPropertyChanged(() => Deposit);
+                }
+            }
+        }
 
         private string GetMediumString()
         {
@@ -556,6 +605,10 @@ namespace BanaData.Logic.Main
             }
         }
 
+        #endregion
+
+        #region Overrides
+
         public override bool Equals(object obj)
         {
             return obj is BankingTransactionLogic o && transID == o.transID;
@@ -565,5 +618,7 @@ namespace BanaData.Logic.Main
         {
             return transID.GetHashCode();
         }
+
+        #endregion
     }
 }

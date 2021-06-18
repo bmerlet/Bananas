@@ -188,6 +188,7 @@
             <local:AutoCompleteTextBox 
                 Grid.Column="2"
                 Text="{Binding EditedTransaction.Payee, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                ItemSelectedCommand="{Binding EditedTransaction.PayeeSelected}"
                 Watermark="Payee"
                 DisplayMember="Payee"
                 ListBoxHeight="150" 

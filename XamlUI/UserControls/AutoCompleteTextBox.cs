@@ -34,7 +34,7 @@ namespace XamlUI.UserControls
         #region Dependency properties
 
         //
-        // Text (bound to the textbox' property of the same name
+        // Text (bound to the textbox' property of the same name)
         //
         public static readonly DependencyProperty TextProperty =
             DependencyProperty.Register("Text", typeof(string), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(string.Empty));
@@ -46,7 +46,7 @@ namespace XamlUI.UserControls
         }
 
         //
-        // ItemsSource (bound to the listbox' property of trhe same name)
+        // ItemsSource (bound to the listbox' property of the same name)
         //
         public static readonly DependencyProperty ItemsSourceProperty =
             DependencyProperty.Register("ItemsSource", typeof(IEnumerable), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(Enumerable.Empty<object>()));
@@ -58,7 +58,7 @@ namespace XamlUI.UserControls
         }
 
         //
-        // Selected Item (bound to the listbox' property of trhe same name)
+        // Selected Item (bound to the listbox' property of the same name)
         //
         public static readonly DependencyProperty SelectedItemProperty =
             DependencyProperty.Register("SelectedItem", typeof(object), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(null));
@@ -70,7 +70,19 @@ namespace XamlUI.UserControls
         }
 
         //
-        // Item template property (bound to the listbox' property of trhe same name)
+        // Selection command. Activated when an item is chosen
+        //
+        public static readonly DependencyProperty ItemSelectedCommandProperty =
+            DependencyProperty.Register("ItemSelectedCommand", typeof(ICommand), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(null));
+
+        public ICommand ItemSelectedCommand
+        {
+            get => (ICommand)GetValue(ItemSelectedCommandProperty);
+            set => SetValue(ItemSelectedCommandProperty, value);
+        }
+
+        //
+        // Item template property (bound to the listbox' property of the same name)
         //
         public static readonly DependencyProperty ItemTemplateProperty =
             DependencyProperty.Register("ItemTemplate", typeof(DataTemplate), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(null));
@@ -82,7 +94,7 @@ namespace XamlUI.UserControls
         }
 
         //
-        // Item template selector property (bound to the listbox' property of trhe same name)
+        // Item template selector property (bound to the listbox' property of the same name)
         //
         public static readonly DependencyProperty ItemTemplateSelectorProperty =
             DependencyProperty.Register("ItemTemplateSelector", typeof(DataTemplateSelector), typeof(AutoCompleteTextBox));
@@ -119,7 +131,7 @@ namespace XamlUI.UserControls
         }
 
         //
-        // Watermark property: String that appears faintly through the (transparent) textbox when it is empty
+        // Watermark (bound to the WatermarkTextBox property of the same name)
         //
         public static readonly DependencyProperty WatermarkProperty =
             DependencyProperty.Register("Watermark", typeof(string), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(string.Empty));
@@ -201,7 +213,6 @@ namespace XamlUI.UserControls
 
             GotFocus += OnAutoCompleteTextBoxGotFocus;
 
-            // ZZZZ
             if (editor != null)
             {
                 editor.TextChanged += OnEditorTextChanged;
@@ -237,7 +248,7 @@ namespace XamlUI.UserControls
                 // the one with the focus needs to impose its own filter
                 selector.Items.Filter = Filter;
 
-                //editor.Focus();
+                editor.Focus();
                 editor.SelectAll(); // ZZZ Who unselects?
                 RefreshSelector();
             }
@@ -272,9 +283,15 @@ namespace XamlUI.UserControls
             {
                 case Key.Escape:
                     // On escape key, close popup
-                    IsPopupOpen = false;
-                    //editor.Focus(); ZZZZ Probably not needed
-                    e.Handled = true;
+                    if (IsPopupOpen)
+                    {
+                        IsPopupOpen = false;
+                        //editor.Focus(); ZZZZ Probably not needed
+
+                        // Set handled ONLY if we closed the popup,
+                        // so that the transaction can be cancelled via another Esc
+                        e.Handled = true;
+                    }
                     break;
 
                 case Key.Enter:
@@ -348,6 +365,11 @@ namespace XamlUI.UserControls
                 else
                 {
                     Text = BindingEvaluator.GetValue(item, DisplayMember);
+                }
+
+                if (ItemSelectedCommand != null)
+                {
+                    ItemSelectedCommand.Execute(item);
                 }
             }
         }
