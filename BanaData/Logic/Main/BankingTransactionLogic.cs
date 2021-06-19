@@ -24,7 +24,7 @@ namespace BanaData.Logic.Main
             public BankTransactionData(
                 DateTime date,
                 ETransactionMedium medium,
-                decimal checkNumber,
+                uint checkNumber,
                 string payee,
                 string memo,
                 string category,
@@ -41,7 +41,7 @@ namespace BanaData.Logic.Main
             // Properties
             public DateTime Date;
             public ETransactionMedium Medium;
-            public decimal CheckNumber;
+            public uint CheckNumber;
             public string Payee;
             public string Memo;
             public string Category;
@@ -124,8 +124,19 @@ namespace BanaData.Logic.Main
             set => ParseMediumString(value);
         }
 
-        // ZZZ
-        public string[] MediumSource { get; } = new string[] { "Next Check Num", "ATM", "Deposit", "Transfer", "EFT" };
+        // Strings for medium
+        private const string MEDIUM_NEXTCHECKNUM = "Next Check Num";
+        private const string MEDIUM_ATM = "ATM";
+        private const string MEDIUM_CASH = "Cash";
+        private const string MEDIUM_DEPOSIT = "DEP";
+        private const string MEDIUM_DIVIDEND = "Div";
+        private const string MEDIUM_EFT = "EFT";
+        private const string MEDIUM_TRANSFER = "Transfer";
+
+        public string[] MediumSource { get; } = new string[] 
+        {
+            MEDIUM_NEXTCHECKNUM, MEDIUM_ATM, MEDIUM_CASH, MEDIUM_DEPOSIT, MEDIUM_DIVIDEND, MEDIUM_EFT, MEDIUM_TRANSFER
+        };
 
         // Payee
         public string Payee
@@ -174,6 +185,8 @@ namespace BanaData.Logic.Main
                 }
             }
         }
+        public bool IsPaymentTabStop => !IsDepositTabStop;
+
 
         public string Status
         {
@@ -199,6 +212,7 @@ namespace BanaData.Logic.Main
                 }
             }
         }
+        public bool IsDepositTabStop { get; private set; }
 
         // Balance
         // BalanceString is the UI property, Balance is updated by the logic
@@ -425,7 +439,7 @@ namespace BanaData.Logic.Main
                 // Create new banking transaction row if needed
                 if (bankRegisterLogic.IsBank)
                 {
-                    household.BankingTransactions.Add(transactionRow, data.Medium, (uint)data.CheckNumber);
+                    household.BankingTransactions.Add(transactionRow, data.Medium, data.CheckNumber);
                 }
 
                 // Create all line items (ZZZ only one for now)
@@ -443,7 +457,7 @@ namespace BanaData.Logic.Main
                 // Update banking transaction if needed
                 if (bankRegisterLogic.IsBank)
                 {
-                    household.BankingTransactions.Update(transactionRow, data.Medium, (uint)data.CheckNumber);
+                    household.BankingTransactions.Update(transactionRow, data.Medium, data.CheckNumber);
                 }
 
                 // Update lineItem (ZZZ only one for now)
@@ -505,23 +519,23 @@ namespace BanaData.Logic.Main
                         rs = data.CheckNumber.ToString();
                     }
                     break;
-                case ETransactionMedium.PrintCheck:
-                    rs = "PrtCk";
-                    break;
                 case ETransactionMedium.ATM:
-                    rs = "ATM";
+                    rs = MEDIUM_ATM;
                     break;
                 case ETransactionMedium.Cash:
-                    rs = "Cash";
+                    rs = MEDIUM_CASH;
                     break;
                 case ETransactionMedium.Deposit:
-                    rs = "DEP";
+                    rs = MEDIUM_DEPOSIT;
                     break;
                 case ETransactionMedium.Dividend:
-                    rs = "Div";
+                    rs = MEDIUM_DIVIDEND;
                     break;
                 case ETransactionMedium.EFT:
-                    rs = "EFT";
+                    rs = MEDIUM_EFT;
+                    break;
+                case ETransactionMedium.Transfer:
+                    rs = MEDIUM_TRANSFER;
                     break;
                 case ETransactionMedium.None:
                     rs = "";
@@ -536,29 +550,34 @@ namespace BanaData.Logic.Main
 
             switch (type)
             {
-                case "PrtCk":
-                    data.Medium = ETransactionMedium.PrintCheck;
+                case MEDIUM_NEXTCHECKNUM:
+                    data.Medium = ETransactionMedium.Check;
+                    data.CheckNumber = GetNextCheckNumber();
+                    OnPropertyChanged(() => Medium);
                     break;
-                case "ATM":
+                case MEDIUM_ATM:
                     data.Medium = ETransactionMedium.ATM;
                     break;
-                case "Cash":
+                case MEDIUM_CASH:
                     data.Medium = ETransactionMedium.Cash;
                     break;
-                case "DEP":
+                case MEDIUM_DEPOSIT:
                     data.Medium = ETransactionMedium.Deposit;
                     break;
-                case "Div":
+                case MEDIUM_DIVIDEND:
                     data.Medium = ETransactionMedium.Dividend;
                     break;
-                case "EFT":
+                case MEDIUM_EFT:
                     data.Medium = ETransactionMedium.EFT;
+                    break;
+                case MEDIUM_TRANSFER:
+                    data.Medium = ETransactionMedium.Transfer;
                     break;
                 case "":
                     data.Medium = ETransactionMedium.None;
                     break;
                 default:
-                    if (decimal.TryParse(type, out decimal checkNum))
+                    if (uint.TryParse(type, out uint checkNum))
                     {
                         data.Medium = ETransactionMedium.Check;
                         data.CheckNumber = checkNum;
@@ -569,7 +588,27 @@ namespace BanaData.Logic.Main
                     }
                     break;
             }
+
+            IsDepositTabStop = data.Medium == ETransactionMedium.Deposit;
+            OnPropertyChanged(() => IsDepositTabStop);
+            OnPropertyChanged(() => IsPaymentTabStop);
         }
+
+        private uint GetNextCheckNumber()
+        {
+            uint result = 0;
+
+            foreach(BankingTransactionLogic btl in bankRegisterLogic.Transactions)
+            {
+                if (btl != this)
+                {
+                    result = Math.Max(result, btl.data.CheckNumber);
+                }
+            }
+
+            return result + 1;
+        }
+
         private string GetStatusString()
         {
             string rs = "???";

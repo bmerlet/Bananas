@@ -302,7 +302,7 @@ namespace BanaData.Logic.Main
                 var transactionData = new BankingTransactionLogic.BankTransactionData(
                     trans.Date,
                     transBank == null ? ETransactionMedium.None : transBank.Medium,
-                    transBank == null ? 0 : (transBank.IsCheckNumberNull() ? 0 : transBank.CheckNumber),
+                    transBank == null ? 0 : (transBank.IsCheckNumberNull() ? 0 : (uint)transBank.CheckNumber),
                     trans.IsPayeeNull() ? "" : trans.Payee,
                     memo,
                     category,
