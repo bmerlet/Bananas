@@ -63,7 +63,7 @@ namespace BanaData.Logic.Dialogs
         private void OnAddMemorizedPayee()
         {
             // Create new memorized payee
-            var newMemorizedPayee = new MemorizedPayeeItem(-1, "", new LineItem[1] { new LineItem(-1, "", -1, -1, "", 0) });
+            var newMemorizedPayee = new MemorizedPayeeItem(-1, "", new LineItem[1] { new LineItem(mainWindowLogic, -1, "", -1, -1, "", 0, true) });
 
             var logic = new EditMemorizedPayeeLogic(mainWindowLogic, newMemorizedPayee, true);
             if (mainWindowLogic.GuiServices.ShowDialog(logic))

@@ -4,34 +4,184 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using BanaData.Logic.Main;
+
 namespace BanaData.Logic.Items
 {
     /// <summary>
-    /// Immutable class representing a line item for the UI
+    /// Sealable class representing a line item for the UI
     /// </summary>
     public class LineItem
     {
+        #region Provate members
+
+        private readonly MainWindowLogic mainWindowLogic;
+
+        #endregion
+        
+        #region Constructors
+
         // Explicit constructor
-        public LineItem(int id, string category, int categoryID, int categoryAccountID, string memo, decimal amount) =>
-            (ID, Category, CategoryID, CategoryAccountID, Memo, Amount, AmountString) =
-            (id, category, categoryID, categoryAccountID, memo, amount, amount.ToString("N"));
+        public LineItem(
+            MainWindowLogic _mainWindowLogic,
+            int id, 
+            string _category,
+            int categoryID,
+            int categoryAccountID,
+            string _memo,
+            decimal _amount,
+            bool _sealed) =>
+            (mainWindowLogic, ID, category, CategoryID, CategoryAccountID, memo, amount, Sealed) =
+            (_mainWindowLogic, id, _category, categoryID, categoryAccountID, _memo, _amount, _sealed);
+
+        // Lookup category ids and construct
+        static public LineItem GetLineItem(MainWindowLogic _mainWindowLogic,
+            int id,
+            string category,
+            string memo,
+            decimal amount,
+            bool _sealed)
+        {
+            (int catID, int catAccntId) = GetCategoryIds(_mainWindowLogic, category);
+
+            return new LineItem(_mainWindowLogic, id, category, catID, catAccntId, memo, amount, _sealed);
+        }
 
         // Clone with a new ID
-        public LineItem(LineItem src, int id) =>
-            (ID, Category, CategoryID, CategoryAccountID, Memo, Amount, AmountString) =
-            (id, src.Category, src.CategoryID, src.CategoryAccountID, src.Memo, src.Amount, src.Amount.ToString("N"));
+        public LineItem(LineItem src, int id)
+            : this(src.mainWindowLogic, id, src.Category, src.CategoryID, src.CategoryAccountID, src.Memo, src.Amount, src.Sealed) { }
+
+        // Clone
+        public LineItem(LineItem src)
+            : this(src, src.ID) { }
+
+        static private (int catID, int catAccntId) GetCategoryIds(MainWindowLogic mainWindowLogic, string category)
+        {
+            int categoryID;
+            int categoryAccountID;
+
+            if (string.IsNullOrWhiteSpace(category))
+            {
+                categoryID = -1;
+                categoryAccountID = -1;
+            }
+            else
+            {
+                var cat = mainWindowLogic.Categories.FirstOrDefault(c => c.FullName == category);
+                if (cat == null)
+                {
+                    throw new ArgumentException($"Category {category} does not exist");
+                }
+                categoryID = cat.ID;
+                categoryAccountID = cat.AccountID;
+            }
+
+            return (categoryID, categoryAccountID);
+        }
+
+        #endregion
+
+        #region Logic properties
+
+        // line item DB ID - we prefer to recreate the line item rather than change it...
         public readonly int ID;
-        public readonly int CategoryID;
-        public readonly int CategoryAccountID;
 
-        public string Category { get; }
-        public string Memo { get; }
-        public decimal Amount { get; }
-        public string AmountString { get; }
+        // Category ids dervide from category string
+        public int CategoryID { get; private set; }
+        public int CategoryAccountID { get; private set; }
 
+        // If this instance is sealed
+        public bool Sealed;
+
+        #endregion
+
+        #region UI properties
+
+        //
+        // Category
+        //
+        private string category;
+        public string Category
+        {
+            get => category;
+            set
+            {
+                if (category != value)
+                {
+                    if (Sealed)
+                    {
+                        throw new InvalidOperationException("Trying to set Category on a sealed LineItem");
+                    }
+
+                    var tmp = value.Trim();
+                    (CategoryID, CategoryAccountID) = GetCategoryIds(mainWindowLogic, tmp);
+                    category = tmp;
+                }
+            }
+        }
+
+        //
+        // Memo
+        //
+        private string memo;
+        public string Memo
+        {
+            get => memo;
+            set
+            {
+                if (Sealed)
+                {
+                    throw new InvalidOperationException("Trying to set Memo on a sealed LineItem");
+                }
+                memo = value;
+            }
+        }
+
+        //
+        // Amount
+        //
+        private decimal amount;
+        public decimal Amount 
+        {
+            get => amount;
+            set
+            {
+                if (Sealed)
+                {
+                    throw new InvalidOperationException("Trying to set Amount on a sealed LineItem");
+                }
+                amount = value;
+            }
+        }
+
+        //
+        // Amount derived values
+        //
+        public string AmountString => amount.ToString("N");
         public bool Payment => Amount < 0;
         public bool Deposit => Amount >= 0;
         public decimal AbsoluteAmount => Math.Abs(Amount);
         public string AbsoluteAmountString => Math.Abs(Amount).ToString("N");
+
+        #endregion
+
+        #region Overrides
+
+        public override bool Equals(object obj)
+        {
+            return
+                obj is LineItem li &&
+                li.ID == ID &&
+                li.Category == Category &&
+                li.Memo == Memo &&
+                li.Amount == Amount;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        #endregion
     }
 }

@@ -87,7 +87,7 @@ namespace BanaData.Logic.Dialogs
         public GridViewLineItem BuildNewLineItem()
         {
             int id = gridViewLineItems.Max(gvli => gvli.ID) + 1;
-            var lineItem = new LineItem(id, "", -1, -1, "", 0);
+            var lineItem = new LineItem(mainWindowLogic, id, "", -1, -1, "", 0, true);
             var result = new GridViewLineItem(this, lineItem, false, categories);
 
             return result;
@@ -107,15 +107,18 @@ namespace BanaData.Logic.Dialogs
 
             foreach (var gvli in gridViewLineItems)
             {
-                var category = mainWindowLogic.Categories.Find(c => c.FullName == gvli.Category);
-                if (category == null)
+                decimal amount = Type == DEPOSIT ? gvli.Amount : -gvli.Amount;
+                LineItem li;
+                try
                 {
-                    mainWindowLogic.ErrorMessage($"Category {gvli.Category} does not exist");
+                    li = LineItem.GetLineItem(mainWindowLogic, gvli.ID, gvli.Category, gvli.Memo, amount, true);
+                }
+                catch(ArgumentException e)
+                {
+                    mainWindowLogic.ErrorMessage(e.Message);
                     return null; // Stay on dialog
                 }
-                decimal amount = Type == DEPOSIT ? gvli.Amount : -gvli.Amount;
 
-                var li = new LineItem(gvli.ID, category.FullName, category.ID, category.AccountID, gvli.Memo, amount);
                 newLineItems.Add(li);
             }
 

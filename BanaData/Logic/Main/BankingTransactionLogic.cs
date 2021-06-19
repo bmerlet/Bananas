@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Toolbox.UILogic;
 using BanaData.Database;
 using BanaData.Logic.Items;
+using BanaData.Logic.Dialogs;
 
 namespace BanaData.Logic.Main
 {
@@ -16,7 +17,7 @@ namespace BanaData.Logic.Main
     /// </summary>
     public class BankingTransactionLogic : LogicBase, IEditableObject
     {
-        #region Supporting data class
+        #region Supporting class
 
         public class BankTransactionData
         {
@@ -26,40 +27,60 @@ namespace BanaData.Logic.Main
                 ETransactionMedium medium,
                 uint checkNumber,
                 string payee,
-                string memo,
-                string category,
                 ETransactionStatus status,
-                decimal amount) => 
-                (Date, Medium, CheckNumber, Payee, Memo, Category, Status, Amount) =
-                (date, medium, checkNumber, payee, memo, category, status, amount);
+                IEnumerable<LineItem> lineItems)
+            {
+                (Date, Medium, CheckNumber, Payee, Status) =
+                    (date, medium, checkNumber, payee, status);
+
+                LineItems.AddRange(lineItems);
+            }
 
             // Clone
-            public BankTransactionData(BankTransactionData src) =>
-                (Date, Medium, CheckNumber, Payee, Memo, Category, Status, Amount) =
-                (src.Date, src.Medium, src.CheckNumber, src.Payee, src.Memo, src.Category, src.Status, src.Amount);
+            public BankTransactionData(BankTransactionData src)
+            {
+                (Date, Medium, CheckNumber, Payee, Status) =
+                    (src.Date, src.Medium, src.CheckNumber, src.Payee, src.Status);
+
+                src.LineItems.ForEach(li => LineItems.Add(new LineItem(li)));
+            }
 
             // Properties
             public DateTime Date;
             public ETransactionMedium Medium;
             public uint CheckNumber;
             public string Payee;
-            public string Memo;
-            public string Category;
             public ETransactionStatus Status;
-            public decimal Amount;
+            public readonly List<LineItem> LineItems = new List<LineItem>();
+
+            // Show either the first line item when no split or a summary
+            public string Memo => LineItems.Count == 1 ? LineItems[0].Memo : "";
+            public string Category => LineItems.Count == 1 ? LineItems[0].Category : "<Split>";
+            public decimal Amount => LineItems.Sum(li => li.Amount);
 
             public override bool Equals(object obj)
             {
-                return
-                    obj is BankTransactionData o &&
-                    o.Date.Equals(Date) &&
-                    o.Medium == Medium &&
-                    o.CheckNumber == CheckNumber &&
-                    o.Payee == Payee &&
-                    o.Memo == Memo &&
-                    o.Category == Category &&
-                    o.Status == Status &&
-                    o.Amount == Amount;
+                bool equ = false;
+                if (obj is BankTransactionData o)
+                {
+                    equ =
+                        o.Date.Equals(Date) &&
+                        o.Medium == Medium &&
+                        o.CheckNumber == CheckNumber &&
+                        o.Payee == Payee &&
+                        o.Amount == Amount &&
+                        o.LineItems.Count == LineItems.Count;
+
+                    if (equ)
+                    {
+                        for (int i = 0; i < LineItems.Count; i++)
+                        {
+                            equ &= o.LineItems[i].Equals(LineItems[i]);
+                        }
+                    }
+                }
+
+                return equ;
             }
 
             public override int GetHashCode()
@@ -103,7 +124,8 @@ namespace BanaData.Logic.Main
         // To create new transactions (not in DB yet)
         public BankingTransactionLogic(MainWindowLogic _mainWindowLogic, BankRegisterLogic _bankRegisterLogic, int _accountID)
             : this(_mainWindowLogic, _bankRegisterLogic, _accountID, -1,
-                  new BankTransactionData(DateTime.Today, ETransactionMedium.None, 0, "", "", "", ETransactionStatus.Pending, 0))
+                  new BankTransactionData(DateTime.Today, ETransactionMedium.None, 0, "", ETransactionStatus.Pending,
+                      new LineItem[] { new LineItem(_mainWindowLogic, -1, "", -1, -1, "", 0, false) }))
         {
         }
 
@@ -155,14 +177,34 @@ namespace BanaData.Logic.Main
         public string Memo
         {
             get => data.Memo;
-            set => data.Memo = value;
+            set
+            {
+                if (data.LineItems.Count == 1)
+                {
+                    data.LineItems[0].Memo = value;
+                }
+                else
+                {
+                    mainWindowLogic.ErrorMessage("Cannot add memo to split transactions");
+                }
+            }
         }
 
         // Category
         public string Category 
         {
             get => data.Category;
-            set => data.Category = value;
+            set
+            {
+                if (data.LineItems.Count == 1)
+                {
+                    data.LineItems[0].Category = value;
+                }
+                else
+                {
+                    mainWindowLogic.ErrorMessage("Cannot set category for split transactions");
+                }
+            }
         }
 
         public IEnumerable<CategoryItem> Categories => mainWindowLogic.Categories;
@@ -179,10 +221,17 @@ namespace BanaData.Logic.Main
             {
                 if (data.Amount != -value)
                 {
-                    data.Amount = -value;
-                    OnPropertyChanged(() => PaymentString);
-                    OnPropertyChanged(() => DepositString);
-                    OnPropertyChanged(() => Deposit);
+                    if (data.LineItems.Count == 1)
+                    {
+                        data.LineItems[0].Amount = -value;
+                        OnPropertyChanged(() => PaymentString);
+                        OnPropertyChanged(() => DepositString);
+                        OnPropertyChanged(() => Deposit);
+                    }
+                    else
+                    {
+                        mainWindowLogic.ErrorMessage("Cannot set amount on split transactions");
+                    }
                 }
             }
         }
@@ -206,10 +255,17 @@ namespace BanaData.Logic.Main
             {
                 if (data.Amount != value)
                 {
-                    data.Amount = value;
-                    OnPropertyChanged(() => PaymentString);
-                    OnPropertyChanged(() => DepositString);
-                    OnPropertyChanged(() => Payment);
+                    if (data.LineItems.Count == 1)
+                    {
+                        data.LineItems[0].Amount = value;
+                        OnPropertyChanged(() => PaymentString);
+                        OnPropertyChanged(() => DepositString);
+                        OnPropertyChanged(() => Payment);
+                    }
+                    else
+                    {
+                        mainWindowLogic.ErrorMessage("Cannot set amount on split transactions");
+                    }
                 }
             }
         }
@@ -288,32 +344,21 @@ namespace BanaData.Logic.Main
                     OnPropertyChanged(() => Payee);
                 }
 
-                if (data.Memo != backup.Memo)
-                {
-                    data.Memo = backup.Memo;
-                    OnPropertyChanged(() => Memo);
-                }
-
-                if (data.Category != backup.Category)
-                {
-                    data.Category = backup.Category;
-                    OnPropertyChanged(() => Category);
-                }
-
                 if (data.Status != backup.Status)
                 {
                     data.Status = backup.Status;
                     OnPropertyChanged(() => Status);
                 }
 
-                if (data.Amount != backup.Amount)
-                {
-                    data.Amount = backup.Amount;
-                    OnPropertyChanged(() => PaymentString);
-                    OnPropertyChanged(() => Payment);
-                    OnPropertyChanged(() => DepositString);
-                    OnPropertyChanged(() => Deposit);
-                }
+                data.LineItems.Clear();
+                backup.LineItems.ForEach(li => data.LineItems.Add(new LineItem(li)));
+                
+                OnPropertyChanged(() => Memo);
+                OnPropertyChanged(() => Category);
+                OnPropertyChanged(() => PaymentString);
+                OnPropertyChanged(() => Payment);
+                OnPropertyChanged(() => DepositString);
+                OnPropertyChanged(() => Deposit);
 
                 backup = null;
             }
@@ -447,12 +492,11 @@ namespace BanaData.Logic.Main
                     household.BankingTransactions.Add(transactionRow, data.Medium, data.CheckNumber);
                 }
 
-                // Create all line items (ZZZ only one for now)
-                var category = mainWindowLogic.Categories.FirstOrDefault(c => c.FullName == data.Category);
-                int categoryId = category == null ? -1 : category.ID;
-                int categoryAccountId = category == null ? -1 : category.AccountID;
-
-                household.LineItems.Add(transactionRow, categoryId, categoryAccountId, data.Memo, data.Amount);
+                // Create all line items
+                foreach(var li in data.LineItems)
+                {
+                    household.LineItems.Add(transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount);
+                }
             }
             else
             {
@@ -465,14 +509,31 @@ namespace BanaData.Logic.Main
                     household.BankingTransactions.Update(transactionRow, data.Medium, data.CheckNumber);
                 }
 
-                // Update lineItem (ZZZ only one for now)
-                var category = mainWindowLogic.Categories.FirstOrDefault(c => c.FullName == data.Category);
-                int categoryId = category == null ? -1 : category.ID;
-                int categoryAccountId = category == null ? -1 : category.AccountID;
-
-                var lineItems = household.LineItems.GetByTransaction(transactionRow);
-                var lineItem = lineItems[0]; // ZZZZZZZZZZZ
-                household.LineItems.Update(lineItem, transactionRow, categoryId, categoryAccountId, data.Memo, data.Amount);
+                //
+                // Update the line items
+                //
+                // First find deleted line items and delete them in the DB
+                foreach (var li in backup.LineItems)
+                {
+                    if (li.ID >= 0 && !data.LineItems.Contains(li))
+                    {
+                        household.LineItems.FindByID(li.ID).Delete();
+                    }
+                }
+                // Second update or create the other ones
+                foreach (var li in data.LineItems)
+                {
+                    if (li.ID >= 0)
+                    {
+                        var liRow = household.LineItems.FindByID(li.ID);
+                        household.LineItems.Update(liRow, transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount);
+                    }
+                    else
+                    {
+                        var liRow = household.LineItems.Add(transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount);
+                        data.LineItems[data.LineItems.IndexOf(li)] = new LineItem(li, liRow.ID);
+                    }
+                }
             }
 
             mainWindowLogic.CommitChanges();
@@ -487,34 +548,52 @@ namespace BanaData.Logic.Main
         //
         private void OnPayeeSelected(object arg)
         {
-            if (arg is MemorizedPayeeItem memorizedPayee && backup != null)
+            if (arg is MemorizedPayeeItem memorizedPayee && memorizedPayee.LineItems.Length > 0 && backup != null)
             {
-                if (!string.IsNullOrWhiteSpace(memorizedPayee.Memo))
+                data.LineItems.Clear();
+                foreach(var li in memorizedPayee.LineItems)
                 {
-                    data.Memo = memorizedPayee.Memo;
-                    OnPropertyChanged(() => Memo);
+                    var unsealedLineItem = new LineItem(li) { Sealed = false };
+                    data.LineItems.Add(unsealedLineItem);
                 }
 
-                if (!string.IsNullOrWhiteSpace(memorizedPayee.Category))
-                {
-                    data.Category = memorizedPayee.Category;
-                    OnPropertyChanged(() => Category);
-                }
-
-                if (memorizedPayee.Amount != 0)
-                {
-                    data.Amount = memorizedPayee.Amount;
-                    OnPropertyChanged(() => PaymentString);
-                    OnPropertyChanged(() => Payment);
-                    OnPropertyChanged(() => DepositString);
-                    OnPropertyChanged(() => Deposit);
-                }
+                OnPropertyChanged(() => Memo);
+                OnPropertyChanged(() => Category);
+                OnPropertyChanged(() => PaymentString);
+                OnPropertyChanged(() => Payment);
+                OnPropertyChanged(() => DepositString);
+                OnPropertyChanged(() => Deposit);
             }
         }
 
         private void OnSplitTransaction()
         {
+            // Work on a sealed copy of the  LineItems
+            var lis = new LineItem[data.LineItems.Count];
+            for(int i = 0; i < lis.Length; i++)
+            {
+                lis[i] = new LineItem(data.LineItems[i]) { Sealed = false };
+            }
+
             // Show the split transaction dialog
+            var splitDialog = new EditSplitLogic(mainWindowLogic, lis);
+            if (mainWindowLogic.GuiServices.ShowDialog(splitDialog))
+            {
+                // Copy the result back
+                data.LineItems.Clear();
+                foreach(var li in splitDialog.NewLineItems)
+                {
+                    li.Sealed = false;
+                    data.LineItems.Add(li);
+                }
+
+                OnPropertyChanged(() => Memo);
+                OnPropertyChanged(() => Category);
+                OnPropertyChanged(() => PaymentString);
+                OnPropertyChanged(() => Payment);
+                OnPropertyChanged(() => DepositString);
+                OnPropertyChanged(() => Deposit);
+            }
         }
 
         private string GetMediumString()

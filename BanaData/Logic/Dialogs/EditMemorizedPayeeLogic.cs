@@ -186,12 +186,12 @@ namespace BanaData.Logic.Dialogs
             {
                 if (string.IsNullOrWhiteSpace(Category))
                 {
-                    lineItems[0] = new LineItem(lineItems[0].ID, "", -1, -1, Memo, GetAmountFromControls());
+                    lineItems[0] = new LineItem(mainWindowLogic, lineItems[0].ID, "", -1, -1, Memo, GetAmountFromControls(), true);
                 }
                 else
                 {
                     var categoryItem = Categories.First(c => c.FullName == Category);
-                    lineItems[0] = new LineItem(lineItems[0].ID, Category, categoryItem.ID, categoryItem.AccountID, Memo, GetAmountFromControls());
+                    lineItems[0] = new LineItem(mainWindowLogic, lineItems[0].ID, Category, categoryItem.ID, categoryItem.AccountID, Memo, GetAmountFromControls(), true);
                 }
             }
 

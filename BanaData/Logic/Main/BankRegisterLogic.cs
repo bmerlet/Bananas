@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
 
 using Toolbox.UILogic;
 using BanaData.Database;
-using System.Windows.Data;
-using System.ComponentModel;
+using BanaData.Logic.Items;
 
 namespace BanaData.Logic.Main
 {
@@ -254,6 +255,7 @@ namespace BanaData.Logic.Main
             // Export if banking account
             IsBank = account.Type == EAccountType.Bank;
             OnPropertyChanged(() => IsBank);
+            OnPropertyChanged(() => WidthOfMediumColumn);
 
             // Find transactions and put them in the transaction list
             BankingTransactionLogic bankingTransaction = null;
@@ -272,42 +274,38 @@ namespace BanaData.Logic.Main
                 }
 
                 // Get line item(s)
-                var lineItems = household.LineItems.GetByTransaction(trans);
-                decimal amount = lineItems.Sum(li => li.Amount);
-                string category = "";
-
-                if (lineItems.Length > 1)
+                var dbLineItems = household.LineItems.GetByTransaction(trans);
+                var lineItems = new List<LineItem>();
+                foreach(var dbli in dbLineItems)
                 {
-                    category = "<Split>";
-                }
-                else if (lineItems[0].IsTransfer)
-                {
-                    if (!lineItems[0].IsAccountIDNull())
+                    int catID = -1;
+                    int catAccntID = -1;
+                    string category = "";
+                    if (dbli.IsTransfer && !dbli.IsAccountIDNull())
                     {
-                        var destAccount = household.Accounts.FindByID(lineItems[0].AccountID);
+                        var destAccount = household.Accounts.FindByID(dbli.AccountID);
                         category = "[" + destAccount.Name + "]";
+                        catAccntID = dbli.AccountID;
                     }
-                }
-                else
-                {
-                    if (!lineItems[0].IsCategoryIDNull())
+                    else if (!dbli.IsCategoryIDNull())
                     {
-                        var destCategory = household.Categories.FindByID(lineItems[0].CategoryID);
+                        var destCategory = household.Categories.FindByID(dbli.CategoryID);
                         category = destCategory.FullName;
+                        catID = dbli.CategoryID;
                     }
-                }
+                    string memo = dbli.IsMemoNull() ? "" : dbli.Memo;
 
-                string memo = (lineItems.Length == 1) ? (lineItems[0].IsMemoNull() ? "" : lineItems[0].Memo) : "";
+                    var li = new LineItem(mainWindowLogic, dbli.ID, category, catID, catAccntID, memo, dbli.Amount, false);
+                    lineItems.Add(li);
+                }
 
                 var transactionData = new BankingTransactionLogic.BankTransactionData(
                     trans.Date,
                     transBank == null ? ETransactionMedium.None : transBank.Medium,
                     transBank == null ? 0 : (transBank.IsCheckNumberNull() ? 0 : (uint)transBank.CheckNumber),
                     trans.IsPayeeNull() ? "" : trans.Payee,
-                    memo,
-                    category,
                     trans.Status,
-                    amount);
+                    lineItems);
 
                 bankingTransaction = new BankingTransactionLogic(mainWindowLogic, this, accountID, trans.ID, transactionData);
                 transactions.Add(bankingTransaction);

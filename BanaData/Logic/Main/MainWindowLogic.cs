@@ -327,7 +327,7 @@ namespace BanaData.Logic.Main
 
                     string memo = dbli.IsMemoNull() ? "" : dbli.Memo;
 
-                    lineItems.Add(new LineItem(dbli.ID, category, categoryID, categoryAccountID, memo, dbli.Amount));
+                    lineItems.Add(new LineItem(this, dbli.ID, category, categoryID, categoryAccountID, memo, dbli.Amount, true));
                 }
 
                 var mp = new MemorizedPayeeItem(mpr.ID, mpr.Payee, lineItems.ToArray());

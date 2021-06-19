@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:XamlUI.Dialogs"
         xmlns:w="clr-namespace:XamlUI.UserControls"
+        xmlns:t="clr-namespace:XamlUI.Tools"
         mc:Ignorable="d"
         Title="Edit Split"
         Icon="/XamlUI;component/Images/Bananas.ico"
@@ -19,6 +20,8 @@
         <Grid>
             <Grid.Resources>
 
+                <t:FontWeightConverter x:Key="fontWeightConverter"/>
+
                 <!-- Templates for the category column -->
                 <DataTemplate x:Key="CategoryColumnTemplate">
                     <TextBlock Text="{Binding Category}"/>
@@ -31,6 +34,11 @@
                         ListBoxHeight="150" 
                         ListBoxWidth="200"
                         ItemsSource="{Binding Categories}">
+                        <w:AutoCompleteTextBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding IndentedName}" FontWeight="{Binding FontWeight, Converter={StaticResource fontWeightConverter}}" />
+                            </DataTemplate>
+                        </w:AutoCompleteTextBox.ItemTemplate>
                     </w:AutoCompleteTextBox>
                 </DataTemplate>
 
