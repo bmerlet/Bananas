@@ -131,7 +131,7 @@ namespace XamlUI
             }
             else if (logic is EditSplitLogic editSplitLogic)
             {
-                dialog = new EditSplit(editSplitLogic);
+                dialog = new EditSplitLV(editSplitLogic);
             }
             else
             {

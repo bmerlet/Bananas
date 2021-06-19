@@ -79,6 +79,9 @@
     <Compile Include="Dialogs\EditSplit.xaml.cs">
       <DependentUpon>EditSplit.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\EditSplitLV.xaml.cs">
+      <DependentUpon>EditSplitLV.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tools\BindingProxy.cs" />
     <Compile Include="Tools\DataGridLengthConverter.cs" />
     <Compile Include="Tools\FontWeightConverter.cs" />
@@ -128,6 +131,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\EditSplit.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\EditSplitLV.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

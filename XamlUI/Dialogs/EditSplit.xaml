@@ -12,6 +12,11 @@
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
         SizeToContent="WidthAndHeight">
+    <!-- ====================================-->
+    <!-- ==             OBSOLETE           ==-->
+    <!-- ====================================-->
+    <!-- ==    Replaced by EditSplitLV     ==-->
+    <!-- ====================================-->
 
     <DockPanel>
         <!-- OK/Cancel panel -->

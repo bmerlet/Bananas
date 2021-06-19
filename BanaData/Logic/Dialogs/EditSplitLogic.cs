@@ -52,11 +52,25 @@ namespace BanaData.Logic.Dialogs
                 gridViewLineItems.Add(new GridViewLineItem(this, li, isDeposit, categories));
             }
 
-            // Update total wjhen a line is deleted
+            // Update total when a line is deleted
             gridViewLineItems.CollectionChanged += (o, e) => UpdateTotal();
 
             // Give the default view to the UI
             GridViewLineItems = (CollectionView)CollectionViewSource.GetDefaultView(gridViewLineItems);
+
+            // Delete line item command
+            DeleteLineItem = new CommandBase(OnDeleteLineItem);
+        }
+
+        // Activated when the window is loaded
+        public void OnLoaded()
+        {
+            // Select first line item
+            selectedLineItem = gridViewLineItems[0];
+            editedLineItem = gridViewLineItems[0];
+            OnPropertyChanged(() => SelectedLineItem);
+            OnPropertyChanged(() => EditedLineItem);
+            OnPropertyChanged("UpdateOverlayPosition");
         }
 
         #endregion
@@ -67,12 +81,83 @@ namespace BanaData.Logic.Dialogs
         private readonly ObservableCollection<GridViewLineItem> gridViewLineItems;
         public CollectionView GridViewLineItems { get; }
 
+        // Selected line item
+        private GridViewLineItem selectedLineItem;
+        private bool logicIsChangingSelection;
+        public GridViewLineItem SelectedLineItem
+        {
+            get => selectedLineItem;
+            set
+            {
+                if (value != selectedLineItem)
+                {
+                    if (logicIsChangingSelection)
+                    {
+                        // This logic is changing the selection (e.g. processing of return key)
+                        selectedLineItem = value;
+                        editedLineItem = value;
+                        OnPropertyChanged(() => SelectedLineItem);
+                    }
+                    else
+                    {
+                        // User changed selection (e.g. by clicking on a row)
+                        if (editedLineItem != null && gridViewLineItems.Contains(editedLineItem))
+                        {
+                            editedLineItem.CancelEdit();
+                        }
+                        selectedLineItem = value;
+                        editedLineItem = value;
+                    }
+
+                    if (selectedLineItem != null)
+                    {
+                        selectedLineItem.BeginEdit();
+                    }
+                    OnPropertyChanged(() => EditedLineItem);
+                    OnPropertyChanged("UpdateOverlayPosition");
+                }
+            }
+        }
+
+        // Line item being edited
+        private GridViewLineItem editedLineItem;
+        public GridViewLineItem EditedLineItem
+        {
+            get => editedLineItem;
+            set { editedLineItem = value; OnPropertyChanged(() => EditedLineItem); }
+        }
+
+        // Delete command from context menu
+        public CommandBase DeleteLineItem { get; }
+
         // Deposit/payment Combobox
         public string Type { get; set; }
         public string[] TypeSource { get; } = new string[] { DEPOSIT, PAYMENT };
 
         // Total
         public string Total { get; private set; }
+
+        // Column widths
+        private double widthOfCategoryColumn = 200;
+        public double WidthOfCategoryColumn 
+        { 
+            get => widthOfCategoryColumn; 
+            set { widthOfCategoryColumn = value; OnPropertyChanged(() => WidthOfCategoryColumn); }
+        }
+
+        private double widthOfMemoColumn = 200;
+        public double WidthOfMemoColumn
+        {
+            get => widthOfMemoColumn;
+            set { widthOfMemoColumn = value; OnPropertyChanged(() => WidthOfMemoColumn); }
+        }
+
+        private double widthOfAmountColumn = 90;
+        public double WidthOfAmountColumn
+        {
+            get => widthOfAmountColumn;
+            set { widthOfAmountColumn = value; OnPropertyChanged(() => WidthOfAmountColumn); }
+        }
 
         #endregion
 
@@ -84,10 +169,67 @@ namespace BanaData.Logic.Dialogs
 
         #region Actions
 
+        public void MoveOneLineDown()
+        {
+            GridViewLineItem gvli;
+
+            int ix = gridViewLineItems.IndexOf(SelectedLineItem);
+            if (ix >= gridViewLineItems.Count - 1)
+            {
+                // Need to add a new item
+                var lineItem = new LineItem(mainWindowLogic, -1, "", -1, -1, "", 0, true);
+                gvli = new GridViewLineItem(this, lineItem, false, categories);
+                gridViewLineItems.Add(gvli);
+            }
+            else
+            {
+                // move to next
+                gvli = gridViewLineItems[ix + 1];
+            }
+
+            // Select it
+            logicIsChangingSelection = true;
+            SelectedLineItem = gvli;
+            logicIsChangingSelection = false;
+        }
+
+        private void OnDeleteLineItem(object arg)
+        {
+            var gvli = arg == null ? editedLineItem : arg as GridViewLineItem;
+            if (gvli == null)
+            {
+                return;
+            }
+
+            if (gridViewLineItems.Count == 1)
+            {
+                mainWindowLogic.ErrorMessage("Cannot remove the last line item");
+                return;
+            }
+            if (gvli == editedLineItem)
+            {
+                // Select next line item (if it exists) or previous one
+                int ix = gridViewLineItems.IndexOf(gvli);
+                if (ix < gridViewLineItems.Count - 1)
+                {
+                    ix += 1;
+                }
+                else
+                {
+                    ix -= 1;
+                }
+
+                logicIsChangingSelection = true;
+                SelectedLineItem = gridViewLineItems[ix];
+                logicIsChangingSelection = false;
+            }
+            gridViewLineItems.Remove(gvli);
+        }
+
+        // ZZZ Obsolete
         public GridViewLineItem BuildNewLineItem()
         {
-            int id = gridViewLineItems.Max(gvli => gvli.ID) + 1;
-            var lineItem = new LineItem(mainWindowLogic, id, "", -1, -1, "", 0, true);
+            var lineItem = new LineItem(mainWindowLogic, -1, "", -1, -1, "", 0, true);
             var result = new GridViewLineItem(this, lineItem, false, categories);
 
             return result;
@@ -219,13 +361,14 @@ namespace BanaData.Logic.Dialogs
             {
                 if (editing)
                 {
-                    // Publish data (not sure it's needed)
+                    // Publish data
                     editing = false;
                     OnPropertyChanged(() => Category);
                     OnPropertyChanged(() => Memo);
                     OnPropertyChanged(() => Amount);
                     OnPropertyChanged(() => AmountString);
                 }
+                logic.MoveOneLineDown();
             }
 
             public void CancelEdit()

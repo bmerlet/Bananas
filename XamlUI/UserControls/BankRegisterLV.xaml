@@ -252,12 +252,12 @@
                 SelectedItem="{Binding EditedTransaction.Status, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
             <!-- Deposit -->
-                <local:AmountBox
-                    Grid.Column="7"
-                    Watermark="Deposit" 
-                    TextAlignment="Right"
-                    Amount="{Binding EditedTransaction.Deposit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    IsTabStop="{Binding EditedTransaction.IsDepositTabStop}"/>
+            <local:AmountBox
+                Grid.Column="7"
+                Watermark="Deposit" 
+                TextAlignment="Right"
+                Amount="{Binding EditedTransaction.Deposit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                IsTabStop="{Binding EditedTransaction.IsDepositTabStop}"/>
         </Grid>
     </Grid>
 </UserControl>
