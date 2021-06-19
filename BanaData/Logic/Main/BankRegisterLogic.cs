@@ -124,10 +124,10 @@ namespace BanaData.Logic.Main
 
         public double WidthOfMediumColumn
         {
-            get => mainWindowLogic.UserSettings.WidthOfMediumColumn;
+            get => IsBank ? mainWindowLogic.UserSettings.WidthOfMediumColumn : 0;
             set
             {
-                if (mainWindowLogic.UserSettings.WidthOfMediumColumn != value)
+                if (IsBank && mainWindowLogic.UserSettings.WidthOfMediumColumn != value)
                 {
                     mainWindowLogic.UserSettings.WidthOfMediumColumn = value;
                     mainWindowLogic.SaveUserSettings();

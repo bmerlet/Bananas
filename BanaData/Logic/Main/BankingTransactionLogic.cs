@@ -97,6 +97,7 @@ namespace BanaData.Logic.Main
             (mainWindowLogic, bankRegisterLogic, accountID, transID, data) = (_mainWindowLogic, _bankRegisterLogic, _accountID, _transID, _data);
 
             PayeeSelected = new CommandBase(OnPayeeSelected);
+            SplitTransaction = new CommandBase(OnSplitTransaction);
         }
 
         // To create new transactions (not in DB yet)
@@ -238,6 +239,10 @@ namespace BanaData.Logic.Main
         // And always displayed at the bottom of the listview
         // (see PropertyGroupDescription in BankRegisterLogic constructor)
         public string GroupSorter => (transID < 0) ? "Z" : "A";
+
+        // Split dialog
+        public CommandBase SplitTransaction { get; }
+
 
         #endregion
 
@@ -505,6 +510,11 @@ namespace BanaData.Logic.Main
                     OnPropertyChanged(() => Deposit);
                 }
             }
+        }
+
+        private void OnSplitTransaction()
+        {
+            // Show the split transaction dialog
         }
 
         private string GetMediumString()

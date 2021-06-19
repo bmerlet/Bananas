@@ -136,9 +136,11 @@
             <Grid.Resources>
 
                 <t:FontWeightConverter x:Key="fontWeightConverter"/>
-                
+                <t:VisibilityBoolConverter x:Key="visibilityConverter"/>
+
                 <ContextMenu x:Key="TransactionContextMenu">
                     <MenuItem Header="Delete" Command="{Binding DeleteTransaction}"/>
+                    <MenuItem Header="Split..." Command="{Binding EditedTransaction.SplitTransaction}"/>
                 </ContextMenu>
 
                 <Style TargetType="{x:Type local:DateBox}">
@@ -183,7 +185,8 @@
                 Grid.Column="1"
                 IsEditable="True" 
                 Text="{Binding EditedTransaction.Medium, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                ItemsSource="{Binding EditedTransaction.MediumSource}"/>
+                ItemsSource="{Binding EditedTransaction.MediumSource}"
+                Visibility="{Binding IsBank, Converter={StaticResource visibilityConverter}}"/>
 
             <!-- Payee -->
             <local:AutoCompleteTextBox 

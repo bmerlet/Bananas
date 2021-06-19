@@ -83,6 +83,7 @@
     <Compile Include="Tools\DataGridLengthConverter.cs" />
     <Compile Include="Tools\FontWeightConverter.cs" />
     <Compile Include="Tools\GridLengthConverter.cs" />
+    <Compile Include="Tools\VisibilityBoolConverter.cs" />
     <Compile Include="UserControls\AccountGroup.xaml.cs">
       <DependentUpon>AccountGroup.xaml</DependentUpon>
     </Compile>
