@@ -111,6 +111,9 @@
     <Compile Include="UserControls\OKCancel.xaml.cs">
       <DependentUpon>OKCancel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\ReconcileGrid.xaml.cs">
+      <DependentUpon>ReconcileGrid.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\WatermarkTextBox.cs" />
     <Page Include="Dialogs\EditAccount.xaml">
       <SubType>Designer</SubType>
@@ -185,6 +188,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserControls\OKCancel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\ReconcileGrid.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

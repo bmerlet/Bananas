@@ -12,13 +12,69 @@
         WindowStartupLocation="CenterOwner"
         SizeToContent="WidthAndHeight">
     <DockPanel>
+
+        <DockPanel.Resources>
+            <Style TargetType="TextBlock">
+                <Setter Property="Margin" Value="5"/>
+            </Style>
+        </DockPanel.Resources>
         
         <!-- OK/Cancel panel -->
-        <w:OKCancel DockPanel.Dock="Bottom"/>
+        <WrapPanel
+            DockPanel.Dock="Bottom" 
+            HorizontalAlignment="Right" VerticalAlignment="Bottom"
+            Orientation="Horizontal" Margin="0,8" >
+            <WrapPanel.Resources>
+                <Style TargetType="Button">
+                    <Setter Property="HorizontalAlignment" Value="Left"/>
+                    <Setter Property ="VerticalAlignment" Value="Center"/>
+                    <Setter Property="Width" Value="75" />
+                    <Setter Property="Margin" Value="0,0,10,0" />
+                </Style>
+            </WrapPanel.Resources>
+            <Button Content="Done" Command="{Binding CommitCommand}"/>
+            <Button Content="Finish Later" Command="{Binding FinishLaterCommand}" IsDefault="True"/>
+            <Button Content="Cancel" IsCancel="True"/>
+        </WrapPanel>
         
-        <!-- Main panel -->
-        <Grid>
-            
+        <!-- Main panel: left column for payments, right column for deposits and controls -->
+        <Grid Height="400">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+
+            <w:ReconcileGrid DataContext="{Binding Payments}" Grid.RowSpan="2" VerticalAlignment="Stretch"/>
+
+            <w:ReconcileGrid DataContext="{Binding Deposits}" Grid.Column="1" VerticalAlignment="Stretch"/>
+
+            <!-- Balances -->
+            <Grid Grid.Column="1" Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="90"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="Prior statement balance:"/>
+                <TextBlock Text="{Binding PriorStatementBalance}" HorizontalAlignment="Right" Grid.Column="1"/>
+                <TextBlock Text="Cleared balance:" Grid.Row="1"/>
+                <TextBlock Text="{Binding ClearedBalance}" HorizontalAlignment="Right" Grid.Column="1" Grid.Row="1"/>
+                <TextBlock Text="Statement Balance:" Grid.Row="2"/>
+                <TextBlock Text="{Binding StatementBalance}" HorizontalAlignment="Right" Grid.Column="1" Grid.Row="2"/>
+                <TextBlock Text="Difference:" Grid.Row="3"/>
+                <TextBlock Text="{Binding BalanceToClear}" HorizontalAlignment="Right" Grid.Column="1" Grid.Row="3"/>
+            </Grid>
         </Grid>
 
     </DockPanel>

@@ -79,6 +79,14 @@ namespace BanaData.Database
                 return balance;
             }
 
+            // Get the reconciled balance of a banking account
+            public IEnumerable<Household.TransactionsRow> GetUnreconciledTransactions()
+            {
+                var accountToTransactions = Table.ChildRelations["FK_Accounts_Transactions"];
+
+                return GetChildRows(accountToTransactions).Cast<Household.TransactionsRow>().Where(tr => tr.Status != ETransactionStatus.Reconciled);
+            }
+
             // Get the balance of an investment account
             public decimal GetInvestmentValue()
             {
