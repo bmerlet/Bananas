@@ -239,10 +239,10 @@ namespace BanaData.Logic.Main
 
         #region Actions
 
-        public void SetAccount(int accountID)
+        public void SetAccount(int _accountID)
         {
             // Remember
-            this.accountID = accountID;
+            accountID = _accountID;
 
             // Get the account details
             var household = mainWindowLogic.Household;
@@ -316,6 +316,26 @@ namespace BanaData.Logic.Main
 
             // Compute balances
             RecomputeBalances();
+        }
+
+        public void UpdateTransactionStati()
+        {
+            // Return if we are not active
+            if (accountID != mainWindowLogic.DisplayedAccountID)
+            {
+                return;
+            }
+
+            var household = mainWindowLogic.Household;
+
+            foreach(var tr in transactions)
+            {
+                if (tr.transID >= 0)
+                {
+                    var trRow = household.Transactions.FindByID(tr.transID);
+                    tr.UpdateStatus(trRow.Status);
+                }
+            }
         }
 
         public void MoveDownOneTransaction(bool wasEmptyTransaction)

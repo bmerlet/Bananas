@@ -544,6 +544,16 @@ namespace BanaData.Logic.Main
 
         #region Actions
 
+        // Called by on behalf of reconcile to update status on transaction if needed
+        public void UpdateStatus(ETransactionStatus newStatus)
+        {
+            if (data.Status != newStatus)
+            {
+                data.Status = newStatus;
+                OnPropertyChanged(() => Status);
+            }
+        }
+
         //
         // Fill out fields when a memorized payee is selected
         //

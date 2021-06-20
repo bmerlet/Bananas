@@ -52,6 +52,7 @@ namespace BanaData.Logic.Dialogs
 
             MarkAll = new CommandBase(OnMarkAll);
             UnmarkAll = new CommandBase(OnUnmarkAll);
+            FinishLaterCommand = new CommandBase(OnFinishLaterCommand);
 
             UpdateBalances();
         }
@@ -127,6 +128,29 @@ namespace BanaData.Logic.Dialogs
                     }
                 }
             }
+        }
+
+        // Propagate the cleared transaction to the DB and the register view
+        private void OnFinishLaterCommand()
+        {
+            var household = mainWindowLogic.Household;
+
+            // Update the status of relevant transactions in the DB
+            foreach (var trList in new TransactionsToReconcile[] { Payments, Deposits })
+            {
+                foreach (TransactionToReconcile tr in trList.Transactions)
+                {
+                    var transRow = household.Transactions.FindByID(tr.ID);
+                    var newStatus = tr.IsCleared == true ? ETransactionStatus.Cleared : ETransactionStatus.Pending;
+                    transRow.Status = newStatus;
+                }
+            }
+
+            // Update DB
+            mainWindowLogic.CommitChanges();
+
+            // Close the dialog indicating change
+            CloseView(true);
         }
 
         protected override bool? Commit()

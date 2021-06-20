@@ -127,11 +127,16 @@ namespace BanaData.Logic.Main
             int accountID = mainWindow.DisplayedAccountID;
 
             // Create logic and show reconcile info dialog
-            var logic = new ReconcileInfoLogic(mainWindow, accountID);
-            if (mainWindow.GuiServices.ShowDialog(logic))
+            var infoLogic = new ReconcileInfoLogic(mainWindow, accountID);
+            if (mainWindow.GuiServices.ShowDialog(infoLogic))
             {
                 // Show reconcile dialog
-                mainWindow.GuiServices.ShowDialog(new ReconcileLogic(mainWindow, accountID));
+                var reconcileLogic = new ReconcileLogic(mainWindow, accountID);
+                if (mainWindow.GuiServices.ShowDialog(reconcileLogic))
+                {
+                    // Update the cleared status in the register
+                    mainWindow.BankRegister.UpdateTransactionStati();
+                }
             }
         }
 
