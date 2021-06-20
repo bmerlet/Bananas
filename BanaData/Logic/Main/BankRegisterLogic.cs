@@ -261,11 +261,8 @@ namespace BanaData.Logic.Main
             BankingTransactionLogic bankingTransaction = null;
             transactions.Clear();
             var accTransRel = household.Relations["FK_Accounts_Transactions"];
-            foreach (var transRow in account.GetChildRows(accTransRel))
+            foreach (Household.TransactionsRow trans in account.GetChildRows(accTransRel))
             {
-                // Get transaction
-                var trans = transRow as Household.TransactionsRow;
-
                 // Get banking details
                 Household.BankingTransactionsRow transBank = null;
                 if (account.Type == EAccountType.Bank)
@@ -318,7 +315,7 @@ namespace BanaData.Logic.Main
             RecomputeBalances();
         }
 
-        public void UpdateTransactionStati()
+        public void UpdateAllTransactionStatus()
         {
             // Return if we are not active
             if (accountID != mainWindowLogic.DisplayedAccountID)

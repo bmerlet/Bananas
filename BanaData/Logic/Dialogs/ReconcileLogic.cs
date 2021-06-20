@@ -136,15 +136,7 @@ namespace BanaData.Logic.Dialogs
             var household = mainWindowLogic.Household;
 
             // Update the status of relevant transactions in the DB
-            foreach (var trList in new TransactionsToReconcile[] { Payments, Deposits })
-            {
-                foreach (TransactionToReconcile tr in trList.Transactions)
-                {
-                    var transRow = household.Transactions.FindByID(tr.ID);
-                    var newStatus = tr.IsCleared == true ? ETransactionStatus.Cleared : ETransactionStatus.Pending;
-                    transRow.Status = newStatus;
-                }
-            }
+            UpdateAllMarkedTransactionsTo(ETransactionStatus.Cleared);
 
             // Update DB
             mainWindowLogic.CommitChanges();
@@ -155,7 +147,47 @@ namespace BanaData.Logic.Dialogs
 
         protected override bool? Commit()
         {
+            if (BalanceToClear != 0)
+            {
+                mainWindowLogic.ErrorMessage("Balance is not cleared");
+                return null;
+            }
+
+            var household = mainWindowLogic.Household;
+
+            // Update the status of relevant transactions in the DB
+            UpdateAllMarkedTransactionsTo(ETransactionStatus.Reconciled);
+
+            // Get account and reconcile info rows
+            var accountRow = household.Accounts.FindByID(accountID);
+            var accountsToReconcileInfo = household.ReconcileInfo.ParentRelations["FK_Accounts_ReconcileInfo"];
+            var reconcileInfo = accountRow.GetChildRows(accountsToReconcileInfo).Cast<Household.ReconcileInfoRow>().First();
+
+            // Update the last statement date in the account
+            accountRow.LastStatementDate = reconcileInfo.StatementDate;
+
+            // Delete the current reconcile info since we are done
+            reconcileInfo.Delete();
+
+            // Update DB
+            mainWindowLogic.CommitChanges();
+
+            // Close the dialog indicating change
             return true;
+        }
+
+        private void UpdateAllMarkedTransactionsTo(ETransactionStatus newStatus)
+        {
+            var household = mainWindowLogic.Household;
+
+            foreach (var trList in new TransactionsToReconcile[] { Payments, Deposits })
+            {
+                foreach (TransactionToReconcile tr in trList.Transactions)
+                {
+                    var transRow = household.Transactions.FindByID(tr.ID);
+                    transRow.Status = tr.IsCleared == true ? newStatus : ETransactionStatus.Pending;
+                }
+            }
         }
 
         #endregion

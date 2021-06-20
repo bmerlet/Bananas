@@ -70,6 +70,7 @@ namespace BanaData.Logic.Main
                         o.CheckNumber == CheckNumber &&
                         o.Payee == Payee &&
                         o.Amount == Amount &&
+                        o.Status == Status &&
                         o.LineItems.Count == LineItems.Count;
 
                     if (equ)
@@ -516,7 +517,7 @@ namespace BanaData.Logic.Main
                 // First find deleted line items and delete them in the DB
                 foreach (var li in backup.LineItems)
                 {
-                    if (li.ID >= 0 && !data.LineItems.Contains(li))
+                    if (li.ID >= 0 && data.LineItems.FirstOrDefault(l => l.ID == li.ID) == null)
                     {
                         household.LineItems.FindByID(li.ID).Delete();
                     }
@@ -706,6 +707,7 @@ namespace BanaData.Logic.Main
                     data.Status = ETransactionStatus.Reconciled;
                     break;
             }
+            OnPropertyChanged(() => Status);
         }
 
         #endregion

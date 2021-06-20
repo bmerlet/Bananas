@@ -135,7 +135,7 @@ namespace BanaData.Logic.Main
                 if (mainWindow.GuiServices.ShowDialog(reconcileLogic))
                 {
                     // Update the cleared status in the register
-                    mainWindow.BankRegister.UpdateTransactionStati();
+                    mainWindow.BankRegister.UpdateAllTransactionStatus();
                 }
             }
         }
