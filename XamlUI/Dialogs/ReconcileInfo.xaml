@@ -1,0 +1,115 @@
+﻿<Window x:Class="XamlUI.Dialogs.ReconcileInfo"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:XamlUI.Dialogs"
+        xmlns:w="clr-namespace:XamlUI.UserControls"
+        xmlns:t="clr-namespace:XamlUI.Tools"
+        mc:Ignorable="d"
+        Title="Reconcile Info"
+        Icon="/XamlUI;component/Images/Bananas.ico"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        SizeToContent="WidthAndHeight">
+    <Window.Resources>
+
+        <t:VisibilityBoolConverter x:Key="visibilityConverter"/>
+        <t:FontWeightConverter x:Key="fontWeightConverter"/>
+
+        <Style TargetType="TextBlock">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="w:WatermarkTextBox">
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+        <Style TargetType="w:AmountBox">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="ShowZeroAmount" Value="True"/>
+        </Style>
+        <Style TargetType="w:DateBox">
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+    </Window.Resources>
+    <DockPanel>
+        <!-- OK/Cancel panel -->
+        <w:OKCancel DockPanel.Dock="Bottom"/>
+        <!-- Interest panel -->
+        <Grid
+            DockPanel.Dock="Bottom"
+            Visibility="{Binding IsInterestInfoVisible, Converter={StaticResource visibilityConverter}, FallbackValue=Visible}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="5" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="100"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Row 0: Empty spacer -->
+
+            <!-- Row 1: Interest amount -->
+            <TextBlock Text="Interest earned:" Grid.Row="1"/>
+            <w:AmountBox Amount="{Binding InterestAmount, Mode=TwoWay}" x:Name="interest" Grid.Row="1" Grid.Column="1" HorizontalContentAlignment="Right"/>
+
+            <!-- Row 2: Interest date -->
+            <TextBlock Text="Interest date:" Grid.Row="2"/>
+            <w:DateBox Date="{Binding InterestDate, Mode=TwoWay}"  Grid.Row="2" Grid.Column="1"/>
+
+            <!-- Row 3: Interest category -->
+            <TextBlock Text="Interest category:" Grid.Row="3"/>
+            <w:AutoCompleteTextBox
+                        Grid.Row="3" Grid.Column="1"
+                        Text="{Binding InterestCategory, Mode=TwoWay}"
+                        Watermark="Category"
+                        DisplayMember="FullName"
+                        ListBoxHeight="150" 
+                        ListBoxWidth="200"
+                        ItemsSource="{Binding Categories}">
+                <w:AutoCompleteTextBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding IndentedName}" FontWeight="{Binding FontWeight, Converter={StaticResource fontWeightConverter}}" />
+                    </DataTemplate>
+                </w:AutoCompleteTextBox.ItemTemplate>
+            </w:AutoCompleteTextBox>
+
+        </Grid>
+        <!-- Main panel -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="100"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Row 0: Account name -->
+            <TextBlock Text="{Binding BasicInfo}" Grid.ColumnSpan="2"/>
+
+            <!-- Row 1: Prior statement end date -->
+            <TextBlock Text="Prior statement end date:" Grid.Row="1"/>
+            <w:DateBox Date="{Binding PriorStatementEndDate}"  Grid.Row="1" Grid.Column="1" IsReadOnly="True" IsTabStop="False"/>
+
+            <!-- Row 2: Statement end date -->
+            <TextBlock Text="Statement end date:" Grid.Row="2"/>
+            <w:DateBox Date="{Binding StatementEndDate, Mode=TwoWay}"  Grid.Row="2" Grid.Column="1"/>
+
+            <!-- Row 3: Prior balance -->
+            <TextBlock Text="Prior statement balance:" Grid.Row="3"/>
+            <w:AmountBox Amount="{Binding PriorStatementBalance}" IsReadOnly="True" IsTabStop="False" Grid.Row="3" Grid.Column="1" HorizontalContentAlignment="Right"/>
+
+            <!-- Row 4: Current balance -->
+            <TextBlock Text="Statement balance:" Grid.Row="4"/>
+            <w:AmountBox Amount="{Binding StatementBalance, Mode=TwoWay}" Grid.Row="4" Grid.Column="1" HorizontalContentAlignment="Right"/>
+        </Grid>
+    </DockPanel>
+</Window>

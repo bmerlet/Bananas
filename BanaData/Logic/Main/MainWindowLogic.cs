@@ -97,6 +97,9 @@ namespace BanaData.Logic.Main
         // List of categories, as displayed in the UI
         public readonly List<CategoryItem> Categories = new List<CategoryItem>();
 
+        // Account currently displayed
+        public int DisplayedAccountID { get; private set; } = -1;
+
         #endregion
 
         #region UI properties
@@ -237,6 +240,8 @@ namespace BanaData.Logic.Main
         public void OnBankAccountClicked(int accountID)
         {
             BankRegister.SetAccount(accountID);
+            DisplayedAccountID = accountID;
+            MainMenuLogic.Reconcile.SetCanExecute(accountID >= 0);
         }
 
         #endregion

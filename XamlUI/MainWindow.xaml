@@ -11,6 +11,12 @@
     <Window.Resources>
         <tools:GridLengthConverter x:Key="gridLengthConverter" />
     </Window.Resources>
+    
+    <!-- Key bindings-->
+    <Window.InputBindings>
+        <KeyBinding Modifiers="Ctrl" Key="R" Command="{Binding MainMenuLogic.Reconcile}" />
+    </Window.InputBindings>
+
     <DockPanel>
         <Menu DockPanel.Dock="Top" DataContext="{Binding MainMenuLogic}">
             <MenuItem Header="File">
@@ -22,6 +28,9 @@
                 <MenuItem Header="Accounts..." Command="{Binding EditAccounts}"/>
                 <MenuItem Header="Categories..." Command="{Binding EditCategories}"/>
                 <MenuItem Header="Memorized Payees..." Command="{Binding EditMemorizedPayees}"/>
+            </MenuItem>
+            <MenuItem Header="Actions">
+                <MenuItem Header="Reconcile..." Command="{Binding Reconcile}" InputGestureText="^R"/>
             </MenuItem>
             <MenuItem Header="View">
                 <MenuItem Header="Show closed accounts" IsCheckable="True" IsChecked="{Binding ShowClosedAccounts}"/>

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Toolbox.UILogic;
 using BanaData.Serializations;
 using BanaData.Logic.Dialogs;
-
+using BanaData.Logic.Items;
 
 namespace BanaData.Logic.Main
 {
@@ -32,6 +32,9 @@ namespace BanaData.Logic.Main
             EditAccounts = new CommandBase(OnEditAccounts);
             EditCategories = new CommandBase(OnEditCategories);
             EditMemorizedPayees = new CommandBase(OnEditMemorizedPayees);
+
+            Reconcile = new CommandBase(OnReconcile);
+            Reconcile.SetCanExecute(false);
 
             Test = new CommandBase(OnTest);
         }
@@ -110,6 +113,28 @@ namespace BanaData.Logic.Main
         {
             var logic = new EditMemorizedPayeesLogic(mainWindow);
             mainWindow.GuiServices.ShowDialog(logic);
+        }
+
+        #endregion
+
+        #region Actions menu
+
+        public CommandBase Reconcile { get; }
+
+        private void OnReconcile()
+        {
+            // Retreive account info
+            int accountID = mainWindow.DisplayedAccountID;
+
+            // Retreive reconcile info ZZZZ TODO
+            var reconcileInfo = new ReconcileInfoItem(accountID);
+
+            var logic = new ReconcileInfoLogic(mainWindow, reconcileInfo);
+            if (mainWindow.GuiServices.ShowDialog(logic))
+            {
+                var newReconcileInfo = logic.NewReconcileInfoItem;
+                // ZZZZ
+            }
         }
 
         #endregion

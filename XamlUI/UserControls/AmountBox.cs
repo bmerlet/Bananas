@@ -26,7 +26,7 @@ namespace XamlUI.UserControls
 
         public static readonly DependencyProperty AmountProperty =
             DependencyProperty.Register("Amount", typeof(decimal), typeof(AmountBox),
-                new UIPropertyMetadata((decimal)0, OnAmountChanged));
+                new UIPropertyMetadata(decimal.MinValue, OnAmountChanged));
 
         // Amount change dispatcher
         private static void OnAmountChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -38,11 +38,46 @@ namespace XamlUI.UserControls
         }
 
         // Amount listener: Assign value to textbox text
-        protected void OnAmountChanged(decimal amount)
+        private void OnAmountChanged(decimal amount)
         {
             if (!internalAmountUpdate)
             {
-                Text = amount.ToString("N");
+                if (amount == 0 && !ShowZeroAmount)
+                {
+                    Text = "";
+                }
+                else
+                {
+                    Text = amount.ToString("N");
+                }
+            }
+        }
+
+        //
+        // Show 0 as 0.00 instead of blank
+        //
+        public bool ShowZeroAmount
+        {
+            get { return (bool)GetValue(ShowZeroAmountProperty); }
+            set { SetValue(ShowZeroAmountProperty, value); }
+        }
+
+        public static readonly DependencyProperty ShowZeroAmountProperty =
+            DependencyProperty.Register("ShowZeroAmount", typeof(bool), typeof(AmountBox), new UIPropertyMetadata(false, OnShowZeroAmountChanged));
+
+        private static void OnShowZeroAmountChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is AmountBox ab)
+            {
+                ab.OnShowZeroAmountChanged((bool)e.NewValue);
+            }
+        }
+
+        private void OnShowZeroAmountChanged(bool showZeroAmount)
+        {
+            if (Amount == 0)
+            {
+                Text = showZeroAmount ? Amount.ToString("N") : "";
             }
         }
 
@@ -83,12 +118,16 @@ namespace XamlUI.UserControls
             base.OnTextChanged(e);
 
             // Update amount property
-            if (!string.IsNullOrWhiteSpace(Text))
+            internalAmountUpdate = true;
+            if (string.IsNullOrWhiteSpace(Text))
             {
-                internalAmountUpdate = true;
-                Amount = decimal.Parse(Text);
-                internalAmountUpdate = false;
+                Amount = 0;
             }
+            else
+            {
+                Amount = decimal.Parse(Text);
+            }
+            internalAmountUpdate = false;
         }
 
         // Reformat amount and update the amount property when moving away

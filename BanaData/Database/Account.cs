@@ -54,9 +54,26 @@ namespace BanaData.Database
                 decimal balance = 0;
 
                 var accountToTransactions = Table.ChildRelations["FK_Accounts_Transactions"];
-                foreach (var transaction in GetChildRows(accountToTransactions))
+                foreach (Household.TransactionsRow transaction in GetChildRows(accountToTransactions))
                 {
-                    balance += (transaction as Household.TransactionsRow).GetAmount();
+                    balance += transaction.GetAmount();
+                }
+
+                return balance;
+            }
+
+            // Get the reconciled balance of a banking account
+            public decimal GetBankingReconciledBalance()
+            {
+                decimal balance = 0;
+
+                var accountToTransactions = Table.ChildRelations["FK_Accounts_Transactions"];
+                foreach (Household.TransactionsRow transaction in GetChildRows(accountToTransactions))
+                {
+                    if (transaction.Status == ETransactionStatus.Reconciled)
+                    {
+                        balance += transaction.GetAmount();
+                    }
                 }
 
                 return balance;

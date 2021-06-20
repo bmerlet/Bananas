@@ -133,6 +133,10 @@ namespace XamlUI
             {
                 dialog = new EditSplitLV(editSplitLogic);
             }
+            else if (logic is ReconcileInfoLogic reconcileInfoLogic)
+            {
+                dialog = new ReconcileInfo(reconcileInfoLogic);
+            }
             else
             {
                 throw new NotImplementedException();
