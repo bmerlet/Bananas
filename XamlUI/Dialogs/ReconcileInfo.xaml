@@ -54,7 +54,7 @@
 
             <!-- Row 1: Interest amount -->
             <TextBlock Text="Interest earned:" Grid.Row="1"/>
-            <w:AmountBox Amount="{Binding InterestAmount, Mode=TwoWay}" x:Name="interest" Grid.Row="1" Grid.Column="1" HorizontalContentAlignment="Right"/>
+            <w:AmountBox Amount="{Binding InterestAmount, Mode=TwoWay}" Grid.Row="1" Grid.Column="1" HorizontalContentAlignment="Right"/>
 
             <!-- Row 2: Interest date -->
             <TextBlock Text="Interest date:" Grid.Row="2"/>

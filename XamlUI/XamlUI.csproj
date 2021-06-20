@@ -82,6 +82,9 @@
     <Compile Include="Dialogs\EditSplitLV.xaml.cs">
       <DependentUpon>EditSplitLV.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\Reconcile.xaml.cs">
+      <DependentUpon>Reconcile.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\ReconcileInfo.xaml.cs">
       <DependentUpon>ReconcileInfo.xaml</DependentUpon>
     </Compile>
@@ -138,6 +141,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\EditSplitLV.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Reconcile.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

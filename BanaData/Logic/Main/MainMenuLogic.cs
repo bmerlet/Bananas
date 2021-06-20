@@ -126,14 +126,12 @@ namespace BanaData.Logic.Main
             // Retreive account info
             int accountID = mainWindow.DisplayedAccountID;
 
-            // Retreive reconcile info ZZZZ TODO
-            var reconcileInfo = new ReconcileInfoItem(accountID);
-
-            var logic = new ReconcileInfoLogic(mainWindow, reconcileInfo);
+            // Create logic and show reconcile info dialog
+            var logic = new ReconcileInfoLogic(mainWindow, accountID);
             if (mainWindow.GuiServices.ShowDialog(logic))
             {
-                var newReconcileInfo = logic.NewReconcileInfoItem;
-                // ZZZZ
+                // Show reconcile dialog
+                mainWindow.GuiServices.ShowDialog(new ReconcileLogic(mainWindow, accountID));
             }
         }
 

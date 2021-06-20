@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Toolbox.UILogic.Dialogs;
+using BanaData.Database;
 using BanaData.Logic.Main;
 using BanaData.Logic.Items;
 
@@ -18,40 +19,67 @@ namespace BanaData.Logic.Dialogs
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
-        private readonly ReconcileInfoItem reconcileInfoItem;
-        private ReconcileInfoItem newReconcileInfoItem;
+        private readonly int accountID;
+        private Household.ReconcileInfoRow reconcileInfoRow;
 
         #endregion
 
         #region Constructor
 
-        public ReconcileInfoLogic(MainWindowLogic _mainWindowLogic, ReconcileInfoItem _reconcileInfoItem)
+        public ReconcileInfoLogic(MainWindowLogic _mainWindowLogic, int _accountID)
         {
-            (mainWindowLogic, reconcileInfoItem) = (_mainWindowLogic, _reconcileInfoItem);
+            (mainWindowLogic, accountID) = (_mainWindowLogic, _accountID);
+
+            // Get DB
+            var household = mainWindowLogic.Household;
 
             // Get account info
-            var accountRow = mainWindowLogic.Household.Accounts.FindByID(reconcileInfoItem.AccountID);
+            var accountRow = household.Accounts.FindByID(accountID);
 
+            // Fill out properties with account info
             BasicInfo = $"Information to reconcile account {accountRow.Name}";
 
             // Get last statement end date
             // PriorStatementEndDate = accountRow.LastStatementEndDate; ZZZZ TODO
+            PriorStatementEndDate = new DateTime(2012, 12, 12);
 
             // Compute last reconciled balance
             PriorStatementBalance = accountRow.GetBankingReconciledBalance();
 
-            // Guess the statement end date ZZZZ TODO
-            StatementEndDate = DateTime.Today;
+            // Guess the statement end date
+            StatementEndDate = PriorStatementEndDate.AddMonths(1);
 
             // Is interest info visible?
             IsInterestInfoVisible = accountRow.Type == Database.EAccountType.Bank;
 
-            // Copy info from reconcile info item
-            StatementEndDate = reconcileInfoItem.StatementEndDate;
-            StatementBalance = reconcileInfoItem.StatementBalance;
-            InterestAmount = reconcileInfoItem.InterestAmount;
-            InterestDate = reconcileInfoItem.InterestDate;
-            InterestCategory = reconcileInfoItem.InterestCategory;
+            // Default interest
+            InterestAmount = 0;
+            InterestDate = DateTime.Today;
+            InterestCategory = "Interest Inc";
+
+            // Find if there is a reconcile info available for this account
+            var accountsToReconcileInfo = household.ReconcileInfo.ParentRelations["FK_Accounts_ReconcileInfo"];
+            var reconcileInfos = accountRow.GetChildRows(accountsToReconcileInfo).Cast<Household.ReconcileInfoRow>().ToArray();
+            if (reconcileInfos.Length > 1)
+            {
+                throw new ArgumentOutOfRangeException("Argh");
+            }
+
+            if (reconcileInfos.Length == 1)
+            {
+                reconcileInfoRow = reconcileInfos[0];
+
+                // Copy info from reconcile info item
+                StatementEndDate = reconcileInfoRow.StatementDate;
+                StatementBalance = reconcileInfoRow.StatementBalance;
+                InterestAmount = reconcileInfoRow.IsInterestAmountNull() ? InterestAmount : reconcileInfoRow.InterestAmount;
+                InterestDate = reconcileInfoRow.IsInterestDateNull() ? InterestDate : reconcileInfoRow.InterestDate;
+                if (!reconcileInfoRow.IsInterestCategoryIDNull())
+                {
+                    InterestCategory = household.Categories.FindByID(reconcileInfoRow.InterestCategoryID).FullName;
+                }
+            }
+
         }
 
         #endregion
@@ -79,20 +107,55 @@ namespace BanaData.Logic.Dialogs
 
         #endregion
 
-        #region Result
-
-        public ReconcileInfoItem NewReconcileInfoItem => newReconcileInfoItem;
-
-        #endregion
-
         #region Actions
 
         protected override bool? Commit()
         {
-            newReconcileInfoItem = new ReconcileInfoItem(
-                reconcileInfoItem.AccountID, StatementEndDate, StatementBalance, InterestAmount, InterestDate, InterestCategory);
+            var household = mainWindowLogic.Household;
+            bool adding = reconcileInfoRow == null;
 
-            return !newReconcileInfoItem.Equals(reconcileInfoItem);
+            int categoryID = -1;
+            if (IsInterestInfoVisible)
+            {
+                var category = mainWindowLogic.Categories.FirstOrDefault(c => c.FullName == InterestCategory);
+                if (category == null)
+                {
+                    mainWindowLogic.ErrorMessage($"Invalid category: {InterestCategory}");
+                    return null;
+                }
+                categoryID = category.ID;
+            }
+
+            if (adding)
+            {
+                reconcileInfoRow = household.ReconcileInfo.NewReconcileInfoRow();
+                reconcileInfoRow.AccountID = accountID;
+            }
+
+            reconcileInfoRow.StatementDate = StatementEndDate;
+            reconcileInfoRow.StatementBalance = StatementBalance;
+
+            if (IsInterestInfoVisible)
+            {
+                reconcileInfoRow.InterestAmount = InterestAmount;
+                reconcileInfoRow.InterestDate = InterestDate;
+                reconcileInfoRow.InterestCategoryID = categoryID;
+            }
+            else
+            {
+                reconcileInfoRow.SetInterestAmountNull();
+                reconcileInfoRow.SetInterestDateNull();
+                reconcileInfoRow.SetInterestCategoryIDNull();
+            }
+
+            if (adding)
+            {
+                household.ReconcileInfo.Rows.Add(reconcileInfoRow);
+            }
+
+            mainWindowLogic.CommitChanges();
+
+            return true;
         }
 
         #endregion

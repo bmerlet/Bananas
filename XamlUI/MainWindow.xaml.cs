@@ -137,6 +137,10 @@ namespace XamlUI
             {
                 dialog = new ReconcileInfo(reconcileInfoLogic);
             }
+            else if (logic is ReconcileLogic reconcileLogic)
+            {
+                dialog = new Reconcile(reconcileLogic);
+            }
             else
             {
                 throw new NotImplementedException();

@@ -76,12 +76,12 @@
     <Compile Include="Logic\Dialogs\EditSplitLogic.cs" />
     <Compile Include="Logic\Dialogs\ErrorLogic.cs" />
     <Compile Include="Logic\Dialogs\ReconcileInfoLogic.cs" />
+    <Compile Include="Logic\Dialogs\ReconcileLogic.cs" />
     <Compile Include="Logic\IGuiServices.cs" />
     <Compile Include="Logic\Items\AccountItem.cs" />
     <Compile Include="Logic\Items\CategoryItem.cs" />
     <Compile Include="Logic\Items\LineItem.cs" />
     <Compile Include="Logic\Items\MemorizedPayeeItem.cs" />
-    <Compile Include="Logic\Items\ReconcileInfoItem.cs" />
     <Compile Include="Logic\Main\AccountGroupLogic.cs" />
     <Compile Include="Logic\Main\BankingTransactionLogic.cs" />
     <Compile Include="Logic\Main\BankRegisterLogic.cs" />
