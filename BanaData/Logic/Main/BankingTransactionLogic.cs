@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Toolbox.UILogic;
+using Toolbox.Attributes;
 using BanaData.Database;
 using BanaData.Logic.Items;
 using BanaData.Logic.Dialogs;
@@ -149,14 +150,14 @@ namespace BanaData.Logic.Main
 
         // Strings for medium
         private const string MEDIUM_NEXTCHECKNUM = "Next Check Num";
-        private const string MEDIUM_ATM = "ATM";
-        private const string MEDIUM_CASH = "Cash";
-        private const string MEDIUM_DEPOSIT = "DEP";
-        private const string MEDIUM_DIVIDEND = "Div";
-        private const string MEDIUM_EFT = "EFT";
-        private const string MEDIUM_TRANSFER = "Transfer";
+        static private readonly string MEDIUM_ATM = EnumDescriptionAttribute.GetDescription(ETransactionMedium.ATM);
+        static private readonly string MEDIUM_CASH = EnumDescriptionAttribute.GetDescription(ETransactionMedium.Cash);
+        static private readonly string MEDIUM_DEPOSIT = EnumDescriptionAttribute.GetDescription(ETransactionMedium.Deposit);
+        static private readonly string MEDIUM_DIVIDEND = EnumDescriptionAttribute.GetDescription(ETransactionMedium.Dividend);
+        static private readonly string MEDIUM_EFT = EnumDescriptionAttribute.GetDescription(ETransactionMedium.EFT);
+        static private readonly string MEDIUM_TRANSFER = EnumDescriptionAttribute.GetDescription(ETransactionMedium.Transfer);
 
-        public string[] MediumSource { get; } = new string[] 
+        public string[] MediumSource { get; } =
         {
             MEDIUM_NEXTCHECKNUM, MEDIUM_ATM, MEDIUM_CASH, MEDIUM_DEPOSIT, MEDIUM_DIVIDEND, MEDIUM_EFT, MEDIUM_TRANSFER
         };
@@ -600,36 +601,18 @@ namespace BanaData.Logic.Main
         {
             string rs = "???";
 
-            switch (data.Medium)
+            if (data.Medium == ETransactionMedium.Check)
             {
-                case ETransactionMedium.Check:
-                    if (data.CheckNumber > 0)
-                    {
-                        rs = data.CheckNumber.ToString();
-                    }
-                    break;
-                case ETransactionMedium.ATM:
-                    rs = MEDIUM_ATM;
-                    break;
-                case ETransactionMedium.Cash:
-                    rs = MEDIUM_CASH;
-                    break;
-                case ETransactionMedium.Deposit:
-                    rs = MEDIUM_DEPOSIT;
-                    break;
-                case ETransactionMedium.Dividend:
-                    rs = MEDIUM_DIVIDEND;
-                    break;
-                case ETransactionMedium.EFT:
-                    rs = MEDIUM_EFT;
-                    break;
-                case ETransactionMedium.Transfer:
-                    rs = MEDIUM_TRANSFER;
-                    break;
-                case ETransactionMedium.None:
-                    rs = "";
-                    break;
+                if (data.CheckNumber > 0)
+                {
+                    rs = data.CheckNumber.ToString();
+                }
             }
+            else
+            {
+                rs = EnumDescriptionAttribute.GetDescription(data.Medium);
+            }
+
             return rs;
         }
 
@@ -637,45 +620,27 @@ namespace BanaData.Logic.Main
         {
             data.CheckNumber = 0;
 
-            switch (type)
+            if (type == MEDIUM_NEXTCHECKNUM)
             {
-                case MEDIUM_NEXTCHECKNUM:
+                data.Medium = ETransactionMedium.Check;
+                data.CheckNumber = GetNextCheckNumber();
+                OnPropertyChanged(() => Medium);
+            }
+            else if (MediumSource.Contains(type))
+            {
+                data.Medium = EnumDescriptionAttribute.MatchDescription<ETransactionMedium>(type);
+            }
+            else
+            {
+                if (uint.TryParse(type, out uint checkNum))
+                {
                     data.Medium = ETransactionMedium.Check;
-                    data.CheckNumber = GetNextCheckNumber();
-                    OnPropertyChanged(() => Medium);
-                    break;
-                case MEDIUM_ATM:
-                    data.Medium = ETransactionMedium.ATM;
-                    break;
-                case MEDIUM_CASH:
-                    data.Medium = ETransactionMedium.Cash;
-                    break;
-                case MEDIUM_DEPOSIT:
-                    data.Medium = ETransactionMedium.Deposit;
-                    break;
-                case MEDIUM_DIVIDEND:
-                    data.Medium = ETransactionMedium.Dividend;
-                    break;
-                case MEDIUM_EFT:
-                    data.Medium = ETransactionMedium.EFT;
-                    break;
-                case MEDIUM_TRANSFER:
-                    data.Medium = ETransactionMedium.Transfer;
-                    break;
-                case "":
+                    data.CheckNumber = checkNum;
+                }
+                else
+                {
                     data.Medium = ETransactionMedium.None;
-                    break;
-                default:
-                    if (uint.TryParse(type, out uint checkNum))
-                    {
-                        data.Medium = ETransactionMedium.Check;
-                        data.CheckNumber = checkNum;
-                    }
-                    else
-                    {
-                        data.Medium = ETransactionMedium.None;
-                    }
-                    break;
+                }
             }
 
             IsDepositTabStop = data.Medium == ETransactionMedium.Deposit;

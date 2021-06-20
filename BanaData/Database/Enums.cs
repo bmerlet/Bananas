@@ -55,7 +55,35 @@ namespace BanaData.Database
     public enum ETransactionStatus { Pending, Cleared, Reconciled };
 
     // Bank transaction medium
-    public enum ETransactionMedium { ATM, EFT, Deposit, Transfer, Check, PrintCheck, Dividend, Cash, None };
+    public enum ETransactionMedium
+    {
+        [EnumDescription("ATM")]
+        ATM,
+
+        [EnumDescription("EFT")]
+        EFT,
+
+        [EnumDescription("DEP")]
+        Deposit,
+
+        [EnumDescription("Transfer")]
+        Transfer,
+
+        [EnumDescription("Check")]
+        Check,
+
+        [EnumDescription("PrtChk")]
+        PrintCheck,
+
+        [EnumDescription("Div")]
+        Dividend,
+
+        [EnumDescription("Cash")]
+        Cash,
+
+        [EnumDescription("")]
+        None
+    };
 
     // Memorized transaction type
     public enum EMemorizedTransactionType { Check, Payment, Deposit, None };

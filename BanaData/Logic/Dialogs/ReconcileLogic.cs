@@ -50,6 +50,9 @@ namespace BanaData.Logic.Dialogs
             Deposits = new TransactionsToReconcile(mainWindowLogic, accountID, true);
             Deposits.ClearedBalanceChanged += OnClearedBalanceChanged;
 
+            MarkAll = new CommandBase(OnMarkAll);
+            UnmarkAll = new CommandBase(OnUnmarkAll);
+
             UpdateBalances();
         }
 
@@ -102,6 +105,29 @@ namespace BanaData.Logic.Dialogs
             OnPropertyChanged(() => BalanceToClear);
         }
 
+        private void OnMarkAll()
+        {
+            OnMarkOrUnmarkAll(true);
+        }
+
+        private void OnUnmarkAll()
+        {
+            OnMarkOrUnmarkAll(false);
+        }
+
+        private void OnMarkOrUnmarkAll(bool mark)
+        {
+            foreach (var trList in new TransactionsToReconcile[] { Payments, Deposits })
+            {
+                foreach (TransactionToReconcile tr in trList.Transactions)
+                {
+                    if (tr.IsCleared != mark)
+                    {
+                        tr.IsCleared = mark;
+                    }
+                }
+            }
+        }
 
         protected override bool? Commit()
         {
@@ -150,7 +176,7 @@ namespace BanaData.Logic.Dialogs
                         }
                         else
                         {
-                            medium = bankTrans.Medium.ToString();
+                            medium = Toolbox.Attributes.EnumDescriptionAttribute.GetDescription(bankTrans.Medium);
                         }
                     }
 
@@ -196,6 +222,7 @@ namespace BanaData.Logic.Dialogs
 
             // If this is a bank
             public bool IsBank { get; }
+            public double MediumColumnWidth => IsBank ? 80 : 0;
 
             //
             // Actions
@@ -213,6 +240,7 @@ namespace BanaData.Logic.Dialogs
                 OnPropertyChanged(() => TotalCleared);
 
                 NumberOfCheckedItems = "Cleared transactions: " + transactions.Count(tr => tr.IsCleared == true);
+                OnPropertyChanged(() => NumberOfCheckedItems);
 
                 ClearedBalanceChanged?.Invoke(this, EventArgs.Empty);
             }
@@ -242,8 +270,12 @@ namespace BanaData.Logic.Dialogs
                 get => isCleared;
                 set
                 {
-                    isCleared = value == true;
-                    TransactionCleared?.Invoke(this, EventArgs.Empty);
+                    if (isCleared != value)
+                    {
+                        isCleared = value == true;
+                        OnPropertyChanged(() => IsCleared);
+                        TransactionCleared?.Invoke(this, EventArgs.Empty);
+                    }
                 }
             }
 

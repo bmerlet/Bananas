@@ -26,50 +26,68 @@
             <TextBlock Text="{Binding TotalCleared, StringFormat=N}" HorizontalAlignment="Right" Grid.Column="2"/>
         </Grid>
 
-        <DataGrid
-            AutoGenerateColumns="False"
-            CanUserAddRows="True"
-            CanUserDeleteRows="True"
+        <ListView
             SelectionMode="Single"
-            SelectionUnit="FullRow"
             ItemsSource="{Binding Transactions}">
-            <DataGrid.Columns>
-                <DataGridCheckBoxColumn
-                    Header="Clr"
-                    Binding="{Binding IsCleared}"
-                    CanUserSort="False"
-                    Width="30"/>
-                
-                <DataGridTextColumn
-                    Header="Date"
-                    SortMemberPath="Date"
-                    Binding="{Binding Date}"
-                    IsReadOnly="True" 
-                    Width="80"/>
-                
-                <DataGridTextColumn
-                    Header="Medium"
-                    SortMemberPath="Medium"
-                    Binding="{Binding Medium}"
-                    IsReadOnly="True"
-                    Visibility="{Binding IsBank, Converter={StaticResource visibilityConverter}}"/>
-                
-                <DataGridTextColumn 
-                    Header="Payee"
-                    SortMemberPath="Payee"
-                    Binding="{Binding Payee}"
-                    IsReadOnly="True"
-                    Width="150"/>
-                
-                <DataGridTextColumn 
-                    Header="Amount"
-                    SortMemberPath="Amount"
-                    Binding="{Binding Amount}" 
-                    IsReadOnly="True"
-                    Width="90"/>
 
-            </DataGrid.Columns>
-        </DataGrid>
+            <!-- Make the list view items use all the horizontal space -->
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListView.ItemContainerStyle>
+            
+            <ListView.View>
+                <GridView>
+
+                    <!-- Clear column -->
+                    <GridViewColumn Width="30">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Date"/>
+                        </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsCleared, Mode=TwoWay}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <!-- Date column -->
+                    <GridViewColumn DisplayMemberBinding="{Binding Date, StringFormat=MM/dd/yyyy}" Width="80">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Date"/>
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
+
+                    <!-- Medium column -->
+                    <GridViewColumn DisplayMemberBinding="{Binding Medium}" Width="{Binding MediumColumnWidth}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Type"/>
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
+
+                    <!-- Payee column -->
+                    <GridViewColumn DisplayMemberBinding="{Binding Payee}" Width="150">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Payee"/>
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
+
+                    <!-- Amount column -->
+                    <GridViewColumn Width="90">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Amount"/>
+                        </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Amount}" HorizontalAlignment="Right"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                </GridView>
+            </ListView.View>
+        </ListView>
             
     </DockPanel>
 </UserControl>
