@@ -56,6 +56,7 @@ namespace BanaData.Logic.Main
             BankRegister = new BankRegisterLogic(this);
 
             BankAccountGroup.AccountClicked += (o, e) => OnBankAccountClicked(e.AccountID);
+            AssetAccountGroup.AccountClicked += (o, e) => OnBankAccountClicked(e.AccountID);
 
             if (UserSettings.LastFileOpened != null)
             {
