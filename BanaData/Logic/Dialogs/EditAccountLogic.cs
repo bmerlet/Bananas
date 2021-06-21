@@ -113,7 +113,7 @@ namespace BanaData.Logic.Dialogs
 
             if (type == EAccountType.Investment && investmentKind == EInvestmentKind.Invalid)
             {
-                mainWindowLogic.ErrorMessage("Investment type must be scpecified");
+                mainWindowLogic.ErrorMessage("Investment type must be specified");
                 return null;
             }
 

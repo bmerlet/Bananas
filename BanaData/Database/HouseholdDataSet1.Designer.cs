@@ -54,23 +54,23 @@ namespace BanaData.Database {
         
         private global::System.Data.DataRelation relationFK_Transactions_BankTransactions;
         
-        private global::System.Data.DataRelation relationFK_MemorizedPayees_MemorizedLineItems;
-        
-        private global::System.Data.DataRelation relationFK_Accounts_MemorizedLineItems;
+        private global::System.Data.DataRelation relationFK_Securities_InvestmentTransactions;
         
         private global::System.Data.DataRelation relationFK_Categories_MemorizedLineItems;
         
-        private global::System.Data.DataRelation relationFK_Accounts_ReconcileInfo;
+        private global::System.Data.DataRelation relationFK_Accounts_MemorizedLineItems;
+        
+        private global::System.Data.DataRelation relationFK_MemorizedPayees_MemorizedLineItems;
         
         private global::System.Data.DataRelation relationFK_Categories_ReconcileInfo;
+        
+        private global::System.Data.DataRelation relationFK_Accounts_ReconcileInfo;
         
         private global::System.Data.DataRelation relationAccounts_LineItems;
         
         private global::System.Data.DataRelation relationCategories_LineItems;
         
         private global::System.Data.DataRelation relationTransactions_InvestmentTransactions;
-        
-        private global::System.Data.DataRelation relationSecurities_InvestmentTransactions;
         
         private global::System.Data.SchemaSerializationMode _schemaSerializationMode = global::System.Data.SchemaSerializationMode.IncludeSchema;
         
@@ -464,15 +464,15 @@ namespace BanaData.Database {
             this.relationFK_Accounts_Transactions = this.Relations["FK_Accounts_Transactions"];
             this.relationFK_Transactions_LineItems = this.Relations["FK_Transactions_LineItems"];
             this.relationFK_Transactions_BankTransactions = this.Relations["FK_Transactions_BankTransactions"];
-            this.relationFK_MemorizedPayees_MemorizedLineItems = this.Relations["FK_MemorizedPayees_MemorizedLineItems"];
-            this.relationFK_Accounts_MemorizedLineItems = this.Relations["FK_Accounts_MemorizedLineItems"];
+            this.relationFK_Securities_InvestmentTransactions = this.Relations["FK_Securities_InvestmentTransactions"];
             this.relationFK_Categories_MemorizedLineItems = this.Relations["FK_Categories_MemorizedLineItems"];
-            this.relationFK_Accounts_ReconcileInfo = this.Relations["FK_Accounts_ReconcileInfo"];
+            this.relationFK_Accounts_MemorizedLineItems = this.Relations["FK_Accounts_MemorizedLineItems"];
+            this.relationFK_MemorizedPayees_MemorizedLineItems = this.Relations["FK_MemorizedPayees_MemorizedLineItems"];
             this.relationFK_Categories_ReconcileInfo = this.Relations["FK_Categories_ReconcileInfo"];
+            this.relationFK_Accounts_ReconcileInfo = this.Relations["FK_Accounts_ReconcileInfo"];
             this.relationAccounts_LineItems = this.Relations["Accounts_LineItems"];
             this.relationCategories_LineItems = this.Relations["Categories_LineItems"];
             this.relationTransactions_InvestmentTransactions = this.Relations["Transactions_InvestmentTransactions"];
-            this.relationSecurities_InvestmentTransactions = this.Relations["Securities_InvestmentTransactions"];
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -534,9 +534,16 @@ namespace BanaData.Database {
             fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
             fkc.DeleteRule = global::System.Data.Rule.Cascade;
             fkc.UpdateRule = global::System.Data.Rule.Cascade;
-            fkc = new global::System.Data.ForeignKeyConstraint("FK_MemorizedPayees_MemorizedLineItems", new global::System.Data.DataColumn[] {
-                        this.tableMemorizedPayees.IDColumn}, new global::System.Data.DataColumn[] {
-                        this.tableMemorizedLineItems.MemorizedPayeeIDColumn});
+            fkc = new global::System.Data.ForeignKeyConstraint("FK_Securities_InvestmentTransactions", new global::System.Data.DataColumn[] {
+                        this.tableSecurities.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableInvestmentTransactions.SecurityIDColumn});
+            this.tableInvestmentTransactions.Constraints.Add(fkc);
+            fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
+            fkc.DeleteRule = global::System.Data.Rule.None;
+            fkc.UpdateRule = global::System.Data.Rule.None;
+            fkc = new global::System.Data.ForeignKeyConstraint("FK_Categories_MemorizedLineItems", new global::System.Data.DataColumn[] {
+                        this.tableCategories.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableMemorizedLineItems.CategoryIDColumn});
             this.tableMemorizedLineItems.Constraints.Add(fkc);
             fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
             fkc.DeleteRule = global::System.Data.Rule.Cascade;
@@ -548,17 +555,10 @@ namespace BanaData.Database {
             fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
             fkc.DeleteRule = global::System.Data.Rule.Cascade;
             fkc.UpdateRule = global::System.Data.Rule.Cascade;
-            fkc = new global::System.Data.ForeignKeyConstraint("FK_Categories_MemorizedLineItems", new global::System.Data.DataColumn[] {
-                        this.tableCategories.IDColumn}, new global::System.Data.DataColumn[] {
-                        this.tableMemorizedLineItems.CategoryIDColumn});
+            fkc = new global::System.Data.ForeignKeyConstraint("FK_MemorizedPayees_MemorizedLineItems", new global::System.Data.DataColumn[] {
+                        this.tableMemorizedPayees.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableMemorizedLineItems.MemorizedPayeeIDColumn});
             this.tableMemorizedLineItems.Constraints.Add(fkc);
-            fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
-            fkc.DeleteRule = global::System.Data.Rule.Cascade;
-            fkc.UpdateRule = global::System.Data.Rule.Cascade;
-            fkc = new global::System.Data.ForeignKeyConstraint("FK_Accounts_ReconcileInfo", new global::System.Data.DataColumn[] {
-                        this.tableAccounts.IDColumn}, new global::System.Data.DataColumn[] {
-                        this.tableReconcileInfo.AccountIDColumn});
-            this.tableReconcileInfo.Constraints.Add(fkc);
             fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
             fkc.DeleteRule = global::System.Data.Rule.Cascade;
             fkc.UpdateRule = global::System.Data.Rule.Cascade;
@@ -569,6 +569,13 @@ namespace BanaData.Database {
             fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
             fkc.DeleteRule = global::System.Data.Rule.None;
             fkc.UpdateRule = global::System.Data.Rule.None;
+            fkc = new global::System.Data.ForeignKeyConstraint("FK_Accounts_ReconcileInfo", new global::System.Data.DataColumn[] {
+                        this.tableAccounts.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableReconcileInfo.AccountIDColumn});
+            this.tableReconcileInfo.Constraints.Add(fkc);
+            fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
+            fkc.DeleteRule = global::System.Data.Rule.Cascade;
+            fkc.UpdateRule = global::System.Data.Rule.Cascade;
             this.relationFK_Securities_SecurityPrices = new global::System.Data.DataRelation("FK_Securities_SecurityPrices", new global::System.Data.DataColumn[] {
                         this.tableSecurities.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableSecurityPrices.SecurityIDColumn}, false);
@@ -585,26 +592,30 @@ namespace BanaData.Database {
                         this.tableTransactions.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableBankingTransactions.TransactionIDColumn}, false);
             this.Relations.Add(this.relationFK_Transactions_BankTransactions);
-            this.relationFK_MemorizedPayees_MemorizedLineItems = new global::System.Data.DataRelation("FK_MemorizedPayees_MemorizedLineItems", new global::System.Data.DataColumn[] {
-                        this.tableMemorizedPayees.IDColumn}, new global::System.Data.DataColumn[] {
-                        this.tableMemorizedLineItems.MemorizedPayeeIDColumn}, false);
-            this.Relations.Add(this.relationFK_MemorizedPayees_MemorizedLineItems);
-            this.relationFK_Accounts_MemorizedLineItems = new global::System.Data.DataRelation("FK_Accounts_MemorizedLineItems", new global::System.Data.DataColumn[] {
-                        this.tableAccounts.IDColumn}, new global::System.Data.DataColumn[] {
-                        this.tableMemorizedLineItems.AccountIDColumn}, false);
-            this.Relations.Add(this.relationFK_Accounts_MemorizedLineItems);
+            this.relationFK_Securities_InvestmentTransactions = new global::System.Data.DataRelation("FK_Securities_InvestmentTransactions", new global::System.Data.DataColumn[] {
+                        this.tableSecurities.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableInvestmentTransactions.SecurityIDColumn}, false);
+            this.Relations.Add(this.relationFK_Securities_InvestmentTransactions);
             this.relationFK_Categories_MemorizedLineItems = new global::System.Data.DataRelation("FK_Categories_MemorizedLineItems", new global::System.Data.DataColumn[] {
                         this.tableCategories.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableMemorizedLineItems.CategoryIDColumn}, false);
             this.Relations.Add(this.relationFK_Categories_MemorizedLineItems);
-            this.relationFK_Accounts_ReconcileInfo = new global::System.Data.DataRelation("FK_Accounts_ReconcileInfo", new global::System.Data.DataColumn[] {
+            this.relationFK_Accounts_MemorizedLineItems = new global::System.Data.DataRelation("FK_Accounts_MemorizedLineItems", new global::System.Data.DataColumn[] {
                         this.tableAccounts.IDColumn}, new global::System.Data.DataColumn[] {
-                        this.tableReconcileInfo.AccountIDColumn}, false);
-            this.Relations.Add(this.relationFK_Accounts_ReconcileInfo);
+                        this.tableMemorizedLineItems.AccountIDColumn}, false);
+            this.Relations.Add(this.relationFK_Accounts_MemorizedLineItems);
+            this.relationFK_MemorizedPayees_MemorizedLineItems = new global::System.Data.DataRelation("FK_MemorizedPayees_MemorizedLineItems", new global::System.Data.DataColumn[] {
+                        this.tableMemorizedPayees.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableMemorizedLineItems.MemorizedPayeeIDColumn}, false);
+            this.Relations.Add(this.relationFK_MemorizedPayees_MemorizedLineItems);
             this.relationFK_Categories_ReconcileInfo = new global::System.Data.DataRelation("FK_Categories_ReconcileInfo", new global::System.Data.DataColumn[] {
                         this.tableCategories.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableReconcileInfo.InterestCategoryIDColumn}, false);
             this.Relations.Add(this.relationFK_Categories_ReconcileInfo);
+            this.relationFK_Accounts_ReconcileInfo = new global::System.Data.DataRelation("FK_Accounts_ReconcileInfo", new global::System.Data.DataColumn[] {
+                        this.tableAccounts.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableReconcileInfo.AccountIDColumn}, false);
+            this.Relations.Add(this.relationFK_Accounts_ReconcileInfo);
             this.relationAccounts_LineItems = new global::System.Data.DataRelation("Accounts_LineItems", new global::System.Data.DataColumn[] {
                         this.tableAccounts.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableLineItems.AccountIDColumn}, false);
@@ -617,10 +628,6 @@ namespace BanaData.Database {
                         this.tableTransactions.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableInvestmentTransactions.TransactionIDColumn}, false);
             this.Relations.Add(this.relationTransactions_InvestmentTransactions);
-            this.relationSecurities_InvestmentTransactions = new global::System.Data.DataRelation("Securities_InvestmentTransactions", new global::System.Data.DataColumn[] {
-                        this.tableSecurities.IDColumn}, new global::System.Data.DataColumn[] {
-                        this.tableInvestmentTransactions.SecurityIDColumn}, false);
-            this.Relations.Add(this.relationSecurities_InvestmentTransactions);
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -3221,7 +3228,7 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public InvestmentTransactionsRow AddInvestmentTransactionsRow(TransactionsRow parentTransactionsRowByTransactions_InvestmentTransactions, int IType, SecuritiesRow parentSecuritiesRowBySecurities_InvestmentTransactions, decimal SecurityPrice, decimal SecurityQuantity, decimal Commission) {
+            public InvestmentTransactionsRow AddInvestmentTransactionsRow(TransactionsRow parentTransactionsRowByTransactions_InvestmentTransactions, int IType, SecuritiesRow parentSecuritiesRowByFK_Securities_InvestmentTransactions, decimal SecurityPrice, decimal SecurityQuantity, decimal Commission) {
                 InvestmentTransactionsRow rowInvestmentTransactionsRow = ((InvestmentTransactionsRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
@@ -3234,8 +3241,8 @@ namespace BanaData.Database {
                 if ((parentTransactionsRowByTransactions_InvestmentTransactions != null)) {
                     columnValuesArray[1] = parentTransactionsRowByTransactions_InvestmentTransactions[0];
                 }
-                if ((parentSecuritiesRowBySecurities_InvestmentTransactions != null)) {
-                    columnValuesArray[3] = parentSecuritiesRowBySecurities_InvestmentTransactions[0];
+                if ((parentSecuritiesRowByFK_Securities_InvestmentTransactions != null)) {
+                    columnValuesArray[3] = parentSecuritiesRowByFK_Securities_InvestmentTransactions[0];
                 }
                 rowInvestmentTransactionsRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowInvestmentTransactionsRow);
@@ -4875,23 +4882,23 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public InvestmentTransactionsRow[] GetInvestmentTransactionsRows() {
+                if ((this.Table.ChildRelations["FK_Securities_InvestmentTransactions"] == null)) {
+                    return new InvestmentTransactionsRow[0];
+                }
+                else {
+                    return ((InvestmentTransactionsRow[])(base.GetChildRows(this.Table.ChildRelations["FK_Securities_InvestmentTransactions"])));
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public SecurityPricesRow[] GetSecurityPricesRows() {
                 if ((this.Table.ChildRelations["FK_Securities_SecurityPrices"] == null)) {
                     return new SecurityPricesRow[0];
                 }
                 else {
                     return ((SecurityPricesRow[])(base.GetChildRows(this.Table.ChildRelations["FK_Securities_SecurityPrices"])));
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public InvestmentTransactionsRow[] GetInvestmentTransactionsRows() {
-                if ((this.Table.ChildRelations["Securities_InvestmentTransactions"] == null)) {
-                    return new InvestmentTransactionsRow[0];
-                }
-                else {
-                    return ((InvestmentTransactionsRow[])(base.GetChildRows(this.Table.ChildRelations["Securities_InvestmentTransactions"])));
                 }
             }
         }
@@ -5487,23 +5494,23 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public SecuritiesRow SecuritiesRow {
+                get {
+                    return ((SecuritiesRow)(this.GetParentRow(this.Table.ParentRelations["FK_Securities_InvestmentTransactions"])));
+                }
+                set {
+                    this.SetParentRow(value, this.Table.ParentRelations["FK_Securities_InvestmentTransactions"]);
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public TransactionsRow TransactionsRow {
                 get {
                     return ((TransactionsRow)(this.GetParentRow(this.Table.ParentRelations["Transactions_InvestmentTransactions"])));
                 }
                 set {
                     this.SetParentRow(value, this.Table.ParentRelations["Transactions_InvestmentTransactions"]);
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public SecuritiesRow SecuritiesRow {
-                get {
-                    return ((SecuritiesRow)(this.GetParentRow(this.Table.ParentRelations["Securities_InvestmentTransactions"])));
-                }
-                set {
-                    this.SetParentRow(value, this.Table.ParentRelations["Securities_InvestmentTransactions"]);
                 }
             }
             
@@ -5652,12 +5659,12 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public MemorizedPayeesRow MemorizedPayeesRow {
+            public CategoriesRow CategoriesRow {
                 get {
-                    return ((MemorizedPayeesRow)(this.GetParentRow(this.Table.ParentRelations["FK_MemorizedPayees_MemorizedLineItems"])));
+                    return ((CategoriesRow)(this.GetParentRow(this.Table.ParentRelations["FK_Categories_MemorizedLineItems"])));
                 }
                 set {
-                    this.SetParentRow(value, this.Table.ParentRelations["FK_MemorizedPayees_MemorizedLineItems"]);
+                    this.SetParentRow(value, this.Table.ParentRelations["FK_Categories_MemorizedLineItems"]);
                 }
             }
             
@@ -5674,12 +5681,12 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public CategoriesRow CategoriesRow {
+            public MemorizedPayeesRow MemorizedPayeesRow {
                 get {
-                    return ((CategoriesRow)(this.GetParentRow(this.Table.ParentRelations["FK_Categories_MemorizedLineItems"])));
+                    return ((MemorizedPayeesRow)(this.GetParentRow(this.Table.ParentRelations["FK_MemorizedPayees_MemorizedLineItems"])));
                 }
                 set {
-                    this.SetParentRow(value, this.Table.ParentRelations["FK_Categories_MemorizedLineItems"]);
+                    this.SetParentRow(value, this.Table.ParentRelations["FK_MemorizedPayees_MemorizedLineItems"]);
                 }
             }
             
@@ -5904,23 +5911,23 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public AccountsRow AccountsRow {
-                get {
-                    return ((AccountsRow)(this.GetParentRow(this.Table.ParentRelations["FK_Accounts_ReconcileInfo"])));
-                }
-                set {
-                    this.SetParentRow(value, this.Table.ParentRelations["FK_Accounts_ReconcileInfo"]);
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public CategoriesRow CategoriesRow {
                 get {
                     return ((CategoriesRow)(this.GetParentRow(this.Table.ParentRelations["FK_Categories_ReconcileInfo"])));
                 }
                 set {
                     this.SetParentRow(value, this.Table.ParentRelations["FK_Categories_ReconcileInfo"]);
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public AccountsRow AccountsRow {
+                get {
+                    return ((AccountsRow)(this.GetParentRow(this.Table.ParentRelations["FK_Accounts_ReconcileInfo"])));
+                }
+                set {
+                    this.SetParentRow(value, this.Table.ParentRelations["FK_Accounts_ReconcileInfo"]);
                 }
             }
             

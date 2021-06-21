@@ -32,6 +32,7 @@ namespace BanaData.Logic.Main
             EditAccounts = new CommandBase(OnEditAccounts);
             EditCategories = new CommandBase(OnEditCategories);
             EditMemorizedPayees = new CommandBase(OnEditMemorizedPayees);
+            EditSecurities = new CommandBase(OnEditSecurities);
 
             Reconcile = new CommandBase(OnReconcile);
             Reconcile.SetCanExecute(false);
@@ -105,13 +106,24 @@ namespace BanaData.Logic.Main
         }
 
         //
-        // Edit memorized Payees
+        // Edit memorized payees
         //
         public CommandBase EditMemorizedPayees { get; }
 
         private void OnEditMemorizedPayees()
         {
             var logic = new EditMemorizedPayeesLogic(mainWindow);
+            mainWindow.GuiServices.ShowDialog(logic);
+        }
+
+        //
+        // Edit securities
+        //
+        public CommandBase EditSecurities { get; }
+
+        private void OnEditSecurities()
+        {
+            var logic = new EditSecuritiesLogic(mainWindow);
             mainWindow.GuiServices.ShowDialog(logic);
         }
 
@@ -167,8 +179,9 @@ namespace BanaData.Logic.Main
 
         private void OnTest()
         {
-            var logic = new EditMemorizedPayeeLogic(mainWindow, mainWindow.MemorizedPayees[4], false);
-            mainWindow.GuiServices.ShowDialog(logic);
+            var q = new Web.Quote();
+            var price = q.GetQuote("XOM");
+            Console.WriteLine("XOM price: " + price);
         }
 
         #endregion

@@ -49,7 +49,23 @@ namespace BanaData.Database
     };
 
     // Security type
-    public enum ESecurityType { Stock, MutualFund, MarketIndex, EmployeeStockOption, Invalid }
+    public enum ESecurityType
+    {
+        [EnumDescription("Stock")]
+        Stock,
+
+        [EnumDescription("Mutual Fund")]
+        MutualFund,
+
+        [EnumDescription("Market Index")]
+        MarketIndex,
+
+        [EnumDescription("Employee Stock Option")]
+        EmployeeStockOption,
+
+        [EnumDescription("Other")]
+        Invalid
+    }
 
     // Transaction status
     public enum ETransactionStatus { Pending, Cleared, Reconciled };

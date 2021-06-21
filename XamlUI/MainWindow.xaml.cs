@@ -129,6 +129,14 @@ namespace XamlUI
             {
                 dialog = new EditMemorizedPayee(editMemorizedPayeeLogic);
             }
+            else if (logic is EditSecuritiesLogic editSecuritiesLogic)
+            {
+                dialog = new EditSecurities(editSecuritiesLogic);
+            }
+            else if (logic is EditSecurityLogic editSecurityLogic)
+            {
+                dialog = new EditSecurity(editSecurityLogic);
+            }
             else if (logic is EditSplitLogic editSplitLogic)
             {
                 dialog = new EditSplitLV(editSplitLogic);

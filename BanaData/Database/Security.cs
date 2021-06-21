@@ -40,6 +40,16 @@ namespace BanaData.Database
 
                 return price;
             }
+
+            // Are there transactions associated with this security
+            public bool HasTransactions
+            {
+                get
+                {
+                    var securityToTransactions = Table.ChildRelations["FK_Securities_InvestmentTransactions"];
+                    return GetChildRows(securityToTransactions).Length > 0;
+                }
+            }
         }
 
         partial class SecuritiesDataTable
@@ -51,7 +61,7 @@ namespace BanaData.Database
 
             public SecuritiesRow GetBySymbol(string symbol)
             {
-                return this.First(sec => !sec.IsSymbolNull() && sec.Symbol == symbol);
+                return this.First(sec => sec.Symbol == symbol);
             }
 
             public SecuritiesRow Add(string name, string symbol, ESecurityType type)
@@ -65,10 +75,26 @@ namespace BanaData.Database
                 return secRow;
             }
 
+            public SecuritiesRow Update(int id, string name, string symbol, ESecurityType type)
+            {
+                var secRow = FindByID(id);
+
+                return UpdateSecurity(secRow, name, symbol, type);
+            }
+
             private static SecuritiesRow UpdateSecurity(SecuritiesRow secRow, string name, string symbol, ESecurityType type)
             {
                 secRow.Name = name;
-                secRow.Symbol = symbol;
+
+                if (string.IsNullOrWhiteSpace(symbol))
+                {
+                    secRow.SetSymbolNull();
+                }
+                else
+                {
+                    secRow.Symbol = symbol;
+                }
+
                 secRow.Type = type;
 
                 return secRow;

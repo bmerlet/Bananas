@@ -76,6 +76,12 @@
     <Compile Include="Dialogs\EditMemorizedPayees.xaml.cs">
       <DependentUpon>EditMemorizedPayees.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\EditSecurities.xaml.cs">
+      <DependentUpon>EditSecurities.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\EditSecurity.xaml.cs">
+      <DependentUpon>EditSecurity.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\EditSplit.xaml.cs">
       <DependentUpon>EditSplit.xaml</DependentUpon>
     </Compile>
@@ -92,6 +98,7 @@
     <Compile Include="Tools\DataGridLengthConverter.cs" />
     <Compile Include="Tools\FontWeightConverter.cs" />
     <Compile Include="Tools\GridLengthConverter.cs" />
+    <Compile Include="Tools\SortAdorner.cs" />
     <Compile Include="Tools\VisibilityBoolConverter.cs" />
     <Compile Include="UserControls\AccountGroup.xaml.cs">
       <DependentUpon>AccountGroup.xaml</DependentUpon>
@@ -136,6 +143,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\EditMemorizedPayees.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\EditSecurities.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\EditSecurity.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
