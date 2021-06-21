@@ -136,6 +136,12 @@ namespace BanaData.Logic.Main
                 {
                     // Update the cleared status in the register
                     mainWindow.BankRegister.UpdateAllTransactionStatus();
+
+                    // Update the register if an interest transaction was created
+                    if (reconcileLogic.InterestTransactionID >= 0)
+                    {
+                        mainWindow.BankRegister.AddTransaction(reconcileLogic.InterestTransactionID);
+                    }
                 }
             }
         }

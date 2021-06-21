@@ -20,6 +20,7 @@ namespace BanaData.Logic.Dialogs
 
         private readonly MainWindowLogic mainWindowLogic;
         private readonly int accountID;
+        private readonly decimal interestAmount;
 
         #endregion
 
@@ -40,6 +41,7 @@ namespace BanaData.Logic.Dialogs
             var accountsToReconcileInfo = household.ReconcileInfo.ParentRelations["FK_Accounts_ReconcileInfo"];
             var reconcileInfo = accountRow.GetChildRows(accountsToReconcileInfo).Cast<Household.ReconcileInfoRow>().First();
             StatementBalance = reconcileInfo.StatementBalance;
+            interestAmount = reconcileInfo.IsInterestAmountNull() ? 0 : reconcileInfo.InterestAmount;
 
             Title = "Reconcile: " + accountRow.Name;
 
@@ -90,6 +92,12 @@ namespace BanaData.Logic.Dialogs
 
         #endregion
 
+        #region Results
+
+        public int InterestTransactionID { get; private set; } = -1;
+
+        #endregion
+
         #region Actions
 
         private void OnClearedBalanceChanged(object sender, EventArgs e)
@@ -99,7 +107,7 @@ namespace BanaData.Logic.Dialogs
 
         private void UpdateBalances()
         {
-            ClearedBalance = PriorStatementBalance + Deposits.TotalCleared - Payments.TotalCleared;
+            ClearedBalance = PriorStatementBalance + Deposits.TotalCleared + interestAmount - Payments.TotalCleared;
             BalanceToClear = StatementBalance - ClearedBalance;
 
             OnPropertyChanged(() => ClearedBalance);
@@ -161,13 +169,19 @@ namespace BanaData.Logic.Dialogs
             // Get account and reconcile info rows
             var accountRow = household.Accounts.FindByID(accountID);
             var accountsToReconcileInfo = household.ReconcileInfo.ParentRelations["FK_Accounts_ReconcileInfo"];
-            var reconcileInfo = accountRow.GetChildRows(accountsToReconcileInfo).Cast<Household.ReconcileInfoRow>().First();
+            var reconcileInfoRow = accountRow.GetChildRows(accountsToReconcileInfo).Cast<Household.ReconcileInfoRow>().First();
 
             // Update the last statement date in the account
-            accountRow.LastStatementDate = reconcileInfo.StatementDate;
+            accountRow.LastStatementDate = reconcileInfoRow.StatementDate;
+
+            // Create the interest transaction if there is one
+            if (interestAmount != 0)
+            {
+                AddInterestTransactionToDB(accountRow, reconcileInfoRow);
+            }
 
             // Delete the current reconcile info since we are done
-            reconcileInfo.Delete();
+            reconcileInfoRow.Delete();
 
             // Update DB
             mainWindowLogic.CommitChanges();
@@ -190,9 +204,26 @@ namespace BanaData.Logic.Dialogs
             }
         }
 
+        private void AddInterestTransactionToDB(Household.AccountsRow accountRow, Household.ReconcileInfoRow reconcileInfoRow)
+        {
+            var household = mainWindowLogic.Household;
+
+            // Create new transaction row
+            var transactionRow = household.Transactions.Add(accountRow, reconcileInfoRow.InterestDate, "Interest Earned", ETransactionStatus.Reconciled);
+
+            // Create new banking transaction row
+            household.BankingTransactions.Add(transactionRow,ETransactionMedium.None, 0);
+
+            // Create the line items
+            household.LineItems.Add(transactionRow, reconcileInfoRow.InterestCategoryID, -1, "", interestAmount);
+
+            // Post newly created transaction ID
+            InterestTransactionID = transactionRow.ID;
+        }
+
         #endregion
 
-        #region Supporting classes
+        #region Transaction list class
 
         //
         // One transaction list
@@ -301,6 +332,10 @@ namespace BanaData.Logic.Dialogs
                 ClearedBalanceChanged?.Invoke(this, EventArgs.Empty);
             }
         }
+
+        #endregion
+
+        #region Transaction class 
 
         //
         // One transaction to reconcile

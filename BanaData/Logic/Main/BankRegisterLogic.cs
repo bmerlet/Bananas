@@ -255,57 +255,14 @@ namespace BanaData.Logic.Main
             // Export if banking account
             IsBank = account.Type == EAccountType.Bank;
             OnPropertyChanged(() => IsBank);
-            OnPropertyChanged(() => WidthOfMediumColumn);
 
             // Find transactions and put them in the transaction list
-            BankingTransactionLogic bankingTransaction = null;
             transactions.Clear();
             var accTransRel = household.Relations["FK_Accounts_Transactions"];
+
             foreach (Household.TransactionsRow trans in account.GetChildRows(accTransRel))
             {
-                // Get banking details
-                Household.BankingTransactionsRow transBank = null;
-                if (account.Type == EAccountType.Bank)
-                {
-                    transBank = household.BankingTransactions.GetByTransaction(trans);
-                }
-
-                // Get line item(s)
-                var dbLineItems = household.LineItems.GetByTransaction(trans);
-                var lineItems = new List<LineItem>();
-                foreach(var dbli in dbLineItems)
-                {
-                    int catID = -1;
-                    int catAccntID = -1;
-                    string category = "";
-                    if (dbli.IsTransfer && !dbli.IsAccountIDNull())
-                    {
-                        var destAccount = household.Accounts.FindByID(dbli.AccountID);
-                        category = "[" + destAccount.Name + "]";
-                        catAccntID = dbli.AccountID;
-                    }
-                    else if (!dbli.IsCategoryIDNull())
-                    {
-                        var destCategory = household.Categories.FindByID(dbli.CategoryID);
-                        category = destCategory.FullName;
-                        catID = dbli.CategoryID;
-                    }
-                    string memo = dbli.IsMemoNull() ? "" : dbli.Memo;
-
-                    var li = new LineItem(mainWindowLogic, dbli.ID, category, catID, catAccntID, memo, dbli.Amount, false);
-                    lineItems.Add(li);
-                }
-
-                var transactionData = new BankingTransactionLogic.BankTransactionData(
-                    trans.Date,
-                    transBank == null ? ETransactionMedium.None : transBank.Medium,
-                    transBank == null ? 0 : (transBank.IsCheckNumberNull() ? 0 : (uint)transBank.CheckNumber),
-                    trans.IsPayeeNull() ? "" : trans.Payee,
-                    trans.Status,
-                    lineItems);
-
-                bankingTransaction = new BankingTransactionLogic(mainWindowLogic, this, accountID, trans.ID, transactionData);
-                transactions.Add(bankingTransaction);
+                AddDBTransactionToList(account, trans);
             }
 
             // Add new empty transaction at the bottom
@@ -313,6 +270,67 @@ namespace BanaData.Logic.Main
 
             // Compute balances
             RecomputeBalances();
+        }
+
+        // Add to the transaction list a transaction that was added to the DB "behind our back"
+        // (e.g. interest transaction by the reconcile dialog)
+        public void AddTransaction(int transactionID)
+        {
+            var household = mainWindowLogic.Household;
+            var account = household.Accounts.FindByID(accountID);
+            var trans = household.Transactions.FindByID(transactionID);
+
+            AddDBTransactionToList(account, trans);
+        }
+
+        // Routine to get a transaction from the DB into the list
+        private void AddDBTransactionToList(Household.AccountsRow accountRow, Household.TransactionsRow transRow)
+        {
+            var household = mainWindowLogic.Household;
+
+            // Get banking details
+            Household.BankingTransactionsRow transBankRow = null;
+            if (accountRow.Type == EAccountType.Bank)
+            {
+                transBankRow = household.BankingTransactions.GetByTransaction(transRow);
+            }
+
+            // Get line item(s)
+            var dbLineItems = household.LineItems.GetByTransaction(transRow);
+            var lineItems = new List<LineItem>();
+            foreach (var dbli in dbLineItems)
+            {
+                int catID = -1;
+                int catAccntID = -1;
+                string category = "";
+                if (dbli.IsTransfer && !dbli.IsAccountIDNull())
+                {
+                    var destAccount = household.Accounts.FindByID(dbli.AccountID);
+                    category = "[" + destAccount.Name + "]";
+                    catAccntID = dbli.AccountID;
+                }
+                else if (!dbli.IsCategoryIDNull())
+                {
+                    var destCategory = household.Categories.FindByID(dbli.CategoryID);
+                    category = destCategory.FullName;
+                    catID = dbli.CategoryID;
+                }
+                string memo = dbli.IsMemoNull() ? "" : dbli.Memo;
+
+                var li = new LineItem(mainWindowLogic, dbli.ID, category, catID, catAccntID, memo, dbli.Amount, false);
+                lineItems.Add(li);
+            }
+
+            var transactionData = new BankingTransactionLogic.BankTransactionData(
+                transRow.Date,
+                transBankRow == null ? ETransactionMedium.None : transBankRow.Medium,
+                transBankRow == null ? 0 : (transBankRow.IsCheckNumberNull() ? 0 : (uint)transBankRow.CheckNumber),
+                transRow.IsPayeeNull() ? "" : transRow.Payee,
+                transRow.Status,
+                lineItems);
+
+            var bankingTransaction = new BankingTransactionLogic(mainWindowLogic, this, accountID, transRow.ID, transactionData);
+            transactions.Add(bankingTransaction);
         }
 
         public void UpdateAllTransactionStatus()

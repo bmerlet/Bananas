@@ -53,7 +53,7 @@ namespace BanaData.Logic.Dialogs
 
             // Default interest
             InterestAmount = 0;
-            InterestDate = DateTime.Today;
+            InterestDate = StatementEndDate;
             InterestCategory = "Interest Inc";
 
             // Find if there is a reconcile info available for this account
@@ -61,7 +61,7 @@ namespace BanaData.Logic.Dialogs
             var reconcileInfos = accountRow.GetChildRows(accountsToReconcileInfo).Cast<Household.ReconcileInfoRow>().ToArray();
             if (reconcileInfos.Length > 1)
             {
-                throw new ArgumentOutOfRangeException("Argh");
+                throw new ArgumentOutOfRangeException($"Multiple ReconcileInfo rows for account {accountRow.Name}");
             }
 
             if (reconcileInfos.Length == 1)
