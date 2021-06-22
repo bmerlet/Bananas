@@ -26,6 +26,10 @@
             ScrollViewer.ScrollChanged="OnListViewScrollChanged"
             ItemsSource="{Binding Transactions}">
 
+            <ListView.Resources>
+                <t:TransactionStatusToBrushConverter x:Key="statusConverter"/>
+            </ListView.Resources>
+
             <!-- Make the list view items use all the horizontal space -->
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
@@ -41,44 +45,86 @@
                         CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}" />
                 </ContextMenu>
             </ListView.ContextMenu>
+            
+            <!-- Foreground binding -->
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Foreground="{Binding StatusAsEnum, Converter={StaticResource statusConverter}}"/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
 
             <!-- View definition -->
             <ListView.View>
                 <GridView>
 
                     <!-- Date column -->
-                    <GridViewColumn DisplayMemberBinding="{Binding Date, StringFormat=M/d/yyyy}" Width="{Binding WidthOfDateColumn, Mode=TwoWay}">
+                    <GridViewColumn Width="{Binding WidthOfDateColumn, Mode=TwoWay}">
                         <GridViewColumn.Header>
                             <GridViewColumnHeader Content="Date" Tag="Date" Click="OnColumnHeaderClicked"/>
                         </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Text="{Binding Date, StringFormat=MM/dd/yyyy}"
+                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource statusConverter}}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
                     <!-- Medium column -->
-                    <GridViewColumn DisplayMemberBinding="{Binding Medium}" Width="{Binding WidthOfMediumColumn, Mode=TwoWay}">
+                    <GridViewColumn Width="{Binding WidthOfMediumColumn, Mode=TwoWay}">
                         <GridViewColumn.Header>
                             <GridViewColumnHeader Content="Type" Tag="Medium" Click="OnColumnHeaderClicked"/>
                         </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Text="{Binding Medium}"
+                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource statusConverter}}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                     
                     <!-- Payee column -->
-                    <GridViewColumn DisplayMemberBinding="{Binding Payee}" Width="{Binding WidthOfPayeeColumn, Mode=TwoWay}">
+                    <GridViewColumn Width="{Binding WidthOfPayeeColumn, Mode=TwoWay}">
                         <GridViewColumn.Header>
                             <GridViewColumnHeader Content="Payee" Tag="Payee" Click="OnColumnHeaderClicked"/>
                         </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Text="{Binding Payee}"
+                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource statusConverter}}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                     
                     <!-- Memo column-->
-                    <GridViewColumn DisplayMemberBinding="{Binding Memo}" Width="{Binding WidthOfMemoColumn, Mode=TwoWay}">
+                    <GridViewColumn Width="{Binding WidthOfMemoColumn, Mode=TwoWay}">
                         <GridViewColumn.Header>
                             <GridViewColumnHeader Content="Memo" Tag="Memo" Click="OnColumnHeaderClicked"/>
                         </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Text="{Binding Memo}"
+                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource statusConverter}}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
                     <!-- Category column-->
-                    <GridViewColumn DisplayMemberBinding="{Binding Category}" Width="{Binding WidthOfCategoryColumn, Mode=TwoWay}">
+                    <GridViewColumn Width="{Binding WidthOfCategoryColumn, Mode=TwoWay}">
                         <GridViewColumn.Header>
                             <GridViewColumnHeader Content="Category" Tag="Category" Click="OnColumnHeaderClicked"/>
                         </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Text="{Binding Category}"
+                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource statusConverter}}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
                     <!-- Payment column-->
@@ -88,16 +134,28 @@
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Path=PaymentString}" HorizontalAlignment="Right"/>
+                                <TextBlock
+                                    Text="{Binding Path=PaymentString}"
+                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource statusConverter}}"
+                                    HorizontalAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
                     <!-- Status column-->
-                    <GridViewColumn DisplayMemberBinding="{Binding Status}" Width="{Binding WidthOfStatusColumn, Mode=TwoWay}">
+                    <GridViewColumn Width="{Binding WidthOfStatusColumn, Mode=TwoWay}">
                         <GridViewColumn.Header>
                             <GridViewColumnHeader Content="Status" Tag="Status" Click="OnColumnHeaderClicked"/>
                         </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Text="{Binding Path=Status}"
+                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource statusConverter}}"
+                                    HorizontalAlignment="Center"
+                                    FontWeight="Bold"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
                     <!-- Deposit column-->
@@ -107,7 +165,10 @@
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Path=DepositString}" HorizontalAlignment="Right"/>
+                                <TextBlock 
+                                    Text="{Binding Path=DepositString}"
+                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource statusConverter}}"
+                                    HorizontalAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -117,7 +178,10 @@
                     <GridViewColumn Header="Balance" Width="{Binding WidthOfBalanceColumn, Mode=TwoWay}">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding BalanceString, Mode=OneWay}" HorizontalAlignment="Right"/>
+                                <TextBlock
+                                    Text="{Binding BalanceString, Mode=OneWay}"
+                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource statusConverter}}"
+                                    HorizontalAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

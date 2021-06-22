@@ -99,6 +99,7 @@
     <Compile Include="Tools\FontWeightConverter.cs" />
     <Compile Include="Tools\GridLengthConverter.cs" />
     <Compile Include="Tools\SortAdorner.cs" />
+    <Compile Include="Tools\TransactionStatusToBrushConverter.cs" />
     <Compile Include="Tools\VisibilityBoolConverter.cs" />
     <Compile Include="UserControls\AccountGroup.xaml.cs">
       <DependentUpon>AccountGroup.xaml</DependentUpon>

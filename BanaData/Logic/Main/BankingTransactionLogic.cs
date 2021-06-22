@@ -245,6 +245,7 @@ namespace BanaData.Logic.Main
             get => GetStatusString();
             set => ParseStatusString(value);
         }
+        public ETransactionStatus StatusAsEnum => data.Status;
 
         public string[] StatusSource { get; } = new string[] { "", "c", "R" };
 
