@@ -15,17 +15,10 @@
     <Window.Resources>
 
         <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}"/>
-        <Style TargetType="w:WatermarkTextBox">
-            <Setter Property="Margin" Value="5"/>
-        </Style>
-        <Style TargetType="w:AmountBox">
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="ShowZeroAmount" Value="True"/>
-        </Style>
-        <Style TargetType="w:DateBox">
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="HorizontalContentAlignment" Value="Right"/>
-        </Style>
+        <Style TargetType="w:WatermarkTextBox" BasedOn="{StaticResource FormWatermarkTextBox}"/>
+        <Style TargetType="w:AmountBox" BasedOn="{StaticResource FormAmountBox}"/>
+        <Style TargetType="w:DateBox"  BasedOn="{StaticResource FormDateBox}"/>
+        
     </Window.Resources>
     <DockPanel>
         <!-- OK/Cancel panel -->

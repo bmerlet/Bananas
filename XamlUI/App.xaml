@@ -14,10 +14,51 @@
         <t:FontWeightConverter x:Key="fontWeightConverter"/>
 
 
+        <!-- Default for amount box -->
+        <Style TargetType="ucs:AmountBox">
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+        </Style>
+
+        <!--
+          == Styles for form-like dialogs ==
+          -->
+
         <!-- Form text blocks -->
         <Style TargetType="TextBlock" x:Key="FormTextBlock">
             <Setter Property="Margin" Value="5"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <!-- Form combo box -->
+        <Style TargetType="ComboBox" x:Key="FormComboBox">
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+
+        <!-- Form check box -->
+        <Style TargetType="CheckBox" x:Key="FormCheckBox">
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+
+        <!-- Form watermark -->
+        <Style TargetType="ucs:WatermarkTextBox" x:Key="FormWatermarkTextBox">
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+
+        <!-- Form amount box -->
+        <Style TargetType="ucs:AmountBox" x:Key="FormAmountBox">
+            <Setter Property="ShowZeroAmount" Value="True"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+        
+        <!-- Form date box -->
+        <Style TargetType="ucs:DateBox" x:Key="FormDateBox">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="HorizontalContentAlignment" Value="Right"/>
+        </Style>
+
+        <!-- Form button -->
+        <Style TargetType="Button" x:Key="FormButton">
+            <Setter Property="Margin" Value="5"/>
         </Style>
 
         <!--

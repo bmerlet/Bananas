@@ -15,18 +15,8 @@
     <Window.Resources>
 
         <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}"/>
-        <Style TargetType="w:WatermarkTextBox">
-            <Setter Property="Margin" Value="5"/>
-        </Style>
-        <Style TargetType="w:AmountBox">
-            <Setter Property="Margin" Value="5"/>
-        </Style>
-        <Style TargetType="ComboBox">
-            <Setter Property="Margin" Value="5"/>
-        </Style>
-        <Style TargetType="CheckBox">
-            <Setter Property="Margin" Value="5"/>
-        </Style>
+        <Style TargetType="w:WatermarkTextBox" BasedOn="{StaticResource FormWatermarkTextBox}"/>
+        <Style TargetType="ComboBox" BasedOn="{StaticResource FormComboBox}"/>
 
     </Window.Resources>
     <DockPanel>
