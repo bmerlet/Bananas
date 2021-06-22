@@ -12,7 +12,7 @@
     <Shape ID="DesignTable:SecurityPrices" ZOrder="22" X="1025" Y="104" Height="105" Width="150" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="101" />
     <Shape ID="DesignTable:Transactions" ZOrder="17" X="370" Y="47" Height="124" Width="150" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="120" />
     <Shape ID="DesignTable:LineItems" ZOrder="8" X="555" Y="262" Height="162" Width="150" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="158" />
-    <Shape ID="DesignTable:BankingTransactions" ZOrder="6" X="756" Y="260" Height="105" Width="168" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="101" />
+    <Shape ID="DesignTable:BankingTransactions" ZOrder="6" X="303" Y="243" Height="105" Width="168" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="101" />
     <Shape ID="DesignTable:InvestmentTransactions" ZOrder="15" X="599" Y="46" Height="162" Width="204" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="158" />
     <Shape ID="DesignTable:MemorizedLineItems" ZOrder="13" X="699" Y="443" Height="162" Width="188" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="158" />
     <Shape ID="DesignTable:MemorizedPayees" ZOrder="12" X="909" Y="438" Height="86" Width="171" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="82" />
@@ -62,28 +62,36 @@
     <Connector ID="DesignRelation:FK_Transactions_BankTransactions" ZOrder="16" LineWidth="11">
       <RoutePoints>
         <Point>
-          <X>503</X>
+          <X>424</X>
           <Y>171</Y>
         </Point>
         <Point>
-          <X>503</X>
-          <Y>277</Y>
-        </Point>
-        <Point>
-          <X>756</X>
-          <Y>277</Y>
+          <X>424</X>
+          <Y>243</Y>
         </Point>
       </RoutePoints>
     </Connector>
-    <Connector ID="DesignRelation:FK_MemorizedPayees_MemorizedLineItems" ZOrder="11" LineWidth="11">
+    <Connector ID="DesignRelation:FK_Securities_InvestmentTransactions" ZOrder="1" LineWidth="11">
       <RoutePoints>
         <Point>
-          <X>909</X>
-          <Y>512</Y>
+          <X>843</X>
+          <Y>78</Y>
         </Point>
         <Point>
-          <X>887</X>
-          <Y>512</Y>
+          <X>803</X>
+          <Y>78</Y>
+        </Point>
+      </RoutePoints>
+    </Connector>
+    <Connector ID="DesignRelation:FK_Categories_MemorizedLineItems" ZOrder="3" LineWidth="11">
+      <RoutePoints>
+        <Point>
+          <X>488</X>
+          <Y>555</Y>
+        </Point>
+        <Point>
+          <X>699</X>
+          <Y>555</Y>
         </Point>
       </RoutePoints>
     </Connector>
@@ -103,27 +111,15 @@
         </Point>
       </RoutePoints>
     </Connector>
-    <Connector ID="DesignRelation:FK_Categories_MemorizedLineItems" ZOrder="3" LineWidth="11">
+    <Connector ID="DesignRelation:FK_MemorizedPayees_MemorizedLineItems" ZOrder="11" LineWidth="11">
       <RoutePoints>
         <Point>
-          <X>488</X>
-          <Y>555</Y>
+          <X>909</X>
+          <Y>512</Y>
         </Point>
         <Point>
-          <X>699</X>
-          <Y>555</Y>
-        </Point>
-      </RoutePoints>
-    </Connector>
-    <Connector ID="DesignRelation:FK_Accounts_ReconcileInfo" ZOrder="5" LineWidth="11">
-      <RoutePoints>
-        <Point>
-          <X>157</X>
-          <Y>201</Y>
-        </Point>
-        <Point>
-          <X>157</X>
-          <Y>353</Y>
+          <X>887</X>
+          <Y>512</Y>
         </Point>
       </RoutePoints>
     </Connector>
@@ -136,6 +132,18 @@
         <Point>
           <X>200</X>
           <Y>499</Y>
+        </Point>
+      </RoutePoints>
+    </Connector>
+    <Connector ID="DesignRelation:FK_Accounts_ReconcileInfo" ZOrder="5" LineWidth="11">
+      <RoutePoints>
+        <Point>
+          <X>157</X>
+          <Y>201</Y>
+        </Point>
+        <Point>
+          <X>157</X>
+          <Y>353</Y>
         </Point>
       </RoutePoints>
     </Connector>
@@ -180,18 +188,6 @@
         <Point>
           <X>599</X>
           <Y>111</Y>
-        </Point>
-      </RoutePoints>
-    </Connector>
-    <Connector ID="DesignRelation:FK_Securities_InvestmentTransactions" ZOrder="1" LineWidth="11">
-      <RoutePoints>
-        <Point>
-          <X>843</X>
-          <Y>78</Y>
-        </Point>
-        <Point>
-          <X>803</X>
-          <Y>78</Y>
         </Point>
       </RoutePoints>
     </Connector>

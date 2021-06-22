@@ -54,8 +54,10 @@ namespace BanaData.Logic.Main
             InvestmentAccountGroup = new AccountGroupLogic(this, AccountGroupLogic.EType.Investment);
             AssetAccountGroup = new AccountGroupLogic(this, AccountGroupLogic.EType.Asset);
             BankRegister = new BankRegisterLogic(this);
+            InvestmentRegister = new InvestmentRegisterLogic(this);
 
             BankAccountGroup.AccountClicked += (o, e) => OnBankAccountClicked(e.AccountID);
+            InvestmentAccountGroup.AccountClicked += (o, e) => OnInvestmentAccountClicked(e.AccountID);
             AssetAccountGroup.AccountClicked += (o, e) => OnBankAccountClicked(e.AccountID);
 
             if (UserSettings.LastFileOpened != null)
@@ -148,6 +150,11 @@ namespace BanaData.Logic.Main
 
         // The bank register
         public BankRegisterLogic BankRegister { get; private set; }
+        public bool IsBankRegisterVisible { get; private set; }
+
+        // The investment register
+        public InvestmentRegisterLogic InvestmentRegister { get; private set; }
+        public bool IsInvestmentRegisterVisible { get; private set; }
 
         #endregion
 
@@ -243,6 +250,21 @@ namespace BanaData.Logic.Main
             BankRegister.SetAccount(accountID);
             DisplayedAccountID = accountID;
             MainMenuLogic.Reconcile.SetCanExecute(accountID >= 0);
+            IsInvestmentRegisterVisible = false;
+            IsBankRegisterVisible = true;
+            OnPropertyChanged(() => IsInvestmentRegisterVisible);
+            OnPropertyChanged(() => IsBankRegisterVisible);
+        }
+
+        public void OnInvestmentAccountClicked(int accountID)
+        {
+            InvestmentRegister.SetAccount(accountID);
+            DisplayedAccountID = accountID;
+            MainMenuLogic.Reconcile.SetCanExecute(accountID >= 0);
+            IsInvestmentRegisterVisible = true;
+            IsBankRegisterVisible = false;
+            OnPropertyChanged(() => IsInvestmentRegisterVisible);
+            OnPropertyChanged(() => IsBankRegisterVisible);
         }
 
         #endregion

@@ -12,6 +12,7 @@
           -->
         <t:VisibilityBoolConverter x:Key="visibilityBoolConverter"/>
         <t:FontWeightConverter x:Key="fontWeightConverter"/>
+        <t:TransactionStatusToBrushConverter x:Key="transactionStatusToBrushConverter"/>
 
 
         <!-- Default for amount box -->
