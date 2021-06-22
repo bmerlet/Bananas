@@ -22,7 +22,7 @@
         <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
 
-    <!-- Define the colors for the text box borders (same as mfst) -->
+    <!-- Define the colors for the text box borders (same as msft) -->
     <SolidColorBrush x:Key="TextBoxBorder" Color="#ABADB3" Opacity="1"/>
     <SolidColorBrush x:Key="TextBoxBorderMouseOver" Color="#5794BF" Opacity="1"/>
     <SolidColorBrush x:Key="TextBoxBorderFocused" Color="#3D7BAD" Opacity="1"/>
@@ -174,4 +174,5 @@
             </Setter.Value>
         </Setter>
     </Style>
+
 </ResourceDictionary>

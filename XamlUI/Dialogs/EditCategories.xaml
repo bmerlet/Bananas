@@ -12,9 +12,6 @@
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
         SizeToContent="WidthAndHeight">
-    <Window.Resources>
-        <t:FontWeightConverter x:Key="fontWeightConverter"/>
-    </Window.Resources>
     <DockPanel>
         <!-- Done panel -->
         <w:DonePanel DockPanel.Dock="Bottom"/>

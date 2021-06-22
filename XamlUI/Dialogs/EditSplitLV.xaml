@@ -102,7 +102,6 @@
 
                     <Grid.Resources>
 
-                        <t:FontWeightConverter x:Key="fontWeightConverter"/>
                         <t:VisibilityBoolConverter x:Key="visibilityConverter"/>
 
                         <ContextMenu x:Key="TransactionContextMenu">
@@ -132,18 +131,9 @@
                     <!-- Category -->
                     <w:AutoCompleteTextBox
                         Grid.Column="0"
+                        Style="{StaticResource CategoryBoxStyle}"
                         Text="{Binding EditedLineItem.Category, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                        Watermark="Category"
-                        DisplayMember="FullName"
-                        ListBoxHeight="150" 
-                        ListBoxWidth="200"
-                        ItemsSource="{Binding EditedLineItem.Categories}">
-                        <w:AutoCompleteTextBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding IndentedName}" FontWeight="{Binding FontWeight, Converter={StaticResource fontWeightConverter}}" />
-                            </DataTemplate>
-                        </w:AutoCompleteTextBox.ItemTemplate>
-                    </w:AutoCompleteTextBox>
+                        ItemsSource="{Binding EditedLineItem.Categories}"/>
 
                     <!-- Memo -->
                     <w:WatermarkTextBox

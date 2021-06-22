@@ -16,8 +16,6 @@
 
         <Grid.Resources>
 
-            <t:FontWeightConverter x:Key="fontWeightConverter"/>
-
             <!-- Templates for the date column -->
             <DataTemplate x:Key="DateColumnTemplate">
                 <TextBlock Text="{Binding Date, StringFormat=M/d/yyyy}" HorizontalAlignment="Right"/>
@@ -77,18 +75,9 @@
             </DataTemplate>
             <DataTemplate x:Key="CategoryEditingColumnTemplate">
                 <local:AutoCompleteTextBox 
+                    Style="{StaticResource CategoryBoxStyle}"
                     Text="{Binding Category, Mode=TwoWay}"
-                    Watermark="Category"
-                    DisplayMember="FullName"
-                    ListBoxHeight="150" 
-                    ListBoxWidth="200"
-                    ItemsSource="{Binding Categories}">
-                    <local:AutoCompleteTextBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding IndentedName}" FontWeight="{Binding FontWeight, Converter={StaticResource fontWeightConverter}}" />
-                        </DataTemplate>
-                    </local:AutoCompleteTextBox.ItemTemplate>
-                </local:AutoCompleteTextBox>
+                    ItemsSource="{Binding Categories}"/>
             </DataTemplate>
 
             <!-- Templates for the payment column -->

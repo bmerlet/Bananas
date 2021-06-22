@@ -12,6 +12,7 @@
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
         SizeToContent="WidthAndHeight">
+    
     <Window.Resources>
         <Style TargetType="TextBlock">
             <Setter Property="Margin" Value="5"/>
@@ -29,8 +30,6 @@
         <Style TargetType="Button">
             <Setter Property="Margin" Value="5"/>
         </Style>
-
-        <t:FontWeightConverter x:Key="fontWeightConverter"/>
 
     </Window.Resources>
     <DockPanel>
@@ -62,20 +61,11 @@
             <!-- Row 2: Category -->
             <TextBlock Text="Category:" Grid.Row="2"/>
             <w:AutoCompleteTextBox 
+                Style="{StaticResource CategoryBoxStyle}"
                 Text="{Binding Category, Mode=TwoWay}"
-                Watermark="Category"
-                DisplayMember="FullName"
-                ListBoxHeight="150" 
-                ListBoxWidth="200"
                 IsEnabled="{Binding CategoryEnabled}"
                 ItemsSource="{Binding Categories}"
-                Grid.Row="2" Grid.Column="1">
-                <w:AutoCompleteTextBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding IndentedName}" FontWeight="{Binding FontWeight, Converter={StaticResource fontWeightConverter}}" />
-                    </DataTemplate>
-                </w:AutoCompleteTextBox.ItemTemplate>
-            </w:AutoCompleteTextBox>
+                Grid.Row="2" Grid.Column="1"/>
             <Button
                 Content="Split..." 
                 Command="{Binding EditSplit}"

@@ -199,7 +199,6 @@
 
             <Grid.Resources>
 
-                <t:FontWeightConverter x:Key="fontWeightConverter"/>
                 <t:VisibilityBoolConverter x:Key="visibilityConverter"/>
 
                 <ContextMenu x:Key="TransactionContextMenu">
@@ -288,19 +287,10 @@
             <!-- Category -->
             <local:AutoCompleteTextBox
                 Grid.Column="4"
+                Style="{StaticResource CategoryBoxStyle}"
                 Text="{Binding EditedTransaction.Category, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                Watermark="Category"
-                DisplayMember="FullName"
-                ListBoxHeight="150" 
-                ListBoxWidth="200"
-                ItemsSource="{Binding EditedTransaction.Categories}">
-                <local:AutoCompleteTextBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding IndentedName}" FontWeight="{Binding FontWeight, Converter={StaticResource fontWeightConverter}}" />
-                    </DataTemplate>
-                </local:AutoCompleteTextBox.ItemTemplate>
-            </local:AutoCompleteTextBox>
-            
+                ItemsSource="{Binding EditedTransaction.Categories}"/>
+
             <!-- Payment -->
             <local:AmountBox
                 Grid.Column="5"

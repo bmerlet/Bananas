@@ -30,8 +30,6 @@
             <Setter Property="Margin" Value="5"/>
         </Style>
 
-        <t:FontWeightConverter x:Key="fontWeightConverter"/>
-
     </Window.Resources>
     <DockPanel>
         <!-- OK/Cancel panel -->
@@ -67,18 +65,9 @@
             <TextBlock Text="Sub-category of:" Grid.Row="3"/>
             <w:AutoCompleteTextBox  
                 Grid.Row="3" Grid.Column="1"
+                Style="{StaticResource CategoryBoxStyle}"
                 Text="{Binding Parent, Mode=TwoWay}"
-                DisplayMember="FullName" 
-                Watermark="Category"
-                ListBoxHeight="150" 
-                ListBoxWidth="200"
-                ItemsSource="{Binding Categories}">
-                    <w:AutoCompleteTextBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding IndentedName}" FontWeight="{Binding FontWeight, Converter={StaticResource fontWeightConverter}}" />
-                        </DataTemplate>
-                    </w:AutoCompleteTextBox.ItemTemplate>
-            </w:AutoCompleteTextBox>
+                ItemsSource="{Binding Categories}"/>
 
             <!-- Row 4: Tax Info -->
             <TextBlock Text="Tax Info:" Grid.Row="4"/>

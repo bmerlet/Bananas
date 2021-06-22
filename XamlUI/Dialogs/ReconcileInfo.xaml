@@ -15,7 +15,6 @@
     <Window.Resources>
 
         <t:VisibilityBoolConverter x:Key="visibilityConverter"/>
-        <t:FontWeightConverter x:Key="fontWeightConverter"/>
 
         <Style TargetType="TextBlock">
             <Setter Property="Margin" Value="5"/>
@@ -65,18 +64,9 @@
             <TextBlock Text="Interest category:" Grid.Row="3"/>
             <w:AutoCompleteTextBox
                         Grid.Row="3" Grid.Column="1"
+                        Style="{StaticResource CategoryBoxStyle}"
                         Text="{Binding InterestCategory, Mode=TwoWay}"
-                        Watermark="Category"
-                        DisplayMember="FullName"
-                        ListBoxHeight="150" 
-                        ListBoxWidth="200"
-                        ItemsSource="{Binding Categories}">
-                <w:AutoCompleteTextBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding IndentedName}" FontWeight="{Binding FontWeight, Converter={StaticResource fontWeightConverter}}" />
-                    </DataTemplate>
-                </w:AutoCompleteTextBox.ItemTemplate>
-            </w:AutoCompleteTextBox>
+                        ItemsSource="{Binding Categories}"/>
 
         </Grid>
         <!-- Main panel -->
