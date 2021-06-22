@@ -37,9 +37,9 @@ namespace BanaData.Logic.Dialogs
             MemorizedPayeesSource = (CollectionView)CollectionViewSource.GetDefaultView(memorizedPayeesSource);
             MemorizedPayeesSource.SortDescriptions.Add(new SortDescription("Payee", ListSortDirection.Ascending));
 
-            AddMemorizedPayee = new CommandBase(OnAddMemorizedPayee);
-            EditMemorizedPayee = new CommandBase(OnEditMemorizedPayee);
-            DeleteMemorizedPayee = new CommandBase(OnDeleteMemorizedPayee);
+            AddCommand = new CommandBase(OnAddMemorizedPayee);
+            EditCommand = new CommandBase(OnEditMemorizedPayee);
+            DeleteCommand = new CommandBase(OnDeleteMemorizedPayee);
         }
 
         #endregion
@@ -52,9 +52,9 @@ namespace BanaData.Logic.Dialogs
         private readonly ObservableCollection<MemorizedPayeeItem> memorizedPayeesSource;
         public CollectionView MemorizedPayeesSource { get; }
 
-        public CommandBase AddMemorizedPayee { get; }
-        public CommandBase EditMemorizedPayee { get; }
-        public CommandBase DeleteMemorizedPayee { get; }
+        public CommandBase AddCommand { get; }
+        public CommandBase EditCommand { get; }
+        public CommandBase DeleteCommand { get; }
 
         #endregion
 

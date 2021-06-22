@@ -47,7 +47,7 @@ namespace XamlUI.Dialogs
         {
             if (DataContext is EditMemorizedPayeesLogic logic)
             {
-                logic.EditMemorizedPayee.Execute();
+                logic.EditCommand.Execute();
             }
         }
     }

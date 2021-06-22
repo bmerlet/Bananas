@@ -11,75 +11,53 @@
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
         SizeToContent="WidthAndHeight">
-    <Window.Resources>
-        <Style TargetType="Button">
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-            <Setter Property="Margin" Value="3"/>
-        </Style>
-    </Window.Resources>
+
     <DockPanel>
+        
         <!-- Done panel -->
         <w:DonePanel DockPanel.Dock="Bottom"/>
+
+        <!-- Add/Edit/Delete panel -->
+        <w:AddEditDeletePanel DockPanel.Dock="Bottom"/>
+
         <!-- Main panel -->
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+        <!-- Main panel: Listbox of securitiess -->
+        <ListView
+            x:Name="listView"
+            Height="300" Grid.ColumnSpan="3"
+            AlternationCount="2"
+            SelectionMode="Single"
+            ItemsSource="{Binding SecuritiesSource}"
+            SelectedItem="{Binding SelectedSecurity, Mode=TwoWay}"
+            MouseDoubleClick="OnListviewDoubleClick">
 
-            <!-- Row 0: Listbox of securitiess -->
-            <ListView
-                x:Name="listView"
-                Height="300" Grid.ColumnSpan="3"
-                AlternationCount="2"
-                SelectionMode="Single"
-                ItemsSource="{Binding SecuritiesSource}"
-                SelectedItem="{Binding SelectedSecurity, Mode=TwoWay}"
-                MouseDoubleClick="OnListviewDoubleClick">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Width="400" DisplayMemberBinding="{Binding Name}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Name" Tag="Name" Click="OnColumnHeaderClicked"/>
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
 
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Width="400" DisplayMemberBinding="{Binding Name}">
-                            <GridViewColumn.Header>
-                                <GridViewColumnHeader Content="Name" Tag="Name" Click="OnColumnHeaderClicked"/>
-                            </GridViewColumn.Header>
-                        </GridViewColumn>
+                    <GridViewColumn Width="70" DisplayMemberBinding="{Binding Symbol}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Symbol" Tag="Symbol" Click="OnColumnHeaderClicked"/>
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
 
-                        <GridViewColumn Width="70" DisplayMemberBinding="{Binding Symbol}">
-                            <GridViewColumn.Header>
-                                <GridViewColumnHeader Content="Symbol" Tag="Symbol" Click="OnColumnHeaderClicked"/>
-                            </GridViewColumn.Header>
-                        </GridViewColumn>
+                    <GridViewColumn Width="100">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Type" Tag="Type" Click="OnColumnHeaderClicked"/>
+                        </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding TypeString}" Foreground="Blue" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
 
-                        <GridViewColumn Width="100">
-                            <GridViewColumn.Header>
-                                <GridViewColumnHeader Content="Type" Tag="Type" Click="OnColumnHeaderClicked"/>
-                            </GridViewColumn.Header>
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding TypeString}" Foreground="Blue" />
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                    </GridView>
-                </ListView.View>
-            </ListView>
-
-            <!-- Row 1: Control buttons -->
-            <Button
-                Grid.Column="0" Grid.Row="1"
-                Content="Add..." Command="{Binding AddSecurity}"/>
-            <Button
-                Grid.Column="1" Grid.Row="1"
-                Content="Edit..." Command="{Binding EditSecurity}"/>
-            <Button
-                Grid.Column="2" Grid.Row="1"
-                Content="Delete" Command="{Binding DeleteSecurity}"/>
-        </Grid>
     </DockPanel>
 </Window>

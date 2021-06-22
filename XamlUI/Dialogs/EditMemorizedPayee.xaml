@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:XamlUI.Dialogs"
         xmlns:w="clr-namespace:XamlUI.UserControls"
+        xmlns:t="clr-namespace:XamlUI.Tools"
         mc:Ignorable="d"
         Title="Edit Memorized Payee"
         Icon="/XamlUI;component/Images/Bananas.ico"
@@ -28,6 +29,9 @@
         <Style TargetType="Button">
             <Setter Property="Margin" Value="5"/>
         </Style>
+
+        <t:FontWeightConverter x:Key="fontWeightConverter"/>
+
     </Window.Resources>
     <DockPanel>
         <!-- OK/Cancel panel -->
@@ -66,6 +70,11 @@
                 IsEnabled="{Binding CategoryEnabled}"
                 ItemsSource="{Binding Categories}"
                 Grid.Row="2" Grid.Column="1">
+                <w:AutoCompleteTextBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding IndentedName}" FontWeight="{Binding FontWeight, Converter={StaticResource fontWeightConverter}}" />
+                    </DataTemplate>
+                </w:AutoCompleteTextBox.ItemTemplate>
             </w:AutoCompleteTextBox>
             <Button
                 Content="Split..." 

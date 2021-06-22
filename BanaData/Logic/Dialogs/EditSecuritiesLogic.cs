@@ -39,9 +39,9 @@ namespace BanaData.Logic.Dialogs
             SecuritiesSource = (CollectionView)CollectionViewSource.GetDefaultView(securitySource);
             SecuritiesSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
 
-            AddSecurity = new CommandBase(OnAddSecurity);
-            EditSecurity = new CommandBase(OnEditSecurity);
-            DeleteSecurity = new CommandBase(OnDeleteSecurity);
+            AddCommand = new CommandBase(OnAddSecurity);
+            EditCommand = new CommandBase(OnEditSecurity);
+            DeleteCommand = new CommandBase(OnDeleteSecurity);
         }
 
         #endregion
@@ -54,9 +54,9 @@ namespace BanaData.Logic.Dialogs
         private readonly ObservableCollection<SecurityItem> securitySource;
         public CollectionView SecuritiesSource { get; }
 
-        public CommandBase AddSecurity { get; }
-        public CommandBase EditSecurity { get; }
-        public CommandBase DeleteSecurity { get; }
+        public CommandBase AddCommand { get; }
+        public CommandBase EditCommand { get; }
+        public CommandBase DeleteCommand { get; }
 
         #endregion
 

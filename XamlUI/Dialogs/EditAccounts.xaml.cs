@@ -46,7 +46,7 @@ namespace XamlUI.Dialogs
         {
             if (DataContext is EditAccountsLogic logic)
             {
-                logic.EditAccount.Execute();
+                logic.EditCommand.Execute();
             }
         }
     }

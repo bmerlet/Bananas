@@ -47,7 +47,7 @@ namespace XamlUI.Dialogs
         {
             if (DataContext is EditCategoriesLogic logic)
             {
-                logic.EditCategory.Execute();
+                logic.EditCommand.Execute();
             }
         }
     }

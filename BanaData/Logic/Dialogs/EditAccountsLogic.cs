@@ -50,9 +50,9 @@ namespace BanaData.Logic.Dialogs
             AccountsSource = (CollectionView)CollectionViewSource.GetDefaultView(accountsSource);
             AccountsSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
 
-            AddAccount = new CommandBase(OnAddAccount);
-            EditAccount = new CommandBase(OnEditAccount);
-            DeleteAccount = new CommandBase(OnDeleteAccount);
+            AddCommand = new CommandBase(OnAddAccount);
+            EditCommand = new CommandBase(OnEditAccount);
+            DeleteCommand = new CommandBase(OnDeleteAccount);
         }
 
         #endregion
@@ -65,9 +65,9 @@ namespace BanaData.Logic.Dialogs
         private readonly ObservableCollection<AccountItem> accountsSource;
         public CollectionView AccountsSource { get; }
 
-        public CommandBase AddAccount { get; }
-        public CommandBase EditAccount { get; }
-        public CommandBase DeleteAccount { get; }
+        public CommandBase AddCommand { get; }
+        public CommandBase EditCommand { get; }
+        public CommandBase DeleteCommand { get; }
 
         #endregion
 

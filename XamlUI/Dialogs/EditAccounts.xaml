@@ -11,62 +11,37 @@
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
         SizeToContent="WidthAndHeight">
-    <Window.Resources>
-        <Style TargetType="Button">
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-            <Setter Property="Margin" Value="3"/>
-        </Style>
-    </Window.Resources>
     <DockPanel>
+
         <!-- Done panel -->
         <w:DonePanel DockPanel.Dock="Bottom"/>
-        <!-- Main panel -->
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
 
-            <!-- Row 0: Listbox of accounts -->
-            <ListView
-                x:Name="listView"
-                Height="300" Grid.ColumnSpan="3"
-                AlternationCount="2"
-                SelectionMode="Single"
-                ItemsSource="{Binding AccountsSource}"
-                SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"
-                MouseDoubleClick="OnListviewDoubleClick">
+        <!-- Add/Edit/Delete panel -->
+        <w:AddEditDeletePanel DockPanel.Dock="Bottom"/>
 
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="Name" Width="200" DisplayMemberBinding="{Binding Name}"/>
-                        <GridViewColumn Header="Description" Width="200" DisplayMemberBinding="{Binding Description}"/>
-                        <GridViewColumn Header="Type" Width="85">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding TypeString}" Foreground="Blue" />
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                    </GridView>
-                </ListView.View>
-            </ListView>
+        <!-- Main panel: Listview of accounts -->
+        <ListView
+            x:Name="listView"
+            Height="300" Grid.ColumnSpan="3"
+            AlternationCount="2"
+            SelectionMode="Single"
+            ItemsSource="{Binding AccountsSource}"
+            SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"
+            MouseDoubleClick="OnListviewDoubleClick">
 
-            <!-- Row 1: Control buttons -->
-            <Button
-                Grid.Column="0" Grid.Row="1"
-                Content="Add..." Command="{Binding AddAccount}"/>
-            <Button
-                Grid.Column="1" Grid.Row="1"
-                Content="Edit..." Command="{Binding EditAccount}"/>
-            <Button
-                Grid.Column="2" Grid.Row="1"
-                Content="Delete" Command="{Binding DeleteAccount}"/>
-        </Grid>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Name" Width="200" DisplayMemberBinding="{Binding Name}"/>
+                    <GridViewColumn Header="Description" Width="200" DisplayMemberBinding="{Binding Description}"/>
+                    <GridViewColumn Header="Type" Width="85">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding TypeString}" Foreground="Blue" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
     </DockPanel>
 </Window>

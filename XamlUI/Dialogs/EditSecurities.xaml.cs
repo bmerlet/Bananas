@@ -49,7 +49,7 @@ namespace XamlUI.Dialogs
         {
             if (DataContext is EditSecuritiesLogic logic)
             {
-                logic.EditSecurity.Execute();
+                logic.EditCommand.Execute();
             }
         }
 

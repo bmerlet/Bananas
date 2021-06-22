@@ -44,9 +44,9 @@ namespace BanaData.Logic.Dialogs
             CategoriesSource.Filter = InUseFilter;
             CategoriesSource.SortDescriptions.Add(new SortDescription("CategoryItem.FullName", ListSortDirection.Ascending));
 
-            AddCategory = new CommandBase(OnAddCategory);
-            EditCategory = new CommandBase(OnEditCategory);
-            DeleteCategory = new CommandBase(OnDeleteCategory);
+            AddCommand = new CommandBase(OnAddCategory);
+            EditCommand = new CommandBase(OnEditCategory);
+            DeleteCommand = new CommandBase(OnDeleteCategory);
         }
 
         #endregion
@@ -64,9 +64,9 @@ namespace BanaData.Logic.Dialogs
         public EditCategoryItem CategoryToScrollTo { get; private set; }
 
         // Commands
-        public CommandBase AddCategory { get; }
-        public CommandBase EditCategory { get; }
-        public CommandBase DeleteCategory { get; }
+        public CommandBase AddCommand { get; }
+        public CommandBase EditCommand { get; }
+        public CommandBase DeleteCommand { get; }
 
         // What to show
         private const string SHOW_ALL = "All categories";
