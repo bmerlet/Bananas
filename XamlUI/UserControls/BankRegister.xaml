@@ -38,28 +38,8 @@
             </DataTemplate>
             <DataTemplate x:Key="PayeeEditingColumnTemplate">
                 <local:AutoCompleteTextBox 
-                    Text="{Binding Payee, Mode=TwoWay}"
-                    Watermark="Payee"
-                    DisplayMember="Payee"
-                    ListBoxHeight="150" 
-                    ItemsSource="{Binding Payees}">
-                    <local:AutoCompleteTextBox.ItemTemplate>
-                        <DataTemplate>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="120"/>
-                                    <ColumnDefinition Width="65"/>
-                                    <ColumnDefinition Width="120"/>
-                                    <ColumnDefinition Width="100"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding Payee}"/>
-                                <TextBlock Text="{Binding Amount}"   Grid.Column="1" Margin="3,0" HorizontalAlignment="Right" Foreground="Red"/>
-                                <TextBlock Text="{Binding Category}" Grid.Column="2" Foreground="Blue"/>
-                                <TextBlock Text="{Binding Memo}"     Grid.Column="3" Margin="3,0,0,0"/>
-                            </Grid>
-                        </DataTemplate>
-                    </local:AutoCompleteTextBox.ItemTemplate>
-                </local:AutoCompleteTextBox>
+                    Style="{StaticResource CategoryBoxStyle}"
+                    Text="{Binding Payee, Mode=TwoWay}"/>
             </DataTemplate>
 
             <DataTemplate x:Key="MemoColumnTemplate">

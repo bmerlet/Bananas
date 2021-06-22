@@ -57,6 +57,31 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        
+        <!-- Style for payee autocomplete textbox-->
+        <Style TargetType="{x:Type ucs:AutoCompleteTextBox}" x:Key="PayeeBoxStyle">
+            <Setter Property="Watermark" Value="Payee"/>
+            <Setter Property="DisplayMember" Value="Payee"/>
+            <Setter Property="ListBoxHeight" Value="150"/>
+            <Setter Property="ItemTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="65"/>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="100"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding Payee}"/>
+                            <TextBlock Text="{Binding Amount}"   Grid.Column="1" Margin="3,0" HorizontalAlignment="Right" Foreground="Red"/>
+                            <TextBlock Text="{Binding Category}" Grid.Column="2" Foreground="Blue"/>
+                            <TextBlock Text="{Binding Memo}"     Grid.Column="3" Margin="3,0,0,0"/>
+                        </Grid>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
     </Application.Resources>
 </Application>

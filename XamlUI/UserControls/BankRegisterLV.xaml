@@ -254,29 +254,10 @@
             <!-- Payee -->
             <local:AutoCompleteTextBox 
                 Grid.Column="2"
+                Style="{StaticResource PayeeBoxStyle}"
                 Text="{Binding EditedTransaction.Payee, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 ItemSelectedCommand="{Binding EditedTransaction.PayeeSelected}"
-                Watermark="Payee"
-                DisplayMember="Payee"
-                ListBoxHeight="150" 
-                ItemsSource="{Binding EditedTransaction.Payees}">
-                <local:AutoCompleteTextBox.ItemTemplate>
-                    <DataTemplate>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="120"/>
-                                <ColumnDefinition Width="65"/>
-                                <ColumnDefinition Width="120"/>
-                                <ColumnDefinition Width="100"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding Payee}"/>
-                            <TextBlock Text="{Binding Amount}"   Grid.Column="1" Margin="3,0" HorizontalAlignment="Right" Foreground="Red"/>
-                            <TextBlock Text="{Binding Category}" Grid.Column="2" Foreground="Blue"/>
-                            <TextBlock Text="{Binding Memo}"     Grid.Column="3" Margin="3,0,0,0"/>
-                        </Grid>
-                    </DataTemplate>
-                </local:AutoCompleteTextBox.ItemTemplate>
-            </local:AutoCompleteTextBox>
+                ItemsSource="{Binding EditedTransaction.Payees}"/>
             
             <!-- Memo -->
             <local:WatermarkTextBox
