@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Toolbox.UILogic;
-using BanaData.Serializations;
+using BanaData.Database;
 using BanaData.Logic.Dialogs;
-using BanaData.Logic.Items;
+using BanaData.Web;
 
 namespace BanaData.Logic.Main
 {
@@ -36,6 +36,7 @@ namespace BanaData.Logic.Main
 
             Reconcile = new CommandBase(OnReconcile);
             Reconcile.SetCanExecute(false);
+            UpdateStockPrices = new CommandBase(OnUpdateStockPrices);
 
             Test = new CommandBase(OnTest);
         }
@@ -131,6 +132,9 @@ namespace BanaData.Logic.Main
 
         #region Actions menu
 
+        //
+        // Reconcile
+        //
         public CommandBase Reconcile { get; }
 
         private void OnReconcile()
@@ -156,6 +160,54 @@ namespace BanaData.Logic.Main
                     }
                 }
             }
+        }
+
+        //
+        // Update stock prices
+        //
+        public CommandBase UpdateStockPrices { get; }
+
+        private void OnUpdateStockPrices()
+        {
+            var household = mainWindow.Household;
+            var securities = new List<int>();
+            var quoter = new Quote();
+
+            // Go through all investment accounts
+            foreach(Household.AccountsRow account in household.Accounts.Rows)
+            {
+                if (account.Type == EAccountType.Investment)
+                {
+                    // Find the securities held
+                    foreach(int security in account.GetInvestmentSecurities())
+                    {
+                        if (!securities.Contains(security))
+                        {
+                            securities.Add(security);
+                        }
+                    }
+                }
+            }
+
+            // Now ask quote for all securities held
+            foreach (int security in securities)
+            {
+                var secRow = household.Securities.FindByID(security);
+                if (!secRow.IsSymbolNull())
+                {
+                    var price = quoter.GetQuote(secRow.Symbol);
+
+                    Console.WriteLine($"{secRow.Symbol}:\t{price}");
+
+                    if (price >= 0)
+                    {
+                        household.SecurityPrices.Add(secRow, DateTime.Now, price);
+                    }
+                }
+            }
+
+            mainWindow.CommitChanges();
+            mainWindow.UpdateAll();
         }
 
         #endregion

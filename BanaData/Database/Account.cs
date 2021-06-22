@@ -104,6 +104,24 @@ namespace BanaData.Database
                 // Get latest price for the securities in the portfolio
                 return portfolio.GetValuation();
             }
+
+            // Get the securities held in an investment account
+            public IEnumerable<int> GetInvestmentSecurities()
+            {
+                // Handle to the dataset
+                var household = Table.DataSet as Household;
+
+                // Compute the portfolio
+                var portfolio = new Portfolio();
+                var accountToTransaction = Table.ChildRelations["FK_Accounts_Transactions"];
+                foreach (var transRow in GetChildRows(accountToTransaction))
+                {
+                    portfolio.ApplyTransaction(household, transRow as Household.TransactionsRow);
+                }
+
+                // Get latest price for the securities in the portfolio
+                return portfolio.GetSecurities();
+            }
         }
 
         partial class AccountsDataTable

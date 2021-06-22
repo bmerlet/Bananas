@@ -152,5 +152,11 @@ namespace BanaData.Database
 
             return val;
         }
+
+        // Get the securities held in this portfolio
+        public IEnumerable<int> GetSecurities()
+        {
+            return lots.Select(l => l.Security.ID).Distinct();
+        }
     }
 }

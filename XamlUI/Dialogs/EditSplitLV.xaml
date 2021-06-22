@@ -102,8 +102,6 @@
 
                     <Grid.Resources>
 
-                        <t:VisibilityBoolConverter x:Key="visibilityConverter"/>
-
                         <ContextMenu x:Key="TransactionContextMenu">
                             <MenuItem Header="Delete" Command="{Binding DeleteLineItem}"/>
                         </ContextMenu>

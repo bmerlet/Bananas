@@ -199,8 +199,6 @@
 
             <Grid.Resources>
 
-                <t:VisibilityBoolConverter x:Key="visibilityConverter"/>
-
                 <ContextMenu x:Key="TransactionContextMenu">
                     <MenuItem Header="Delete" Command="{Binding DeleteTransaction}"/>
                     <MenuItem Header="Split..." Command="{Binding EditedTransaction.SplitTransaction}"/>
@@ -249,7 +247,7 @@
                 IsEditable="True" 
                 Text="{Binding EditedTransaction.Medium, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 ItemsSource="{Binding EditedTransaction.MediumSource}"
-                Visibility="{Binding IsBank, Converter={StaticResource visibilityConverter}}"/>
+                Visibility="{Binding IsBank, Converter={StaticResource visibilityBoolConverter}}"/>
 
             <!-- Payee -->
             <local:AutoCompleteTextBox 

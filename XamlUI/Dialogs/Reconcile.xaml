@@ -14,9 +14,7 @@
     <DockPanel>
 
         <DockPanel.Resources>
-            <Style TargetType="TextBlock">
-                <Setter Property="Margin" Value="5"/>
-            </Style>
+            <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}"/>
         </DockPanel.Resources>
         
         <!-- OK/Cancel panel -->

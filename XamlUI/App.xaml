@@ -8,6 +8,19 @@
     <Application.Resources>
 
         <!--
+          == Converterss ==
+          -->
+        <t:VisibilityBoolConverter x:Key="visibilityBoolConverter"/>
+        <t:FontWeightConverter x:Key="fontWeightConverter"/>
+
+
+        <!-- Form text blocks -->
+        <Style TargetType="TextBlock" x:Key="FormTextBlock">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <!--
           == Buttons ==
           -->
 
@@ -43,7 +56,6 @@
         </Style>
 
         <!-- Style for category autocomplete textbox -->
-        <t:FontWeightConverter x:Key="fontWeightConverter"/>
         <Style TargetType="{x:Type ucs:AutoCompleteTextBox}" x:Key="CategoryBoxStyle">
             <Setter Property="Watermark" Value="Category"/>
             <Setter Property="DisplayMember" Value="FullName"/>

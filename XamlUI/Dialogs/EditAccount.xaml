@@ -12,10 +12,8 @@
         WindowStartupLocation="CenterOwner"
         SizeToContent="WidthAndHeight">
     <Window.Resources>
-        <Style TargetType="TextBlock">
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
+
+        <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}"/>
         <Style TargetType="w:WatermarkTextBox">
             <Setter Property="Margin" Value="5"/>
         </Style>

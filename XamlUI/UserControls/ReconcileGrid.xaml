@@ -9,10 +9,6 @@
              d:DesignHeight="450" d:DesignWidth="400">
     <DockPanel>
         
-        <DockPanel.Resources>
-            <t:VisibilityBoolConverter x:Key="visibilityConverter"/>
-        </DockPanel.Resources>
-
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
             <TextBlock Text="{Binding Title}"/>
         </StackPanel>

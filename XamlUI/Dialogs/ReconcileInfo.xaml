@@ -14,12 +14,7 @@
         SizeToContent="WidthAndHeight">
     <Window.Resources>
 
-        <t:VisibilityBoolConverter x:Key="visibilityConverter"/>
-
-        <Style TargetType="TextBlock">
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
+        <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}"/>
         <Style TargetType="w:WatermarkTextBox">
             <Setter Property="Margin" Value="5"/>
         </Style>
@@ -38,7 +33,7 @@
         <!-- Interest panel -->
         <Grid
             DockPanel.Dock="Bottom"
-            Visibility="{Binding IsInterestInfoVisible, Converter={StaticResource visibilityConverter}, FallbackValue=Visible}">
+            Visibility="{Binding IsInterestInfoVisible, Converter={StaticResource visibilityBoolConverter}, FallbackValue=Visible}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="5" />
                 <RowDefinition Height="Auto" />

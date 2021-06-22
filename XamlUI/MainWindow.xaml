@@ -32,6 +32,7 @@
             </MenuItem>
             <MenuItem Header="Actions">
                 <MenuItem Header="Reconcile..." Command="{Binding Reconcile}" InputGestureText="^R"/>
+                <MenuItem Header="Update stock prices..." Command="{Binding UpdateStockPrices}"/>
             </MenuItem>
             <MenuItem Header="View">
                 <MenuItem Header="Show closed accounts" IsCheckable="True" IsChecked="{Binding ShowClosedAccounts}"/>
