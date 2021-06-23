@@ -37,6 +37,7 @@
             Name="listView"
             BorderThickness="0"
             Grid.Row="1" Grid.ColumnSpan="2" 
+            SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"
             ItemsSource="{Binding AccountsAndBalances}"
             ScrollViewer.VerticalScrollBarVisibility="Disabled"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -46,11 +47,7 @@
                     <GridViewColumn>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock>
-                                    <Hyperlink Command="{Binding GoToAccount}">
-                                        <TextBlock Text="{Binding AccountName}"/>
-                                    </Hyperlink>
-                                </TextBlock>
+                                <TextBlock Text="{Binding AccountName}" Foreground="Blue"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

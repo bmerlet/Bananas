@@ -73,6 +73,21 @@ namespace BanaData.Logic.Main
         // List of accounts and balances
         public ObservableCollection<AccountAndBalance> AccountsAndBalances { get; } = new ObservableCollection<AccountAndBalance>();
 
+        // Selected account
+        private AccountAndBalance selectedAccount;
+        public AccountAndBalance SelectedAccount 
+        { 
+            get => selectedAccount;
+            set
+            {
+                if (selectedAccount != value)
+                {
+                    selectedAccount = value;
+                    AccountClicked?.Invoke(this, new AccountClickedEventArgs(selectedAccount.AccountID));
+                }
+            }
+        }
+
         // Combined balance
         public string Balance { get; private set; }
 
@@ -117,7 +132,7 @@ namespace BanaData.Logic.Main
                     AccountsAndBalances[ix].AccountName != acct.Name ||
                     AccountsAndBalances[ix].DecimalBalance != balance)
                 {
-                    var aab = new AccountAndBalance(this, acct.ID, acct.Name, balance);
+                    var aab = new AccountAndBalance(acct.ID, acct.Name, balance);
                     if (ix < AccountsAndBalances.Count)
                     {
                         AccountsAndBalances[ix] = aab;
@@ -150,26 +165,18 @@ namespace BanaData.Logic.Main
             return totalBalance;
         }
 
-        //  Called from AccountAndBalance
-        public void OnAccountClicked(int accountID)
-        {
-            AccountClicked?.Invoke(this, new AccountClickedEventArgs(accountID));
-        }
-
-
         #endregion
 
         #region support classes
 
         public class AccountAndBalance
         {
-            public AccountAndBalance(AccountGroupLogic accountGroup, int accountID, string accountName, decimal balance)
+            public AccountAndBalance(int accountID, string accountName, decimal balance)
             {
                 AccountID = accountID;
                 AccountName = accountName;
                 Balance = balance.ToString("N");
                 DecimalBalance = balance;
-                GoToAccount = new CommandBase(() => accountGroup.OnAccountClicked(accountID));
             }
 
             // Properties for logic
@@ -182,9 +189,6 @@ namespace BanaData.Logic.Main
 
             // Account balance
             public string Balance { get; }
-
-            // Command to execute when clicking on the account
-            public CommandBase GoToAccount { get; }
         }
 
         #endregion
