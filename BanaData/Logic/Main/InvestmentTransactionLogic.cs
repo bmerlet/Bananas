@@ -105,12 +105,85 @@ namespace BanaData.Logic.Main
 
             switch(data.Type)
             {
+                case EInvestmentTransactionType.Cash:
+                    desc = "Opening balance";
+                    break;
+
+                case EInvestmentTransactionType.InterestIncome:
+                    desc = $"Received ${AmountString} in interest";
+                    break;
+
+                case EInvestmentTransactionType.TransferCash:
+                case EInvestmentTransactionType.TransferCashIn:
+                    desc = $"Transfered ${AmountString} in";
+                    break;
+
+                case EInvestmentTransactionType.TransferCashOut:
+                    desc = $"Transfered ${AmountString} out";
+                    break;
+
+                case EInvestmentTransactionType.TransferMiscellaneousIncomeIn:
+                    desc = $"Transfer ${AmountString}";
+                    break;
+
+                case EInvestmentTransactionType.SharesIn:
+                    desc = $"Received {SecurityQuantity} {SecuritySymbol} @ ${SecurityPrice}";
+                    break;
+
+                case EInvestmentTransactionType.SharesOut:
+                    desc = $"Lost {SecurityQuantity} {SecuritySymbol} @ ${SecurityPrice}";
+                    break;
+
                 case EInvestmentTransactionType.Buy:
+                case EInvestmentTransactionType.BuyFromTransferredCash:
                     desc = $"Bought {SecurityQuantity} {SecuritySymbol} @ ${SecurityPrice}";
                     break;
+
                 case EInvestmentTransactionType.Sell:
+                case EInvestmentTransactionType.SellAndTransferCash:
                     desc = $"Sold {SecurityQuantity} {SecuritySymbol} @ ${SecurityPrice}";
                     break;
+
+                case EInvestmentTransactionType.Dividends:
+                case EInvestmentTransactionType.TransferDividends:
+                    desc = $"Received ${AmountString} in dividends from {SecuritySymbol}";
+                    break;
+
+                case EInvestmentTransactionType.ReinvestDividends:
+                case EInvestmentTransactionType.ReinvestLongTermCapitalGains:
+                case EInvestmentTransactionType.ReinvestMediumTermCapitalGains:
+                case EInvestmentTransactionType.ReinvestShortTermCapitalGains:
+                    desc = $"Reinvested ${AmountString} as {SecurityQuantity} shares of {SecuritySymbol}";
+                    break;
+
+                case EInvestmentTransactionType.ShortTermCapitalGains:
+                case EInvestmentTransactionType.TransferShortTermCapitalGains:
+                    desc = $"Received ${AmountString} in ST CG from {SecuritySymbol}";
+                    break;
+
+                case EInvestmentTransactionType.LongTermCapitalGains:
+                case EInvestmentTransactionType.TransferLongTermCapitalGains:
+                    desc = $"Received ${AmountString} in LT CG from {SecuritySymbol}";
+                    break;
+
+                    /*
+ 
+        [EnumDescription("ROC")]
+        ReturnOnCapital,
+
+        [EnumDescription("Grant")]
+        Grant,
+
+        [EnumDescription("Vest")]
+        Vest,
+
+        [EnumDescription("Exercise")]
+        Exercise,
+
+        [EnumDescription("Expire")]
+        Expire,
+
+                     */
             }
 
             return desc;
