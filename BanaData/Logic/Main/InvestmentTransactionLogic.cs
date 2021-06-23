@@ -15,17 +15,7 @@ namespace BanaData.Logic.Main
         #region Private fields
 
         // Parent logics
-        private readonly MainWindowLogic mainWindowLogic;
         private readonly InvestmentRegisterLogic investmentRegisterLogic;
-
-        // Account this transaction is for
-        private readonly int accountID;
-
-        // Transaction data
-        private readonly InvestmentTransactionData data;
-
-        // Backup of data (taken at edit start)
-        private InvestmentTransactionData backup;
 
         #endregion
 
@@ -39,8 +29,8 @@ namespace BanaData.Logic.Main
             InvestmentTransactionData _data)
             : base(_mainWindowLogic, _accountID, transID, _data)
         {
-            (mainWindowLogic, investmentRegisterLogic, accountID, TransID, data) =
-                (_mainWindowLogic, _investmentRegisterLogic, _accountID, transID, _data);
+            (investmentRegisterLogic) =
+                (_investmentRegisterLogic);
         }
 
         public InvestmentTransactionLogic(
