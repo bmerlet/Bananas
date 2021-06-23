@@ -46,7 +46,7 @@
                 <GridView>
 
                     <!-- Date column -->
-                    <GridViewColumn Width="{Binding WidthOfDateColumn, Mode=TwoWay}">
+                    <GridViewColumn Width="{Binding Widths.WidthOfDateColumn, Mode=TwoWay}">
                         <GridViewColumn.Header>
                             <GridViewColumnHeader Content="Date" Tag="Date" Click="OnColumnHeaderClicked"/>
                         </GridViewColumn.Header>
@@ -60,7 +60,7 @@
                     </GridViewColumn>
 
                     <!-- Medium column -->
-                    <GridViewColumn Width="{Binding WidthOfMediumColumn, Mode=TwoWay}">
+                    <GridViewColumn Width="{Binding Widths.WidthOfMediumColumn, Mode=TwoWay}">
                         <GridViewColumn.Header>
                             <GridViewColumnHeader Content="Type" Tag="Medium" Click="OnColumnHeaderClicked"/>
                         </GridViewColumn.Header>
@@ -74,7 +74,7 @@
                     </GridViewColumn>
                     
                     <!-- Payee column -->
-                    <GridViewColumn Width="{Binding WidthOfPayeeColumn, Mode=TwoWay}">
+                    <GridViewColumn Width="{Binding Widths.WidthOfPayeeColumn, Mode=TwoWay}">
                         <GridViewColumn.Header>
                             <GridViewColumnHeader Content="Payee" Tag="Payee" Click="OnColumnHeaderClicked"/>
                         </GridViewColumn.Header>
@@ -88,7 +88,7 @@
                     </GridViewColumn>
                     
                     <!-- Memo column-->
-                    <GridViewColumn Width="{Binding WidthOfMemoColumn, Mode=TwoWay}">
+                    <GridViewColumn Width="{Binding Widths.WidthOfMemoColumn, Mode=TwoWay}">
                         <GridViewColumn.Header>
                             <GridViewColumnHeader Content="Memo" Tag="Memo" Click="OnColumnHeaderClicked"/>
                         </GridViewColumn.Header>
@@ -102,7 +102,7 @@
                     </GridViewColumn>
 
                     <!-- Category column-->
-                    <GridViewColumn Width="{Binding WidthOfCategoryColumn, Mode=TwoWay}">
+                    <GridViewColumn Width="{Binding Widths.WidthOfCategoryColumn, Mode=TwoWay}">
                         <GridViewColumn.Header>
                             <GridViewColumnHeader Content="Category" Tag="Category" Click="OnColumnHeaderClicked"/>
                         </GridViewColumn.Header>
@@ -116,7 +116,7 @@
                     </GridViewColumn>
 
                     <!-- Payment column-->
-                    <GridViewColumn Width="{Binding WidthOfPaymentColumn, Mode=TwoWay}">
+                    <GridViewColumn Width="{Binding Widths.WidthOfPaymentColumn, Mode=TwoWay}">
                         <GridViewColumn.Header>
                             <GridViewColumnHeader Content="Payment" Tag="Payment" Click="OnColumnHeaderClicked"/>
                         </GridViewColumn.Header>
@@ -131,7 +131,7 @@
                     </GridViewColumn>
 
                     <!-- Status column-->
-                    <GridViewColumn Width="{Binding WidthOfStatusColumn, Mode=TwoWay}">
+                    <GridViewColumn Width="{Binding Widths.WidthOfStatusColumn, Mode=TwoWay}">
                         <GridViewColumn.Header>
                             <GridViewColumnHeader Content="Status" Tag="Status" Click="OnColumnHeaderClicked"/>
                         </GridViewColumn.Header>
@@ -147,7 +147,7 @@
                     </GridViewColumn>
 
                     <!-- Deposit column-->
-                    <GridViewColumn Width="{Binding WidthOfDepositColumn, Mode=TwoWay}">
+                    <GridViewColumn Width="{Binding Widths.WidthOfDepositColumn, Mode=TwoWay}">
                         <GridViewColumn.Header>
                             <GridViewColumnHeader Content="Deposit" Tag="Deposit" Click="OnColumnHeaderClicked"/>
                         </GridViewColumn.Header>
@@ -163,7 +163,7 @@
 
 
                     <!-- Balance column-->
-                    <GridViewColumn Header="Balance" Width="{Binding WidthOfBalanceColumn, Mode=TwoWay}">
+                    <GridViewColumn Header="Balance" Width="{Binding Widths.WidthOfBalanceColumn, Mode=TwoWay}">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock
@@ -215,15 +215,15 @@
             </Grid.RowDefinitions>
             
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="{Binding WidthOfDateColumn}"/>
-                <ColumnDefinition Width="{Binding WidthOfMediumColumn}"/>
-                <ColumnDefinition Width="{Binding WidthOfPayeeColumn}"/>
-                <ColumnDefinition Width="{Binding WidthOfMemoColumn}"/>
-                <ColumnDefinition Width="{Binding WidthOfCategoryColumn}"/>
-                <ColumnDefinition Width="{Binding WidthOfPaymentColumn}"/>
-                <ColumnDefinition Width="{Binding WidthOfStatusColumn}"/>
-                <ColumnDefinition Width="{Binding WidthOfDepositColumn}"/>
-                <ColumnDefinition Width="{Binding WidthOfBalanceColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfDateColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfMediumColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfPayeeColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfMemoColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfCategoryColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfPaymentColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfStatusColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfDepositColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfBalanceColumn}"/>
             </Grid.ColumnDefinitions>
 
             <!-- Date-->

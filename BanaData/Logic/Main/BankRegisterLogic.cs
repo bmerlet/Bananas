@@ -41,6 +41,9 @@ namespace BanaData.Logic.Main
             Transactions.GroupDescriptions.Add(new PropertyGroupDescription("GroupSorter"));
 
             DeleteTransaction = new CommandBase(OnDeleteTransaction);
+
+            // Create column width manager
+            Widths = new ColumnWidths(mainWindowLogic, this);
         }
 
         #endregion
@@ -109,131 +112,7 @@ namespace BanaData.Logic.Main
         public CommandBase DeleteTransaction { get; }
 
         // Column widths
-        public double WidthOfDateColumn
-        {
-            get => mainWindowLogic.UserSettings.WidthOfDateColumn;
-            set
-            {
-                if (mainWindowLogic.UserSettings.WidthOfDateColumn != value)
-                {
-                    mainWindowLogic.UserSettings.WidthOfDateColumn = value;
-                    mainWindowLogic.SaveUserSettings();
-                    OnPropertyChanged(() => WidthOfDateColumn);
-                }
-            }
-        }
-
-        public double WidthOfMediumColumn
-        {
-            get => IsBank ? mainWindowLogic.UserSettings.WidthOfMediumColumn : 0;
-            set
-            {
-                if (IsBank && mainWindowLogic.UserSettings.WidthOfMediumColumn != value)
-                {
-                    mainWindowLogic.UserSettings.WidthOfMediumColumn = value;
-                    mainWindowLogic.SaveUserSettings();
-                    OnPropertyChanged(() => WidthOfMediumColumn);
-                }
-            }
-        }
-
-        public double WidthOfPayeeColumn
-        {
-            get => mainWindowLogic.UserSettings.WidthOfPayeeColumn;
-            set
-            {
-                if (mainWindowLogic.UserSettings.WidthOfPayeeColumn != value)
-                {
-                    mainWindowLogic.UserSettings.WidthOfPayeeColumn = value;
-                    mainWindowLogic.SaveUserSettings();
-                    OnPropertyChanged(() => WidthOfPayeeColumn);
-                }
-            }
-        }
-
-        public double WidthOfMemoColumn
-        {
-            get => mainWindowLogic.UserSettings.WidthOfMemoColumn;
-            set
-            {
-                if (mainWindowLogic.UserSettings.WidthOfMemoColumn != value)
-                {
-                    mainWindowLogic.UserSettings.WidthOfMemoColumn = value;
-                    mainWindowLogic.SaveUserSettings();
-                    OnPropertyChanged(() => WidthOfMemoColumn);
-                }
-            }
-        }
-
-        public double WidthOfCategoryColumn
-        {
-            get => mainWindowLogic.UserSettings.WidthOfCategoryColumn;
-            set
-            {
-                if (mainWindowLogic.UserSettings.WidthOfCategoryColumn != value)
-                {
-                    mainWindowLogic.UserSettings.WidthOfCategoryColumn = value;
-                    mainWindowLogic.SaveUserSettings();
-                    OnPropertyChanged(() => WidthOfCategoryColumn);
-                }
-            }
-        }
-
-        public double WidthOfPaymentColumn
-        {
-            get => mainWindowLogic.UserSettings.WidthOfPaymentColumn;
-            set
-            {
-                if (mainWindowLogic.UserSettings.WidthOfPaymentColumn != value)
-                {
-                    mainWindowLogic.UserSettings.WidthOfPaymentColumn = value;
-                    mainWindowLogic.SaveUserSettings();
-                    OnPropertyChanged(() => WidthOfPaymentColumn);
-                }
-            }
-        }
-
-        public double WidthOfStatusColumn
-        {
-            get => mainWindowLogic.UserSettings.WidthOfStatusColumn;
-            set
-            {
-                if (mainWindowLogic.UserSettings.WidthOfStatusColumn != value)
-                {
-                    mainWindowLogic.UserSettings.WidthOfStatusColumn = value;
-                    mainWindowLogic.SaveUserSettings();
-                    OnPropertyChanged(() => WidthOfStatusColumn);
-                }
-            }
-        }
-
-        public double WidthOfDepositColumn
-        {
-            get => mainWindowLogic.UserSettings.WidthOfDepositColumn;
-            set
-            {
-                if (mainWindowLogic.UserSettings.WidthOfDepositColumn != value)
-                {
-                    mainWindowLogic.UserSettings.WidthOfDepositColumn = value;
-                    mainWindowLogic.SaveUserSettings();
-                    OnPropertyChanged(() => WidthOfDepositColumn);
-                }
-            }
-        }
-
-        public double WidthOfBalanceColumn
-        {
-            get => mainWindowLogic.UserSettings.WidthOfBalanceColumn;
-            set
-            {
-                if (mainWindowLogic.UserSettings.WidthOfBalanceColumn != value)
-                {
-                    mainWindowLogic.UserSettings.WidthOfBalanceColumn = value;
-                    mainWindowLogic.SaveUserSettings();
-                    OnPropertyChanged(() => WidthOfBalanceColumn);
-                }
-            }
-        }
+        public ColumnWidths Widths { get; }
 
         #endregion
 
@@ -255,6 +134,7 @@ namespace BanaData.Logic.Main
             // Export if banking account
             IsBank = account.Type == EAccountType.Bank;
             OnPropertyChanged(() => IsBank);
+            Widths.IsBankHasChanged();
 
             // Find transactions and put them in the transaction list
             transactions.Clear();
@@ -345,9 +225,9 @@ namespace BanaData.Logic.Main
 
             foreach(var tr in transactions)
             {
-                if (tr.transID >= 0)
+                if (tr.TransID >= 0)
                 {
-                    var trRow = household.Transactions.FindByID(tr.transID);
+                    var trRow = household.Transactions.FindByID(tr.TransID);
                     tr.UpdateStatus(trRow.Status);
                 }
             }
@@ -414,7 +294,7 @@ namespace BanaData.Logic.Main
                 return;
             }
 
-            if (btl.transID < 0)
+            if (btl.TransID < 0)
             {
                 // Can't remove the empty transaction
                 return;
@@ -425,7 +305,7 @@ namespace BanaData.Logic.Main
 
             // Delete from dataset
             var household = mainWindowLogic.Household;
-            var transactionRow = household.Transactions.FindByID(btl.transID);
+            var transactionRow = household.Transactions.FindByID(btl.TransID);
 
             // Delete all line items
             var lineItems = household.LineItems.GetByTransaction(transactionRow);
@@ -469,6 +349,151 @@ namespace BanaData.Logic.Main
                     btl.Balance = balance;
                 }
             }
+        }
+
+        #endregion
+
+        #region Supporting classes
+
+        public class ColumnWidths : LogicBase
+        {
+            private readonly MainWindowLogic mainWindowLogic;
+            private readonly BankRegisterLogic bankRegisterLogic;
+
+            public ColumnWidths(MainWindowLogic _mainWindowLogic, BankRegisterLogic _bankRegisterLogic)
+                => (mainWindowLogic, bankRegisterLogic) = (_mainWindowLogic, _bankRegisterLogic);
+
+            public void IsBankHasChanged()
+            {
+                OnPropertyChanged(() => WidthOfMediumColumn);
+            }
+
+            public double WidthOfDateColumn
+            {
+                get => mainWindowLogic.UserSettings.WidthOfDateColumn;
+                set
+                {
+                    if (mainWindowLogic.UserSettings.WidthOfDateColumn != value)
+                    {
+                        mainWindowLogic.UserSettings.WidthOfDateColumn = value;
+                        mainWindowLogic.SaveUserSettings();
+                        OnPropertyChanged(() => WidthOfDateColumn);
+                    }
+                }
+            }
+
+            public double WidthOfMediumColumn
+            {
+                get => bankRegisterLogic.IsBank ? mainWindowLogic.UserSettings.WidthOfMediumColumn : 0;
+                set
+                {
+                    if (bankRegisterLogic.IsBank && mainWindowLogic.UserSettings.WidthOfMediumColumn != value)
+                    {
+                        mainWindowLogic.UserSettings.WidthOfMediumColumn = value;
+                        mainWindowLogic.SaveUserSettings();
+                        OnPropertyChanged(() => WidthOfMediumColumn);
+                    }
+                }
+            }
+
+            public double WidthOfPayeeColumn
+            {
+                get => mainWindowLogic.UserSettings.WidthOfPayeeColumn;
+                set
+                {
+                    if (mainWindowLogic.UserSettings.WidthOfPayeeColumn != value)
+                    {
+                        mainWindowLogic.UserSettings.WidthOfPayeeColumn = value;
+                        mainWindowLogic.SaveUserSettings();
+                        OnPropertyChanged(() => WidthOfPayeeColumn);
+                    }
+                }
+            }
+
+            public double WidthOfMemoColumn
+            {
+                get => mainWindowLogic.UserSettings.WidthOfMemoColumn;
+                set
+                {
+                    if (mainWindowLogic.UserSettings.WidthOfMemoColumn != value)
+                    {
+                        mainWindowLogic.UserSettings.WidthOfMemoColumn = value;
+                        mainWindowLogic.SaveUserSettings();
+                        OnPropertyChanged(() => WidthOfMemoColumn);
+                    }
+                }
+            }
+
+            public double WidthOfCategoryColumn
+            {
+                get => mainWindowLogic.UserSettings.WidthOfCategoryColumn;
+                set
+                {
+                    if (mainWindowLogic.UserSettings.WidthOfCategoryColumn != value)
+                    {
+                        mainWindowLogic.UserSettings.WidthOfCategoryColumn = value;
+                        mainWindowLogic.SaveUserSettings();
+                        OnPropertyChanged(() => WidthOfCategoryColumn);
+                    }
+                }
+            }
+
+            public double WidthOfPaymentColumn
+            {
+                get => mainWindowLogic.UserSettings.WidthOfPaymentColumn;
+                set
+                {
+                    if (mainWindowLogic.UserSettings.WidthOfPaymentColumn != value)
+                    {
+                        mainWindowLogic.UserSettings.WidthOfPaymentColumn = value;
+                        mainWindowLogic.SaveUserSettings();
+                        OnPropertyChanged(() => WidthOfPaymentColumn);
+                    }
+                }
+            }
+
+            public double WidthOfStatusColumn
+            {
+                get => mainWindowLogic.UserSettings.WidthOfStatusColumn;
+                set
+                {
+                    if (mainWindowLogic.UserSettings.WidthOfStatusColumn != value)
+                    {
+                        mainWindowLogic.UserSettings.WidthOfStatusColumn = value;
+                        mainWindowLogic.SaveUserSettings();
+                        OnPropertyChanged(() => WidthOfStatusColumn);
+                    }
+                }
+            }
+
+            public double WidthOfDepositColumn
+            {
+                get => mainWindowLogic.UserSettings.WidthOfDepositColumn;
+                set
+                {
+                    if (mainWindowLogic.UserSettings.WidthOfDepositColumn != value)
+                    {
+                        mainWindowLogic.UserSettings.WidthOfDepositColumn = value;
+                        mainWindowLogic.SaveUserSettings();
+                        OnPropertyChanged(() => WidthOfDepositColumn);
+                    }
+                }
+            }
+
+            public double WidthOfBalanceColumn
+            {
+                get => mainWindowLogic.UserSettings.WidthOfBalanceColumn;
+                set
+                {
+                    if (mainWindowLogic.UserSettings.WidthOfBalanceColumn != value)
+                    {
+                        mainWindowLogic.UserSettings.WidthOfBalanceColumn = value;
+                        mainWindowLogic.SaveUserSettings();
+                        OnPropertyChanged(() => WidthOfBalanceColumn);
+                    }
+                }
+            }
+
         }
 
         #endregion

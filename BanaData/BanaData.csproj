@@ -85,6 +85,7 @@
     <Compile Include="Logic\Items\LineItem.cs" />
     <Compile Include="Logic\Items\MemorizedPayeeItem.cs" />
     <Compile Include="Logic\Items\SecurityItem.cs" />
+    <Compile Include="Logic\Main\AbstractTransactionLogic.cs" />
     <Compile Include="Logic\Main\AccountGroupLogic.cs" />
     <Compile Include="Logic\Main\BankingTransactionLogic.cs" />
     <Compile Include="Logic\Main\BankRegisterLogic.cs" />

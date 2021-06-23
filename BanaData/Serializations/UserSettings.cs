@@ -24,7 +24,7 @@ namespace BanaData.Serializations
         // Last file opened
         public string LastFileOpened;
 
-        // Column widths
+        // Column widths (bank register)
         public double WidthOfDateColumn = 80;
         public double WidthOfMediumColumn = 80;
         public double WidthOfPayeeColumn = 140;
@@ -34,5 +34,16 @@ namespace BanaData.Serializations
         public double WidthOfStatusColumn = 40;
         public double WidthOfDepositColumn = 90;
         public double WidthOfBalanceColumn = 90;
+
+        // Column widths (investment register)
+        public double InvstWidthOfStatusColumn = 40;
+        public double InvstWidthOfDateColumn = 80;
+        public double InvstWidthOfTypeColumn = 80;
+        public double InvstWidthOfPayeeColumn = 140;
+        public double InvstWidthOfMemoColumn = 140;
+        public double InvstWidthOfCategoryColumn = 140;
+        public double InvstWidthOfPaymentColumn = 90;
+        public double InvstWidthOfDepositColumn = 90;
+        public double InvstWidthOfBalanceColumn = 90;
     }
 }

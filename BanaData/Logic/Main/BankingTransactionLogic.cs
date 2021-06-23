@@ -16,11 +16,11 @@ namespace BanaData.Logic.Main
     /// <summary>
     /// Logic for one banking transaction
     /// </summary>
-    public class BankingTransactionLogic : LogicBase, IEditableObject
+    public class BankingTransactionLogic : AbstractTransactionLogic
     {
         #region Supporting class
 
-        public class BankTransactionData
+        public class BankTransactionData : AbstractTransactionLogic.BaseTransactionData
         {
             // Construct from scratch
             public BankTransactionData(
@@ -30,59 +30,23 @@ namespace BanaData.Logic.Main
                 string payee,
                 ETransactionStatus status,
                 IEnumerable<LineItem> lineItems)
-            {
-                (Date, Medium, CheckNumber, Payee, Status) =
-                    (date, medium, checkNumber, payee, status);
-
-                LineItems.AddRange(lineItems);
-            }
+                : base(date, payee, status, lineItems) => (Medium, CheckNumber) = (medium, checkNumber);
 
             // Clone
             public BankTransactionData(BankTransactionData src)
-            {
-                (Date, Medium, CheckNumber, Payee, Status) =
-                    (src.Date, src.Medium, src.CheckNumber, src.Payee, src.Status);
-
-                src.LineItems.ForEach(li => LineItems.Add(new LineItem(li)));
-            }
+                : base(src) => (Medium, CheckNumber) = (src.Medium, src.CheckNumber);
 
             // Properties
-            public DateTime Date;
             public ETransactionMedium Medium;
             public uint CheckNumber;
-            public string Payee;
-            public ETransactionStatus Status;
-            public readonly List<LineItem> LineItems = new List<LineItem>();
-
-            // Show either the first line item when no split or a summary
-            public string Memo => LineItems.Count == 1 ? LineItems[0].Memo : "";
-            public string Category => LineItems.Count == 1 ? LineItems[0].Category : "<Split>";
-            public decimal Amount => LineItems.Sum(li => li.Amount);
 
             public override bool Equals(object obj)
             {
-                bool equ = false;
-                if (obj is BankTransactionData o)
-                {
-                    equ =
-                        o.Date.Equals(Date) &&
-                        o.Medium == Medium &&
-                        o.CheckNumber == CheckNumber &&
-                        o.Payee == Payee &&
-                        o.Amount == Amount &&
-                        o.Status == Status &&
-                        o.LineItems.Count == LineItems.Count;
-
-                    if (equ)
-                    {
-                        for (int i = 0; i < LineItems.Count; i++)
-                        {
-                            equ &= o.LineItems[i].Equals(LineItems[i]);
-                        }
-                    }
-                }
-
-                return equ;
+                return
+                    obj is BankTransactionData o &&
+                    base.Equals(o) &&
+                    o.Medium == Medium &&
+                    o.CheckNumber == CheckNumber;
             }
 
             public override int GetHashCode()
@@ -96,28 +60,16 @@ namespace BanaData.Logic.Main
         #region Private members
 
         // Parent logic
-        private readonly MainWindowLogic mainWindowLogic;
         private readonly BankRegisterLogic bankRegisterLogic;
-
-        // Account this transaction is for
-        private readonly int accountID;
-
-        // Transaction id, -1 if not in DB yet
-        public int transID;
-
-        // Transaction data
-        private readonly BankTransactionData data;
-
-        // Backup of data (taken at edit start)
-        private BankTransactionData backup;
 
         #endregion
 
         #region Constructor
 
-        public BankingTransactionLogic(MainWindowLogic _mainWindowLogic, BankRegisterLogic _bankRegisterLogic, int _accountID, int _transID, BankTransactionData _data)
+        public BankingTransactionLogic(MainWindowLogic mainWindowLogic, BankRegisterLogic _bankRegisterLogic, int accountID, int transID, BankTransactionData data)
+            : base(mainWindowLogic, accountID, transID, data)
         {
-            (mainWindowLogic, bankRegisterLogic, accountID, transID, data) = (_mainWindowLogic, _bankRegisterLogic, _accountID, _transID, _data);
+            (bankRegisterLogic, TransID) = (_bankRegisterLogic, transID);
 
             PayeeSelected = new CommandBase(OnPayeeSelected);
             SplitTransaction = new CommandBase(OnSplitTransaction);
@@ -134,13 +86,6 @@ namespace BanaData.Logic.Main
         #endregion
 
         #region UI properties
-
-        // Date of the transaction
-        public DateTime Date
-        {
-            get => data.Date;
-            set => data.Date = value;
-        }
 
         // Medium of transaction
         public string Medium 
@@ -163,205 +108,52 @@ namespace BanaData.Logic.Main
             MEDIUM_NEXTCHECKNUM, MEDIUM_ATM, MEDIUM_CASH, MEDIUM_DEPOSIT, MEDIUM_DIVIDEND, MEDIUM_EFT, MEDIUM_TRANSFER
         };
 
-        // Payee
-        public string Payee
-        { 
-            get => data.Payee;
-            set => data.Payee = value;
-        }
-        // Memorized payees
-        public IEnumerable<MemorizedPayeeItem> Payees => mainWindowLogic.MemorizedPayees;
+        // Derived from medium being a deposit or not
+        public bool IsDepositTabStop { get; private set; }
+        public bool IsPaymentTabStop => !IsDepositTabStop;
 
         // Activated when a payee is selected from the drop down list
         public CommandBase PayeeSelected { get; }
 
-        // Memo
-        public string Memo
-        {
-            get => data.Memo;
-            set
-            {
-                if (data.LineItems.Count == 1)
-                {
-                    data.LineItems[0].Memo = value;
-                }
-                else
-                {
-                    mainWindowLogic.ErrorMessage("Cannot add memo to split transactions");
-                }
-            }
-        }
-
-        // Category
-        public string Category 
-        {
-            get => data.Category;
-            set
-            {
-                if (data.LineItems.Count == 1)
-                {
-                    data.LineItems[0].Category = value;
-                }
-                else
-                {
-                    mainWindowLogic.ErrorMessage("Cannot set category for split transactions");
-                }
-            }
-        }
-
-        public IEnumerable<CategoryItem> Categories => mainWindowLogic.Categories;
-
-        // Amount (not a UI property, needed to recompute balance)
-        public decimal Amount => data.Amount;
-
-        // Payment
-        public string PaymentString => data.Amount > 0 ? "" : (-data.Amount).ToString("N");
-        public decimal Payment
-        {
-            get => -data.Amount;
-            set
-            {
-                if (data.Amount != -value)
-                {
-                    if (data.LineItems.Count == 1)
-                    {
-                        data.LineItems[0].Amount = -value;
-                        OnPropertyChanged(() => PaymentString);
-                        OnPropertyChanged(() => DepositString);
-                        OnPropertyChanged(() => Deposit);
-                    }
-                    else
-                    {
-                        mainWindowLogic.ErrorMessage("Cannot set amount on split transactions");
-                    }
-                }
-            }
-        }
-        public bool IsPaymentTabStop => !IsDepositTabStop;
-
-
-        public string Status
-        {
-            get => GetStatusString();
-            set => ParseStatusString(value);
-        }
-        public ETransactionStatus StatusAsEnum => data.Status;
-
-        public string[] StatusSource { get; } = new string[] { "", "c", "R" };
-
-        // Deposit
-        public string DepositString => data.Amount <= 0 ? "" : data.Amount.ToString("N");
-        public decimal Deposit
-        {
-            get => data.Amount;
-            set
-            {
-                if (data.Amount != value)
-                {
-                    if (data.LineItems.Count == 1)
-                    {
-                        data.LineItems[0].Amount = value;
-                        OnPropertyChanged(() => PaymentString);
-                        OnPropertyChanged(() => DepositString);
-                        OnPropertyChanged(() => Payment);
-                    }
-                    else
-                    {
-                        mainWindowLogic.ErrorMessage("Cannot set amount on split transactions");
-                    }
-                }
-            }
-        }
-        public bool IsDepositTabStop { get; private set; }
-
-        // Balance
-        // BalanceString is the UI property, Balance is updated by the logic
-        private decimal balance = decimal.MinValue;
-        public decimal Balance
-        {
-            get => balance;
-            set
-            {
-                if (balance != value)
-                {
-                    balance = value;
-                    BalanceString = balance.ToString("N");
-                    OnPropertyChanged(() => BalanceString);
-                }
-            }
-        }
-
-        public string BalanceString { get; private set; } = "";
-
-        // Group sorter
-        // To have the uncommitted transaction in a different group than the others
-        // And always displayed at the bottom of the listview
-        // (see PropertyGroupDescription in BankRegisterLogic constructor)
-        public string GroupSorter => (transID < 0) ? "Z" : "A";
-
         // Split dialog
         public CommandBase SplitTransaction { get; }
-
 
         #endregion
 
         #region IEditable interface implementation
 
-        public void BeginEdit()
+        public override void BeginEdit()
         {
             // Save existing data
             if (backup == null)
             {
-                backup = new BankTransactionData(data);
+                backup = new BankTransactionData(data as BankTransactionData);
             }
 
             Console.WriteLine($"Begin edit transaction date {Date.ToShortDateString()} Payee {Payee} amount {Payment}");
         }
 
-        public void CancelEdit()
+        public override void CancelEdit()
         {
+            base.CancelEdit();
+
             // Restore data
             if (backup != null)
             {
-                if (data.Date != backup.Date)
-                {
-                    data.Date = backup.Date;
-                    OnPropertyChanged(() => Date);
-                }
+                var _data = data as BankTransactionData;
+                var _backup = backup as BankTransactionData;
 
-                if (data.Medium != backup.Medium)
+                if (_data.Medium != _backup.Medium)
                 {
-                    data.Medium = backup.Medium;
+                    _data.Medium = _backup.Medium;
                     OnPropertyChanged(() => Medium);
                 }
 
-                if (data.CheckNumber != backup.CheckNumber)
+                if (_data.CheckNumber != _backup.CheckNumber)
                 {
-                    data.CheckNumber = backup.CheckNumber;
+                    _data.CheckNumber = _backup.CheckNumber;
                     OnPropertyChanged(() => Medium);
                 }
-
-                if (data.Payee != backup.Payee)
-                {
-                    data.Payee = backup.Payee;
-                    OnPropertyChanged(() => Payee);
-                }
-
-                if (data.Status != backup.Status)
-                {
-                    data.Status = backup.Status;
-                    OnPropertyChanged(() => Status);
-                }
-
-                data.LineItems.Clear();
-                backup.LineItems.ForEach(li => data.LineItems.Add(new LineItem(li)));
-                
-                OnPropertyChanged(() => Memo);
-                OnPropertyChanged(() => Category);
-                OnPropertyChanged(() => PaymentString);
-                OnPropertyChanged(() => Payment);
-                OnPropertyChanged(() => DepositString);
-                OnPropertyChanged(() => Deposit);
 
                 backup = null;
             }
@@ -369,7 +161,7 @@ namespace BanaData.Logic.Main
             Console.WriteLine($"Cancel edit transaction date {Date.ToShortDateString()} Payee {Payee} amount {Payment}");
         }
 
-        public void EndEdit()
+        public override void EndEdit()
         {
             // Out of sequence
             if (backup == null)
@@ -381,7 +173,7 @@ namespace BanaData.Logic.Main
             if (backup.Equals(data))
             {
                 backup = null;
-                bankRegisterLogic.MoveDownOneTransaction(transID < 0);
+                bankRegisterLogic.MoveDownOneTransaction(TransID < 0);
                 return;
             }
 
@@ -407,7 +199,7 @@ namespace BanaData.Logic.Main
             }
 
             // Commit the changes
-            bool wasEmptyTransaction = transID < 0;
+            bool wasEmptyTransaction = TransID < 0;
             if (wasEmptyTransaction)
             {
                 // Remove from the list since we are going to change the ID, which is the equality criteria,
@@ -432,12 +224,14 @@ namespace BanaData.Logic.Main
                 OnPropertyChanged(() => Date);
             }
 
-            if (data.Medium != backup.Medium)
+            var _data = data as BankTransactionData;
+            var _backup = backup as BankTransactionData;
+            if (_data.Medium != _backup.Medium)
             {
                 OnPropertyChanged(() => Medium);
             }
 
-            if (data.CheckNumber != backup.CheckNumber)
+            if (_data.CheckNumber != _backup.CheckNumber)
             {
                 OnPropertyChanged(() => Medium);
             }
@@ -483,16 +277,17 @@ namespace BanaData.Logic.Main
             var household = mainWindowLogic.Household;
             var accountRow = household.Accounts.FindByID(accountID);
 
-            if (transID < 0)
+            if (TransID < 0)
             {
                 // Create new transaction row
                 var transactionRow = household.Transactions.Add(accountRow, data.Date, data.Payee, data.Status);
-                transID = transactionRow.ID;
+                TransID = transactionRow.ID;
 
                 // Create new banking transaction row if needed
                 if (bankRegisterLogic.IsBank)
                 {
-                    household.BankingTransactions.Add(transactionRow, data.Medium, data.CheckNumber);
+                    var _data = data as BankTransactionData;
+                    household.BankingTransactions.Add(transactionRow, _data.Medium, _data.CheckNumber);
                 }
 
                 // Create all line items
@@ -504,12 +299,13 @@ namespace BanaData.Logic.Main
             else
             {
                 // Update transaction row
-                var transactionRow = household.Transactions.Update(transID, accountRow, data.Date, data.Payee, data.Status);
+                var transactionRow = household.Transactions.Update(TransID, accountRow, data.Date, data.Payee, data.Status);
 
                 // Update banking transaction if needed
                 if (bankRegisterLogic.IsBank)
                 {
-                    household.BankingTransactions.Update(transactionRow, data.Medium, data.CheckNumber);
+                    var _data = data as BankTransactionData;
+                    household.BankingTransactions.Update(transactionRow, _data.Medium, _data.CheckNumber);
                 }
 
                 //
@@ -545,16 +341,6 @@ namespace BanaData.Logic.Main
         #endregion
 
         #region Actions
-
-        // Called by on behalf of reconcile to update status on transaction if needed
-        public void UpdateStatus(ETransactionStatus newStatus)
-        {
-            if (data.Status != newStatus)
-            {
-                data.Status = newStatus;
-                OnPropertyChanged(() => Status);
-            }
-        }
 
         //
         // Fill out fields when a memorized payee is selected
@@ -613,16 +399,17 @@ namespace BanaData.Logic.Main
         {
             string rs = "???";
 
-            if (data.Medium == ETransactionMedium.Check)
+            var _data = data as BankTransactionData;
+            if (_data.Medium == ETransactionMedium.Check)
             {
-                if (data.CheckNumber > 0)
+                if (_data.CheckNumber > 0)
                 {
-                    rs = data.CheckNumber.ToString();
+                    rs = _data.CheckNumber.ToString();
                 }
             }
             else
             {
-                rs = EnumDescriptionAttribute.GetDescription(data.Medium);
+                rs = EnumDescriptionAttribute.GetDescription(_data.Medium);
             }
 
             return rs;
@@ -630,32 +417,33 @@ namespace BanaData.Logic.Main
 
         private void ParseMediumString(string type)
         {
-            data.CheckNumber = 0;
+            var _data = data as BankTransactionData;
+            _data.CheckNumber = 0;
 
             if (type == MEDIUM_NEXTCHECKNUM)
             {
-                data.Medium = ETransactionMedium.Check;
-                data.CheckNumber = GetNextCheckNumber();
+                _data.Medium = ETransactionMedium.Check;
+                _data.CheckNumber = GetNextCheckNumber();
                 OnPropertyChanged(() => Medium);
             }
             else if (MediumSource.Contains(type))
             {
-                data.Medium = EnumDescriptionAttribute.MatchDescription<ETransactionMedium>(type);
+                _data.Medium = EnumDescriptionAttribute.MatchDescription<ETransactionMedium>(type);
             }
             else
             {
                 if (uint.TryParse(type, out uint checkNum))
                 {
-                    data.Medium = ETransactionMedium.Check;
-                    data.CheckNumber = checkNum;
+                    _data.Medium = ETransactionMedium.Check;
+                    _data.CheckNumber = checkNum;
                 }
                 else
                 {
-                    data.Medium = ETransactionMedium.None;
+                    _data.Medium = ETransactionMedium.None;
                 }
             }
 
-            IsDepositTabStop = data.Medium == ETransactionMedium.Deposit;
+            IsDepositTabStop = _data.Medium == ETransactionMedium.Deposit;
             OnPropertyChanged(() => IsDepositTabStop);
             OnPropertyChanged(() => IsPaymentTabStop);
         }
@@ -668,47 +456,11 @@ namespace BanaData.Logic.Main
             {
                 if (btl != this)
                 {
-                    result = Math.Max(result, btl.data.CheckNumber);
+                    result = Math.Max(result, ((BankTransactionData)(btl.data)).CheckNumber);
                 }
             }
 
             return result + 1;
-        }
-
-        private string GetStatusString()
-        {
-            string rs = "???";
-
-            switch (data.Status)
-            {
-                case ETransactionStatus.Pending:
-                    rs = "";
-                    break;
-                case ETransactionStatus.Cleared:
-                    rs = "c";
-                    break;
-                case ETransactionStatus.Reconciled:
-                    rs = "R";
-                    break;
-            }
-            return rs;
-        }
-
-        private void ParseStatusString(string status)
-        {
-            switch (status)
-            {
-                case "":
-                    data.Status = ETransactionStatus.Pending;
-                    break;
-                case "c":
-                    data.Status = ETransactionStatus.Cleared;
-                    break;
-                case "R":
-                    data.Status = ETransactionStatus.Reconciled;
-                    break;
-            }
-            OnPropertyChanged(() => Status);
         }
 
         #endregion
@@ -717,12 +469,12 @@ namespace BanaData.Logic.Main
 
         public override bool Equals(object obj)
         {
-            return obj is BankingTransactionLogic o && transID == o.transID;
+            return obj is BankingTransactionLogic o && TransID == o.TransID;
         }
 
         public override int GetHashCode()
         {
-            return transID.GetHashCode();
+            return TransID.GetHashCode();
         }
 
         #endregion
