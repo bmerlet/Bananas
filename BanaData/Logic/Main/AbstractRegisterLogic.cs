@@ -61,6 +61,9 @@ namespace BanaData.Logic.Main
                 AddDBTransactionToList(account, transRow, lineItems);
             }
 
+            // Publish the transactions
+            PublishTransactionList();
+
             // Add new empty transaction at the bottom
             AddEmptyTransactionAtBottom();
 
@@ -117,6 +120,7 @@ namespace BanaData.Logic.Main
         protected abstract void ClearTransactionList();
         protected abstract void AddDBTransactionToList(
             Household.AccountsRow account, Household.TransactionsRow transRow, List<LineItem> lineItems);
+        protected abstract void PublishTransactionList();
         protected abstract void AddEmptyTransactionAtBottom();
         public abstract void RecomputeBalances();
 

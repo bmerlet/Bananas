@@ -46,6 +46,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\ObservableRangeCollection.cs" />
+    <Compile Include="Collections\WpfObservableRangeCollection.cs" />
     <Compile Include="Database\Account.cs" />
     <Compile Include="Database\BankingTransaction.cs" />
     <Compile Include="Database\Category.cs" />

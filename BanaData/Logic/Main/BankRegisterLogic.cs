@@ -11,6 +11,7 @@ using System.Windows.Data;
 using Toolbox.UILogic;
 using BanaData.Database;
 using BanaData.Logic.Items;
+using BanaData.Collections;
 
 namespace BanaData.Logic.Main
 {
@@ -19,7 +20,8 @@ namespace BanaData.Logic.Main
         #region Private members
 
         // Actual collection of transactions backing the Transactions collection view property
-        private readonly ObservableCollection<BankingTransactionLogic> transactions = new ObservableCollection<BankingTransactionLogic>();
+        private readonly WpfObservableRangeCollection<BankingTransactionLogic> transactions = new WpfObservableRangeCollection<BankingTransactionLogic>();
+        private readonly List<BankingTransactionLogic> temporaryTransactionList = new List<BankingTransactionLogic>();
 
         #endregion
 
@@ -108,7 +110,12 @@ namespace BanaData.Logic.Main
 
         #region Actions
 
-        protected override void ClearTransactionList() => transactions.Clear();
+        protected override void ClearTransactionList() => temporaryTransactionList.Clear();
+        protected override void PublishTransactionList()
+        {
+            transactions.Clear();
+            transactions.AddRange(temporaryTransactionList);
+        }
 
         // Routine to get a transaction from the DB into the list
         protected override void AddDBTransactionToList(Household.AccountsRow accountRow, Household.TransactionsRow transRow, List<LineItem> lineItems) 
@@ -131,7 +138,7 @@ namespace BanaData.Logic.Main
                 lineItems);
 
             var bankingTransaction = new BankingTransactionLogic(mainWindowLogic, this, accountID, transRow.ID, transactionData);
-            transactions.Add(bankingTransaction);
+            temporaryTransactionList.Add(bankingTransaction);
         }
 
         public void UpdateAllTransactionStatus()

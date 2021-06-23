@@ -108,6 +108,7 @@ namespace BanaData.Logic.Main
         #region Actions & Hooks for abstract base class
 
         protected override void ClearTransactionList() => transactions.Clear();
+        protected override void PublishTransactionList() { }
 
         // Routine to get a transaction from the DB into the list
         protected override void AddDBTransactionToList(Household.AccountsRow accountRow, Household.TransactionsRow transRow, List<LineItem> lineItems)
