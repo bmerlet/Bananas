@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
 using BanaData.Database;
 using BanaData.Logic.Items;
 using Toolbox.UILogic;
@@ -32,6 +33,9 @@ namespace BanaData.Logic.Main
         // Name of the account
         public string AccountName { get; private set; }
 
+        // Transactions. The CollectionView type enables sorting on columns, and is generic
+        public CollectionView Transactions { get; protected set; }
+
         #endregion
 
         #region Actions
@@ -58,7 +62,7 @@ namespace BanaData.Logic.Main
             foreach (Household.TransactionsRow transRow in account.GetChildRows(accTransRel))
             {
                 var lineItems = GetLineItems(transRow);
-                AddDBTransactionToList(account, transRow, lineItems);
+                AddDBTransactionToList(account, transRow, lineItems, true);
             }
 
             // Publish the transactions
@@ -80,7 +84,30 @@ namespace BanaData.Logic.Main
             var transRow = household.Transactions.FindByID(transactionID);
             var lineItems = GetLineItems(transRow);
 
-            AddDBTransactionToList(account, transRow, lineItems);
+            AddDBTransactionToList(account, transRow, lineItems, false);
+
+            // Re-compute balances
+            RecomputeBalances();
+        }
+
+        public void UpdateAllTransactionStatus()
+        {
+            // Return if we are not active
+            if (accountID != mainWindowLogic.DisplayedAccountID)
+            {
+                return;
+            }
+
+            var household = mainWindowLogic.Household;
+
+            foreach (var tr in AbstractTransactions)
+            {
+                if (tr.TransID >= 0)
+                {
+                    var trRow = household.Transactions.FindByID(tr.TransID);
+                    tr.UpdateStatus(trRow.Status);
+                }
+            }
         }
 
         // Get line item(s) from a transaction
@@ -116,14 +143,31 @@ namespace BanaData.Logic.Main
             return lineItems;
         }
 
-        // Hooks provided by derived classes
+        #endregion
+
+        #region Hooks provided by derived classes
+
+        // For a bulk add of transaction, prepare the transaction list
         protected abstract void ClearTransactionList();
+
+        // Add one transaction to the transaction list.
+        // when bullk is true, ClearTransactionList() has been called
+        // before a series of call to this method, and
+        // PublishTransactionList is called afterwards
         protected abstract void AddDBTransactionToList(
-            Household.AccountsRow account, Household.TransactionsRow transRow, List<LineItem> lineItems);
+            Household.AccountsRow account,
+            Household.TransactionsRow transRow, 
+            List<LineItem> lineItems,
+            bool bulk);
+
+        // Called at the end of a bulk add of transactions
         protected abstract void PublishTransactionList();
+
+        // Provide an iterator on the transaction list
+        protected abstract IEnumerable<AbstractTransactionLogic> AbstractTransactions { get; }
+
         protected abstract void AddEmptyTransactionAtBottom();
         public abstract void RecomputeBalances();
-
 
         #endregion
     }

@@ -10,6 +10,7 @@ using System.Windows.Data;
 using Toolbox.UILogic;
 using BanaData.Database;
 using BanaData.Logic.Items;
+using BanaData.Collections;
 
 namespace BanaData.Logic.Main
 {
@@ -18,7 +19,10 @@ namespace BanaData.Logic.Main
         #region Private members
 
         // Actual collection of transactions backing the Transactions collection view property
-        private readonly ObservableCollection<InvestmentTransactionLogic> transactions = new ObservableCollection<InvestmentTransactionLogic>();
+        private readonly WpfObservableRangeCollection<InvestmentTransactionLogic> transactions = new WpfObservableRangeCollection<InvestmentTransactionLogic>();
+
+        // Temporary list used when bulk-adding transactions
+        private readonly List<InvestmentTransactionLogic> temporaryTransactionList = new List<InvestmentTransactionLogic>();
 
         #endregion
 
@@ -41,12 +45,6 @@ namespace BanaData.Logic.Main
         #endregion
 
         #region UI properties
-
-        // If banking account (as opposed to credit card)
-        public bool IsBank { get; private set; }
-
-        // Transactions. The CollectionView type enables sorting on columns
-        public CollectionView Transactions { get; }
 
         // Selected transaction
         private InvestmentTransactionLogic selectedTransaction;
@@ -107,11 +105,12 @@ namespace BanaData.Logic.Main
 
         #region Actions & Hooks for abstract base class
 
-        protected override void ClearTransactionList() => transactions.Clear();
-        protected override void PublishTransactionList() { }
+        protected override void ClearTransactionList() => temporaryTransactionList.Clear();
+        protected override void PublishTransactionList() => transactions.ReplaceRange(temporaryTransactionList);
+        protected override IEnumerable<AbstractTransactionLogic> AbstractTransactions => transactions.Cast<AbstractTransactionLogic>();
 
-        // Routine to get a transaction from the DB into the list
-        protected override void AddDBTransactionToList(Household.AccountsRow accountRow, Household.TransactionsRow transRow, List<LineItem> lineItems)
+        // Routine to add a transaction from the DB into the list
+        protected override void AddDBTransactionToList(Household.AccountsRow accountRow, Household.TransactionsRow transRow, List<LineItem> lineItems, bool bulk)
         {
             var household = mainWindowLogic.Household;
 
@@ -130,27 +129,15 @@ namespace BanaData.Logic.Main
                 investmentTransRow.IsSecurityQuantityNull() ? 0 : investmentTransRow.SecurityQuantity,
                 investmentTransRow.Commission);
 
-            var bankingTransaction = new InvestmentTransactionLogic(mainWindowLogic, this, accountID, transRow.ID, transactionData);
-            transactions.Add(bankingTransaction);
-        }
+            var investmentTransaction = new InvestmentTransactionLogic(mainWindowLogic, this, accountID, transRow.ID, transactionData);
 
-        public void UpdateAllTransactionStatus()
-        {
-            // Return if we are not active
-            if (accountID != mainWindowLogic.DisplayedAccountID)
+            if (bulk)
             {
-                return;
+                temporaryTransactionList.Add(investmentTransaction);
             }
-
-            var household = mainWindowLogic.Household;
-
-            foreach (var tr in transactions)
+            else
             {
-                if (tr.TransID >= 0)
-                {
-                    var trRow = household.Transactions.FindByID(tr.TransID);
-                    tr.UpdateStatus(trRow.Status);
-                }
+                transactions.Add(investmentTransaction);
             }
         }
 
@@ -209,24 +196,24 @@ namespace BanaData.Logic.Main
 
         private void OnDeleteTransaction(object arg)
         {
-            InvestmentTransactionLogic btl = arg == null ? EditedTransaction : arg as InvestmentTransactionLogic;
-            if (btl == null)
+            InvestmentTransactionLogic itl = arg == null ? EditedTransaction : arg as InvestmentTransactionLogic;
+            if (itl == null)
             {
                 return;
             }
 
-            if (btl.TransID < 0)
+            if (itl.TransID < 0)
             {
                 // Can't remove the empty transaction
                 return;
             }
 
             // Cancel all changes
-            btl.CancelEdit();
+            itl.CancelEdit();
 
             // Delete from dataset
             var household = mainWindowLogic.Household;
-            var transactionRow = household.Transactions.FindByID(btl.TransID);
+            var transactionRow = household.Transactions.FindByID(itl.TransID);
 
             // Delete all line items
             var lineItems = household.LineItems.GetByTransaction(transactionRow);
@@ -235,18 +222,15 @@ namespace BanaData.Logic.Main
                 lineItem.Delete();
             }
 
-            // Delete banking transaction
-            if (IsBank)
-            {
-                household.BankingTransactions.GetByTransaction(transactionRow).Delete();
-            }
+            // Delete investment transaction
+            household.InvestmentTransactions.GetByTransaction(transactionRow).Delete();
 
             // Finally delete the transaction
             transactionRow.Delete();
             mainWindowLogic.CommitChanges();
 
             // Delete from list
-            transactions.Remove(btl);
+            transactions.Remove(itl);
             Transactions.Refresh();
 
             // Move away
@@ -256,18 +240,19 @@ namespace BanaData.Logic.Main
             RecomputeBalances();
         }
 
+        // ZZZ All amounts are positive in investment. ARGH. ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
         public override void RecomputeBalances()
         {
             decimal balance = 0;
             foreach (var o in Transactions)
             {
-                if (o is BankingTransactionLogic btl)
+                if (o is AbstractTransactionLogic atl)
                 {
                     // Update running balance
-                    balance += btl.Amount;
+                    balance += atl.Amount;
 
                     // Update balance in transaction
-                    btl.Balance = balance;
+                    atl.Balance = balance;
                 }
             }
         }

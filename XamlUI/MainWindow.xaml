@@ -14,14 +14,16 @@
     
     <!-- Key bindings-->
     <Window.InputBindings>
+        <KeyBinding Modifiers="Ctrl" Key="O" Command="{Binding MainMenuLogic.Open}" />
         <KeyBinding Modifiers="Ctrl" Key="R" Command="{Binding MainMenuLogic.Reconcile}" />
+        <KeyBinding Modifiers="Ctrl" Key="S" Command="{Binding MainMenuLogic.Save}" />
     </Window.InputBindings>
 
     <DockPanel>
         <Menu DockPanel.Dock="Top" DataContext="{Binding MainMenuLogic}">
             <MenuItem Header="File">
-                <MenuItem Header="Open..." Command="{Binding Open}"/>
-                <MenuItem Header="Save" Command="{Binding Save}"/>
+                <MenuItem Header="Open..." Command="{Binding Open}" InputGestureText="^O"/>
+                <MenuItem Header="Save" Command="{Binding Save}" InputGestureText="^S"/>
                 <MenuItem Header="Exit" Command="{Binding Exit}"/>
             </MenuItem>
             <MenuItem Header="Edit">

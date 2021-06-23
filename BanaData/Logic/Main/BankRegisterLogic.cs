@@ -48,9 +48,6 @@ namespace BanaData.Logic.Main
         // If banking account (as opposed to credit card)
         public bool IsBank { get; private set; }
 
-        // Transactions. The CollectionView type enables sorting on columns
-        public CollectionView Transactions { get; }
-
         // Selected transaction
         private BankingTransactionLogic selectedTransaction;
         private bool logicIsChangingSelection;
@@ -111,14 +108,12 @@ namespace BanaData.Logic.Main
         #region Actions
 
         protected override void ClearTransactionList() => temporaryTransactionList.Clear();
-        protected override void PublishTransactionList()
-        {
-            transactions.Clear();
-            transactions.AddRange(temporaryTransactionList);
-        }
+        protected override void PublishTransactionList() => transactions.ReplaceRange(temporaryTransactionList);
+        protected override IEnumerable<AbstractTransactionLogic> AbstractTransactions => transactions.Cast<AbstractTransactionLogic>();
+
 
         // Routine to get a transaction from the DB into the list
-        protected override void AddDBTransactionToList(Household.AccountsRow accountRow, Household.TransactionsRow transRow, List<LineItem> lineItems) 
+        protected override void AddDBTransactionToList(Household.AccountsRow accountRow, Household.TransactionsRow transRow, List<LineItem> lineItems, bool bulk) 
         {
             var household = mainWindowLogic.Household;
 
@@ -138,26 +133,14 @@ namespace BanaData.Logic.Main
                 lineItems);
 
             var bankingTransaction = new BankingTransactionLogic(mainWindowLogic, this, accountID, transRow.ID, transactionData);
-            temporaryTransactionList.Add(bankingTransaction);
-        }
 
-        public void UpdateAllTransactionStatus()
-        {
-            // Return if we are not active
-            if (accountID != mainWindowLogic.DisplayedAccountID)
+            if (bulk)
             {
-                return;
+                temporaryTransactionList.Add(bankingTransaction);
             }
-
-            var household = mainWindowLogic.Household;
-
-            foreach(var tr in transactions)
+            else
             {
-                if (tr.TransID >= 0)
-                {
-                    var trRow = household.Transactions.FindByID(tr.TransID);
-                    tr.UpdateStatus(trRow.Status);
-                }
+                transactions.Add(bankingTransaction);
             }
         }
 
@@ -198,7 +181,6 @@ namespace BanaData.Logic.Main
             // Add new empty transaction at the bottom
             var emptyTransaction = new BankingTransactionLogic(mainWindowLogic, this, accountID);
             transactions.Add(emptyTransaction);
-            //Transactions.Refresh();
 
             // Select it
             mainWindowLogic.GuiServices.ExecuteAsync((Action)delegate ()
