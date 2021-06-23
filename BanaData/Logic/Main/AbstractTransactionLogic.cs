@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-
 using BanaData.Database;
 using BanaData.Logic.Items;
 using Toolbox.UILogic;
@@ -40,8 +39,12 @@ namespace BanaData.Logic.Main
 
         #endregion
 
+        #region Logic properties
+
         // Transaction id, -1 if not in DB yet
         public int TransID;
+
+        #endregion
 
         #region UI properties
 
@@ -100,6 +103,9 @@ namespace BanaData.Logic.Main
 
         // Amount (not a UI property, needed to recompute balance)
         public decimal Amount => data.Amount;
+
+        // Amount as a string
+        public string AmountString => data.Amount.ToString("N");
 
         // Payment
         public string PaymentString => data.Amount > 0 ? "" : (-data.Amount).ToString("N");
@@ -240,6 +246,8 @@ namespace BanaData.Logic.Main
                 OnPropertyChanged(() => Status);
             }
         }
+
+        // Status string management
         private string GetStatusString()
         {
             string rs = "???";

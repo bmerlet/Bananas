@@ -18,45 +18,6 @@ namespace BanaData.Logic.Main
     /// </summary>
     public class BankingTransactionLogic : AbstractTransactionLogic
     {
-        #region Supporting class
-
-        public class BankTransactionData : AbstractTransactionLogic.BaseTransactionData
-        {
-            // Construct from scratch
-            public BankTransactionData(
-                DateTime date,
-                ETransactionMedium medium,
-                uint checkNumber,
-                string payee,
-                ETransactionStatus status,
-                IEnumerable<LineItem> lineItems)
-                : base(date, payee, status, lineItems) => (Medium, CheckNumber) = (medium, checkNumber);
-
-            // Clone
-            public BankTransactionData(BankTransactionData src)
-                : base(src) => (Medium, CheckNumber) = (src.Medium, src.CheckNumber);
-
-            // Properties
-            public ETransactionMedium Medium;
-            public uint CheckNumber;
-
-            public override bool Equals(object obj)
-            {
-                return
-                    obj is BankTransactionData o &&
-                    base.Equals(o) &&
-                    o.Medium == Medium &&
-                    o.CheckNumber == CheckNumber;
-            }
-
-            public override int GetHashCode()
-            {
-                return base.GetHashCode();
-            }
-        }
-
-        #endregion
-
         #region Private members
 
         // Parent logic
@@ -475,6 +436,45 @@ namespace BanaData.Logic.Main
         public override int GetHashCode()
         {
             return TransID.GetHashCode();
+        }
+
+        #endregion
+
+        #region Supporting class
+
+        public class BankTransactionData : AbstractTransactionLogic.BaseTransactionData
+        {
+            // Construct from scratch
+            public BankTransactionData(
+                DateTime date,
+                ETransactionMedium medium,
+                uint checkNumber,
+                string payee,
+                ETransactionStatus status,
+                IEnumerable<LineItem> lineItems)
+                : base(date, payee, status, lineItems) => (Medium, CheckNumber) = (medium, checkNumber);
+
+            // Clone
+            public BankTransactionData(BankTransactionData src)
+                : base(src) => (Medium, CheckNumber) = (src.Medium, src.CheckNumber);
+
+            // Properties
+            public ETransactionMedium Medium;
+            public uint CheckNumber;
+
+            public override bool Equals(object obj)
+            {
+                return
+                    obj is BankTransactionData o &&
+                    base.Equals(o) &&
+                    o.Medium == Medium &&
+                    o.CheckNumber == CheckNumber;
+            }
+
+            public override int GetHashCode()
+            {
+                return base.GetHashCode();
+            }
         }
 
         #endregion

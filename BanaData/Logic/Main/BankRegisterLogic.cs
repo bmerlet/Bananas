@@ -14,27 +14,20 @@ using BanaData.Logic.Items;
 
 namespace BanaData.Logic.Main
 {
-    public class BankRegisterLogic : LogicBase
+    public class BankRegisterLogic :  AbstractRegisterLogic
     {
         #region Private members
 
-        // Main logic
-        private readonly MainWindowLogic mainWindowLogic;
-
         // Actual collection of transactions backing the Transactions collection view property
         private readonly ObservableCollection<BankingTransactionLogic> transactions = new ObservableCollection<BankingTransactionLogic>();
-
-        // Account ID
-        private int accountID;
 
         #endregion
 
         #region Constructor
 
         public BankRegisterLogic(MainWindowLogic mainWindowLogic)
+            :  base(mainWindowLogic)
         {
-            this.mainWindowLogic = mainWindowLogic;
-
             // Create transaction collection view, and sort by date
             Transactions = (CollectionView)CollectionViewSource.GetDefaultView(transactions);
             Transactions.SortDescriptions.Add(new SortDescription("Date", ListSortDirection.Ascending));
@@ -49,9 +42,6 @@ namespace BanaData.Logic.Main
         #endregion
 
         #region UI properties
-
-        // Name of the account
-        public string AccountName { get; private set; }
 
         // If banking account (as opposed to credit card)
         public bool IsBank { get; private set; }
@@ -118,53 +108,10 @@ namespace BanaData.Logic.Main
 
         #region Actions
 
-        public void SetAccount(int _accountID)
-        {
-            // Remember
-            accountID = _accountID;
-
-            // Get the account details
-            var household = mainWindowLogic.Household;
-            var account = household.Accounts.FindByID(accountID);
-
-            // Export account name
-            AccountName = account.Name;
-            OnPropertyChanged(() => AccountName);
-
-            // Export if banking account
-            IsBank = account.Type == EAccountType.Bank;
-            OnPropertyChanged(() => IsBank);
-            Widths.IsBankHasChanged();
-
-            // Find transactions and put them in the transaction list
-            transactions.Clear();
-            var accTransRel = household.Relations["FK_Accounts_Transactions"];
-
-            foreach (Household.TransactionsRow trans in account.GetChildRows(accTransRel))
-            {
-                AddDBTransactionToList(account, trans);
-            }
-
-            // Add new empty transaction at the bottom
-            AddEmptyTransactionAtBottom();
-
-            // Compute balances
-            RecomputeBalances();
-        }
-
-        // Add to the transaction list a transaction that was added to the DB "behind our back"
-        // (e.g. interest transaction by the reconcile dialog)
-        public void AddTransaction(int transactionID)
-        {
-            var household = mainWindowLogic.Household;
-            var account = household.Accounts.FindByID(accountID);
-            var trans = household.Transactions.FindByID(transactionID);
-
-            AddDBTransactionToList(account, trans);
-        }
+        protected override void ClearTransactionList() => transactions.Clear();
 
         // Routine to get a transaction from the DB into the list
-        private void AddDBTransactionToList(Household.AccountsRow accountRow, Household.TransactionsRow transRow)
+        protected override void AddDBTransactionToList(Household.AccountsRow accountRow, Household.TransactionsRow transRow, List<LineItem> lineItems) 
         {
             var household = mainWindowLogic.Household;
 
@@ -173,32 +120,6 @@ namespace BanaData.Logic.Main
             if (accountRow.Type == EAccountType.Bank)
             {
                 transBankRow = household.BankingTransactions.GetByTransaction(transRow);
-            }
-
-            // Get line item(s)
-            var dbLineItems = household.LineItems.GetByTransaction(transRow);
-            var lineItems = new List<LineItem>();
-            foreach (var dbli in dbLineItems)
-            {
-                int catID = -1;
-                int catAccntID = -1;
-                string category = "";
-                if (dbli.IsTransfer && !dbli.IsAccountIDNull())
-                {
-                    var destAccount = household.Accounts.FindByID(dbli.AccountID);
-                    category = "[" + destAccount.Name + "]";
-                    catAccntID = dbli.AccountID;
-                }
-                else if (!dbli.IsCategoryIDNull())
-                {
-                    var destCategory = household.Categories.FindByID(dbli.CategoryID);
-                    category = destCategory.FullName;
-                    catID = dbli.CategoryID;
-                }
-                string memo = dbli.IsMemoNull() ? "" : dbli.Memo;
-
-                var li = new LineItem(mainWindowLogic, dbli.ID, category, catID, catAccntID, memo, dbli.Amount, false);
-                lineItems.Add(li);
             }
 
             var transactionData = new BankingTransactionLogic.BankTransactionData(
@@ -265,7 +186,7 @@ namespace BanaData.Logic.Main
             transactions.Add(btl);
         }
 
-        private void AddEmptyTransactionAtBottom()
+        protected override void AddEmptyTransactionAtBottom()
         {
             // Add new empty transaction at the bottom
             var emptyTransaction = new BankingTransactionLogic(mainWindowLogic, this, accountID);
@@ -335,7 +256,7 @@ namespace BanaData.Logic.Main
             RecomputeBalances();
         }
 
-        public void RecomputeBalances()
+        public override void RecomputeBalances()
         {
             decimal balance = 0;
             foreach (var o in Transactions)

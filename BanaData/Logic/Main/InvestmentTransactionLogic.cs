@@ -4,9 +4,11 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+using Toolbox.Attributes;
+using Toolbox.UILogic;
 using BanaData.Database;
 using BanaData.Logic.Items;
-using Toolbox.UILogic;
 
 namespace BanaData.Logic.Main
 {
@@ -16,6 +18,9 @@ namespace BanaData.Logic.Main
 
         // Parent logics
         private readonly InvestmentRegisterLogic investmentRegisterLogic;
+
+        // Our data
+        private new readonly InvestmentTransactionData data;
 
         #endregion
 
@@ -29,8 +34,8 @@ namespace BanaData.Logic.Main
             InvestmentTransactionData _data)
             : base(_mainWindowLogic, _accountID, transID, _data)
         {
-            (investmentRegisterLogic) =
-                (_investmentRegisterLogic);
+            (investmentRegisterLogic, data) =
+                (_investmentRegisterLogic, _data);
         }
 
         public InvestmentTransactionLogic(
@@ -45,6 +50,29 @@ namespace BanaData.Logic.Main
 
         #region UI Properties
 
+        public string Type
+        {
+            get => EnumDescriptionAttribute.GetDescription(data.Type);
+            // ZZZ set
+        }
+
+        public string[] TypesSource => EnumDescriptionAttribute.GetDescriptions(typeof(EInvestmentTransactionType));
+
+        public string Description => GetDescription();
+
+        public string SecuritySymbol
+        {
+            get => GetSecuritySymbol(data.SecurityID);
+            // Set
+        }
+
+        public string SecurityPrice => data.SecurityPrice == 0 ? "" : data.SecurityPrice.ToString("N");
+
+        public string SecurityQuantity => data.SecurityQuantity == 0 ? "" : data.SecurityQuantity.ToString("N");
+
+        public string Commission => data.Commission == 0 ? "" : data.Commission.ToString("N");
+
+        public string ShareBalance => "ZZZ";
 
         #endregion
 
@@ -70,6 +98,37 @@ namespace BanaData.Logic.Main
         #endregion
 
         #region Actions
+
+        private string GetDescription()
+        {
+            string desc = "";
+
+            switch(data.Type)
+            {
+                case EInvestmentTransactionType.Buy:
+                    desc = $"Bought {SecurityQuantity} {SecuritySymbol} @ ${SecurityPrice}";
+                    break;
+                case EInvestmentTransactionType.Sell:
+                    desc = $"Sold {SecurityQuantity} {SecuritySymbol} @ ${SecurityPrice}";
+                    break;
+            }
+
+            return desc;
+        }
+
+        private string GetSecuritySymbol(int id)
+        {
+            string result = "";
+
+            if (id >= 0)
+            {
+                var household = mainWindowLogic.Household;
+                var security = household.Securities.FindByID(id);
+                result = security.IsSymbolNull() ? "" : security.Symbol;
+            }
+
+            return result;
+        }
 
         #endregion
 

@@ -23,7 +23,7 @@
             SelectionMode="Single"
             SelectedItem="{Binding SelectedTransaction, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             ScrollViewer.ScrollChanged="OnListViewScrollChanged"
-            ItemsSource="{Binding Transactions}">
+            ItemsSource="{Binding Transactions, IsAsync=True}">
 
             <!-- Make the list view items use all the horizontal space -->
             <ListView.ItemContainerStyle>

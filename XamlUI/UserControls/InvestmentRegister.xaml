@@ -23,7 +23,7 @@
             SelectionMode="Single"
             SelectedItem="{Binding SelectedTransaction, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             ScrollViewer.ScrollChanged="OnListViewScrollChanged"
-            ItemsSource="{Binding Transactions}">
+            ItemsSource="{Binding Transactions, IsAsync=True}">
 
             <!-- Make the list view items use all the horizontal space -->
             <ListView.ItemContainerStyle>
@@ -89,16 +89,15 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <!-- USED???? -->
-                    <!-- Payee column -->
-                    <GridViewColumn Width="{Binding Widths.WidthOfPayeeColumn, Mode=TwoWay}">
+                    <!-- Description column -->
+                    <GridViewColumn Width="{Binding Widths.WidthOfDescriptionColumn, Mode=TwoWay}">
                         <GridViewColumn.Header>
-                            <GridViewColumnHeader Content="Payee" Tag="Payee" Click="OnColumnHeaderClicked"/>
+                            <GridViewColumnHeader Content="Description" Tag="Description" Click="OnColumnHeaderClicked"/>
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock
-                                    Text="{Binding Payee}"
+                                    Text="{Binding Description}"
                                     Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
@@ -118,45 +117,71 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <!-- LINE ITEM FOR TX? USED???? -->
-                    <!-- Category column-->
-                    <GridViewColumn Width="{Binding Widths.WidthOfCategoryColumn, Mode=TwoWay}">
+                    <!-- Security symbol column-->
+                    <GridViewColumn Width="{Binding Widths.WidthOfSecuritySymbolColumn, Mode=TwoWay}">
                         <GridViewColumn.Header>
-                            <GridViewColumnHeader Content="Category" Tag="Category" Click="OnColumnHeaderClicked"/>
+                            <GridViewColumnHeader Content="Security" Tag="SecuritySymbol" Click="OnColumnHeaderClicked"/>
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock
-                                    Text="{Binding Category}"
+                                <TextBlock 
+                                    Text="{Binding Path=SecuritySymbol}"
                                     Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <!-- Payment column-->
-                    <GridViewColumn Width="{Binding Widths.WidthOfPaymentColumn, Mode=TwoWay}">
+                    <!-- Security quantity column-->
+                    <GridViewColumn Width="{Binding Widths.WidthOfSecurityQuantityColumn, Mode=TwoWay}">
                         <GridViewColumn.Header>
-                            <GridViewColumnHeader Content="Payment" Tag="Payment" Click="OnColumnHeaderClicked"/>
+                            <GridViewColumnHeader Content="#Shares" Tag="SecurityQuantity" Click="OnColumnHeaderClicked"/>
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock
-                                    Text="{Binding Path=PaymentString}"
+                                <TextBlock 
+                                    Text="{Binding Path=SecurityQuantity}"
                                     Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"
                                     HorizontalAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <!-- Deposit column-->
-                    <GridViewColumn Width="{Binding Widths.WidthOfDepositColumn, Mode=TwoWay}">
+                    <!-- Security price column-->
+                    <GridViewColumn Width="{Binding Widths.WidthOfSecurityPriceColumn, Mode=TwoWay}">
                         <GridViewColumn.Header>
-                            <GridViewColumnHeader Content="Deposit" Tag="Deposit" Click="OnColumnHeaderClicked"/>
+                            <GridViewColumnHeader Content="Price" Tag="SecurityPrice" Click="OnColumnHeaderClicked"/>
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock 
-                                    Text="{Binding Path=DepositString}"
+                                    Text="{Binding Path=SecurityPrice}"
+                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"
+                                    HorizontalAlignment="Right"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    
+                    <!-- Security balance column-->
+                    <GridViewColumn Header="Share Bal" Width="{Binding Widths.WidthOfSecurityBalanceColumn, Mode=TwoWay}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock 
+                                    Text="{Binding Path=SecurityBalance}"
+                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"
+                                    HorizontalAlignment="Right"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <!-- Amount column-->
+                    <GridViewColumn Width="{Binding Widths.WidthOfAmountColumn, Mode=TwoWay}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Amount" Tag="AmountString" Click="OnColumnHeaderClicked"/>
+                        </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock 
+                                    Text="{Binding Path=AmountString}"
                                     Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"
                                     HorizontalAlignment="Right"/>
                             </DataTemplate>
@@ -175,6 +200,21 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
+
+                    <!-- Transfer destination column-->
+                    <GridViewColumn Width="{Binding Widths.WidthOfCategoryColumn, Mode=TwoWay}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Transfer" Tag="Category" Click="OnColumnHeaderClicked"/>
+                        </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Text="{Binding Category}"
+                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
                 </GridView>
             </ListView.View>
         </ListView>

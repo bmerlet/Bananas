@@ -107,33 +107,88 @@ namespace BanaData.Database
     // Investment transaction type
     public enum EInvestmentTransactionType
     {
+        [EnumDescription("Cash")]
         Cash,
+
+        [EnumDescription("Interest income")]
         InterestIncome,
+
+        [EnumDescription("Transfer cash")]
         TransferCash,
+
+        [EnumDescription("XIn")]
         TransferCashIn,
+
+        [EnumDescription("XOut")]
         TransferCashOut,
+
+        [EnumDescription("MiscIn")]
         TransferMiscellaneousIncomeIn,
+
+        [EnumDescription("SharesIn")]
         SharesIn,
+
+        [EnumDescription("SharesOut")]
         SharesOut,
+
+        [EnumDescription("Bought")]
         Buy,
+
+        [EnumDescription("BoughtX")]
         BuyFromTransferredCash,
+
+        [EnumDescription("Sold")]
         Sell,
+
+        [EnumDescription("SoldX")]
         SellAndTransferCash,
+
+        [EnumDescription("Div")]
         Dividends,
+
+        [EnumDescription("DivX")]
         TransferDividends,
+
+        [EnumDescription("ReinvDiv")]
         ReinvestDividends,
+
+        [EnumDescription("CGShort")]
         ShortTermCapitalGains,
+
+        [EnumDescription("CGShortX")]
         TransferShortTermCapitalGains,
+
+        [EnumDescription("ReinvCGShort")]
         ReinvestShortTermCapitalGains,
+
+        [EnumDescription("ReinvCGMedium")]
         ReinvestMediumTermCapitalGains,
+
+        [EnumDescription("CGLong")]
         LongTermCapitalGains,
+
+        [EnumDescription("CGLongX")]
         TransferLongTermCapitalGains,
+
+        [EnumDescription("ReinvCGLong")]
         ReinvestLongTermCapitalGains,
+
+        [EnumDescription("ROC")]
         ReturnOnCapital,
+
+        [EnumDescription("Grant")]
         Grant,
+
+        [EnumDescription("Vest")]
         Vest,
+
+        [EnumDescription("Exercise")]
         Exercise,
+
+        [EnumDescription("Expire")]
         Expire,
+
+        [EnumDescription("")]
         None
     }
 

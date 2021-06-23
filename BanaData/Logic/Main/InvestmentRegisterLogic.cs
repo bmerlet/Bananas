@@ -13,27 +13,20 @@ using BanaData.Logic.Items;
 
 namespace BanaData.Logic.Main
 {
-    public class InvestmentRegisterLogic : LogicBase
+    public class InvestmentRegisterLogic : AbstractRegisterLogic
     {
         #region Private members
 
-        // Main logic
-        private readonly MainWindowLogic mainWindowLogic;
-
         // Actual collection of transactions backing the Transactions collection view property
         private readonly ObservableCollection<InvestmentTransactionLogic> transactions = new ObservableCollection<InvestmentTransactionLogic>();
-
-        // Account ID
-        private int accountID;
 
         #endregion
 
         #region Constructor
 
-        public InvestmentRegisterLogic(MainWindowLogic _mainWindowLogic)
+        public InvestmentRegisterLogic(MainWindowLogic mainWindowLogic)
+            : base(mainWindowLogic)
         {
-            mainWindowLogic = _mainWindowLogic;
-
             // Create transaction collection view, and sort by date
             Transactions = (CollectionView)CollectionViewSource.GetDefaultView(transactions);
             Transactions.SortDescriptions.Add(new SortDescription("Date", ListSortDirection.Ascending));
@@ -48,9 +41,6 @@ namespace BanaData.Logic.Main
         #endregion
 
         #region UI properties
-
-        // Name of the account
-        public string AccountName { get; private set; }
 
         // If banking account (as opposed to credit card)
         public bool IsBank { get; private set; }
@@ -115,97 +105,29 @@ namespace BanaData.Logic.Main
 
         #endregion
 
-        #region Actions
+        #region Actions & Hooks for abstract base class
 
-        public void SetAccount(int _accountID)
-        {
-            // Remember
-            accountID = _accountID;
-
-            // Get the account details
-            var household = mainWindowLogic.Household;
-            var account = household.Accounts.FindByID(accountID);
-
-            // Export account name
-            AccountName = account.Name;
-            OnPropertyChanged(() => AccountName);
-
-            // Find transactions and put them in the transaction list
-            transactions.Clear();
-            var accTransRel = household.Relations["FK_Accounts_Transactions"];
-
-            foreach (Household.TransactionsRow trans in account.GetChildRows(accTransRel))
-            {
-                AddDBTransactionToList(account, trans);
-            }
-
-            // Add new empty transaction at the bottom
-            AddEmptyTransactionAtBottom();
-
-            // Compute balances
-            RecomputeBalances();
-        }
-
-        // Add to the transaction list a transaction that was added to the DB "behind our back"
-        // (e.g. interest transaction by the reconcile dialog)
-        public void AddTransaction(int transactionID)
-        {
-            var household = mainWindowLogic.Household;
-            var account = household.Accounts.FindByID(accountID);
-            var trans = household.Transactions.FindByID(transactionID);
-
-            AddDBTransactionToList(account, trans);
-        }
+        protected override void ClearTransactionList() => transactions.Clear();
 
         // Routine to get a transaction from the DB into the list
-        private void AddDBTransactionToList(Household.AccountsRow accountRow, Household.TransactionsRow transRow)
+        protected override void AddDBTransactionToList(Household.AccountsRow accountRow, Household.TransactionsRow transRow, List<LineItem> lineItems)
         {
             var household = mainWindowLogic.Household;
 
-            // Get banking details
-            Household.BankingTransactionsRow transBankRow = null;
-            if (accountRow.Type == EAccountType.Bank)
-            {
-                transBankRow = household.BankingTransactions.GetByTransaction(transRow);
-            }
+            // Get investment transaction info
+            var investmentTransRow = household.InvestmentTransactions.GetByTransaction(transRow);
 
-            // Get line item(s)
-            var dbLineItems = household.LineItems.GetByTransaction(transRow);
-            var lineItems = new List<LineItem>();
-            foreach (var dbli in dbLineItems)
-            {
-                int catID = -1;
-                int catAccntID = -1;
-                string category = "";
-                if (dbli.IsTransfer && !dbli.IsAccountIDNull())
-                {
-                    var destAccount = household.Accounts.FindByID(dbli.AccountID);
-                    category = "[" + destAccount.Name + "]";
-                    catAccntID = dbli.AccountID;
-                }
-                else if (!dbli.IsCategoryIDNull())
-                {
-                    var destCategory = household.Categories.FindByID(dbli.CategoryID);
-                    category = destCategory.FullName;
-                    catID = dbli.CategoryID;
-                }
-                string memo = dbli.IsMemoNull() ? "" : dbli.Memo;
-
-                var li = new LineItem(mainWindowLogic, dbli.ID, category, catID, catAccntID, memo, dbli.Amount, false);
-                lineItems.Add(li);
-            }
-
-            // ZZZZZZZZZZZZZZ
+            // Create data
             var transactionData = new InvestmentTransactionLogic.InvestmentTransactionData(
                 transRow.Date,
                 transRow.IsPayeeNull() ? "" : transRow.Payee,
                 transRow.Status,
                 lineItems,
-                EInvestmentTransactionType.Buy,
-                -1, // SecurityID
-                0, // SecurityPrice
-                0, // security quantity
-                0); // Commission
+                investmentTransRow.Type,
+                investmentTransRow .IsSecurityIDNull() ? - 1 : investmentTransRow.SecurityID,
+                investmentTransRow.IsSecurityPriceNull() ?  0 : investmentTransRow.SecurityPrice,
+                investmentTransRow.IsSecurityQuantityNull() ? 0 : investmentTransRow.SecurityQuantity,
+                investmentTransRow.Commission);
 
             var bankingTransaction = new InvestmentTransactionLogic(mainWindowLogic, this, accountID, transRow.ID, transactionData);
             transactions.Add(bankingTransaction);
@@ -263,7 +185,7 @@ namespace BanaData.Logic.Main
             transactions.Add(itl);
         }
 
-        private void AddEmptyTransactionAtBottom()
+        protected override void AddEmptyTransactionAtBottom()
         {
             // Add new empty transaction at the bottom
             var emptyTransaction = new InvestmentTransactionLogic(mainWindowLogic, this, accountID);
@@ -333,7 +255,7 @@ namespace BanaData.Logic.Main
             RecomputeBalances();
         }
 
-        public void RecomputeBalances()
+        public override void RecomputeBalances()
         {
             decimal balance = 0;
             foreach (var o in Transactions)
@@ -401,16 +323,16 @@ namespace BanaData.Logic.Main
                 }
             }
 
-            public double WidthOfPayeeColumn
+            public double WidthOfDescriptionColumn
             {
-                get => mainWindowLogic.UserSettings.InvstWidthOfPayeeColumn;
+                get => mainWindowLogic.UserSettings.InvstWidthOfDescriptionColumn;
                 set
                 {
-                    if (mainWindowLogic.UserSettings.InvstWidthOfPayeeColumn != value)
+                    if (mainWindowLogic.UserSettings.InvstWidthOfDescriptionColumn != value)
                     {
-                        mainWindowLogic.UserSettings.InvstWidthOfPayeeColumn = value;
+                        mainWindowLogic.UserSettings.InvstWidthOfDescriptionColumn = value;
                         mainWindowLogic.SaveUserSettings();
-                        OnPropertyChanged(() => WidthOfPayeeColumn);
+                        OnPropertyChanged(() => WidthOfDescriptionColumn);
                     }
                 }
             }
@@ -443,30 +365,72 @@ namespace BanaData.Logic.Main
                 }
             }
 
-            public double WidthOfPaymentColumn
+            public double WidthOfSecuritySymbolColumn
             {
-                get => mainWindowLogic.UserSettings.InvstWidthOfPaymentColumn;
+                get => mainWindowLogic.UserSettings.InvstWidthOfSecuritySymbolColumn;
                 set
                 {
-                    if (mainWindowLogic.UserSettings.InvstWidthOfPaymentColumn != value)
+                    if (mainWindowLogic.UserSettings.InvstWidthOfSecuritySymbolColumn != value)
                     {
-                        mainWindowLogic.UserSettings.InvstWidthOfPaymentColumn = value;
+                        mainWindowLogic.UserSettings.InvstWidthOfSecuritySymbolColumn = value;
                         mainWindowLogic.SaveUserSettings();
-                        OnPropertyChanged(() => WidthOfPaymentColumn);
+                        OnPropertyChanged(() => WidthOfSecuritySymbolColumn);
                     }
                 }
             }
 
-            public double WidthOfDepositColumn
+            public double WidthOfSecurityQuantityColumn
             {
-                get => mainWindowLogic.UserSettings.InvstWidthOfDepositColumn;
+                get => mainWindowLogic.UserSettings.InvstWidthOfSecurityQuantityColumn;
                 set
                 {
-                    if (mainWindowLogic.UserSettings.InvstWidthOfDepositColumn != value)
+                    if (mainWindowLogic.UserSettings.InvstWidthOfSecurityQuantityColumn != value)
                     {
-                        mainWindowLogic.UserSettings.InvstWidthOfDepositColumn = value;
+                        mainWindowLogic.UserSettings.InvstWidthOfSecurityQuantityColumn = value;
                         mainWindowLogic.SaveUserSettings();
-                        OnPropertyChanged(() => WidthOfDepositColumn);
+                        OnPropertyChanged(() => WidthOfSecurityQuantityColumn);
+                    }
+                }
+            }
+
+            public double WidthOfSecurityPriceColumn
+            {
+                get => mainWindowLogic.UserSettings.InvstWidthOfSecurityPriceColumn;
+                set
+                {
+                    if (mainWindowLogic.UserSettings.InvstWidthOfSecurityPriceColumn != value)
+                    {
+                        mainWindowLogic.UserSettings.InvstWidthOfSecurityPriceColumn = value;
+                        mainWindowLogic.SaveUserSettings();
+                        OnPropertyChanged(() => WidthOfSecurityPriceColumn);
+                    }
+                }
+            }
+
+            public double WidthOfSecurityBalanceColumn
+            {
+                get => mainWindowLogic.UserSettings.InvstWidthOfSecurityBalanceColumn;
+                set
+                {
+                    if (mainWindowLogic.UserSettings.InvstWidthOfSecurityBalanceColumn != value)
+                    {
+                        mainWindowLogic.UserSettings.InvstWidthOfSecurityBalanceColumn = value;
+                        mainWindowLogic.SaveUserSettings();
+                        OnPropertyChanged(() => WidthOfSecurityBalanceColumn);
+                    }
+                }
+            }
+
+            public double WidthOfAmountColumn
+            {
+                get => mainWindowLogic.UserSettings.InvstWidthOfAmountColumn;
+                set
+                {
+                    if (mainWindowLogic.UserSettings.InvstWidthOfAmountColumn != value)
+                    {
+                        mainWindowLogic.UserSettings.InvstWidthOfAmountColumn = value;
+                        mainWindowLogic.SaveUserSettings();
+                        OnPropertyChanged(() => WidthOfAmountColumn);
                     }
                 }
             }
