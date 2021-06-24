@@ -24,15 +24,15 @@ namespace BanaData.Logic.Items
         // Explicit constructor
         public LineItem(
             MainWindowLogic _mainWindowLogic,
-            int id, 
+            int _id, 
             string _category,
             int categoryID,
             int categoryAccountID,
             string _memo,
             decimal _amount,
             bool _sealed) =>
-            (mainWindowLogic, ID, category, CategoryID, CategoryAccountID, memo, amount, Sealed) =
-            (_mainWindowLogic, id, _category, categoryID, categoryAccountID, _memo, _amount, _sealed);
+            (mainWindowLogic, id, category, CategoryID, CategoryAccountID, memo, amount, Sealed) =
+            (_mainWindowLogic, _id, _category, categoryID, categoryAccountID, _memo, _amount, _sealed);
 
         // Lookup category ids and construct
         static public LineItem GetLineItem(MainWindowLogic _mainWindowLogic,
@@ -83,8 +83,24 @@ namespace BanaData.Logic.Items
 
         #region Logic properties
 
-        // line item DB ID - we prefer to recreate the line item rather than change it...
-        public readonly int ID;
+        // line item DB ID
+        private int id;
+        public int ID
+        {
+            get => id;
+            set
+            {
+                if (id != value)
+                {
+                    if (Sealed)
+                    {
+                        throw new InvalidOperationException("Trying to set ID on a sealed LineItem");
+                    }
+
+                    id = value;
+                }
+            }
+        }
 
         // Category ids dervide from category string
         public int CategoryID { get; private set; }

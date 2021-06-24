@@ -115,6 +115,14 @@ namespace BanaData.Logic.Main
         // Routine to get a transaction from the DB into the list
         protected override void AddDBTransactionToList(Household.AccountsRow accountRow, Household.TransactionsRow transRow, List<LineItem> lineItems, bool bulk) 
         {
+            // ZZZ Should be done somewhere else ZZZ
+            if (IsBank != (accountRow.Type == EAccountType.Bank))
+            {
+                IsBank = accountRow.Type == EAccountType.Bank;
+                OnPropertyChanged(() => IsBank);
+            }
+            // ZZZ Should be done somewhere else ZZZ
+
             var household = mainWindowLogic.Household;
 
             // Get banking details

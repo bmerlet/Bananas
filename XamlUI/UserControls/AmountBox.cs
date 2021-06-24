@@ -112,6 +112,50 @@ namespace XamlUI.UserControls
             }
         }
 
+        // Filter out input that makes the text not parsable (del and backspace)
+        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        {
+            base.OnPreviewKeyDown(e);
+
+            string futureText = null;
+            if (e.Key == Key.Delete)
+            {
+                if (SelectionLength > 0)
+                {
+                    // Delete selection
+                    futureText = Text.Replace(Text.Substring(SelectionStart, SelectionLength), "");
+                }
+                else if (CaretIndex < Text.Length)
+                {
+                    // Delete at caret position
+                    futureText = Text.Remove(CaretIndex, 1);
+                }
+            }
+
+            if (e.Key == Key.Back)
+            {
+                if (SelectionLength > 0)
+                {
+                    // Delete selection
+                    futureText = Text.Replace(Text.Substring(SelectionStart, SelectionLength), "");
+                }
+                else if (CaretIndex > 0)
+                {
+                    // Delete at caret position
+                    futureText = Text.Remove(CaretIndex - 1, 1);
+                }
+            }
+
+            if (futureText != null)
+            {
+                if (!decimal.TryParse(futureText, out _))
+                {
+                    // Can't parse - don't accept
+                    e.Handled = true;
+                }
+            }
+        }
+
         // Update amount property when text changes
         protected override void OnTextChanged(TextChangedEventArgs e)
         {
