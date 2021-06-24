@@ -110,6 +110,23 @@ namespace BanaData.Logic.Main
             }
         }
 
+        // Recompute cash balance
+        public virtual void RecomputeBalances()
+        {
+            decimal balance = 0;
+            foreach (var o in Transactions)
+            {
+                if (o is AbstractTransactionLogic atl)
+                {
+                    // Update running balance
+                    balance += atl.AmountForCashBalance;
+
+                    // Update balance in transaction
+                    atl.Balance = balance;
+                }
+            }
+        }
+
         // Get line item(s) from a transaction
         private List<LineItem> GetLineItems(Household.TransactionsRow transRow)
         {
@@ -167,7 +184,6 @@ namespace BanaData.Logic.Main
         protected abstract IEnumerable<AbstractTransactionLogic> AbstractTransactions { get; }
 
         protected abstract void AddEmptyTransactionAtBottom();
-        public abstract void RecomputeBalances();
 
         #endregion
     }

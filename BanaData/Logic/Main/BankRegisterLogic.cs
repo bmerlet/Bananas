@@ -245,22 +245,6 @@ namespace BanaData.Logic.Main
             RecomputeBalances();
         }
 
-        public override void RecomputeBalances()
-        {
-            decimal balance = 0;
-            foreach (var o in Transactions)
-            {
-                if (o is BankingTransactionLogic btl)
-                {
-                    // Update running balance
-                    balance += btl.Amount;
-
-                    // Update balance in transaction
-                    btl.Balance = balance;
-                }
-            }
-        }
-
         #endregion
 
         #region Supporting classes

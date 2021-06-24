@@ -44,6 +44,9 @@ namespace BanaData.Logic.Main
         // Transaction id, -1 if not in DB yet
         public int TransID;
 
+        // Amount to use for cash balance computation
+        public abstract decimal AmountForCashBalance { get; }
+
         #endregion
 
         #region UI properties

@@ -46,6 +46,12 @@ namespace BanaData.Logic.Main
 
         #endregion
 
+        #region Logic properties
+
+        public override decimal AmountForCashBalance => Amount;
+
+        #endregion
+
         #region UI properties
 
         // Medium of transaction

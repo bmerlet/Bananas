@@ -240,20 +240,44 @@ namespace BanaData.Logic.Main
             RecomputeBalances();
         }
 
-        // ZZZ All amounts are positive in investment. ARGH. ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
+        // Override to compute share balances in addition to cash balance
         public override void RecomputeBalances()
         {
-            decimal balance = 0;
-            foreach (var o in Transactions)
-            {
-                if (o is AbstractTransactionLogic atl)
-                {
-                    // Update running balance
-                    balance += atl.Amount;
+            // Compute cash balance
+            base.RecomputeBalances();
 
-                    // Update balance in transaction
-                    atl.Balance = balance;
+            // Compute share balances
+
+            // securityId -> share balance
+            var dico = new Dictionary<int, decimal>();
+
+            foreach (InvestmentTransactionLogic itl in Transactions)
+            {
+                decimal balance = decimal.MinValue;
+                var secuID = itl.SecurityID;
+ 
+                if (itl.IsSecurityIn)
+                {
+                    balance = itl.SecurityQuantityDecimal;
+                    if (dico.ContainsKey(secuID))
+                    {
+                        balance += dico[secuID];
+                        dico.Remove(secuID);
+                    }
+                    dico.Add(itl.SecurityID, balance);
                 }
+                else if (itl.IsSecurityOut)
+                {
+                    balance = -itl.SecurityQuantityDecimal;
+                    if (dico.ContainsKey(secuID))
+                    {
+                        balance += dico[secuID];
+                        dico.Remove(secuID);
+                    }
+                    dico.Add(itl.SecurityID, balance);
+                }
+
+                itl.ShareBalance = balance;
             }
         }
 

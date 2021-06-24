@@ -166,7 +166,7 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock 
-                                    Text="{Binding Path=SecurityBalance}"
+                                    Text="{Binding Path=ShareBalanceString}"
                                     Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"
                                     HorizontalAlignment="Right"/>
                             </DataTemplate>

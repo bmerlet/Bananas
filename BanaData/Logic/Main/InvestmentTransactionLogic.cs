@@ -48,6 +48,64 @@ namespace BanaData.Logic.Main
 
         #endregion
 
+        #region Logic Properties
+
+        public bool IsCashIn =>
+            data.Type == EInvestmentTransactionType.Cash ||
+            data.Type == EInvestmentTransactionType.InterestIncome ||
+            data.Type == EInvestmentTransactionType.Dividends ||
+            data.Type == EInvestmentTransactionType.ShortTermCapitalGains ||
+            data.Type == EInvestmentTransactionType.LongTermCapitalGains ||
+            data.Type == EInvestmentTransactionType.TransferCash ||
+            data.Type == EInvestmentTransactionType.TransferCashIn ||
+            data.Type == EInvestmentTransactionType.TransferMiscellaneousIncomeIn ||
+            data.Type == EInvestmentTransactionType.ReturnOnCapital ||
+            data.Type == EInvestmentTransactionType.Exercise ||
+            data.Type == EInvestmentTransactionType.Sell;
+
+        public bool IsCashOut =>
+            data.Type == EInvestmentTransactionType.TransferCashOut ||
+            data.Type == EInvestmentTransactionType.Buy;
+
+        public bool IsSecurityIn =>
+            data.Type == EInvestmentTransactionType.SharesIn ||
+            data.Type == EInvestmentTransactionType.BuyFromTransferredCash ||
+            data.Type == EInvestmentTransactionType.ReinvestDividends ||
+            data.Type == EInvestmentTransactionType.ReinvestShortTermCapitalGains ||
+            data.Type == EInvestmentTransactionType.ReinvestMediumTermCapitalGains ||
+            data.Type == EInvestmentTransactionType.ReinvestLongTermCapitalGains ||
+            data.Type == EInvestmentTransactionType.Buy;
+
+        public bool IsSecurityOut =>
+            data.Type == EInvestmentTransactionType.SharesOut ||
+            data.Type == EInvestmentTransactionType.SellAndTransferCash ||
+            data.Type == EInvestmentTransactionType.Sell;
+
+        public override decimal AmountForCashBalance
+        {
+            get
+            {
+                decimal result = 0;
+                if (data.Amount != 0)
+                {
+                    if (IsCashIn)
+                    {
+                        result = data.Amount;
+                    }
+                    else if (IsCashOut)
+                    {
+                        result = -data.Amount;
+                    }
+                }
+                return result;
+            }
+        }
+
+        public int SecurityID => data.SecurityID;
+        public decimal SecurityQuantityDecimal => data.SecurityQuantity;
+
+        #endregion
+
         #region UI Properties
 
         public string Type
@@ -72,7 +130,24 @@ namespace BanaData.Logic.Main
 
         public string Commission => data.Commission == 0 ? "" : data.Commission.ToString("N");
 
-        public string ShareBalance => "ZZZ";
+        // Share balance
+        // ShareBalanceString is the UI property, ShareBalance is updated by the logic
+        private decimal shareBalance = decimal.MinValue;
+        public decimal ShareBalance
+        {
+            get => shareBalance;
+            set
+            {
+                if (shareBalance != value)
+                {
+                    shareBalance = value;
+                    ShareBalanceString = shareBalance == decimal.MinValue ? "" : shareBalance.ToString("N");
+                    OnPropertyChanged(() => ShareBalanceString);
+                }
+            }
+        }
+
+        public string ShareBalanceString { get; private set; } = "";
 
         #endregion
 

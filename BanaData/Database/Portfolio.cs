@@ -74,6 +74,7 @@ namespace BanaData.Database
                 case EInvestmentTransactionType.ReinvestLongTermCapitalGains:
                     AddShares(transaction.Date, security, investmentTransaction.SecurityQuantity);
                     break;
+
                 case EInvestmentTransactionType.Buy:
                     cashBalance -= transaction.GetAmount();
                     AddShares(transaction.Date, security, investmentTransaction.SecurityQuantity);
