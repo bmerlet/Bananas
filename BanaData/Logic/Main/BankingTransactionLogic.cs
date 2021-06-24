@@ -298,7 +298,7 @@ namespace BanaData.Logic.Main
                     else
                     {
                         var liRow = household.LineItems.Add(transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount);
-                        data.LineItems[data.LineItems.IndexOf(li)] = new LineItem(li, liRow.ID);
+                        li.ID = liRow.ID;
                     }
                 }
             }
@@ -315,7 +315,10 @@ namespace BanaData.Logic.Main
         //
         private void OnPayeeSelected(object arg)
         {
-            if (arg is MemorizedPayeeItem memorizedPayee && memorizedPayee.LineItems.Length > 0 && backup != null)
+            if (arg is MemorizedPayeeItem memorizedPayee &&
+                memorizedPayee.LineItems.Length > 0 &&
+                TransID < 0 &&      // Do this only for new transactions
+                backup != null)
             {
                 data.LineItems.Clear();
                 foreach(var li in memorizedPayee.LineItems)

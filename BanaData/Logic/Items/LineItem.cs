@@ -13,7 +13,7 @@ namespace BanaData.Logic.Items
     /// </summary>
     public class LineItem
     {
-        #region Provate members
+        #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
 

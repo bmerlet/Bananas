@@ -249,7 +249,6 @@ namespace XamlUI.UserControls
                 selector.Items.Filter = Filter;
 
                 editor.Focus();
-                editor.SelectAll(); // ZZZ Who unselects?
                 RefreshSelector();
             }
         }
