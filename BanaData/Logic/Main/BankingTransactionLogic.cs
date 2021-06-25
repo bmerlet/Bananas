@@ -128,8 +128,8 @@ namespace BanaData.Logic.Main
             Console.WriteLine($"Cancel edit transaction date {Date.ToShortDateString()} Payee {Payee} amount {Payment}");
         }
 
-        // Returns true if there is something to commit
-        public (bool needCommit, bool moveDown) ValidateEndEdit()
+        // Returns if there is something to commit and if we need to move down
+        public override (bool needCommit, bool moveDown) ValidateEndEdit()
         {
             // Out of sequence
             if (backup == null)

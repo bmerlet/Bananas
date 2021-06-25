@@ -102,7 +102,7 @@ namespace XamlUI.UserControls
             Console.WriteLine("OnDataGridPreparingCellForEdit");
         }
 
-        private void SetRowToEditMode(BankingTransactionLogic btl)
+        private void SetRowToEditMode(AbstractTransactionLogic btl)
         {
             // Get row
             DataGridRow row = (DataGridRow)dataGrid.ItemContainerGenerator.ContainerFromItem(btl);

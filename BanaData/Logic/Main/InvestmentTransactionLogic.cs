@@ -165,6 +165,12 @@ namespace BanaData.Logic.Main
             // throw new NotImplementedException();
         }
 
+        // Returns if there is something to commit and if we need to move down
+        public override (bool needCommit, bool moveDown) ValidateEndEdit()
+        {
+            return (false, false);
+        }
+
         public override void EndEdit()
         {
             // throw new NotImplementedException();

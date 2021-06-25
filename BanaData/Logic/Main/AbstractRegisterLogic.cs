@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+
+using Toolbox.UILogic;
+using BanaData.Collections;
 using BanaData.Database;
 using BanaData.Logic.Items;
-using Toolbox.UILogic;
+using System.ComponentModel;
 
 namespace BanaData.Logic.Main
 {
@@ -20,11 +23,26 @@ namespace BanaData.Logic.Main
         // Account we are displaying
         protected int accountID = -1;
 
+        // Actual collection of transactions backing the Transactions collection view property
+        protected readonly WpfObservableRangeCollection<AbstractTransactionLogic> transactions = new WpfObservableRangeCollection<AbstractTransactionLogic>();
+        protected readonly List<AbstractTransactionLogic> temporaryTransactionList = new List<AbstractTransactionLogic>();
+
         #endregion
 
         #region Constructor
 
-        protected AbstractRegisterLogic(MainWindowLogic _mainWindowLogic) => mainWindowLogic = _mainWindowLogic;
+        protected AbstractRegisterLogic(MainWindowLogic _mainWindowLogic)
+        {
+            mainWindowLogic = _mainWindowLogic;
+
+            // Create transaction collection view, and sort by date
+            Transactions = (CollectionView)CollectionViewSource.GetDefaultView(transactions);
+            Transactions.SortDescriptions.Add(new SortDescription("Date", ListSortDirection.Ascending));
+            Transactions.GroupDescriptions.Add(new PropertyGroupDescription("GroupSorter"));
+
+            // Create commands
+            DeleteTransaction = new CommandBase(OnDeleteTransaction);
+        }
 
         #endregion
 
@@ -36,8 +54,28 @@ namespace BanaData.Logic.Main
         // Transactions. The CollectionView type enables sorting on columns, and is generic
         public CollectionView Transactions { get; protected set; }
 
+        //
+        // Selected transaction
+        //
+        private AbstractTransactionLogic selectedTransaction;
+        protected bool logicIsChangingSelection;
+        public AbstractTransactionLogic SelectedTransaction
+        {
+            get => selectedTransaction;
+            set => SetSelectedTransaction(value);
+        }
+
+        // Transaction being edited
+        public AbstractTransactionLogic EditedTransaction { get; protected set; }
+
+        // Transaction to show
+        public AbstractTransactionLogic TransactionToScrollTo { get; protected set; }
+
         // Set to true to indicate that the overlay should focus on the date field
         public bool DateFocus { get; protected set; }
+
+        // Context menu commands
+        public CommandBase DeleteTransaction { get; protected set; }
 
         #endregion
 
@@ -60,19 +98,21 @@ namespace BanaData.Logic.Main
             AccountName = account.Name;
             OnPropertyChanged(() => AccountName);
 
-            // Find transactions and put them in the transaction list
-            ClearTransactionList();
+            // Find transactions and put them in a temp transaction list
+            // (for performance)
+            temporaryTransactionList.Clear();
 
             var accTransRel = household.Relations["FK_Accounts_Transactions"];
 
             foreach (Household.TransactionsRow transRow in account.GetChildRows(accTransRel))
             {
                 var lineItems = GetLineItems(transRow);
-                AddDBTransactionToList(account, transRow, lineItems, true);
+                var trans = CreateTransactionFromDB(account, transRow, lineItems);
+                temporaryTransactionList.Add(trans);
             }
 
             // Publish the transactions
-            PublishTransactionList();
+            transactions.ReplaceRange(temporaryTransactionList);
 
             // Add new empty transaction at the bottom
             AddEmptyTransactionAtBottom();
@@ -90,7 +130,8 @@ namespace BanaData.Logic.Main
             var transRow = household.Transactions.FindByID(transactionID);
             var lineItems = GetLineItems(transRow);
 
-            AddDBTransactionToList(account, transRow, lineItems, false);
+            var trans = CreateTransactionFromDB(account, transRow, lineItems);
+            transactions.Add(trans);
 
             // Re-compute balances
             RecomputeBalances();
@@ -106,12 +147,64 @@ namespace BanaData.Logic.Main
 
             var household = mainWindowLogic.Household;
 
-            foreach (var tr in AbstractTransactions)
+            foreach (var tr in transactions)
             {
                 if (tr.TransID >= 0)
                 {
                     var trRow = household.Transactions.FindByID(tr.TransID);
                     tr.UpdateStatus(trRow.Status);
+                }
+            }
+        }
+
+        public void ProcessEnter()
+        {
+            var transaction = SelectedTransaction;
+            if (transaction != null)
+            {
+                bool wasEmptyTransaction = transaction.TransID < 0;
+
+                (bool needCommit, bool moveDown) = transaction.ValidateEndEdit();
+
+                if (needCommit)
+                {
+                    // Remove from transaction list if needed
+                    if (wasEmptyTransaction)
+                    {
+                        // Remove transaction from list as its ID is about to change
+                        // And the ID is what is used to determine equality.
+                        // We don't want the list to get confused.
+                        logicIsChangingSelection = true;
+                        SelectedTransaction = null;
+                        logicIsChangingSelection = false;
+                        transactions.Remove(transaction);
+                    }
+
+                    // Commit changes
+                    transaction.EndEdit();
+
+                    // Put back in list
+                    if (wasEmptyTransaction)
+                    {
+                        transactions.Add(transaction);
+                    }
+
+                    // Update balances
+                    RecomputeBalances();
+                }
+
+                if (moveDown)
+                {
+                    if (wasEmptyTransaction)
+                    {
+                        // Create an empty transaction if we consumed the previous one
+                        AddEmptyTransactionAtBottom();
+                    }
+                    else
+                    {
+                        // Move the selection down one row otherwise
+                        MoveDown();
+                    }
                 }
             }
         }
@@ -130,6 +223,30 @@ namespace BanaData.Logic.Main
                     // Update balance in transaction
                     atl.Balance = balance;
                 }
+            }
+        }
+
+        public void MoveUp()
+        {
+            var prevTransaction = GetPreviousTransaction(SelectedTransaction);
+
+            if (prevTransaction != null)
+            {
+                logicIsChangingSelection = true;
+                SelectedTransaction = prevTransaction as BankingTransactionLogic;
+                logicIsChangingSelection = false;
+            }
+        }
+
+        public void MoveDown()
+        {
+            var nextTransaction = GetNextTransaction(SelectedTransaction);
+
+            if (nextTransaction != null)
+            {
+                logicIsChangingSelection = true;
+                SelectedTransaction = nextTransaction as BankingTransactionLogic;
+                logicIsChangingSelection = false;
             }
         }
 
@@ -164,6 +281,66 @@ namespace BanaData.Logic.Main
             }
 
             return lastTrans as AbstractTransactionLogic;
+        }
+
+        private void OnDeleteTransaction(object arg)
+        {
+            AbstractTransactionLogic atl = arg == null ? SelectedTransaction : arg as AbstractTransactionLogic;
+
+            if (atl == null)
+            {
+                return;
+            }
+
+            if (atl.TransID < 0)
+            {
+                // Can't remove the empty transaction
+                return;
+            }
+
+            // We want to select the next transaction afterwards
+            var transactionToSelect = GetNextTransaction(atl);
+
+            // Cancel all changes
+            atl.CancelEdit();
+
+            // Delete from dataset
+            var household = mainWindowLogic.Household;
+            var accountRow = household.Accounts.FindByID(accountID);
+            var transactionRow = household.Transactions.FindByID(atl.TransID);
+
+            // Delete all line items
+            var lineItems = household.LineItems.GetByTransaction(transactionRow);
+            foreach (var lineItem in lineItems)
+            {
+                lineItem.Delete();
+            }
+
+            // Delete banking or investment transaction
+            if (accountRow.Type == EAccountType.Bank)
+            {
+                household.BankingTransactions.GetByTransaction(transactionRow).Delete();
+            }
+            else if (accountRow.Type == EAccountType.Investment)
+            {
+                household.InvestmentTransactions.GetByTransaction(transactionRow).Delete();
+            }
+
+            // Finally delete the transaction
+            transactionRow.Delete();
+            mainWindowLogic.CommitChanges();
+
+            // Delete from list
+            transactions.Remove(atl);
+            Transactions.Refresh();
+
+            // Compute balances
+            RecomputeBalances();
+
+            // Re-select
+            logicIsChangingSelection = true;
+            SelectedTransaction = transactionToSelect as BankingTransactionLogic;
+            logicIsChangingSelection = false;
         }
 
         #endregion
@@ -203,33 +380,84 @@ namespace BanaData.Logic.Main
             return lineItems;
         }
 
+        // Set the selected transaction
+        private void SetSelectedTransaction(AbstractTransactionLogic value)
+        {
+            if (value != selectedTransaction)
+            {
+                if (logicIsChangingSelection)
+                {
+                    // This logic is changing the selection (e.g. processing of return key)
+                    selectedTransaction = value;
+                    EditedTransaction = value;
+                    TransactionToScrollTo = value;
+                    OnPropertyChanged(() => SelectedTransaction);
+                    OnPropertyChanged(() => TransactionToScrollTo);
+                }
+                else
+                {
+                    // User changed selection (e.g. by clicking on a row)
+                    if (EditedTransaction != null && transactions.Contains(EditedTransaction))
+                    {
+                        EditedTransaction.CancelEdit();
+                    }
+                    selectedTransaction = value;
+                    EditedTransaction = value;
+                }
+
+                if (EditedTransaction != null)
+                {
+                    EditedTransaction.BeginEdit();
+
+                    DateFocus = false;
+                    OnPropertyChanged(() => DateFocus);
+                    mainWindowLogic.GuiServices.ExecuteAsync((Action)delegate ()
+                    {
+                        DateFocus = true;
+                        OnPropertyChanged(() => DateFocus);
+                    });
+                }
+                OnPropertyChanged(() => EditedTransaction);
+                OnPropertyChanged("UpdateOverlayPosition");
+            }
+        }
+
+        // Add an empty transaction at the bottom of the register
+        private void AddEmptyTransactionAtBottom()
+        {
+            // Add new empty transaction at the bottom
+            var emptyTransaction = CreateEmptyTransaction();
+            transactions.Add(emptyTransaction);
+
+            // Select it
+            mainWindowLogic.GuiServices.ExecuteAsync((Action)delegate ()
+            {
+                logicIsChangingSelection = true;
+                SelectedTransaction = emptyTransaction;
+                logicIsChangingSelection = false;
+
+                // Go to the bottom
+                //TransactionToScrollTo = bankingTransaction;
+                //OnPropertyChanged(() => TransactionToScrollTo);
+                OnPropertyChanged("ScrollToBottom");
+            });
+        }
+
         #endregion
 
         #region Hooks provided by derived classes
 
-        // Called when a new account is set
-        protected virtual void OnNewAccount(Household.AccountsRow accountRow) {  }
+        // Called by this class when a new account is set
+        protected virtual void OnNewAccount(Household.AccountsRow accountRow) { }
 
-        // For a bulk add of transaction, prepare the transaction list
-        protected abstract void ClearTransactionList();
-
-        // Add one transaction to the transaction list.
-        // when bullk is true, ClearTransactionList() has been called
-        // before a series of call to this method, and
-        // PublishTransactionList is called afterwards
-        protected abstract void AddDBTransactionToList(
+        // Create a transaction from DB info
+        protected abstract AbstractTransactionLogic CreateTransactionFromDB(
             Household.AccountsRow account,
-            Household.TransactionsRow transRow, 
-            List<LineItem> lineItems,
-            bool bulk);
+            Household.TransactionsRow transRow,
+            List<LineItem> lineItems);
 
-        // Called at the end of a bulk add of transactions
-        protected abstract void PublishTransactionList();
-
-        // Provide an iterator on the transaction list
-        protected abstract IEnumerable<AbstractTransactionLogic> AbstractTransactions { get; }
-
-        protected abstract void AddEmptyTransactionAtBottom();
+        // Creaste an empty transaction
+        protected abstract AbstractTransactionLogic CreateEmptyTransaction();
 
         #endregion
     }

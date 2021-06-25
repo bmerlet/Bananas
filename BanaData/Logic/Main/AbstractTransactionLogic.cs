@@ -234,6 +234,9 @@ namespace BanaData.Logic.Main
             }
         }
 
+        public abstract (bool needCommit, bool moveDown) ValidateEndEdit();
+
+
         public abstract void EndEdit();
 
         #endregion

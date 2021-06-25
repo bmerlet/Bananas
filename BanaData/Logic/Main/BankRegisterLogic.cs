@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,31 +9,16 @@ using System.Windows.Data;
 using Toolbox.UILogic;
 using BanaData.Database;
 using BanaData.Logic.Items;
-using BanaData.Collections;
 
 namespace BanaData.Logic.Main
 {
     public class BankRegisterLogic :  AbstractRegisterLogic
     {
-        #region Private members
-
-        // Actual collection of transactions backing the Transactions collection view property
-        private readonly WpfObservableRangeCollection<BankingTransactionLogic> transactions = new WpfObservableRangeCollection<BankingTransactionLogic>();
-        private readonly List<BankingTransactionLogic> temporaryTransactionList = new List<BankingTransactionLogic>();
-
-        #endregion
-
         #region Constructor
 
         public BankRegisterLogic(MainWindowLogic mainWindowLogic)
             :  base(mainWindowLogic)
         {
-            // Create transaction collection view, and sort by date
-            Transactions = (CollectionView)CollectionViewSource.GetDefaultView(transactions);
-            Transactions.SortDescriptions.Add(new SortDescription("Date", ListSortDirection.Ascending));
-            Transactions.GroupDescriptions.Add(new PropertyGroupDescription("GroupSorter"));
-
-            DeleteTransaction = new CommandBase(OnDeleteTransaction);
 
             // Create column width manager
             Widths = new ColumnWidths(mainWindowLogic, this);
@@ -48,63 +31,6 @@ namespace BanaData.Logic.Main
         // If banking account (as opposed to credit card)
         public bool IsBank { get; private set; }
 
-        // Selected transaction
-        private BankingTransactionLogic selectedTransaction;
-        private bool logicIsChangingSelection;
-        public BankingTransactionLogic SelectedTransaction
-        {
-            get => selectedTransaction;
-            set
-            {
-                if (value != selectedTransaction)
-                {
-                    if (logicIsChangingSelection)
-                    {
-                        // This logic is changing the selection (e.g. processing of return key)
-                        selectedTransaction = value;
-                        EditedTransaction = value;
-                        TransactionToScrollTo = value;
-                        OnPropertyChanged(() => SelectedTransaction);
-                        OnPropertyChanged(() => TransactionToScrollTo);
-                    }
-                    else
-                    {
-                        // User changed selection (e.g. by clicking on a row)
-                        if (EditedTransaction != null && transactions.Contains(EditedTransaction))
-                        {
-                            EditedTransaction.CancelEdit();
-                        }
-                        selectedTransaction = value;
-                        EditedTransaction = value;
-                    }
-
-                    if (EditedTransaction != null)
-                    {
-                        EditedTransaction.BeginEdit();
-
-                        DateFocus = false;
-                        OnPropertyChanged(() => DateFocus);
-                        mainWindowLogic.GuiServices.ExecuteAsync((Action)delegate ()
-                        {
-                            DateFocus = true;
-                            OnPropertyChanged(() => DateFocus);
-                        });
-                    }
-                    OnPropertyChanged(() => EditedTransaction);
-                    OnPropertyChanged("UpdateOverlayPosition");
-                }
-            }
-        }
-
-        // Transaction to show
-        public BankingTransactionLogic TransactionToScrollTo { get; private set; }
-
-        // Transaction being edited
-        public BankingTransactionLogic EditedTransaction { get; set; }
-
-        // Contect menu commands
-        public CommandBase DeleteTransaction { get; }
-
         // Column widths
         public ColumnWidths Widths { get; }
 
@@ -112,9 +38,9 @@ namespace BanaData.Logic.Main
 
         #region Actions
 
+        // Manage the visibility of the medium column when displaying a new account
         protected override void OnNewAccount(Household.AccountsRow accountRow) 
         {
-            // Manage the visibility of the medium column
             if (IsBank != (accountRow.Type == EAccountType.Bank))
             {
                 IsBank = accountRow.Type == EAccountType.Bank;
@@ -123,13 +49,8 @@ namespace BanaData.Logic.Main
             }
         }
 
-        protected override void ClearTransactionList() => temporaryTransactionList.Clear();
-        protected override void PublishTransactionList() => transactions.ReplaceRange(temporaryTransactionList);
-        protected override IEnumerable<AbstractTransactionLogic> AbstractTransactions => transactions.Cast<AbstractTransactionLogic>();
-
-
-        // Routine to get a transaction from the DB into the list
-        protected override void AddDBTransactionToList(Household.AccountsRow accountRow, Household.TransactionsRow transRow, List<LineItem> lineItems, bool bulk) 
+        // Routine to create a transaction from the DB
+        protected override AbstractTransactionLogic CreateTransactionFromDB(Household.AccountsRow accountRow, Household.TransactionsRow transRow, List<LineItem> lineItems) 
         {
             var household = mainWindowLogic.Household;
 
@@ -150,164 +71,12 @@ namespace BanaData.Logic.Main
 
             var bankingTransaction = new BankingTransactionLogic(mainWindowLogic, this, accountID, transRow.ID, transactionData);
 
-            if (bulk)
-            {
-                temporaryTransactionList.Add(bankingTransaction);
-            }
-            else
-            {
-                transactions.Add(bankingTransaction);
-            }
+            return bankingTransaction;
         }
 
-        public void ProcessEnter()
+        protected override AbstractTransactionLogic CreateEmptyTransaction()
         {
-            var transaction = SelectedTransaction;
-            if (transaction != null)
-            {
-                bool wasEmptyTransaction = transaction.TransID < 0;
-
-                (bool needCommit, bool moveDown) = transaction.ValidateEndEdit();
-
-                if (needCommit)
-                {
-                    // Remove from transaction list if needed
-                    if (wasEmptyTransaction)
-                    {
-                        // Remove transaction from list as its ID is about to change
-                        // And the ID is what is used to determine equality.
-                        // We don't want the list to get confused.
-                        logicIsChangingSelection = true;
-                        SelectedTransaction = null;
-                        logicIsChangingSelection = false;
-                        transactions.Remove(transaction);
-                    }
-
-                    // Commit changes
-                    transaction.EndEdit();
-
-                    // Put back in list
-                    if (wasEmptyTransaction)
-                    {
-                        transactions.Add(transaction);
-                    }
-
-                    // Update balances
-                    RecomputeBalances();
-                }
-
-                if (moveDown)
-                {
-                    if (wasEmptyTransaction)
-                    {
-                        // Create an empty transaction if we consumed the previous one
-                        AddEmptyTransactionAtBottom();
-                    }
-                    else
-                    {
-                        // Move the selection down one row otherwise
-                        MoveDown();
-                    }
-                }
-            }
-        }
-
-        public void MoveUp()
-        {
-            var prevTransaction = GetPreviousTransaction(SelectedTransaction);
-
-            if (prevTransaction != null)
-            {
-                logicIsChangingSelection = true;
-                SelectedTransaction = prevTransaction as BankingTransactionLogic;
-                logicIsChangingSelection = false;
-            }
-        }
-
-        public void MoveDown()
-        {
-            var nextTransaction = GetNextTransaction(SelectedTransaction);
-
-            if (nextTransaction != null)
-            {
-                logicIsChangingSelection = true;
-                SelectedTransaction = nextTransaction as BankingTransactionLogic;
-                logicIsChangingSelection = false;
-            }
-        }
-
-        protected override void AddEmptyTransactionAtBottom()
-        {
-            // Add new empty transaction at the bottom
-            var emptyTransaction = new BankingTransactionLogic(mainWindowLogic, this, accountID);
-            transactions.Add(emptyTransaction);
-
-            // Select it
-            mainWindowLogic.GuiServices.ExecuteAsync((Action)delegate ()
-            {
-                logicIsChangingSelection = true;
-                SelectedTransaction = emptyTransaction;
-                logicIsChangingSelection = false;
-
-                // Go to the bottom
-                //TransactionToScrollTo = bankingTransaction;
-                //OnPropertyChanged(() => TransactionToScrollTo);
-                OnPropertyChanged("ScrollToBottom");
-            });
-        }
-
-        private void OnDeleteTransaction(object arg)
-        {
-            BankingTransactionLogic btl = arg == null ? SelectedTransaction : arg as BankingTransactionLogic;
-            if (btl == null)
-            {
-                return;
-            }
-
-            if (btl.TransID < 0)
-            {
-                // Can't remove the empty transaction
-                return;
-            }
-
-            // We want to select the next transaction afterwards
-            var transactionToSelect = GetNextTransaction(btl);
-
-            // Cancel all changes
-            btl.CancelEdit();
-
-            // Delete from dataset
-            var household = mainWindowLogic.Household;
-            var transactionRow = household.Transactions.FindByID(btl.TransID);
-
-            // Delete all line items
-            var lineItems = household.LineItems.GetByTransaction(transactionRow);
-            foreach(var lineItem in lineItems)
-            {
-                lineItem.Delete();
-            }
-
-            // Delete banking transaction
-            if (IsBank)
-            {
-                household.BankingTransactions.GetByTransaction(transactionRow).Delete();
-            }
-
-            // Finally delete the transaction
-            transactionRow.Delete();
-            mainWindowLogic.CommitChanges();
-
-            // Delete from list
-            transactions.Remove(btl);
-            Transactions.Refresh();
-
-            // Compute balances
-            RecomputeBalances();
-
-            // Re-select
-            logicIsChangingSelection = true;
-            SelectedTransaction = transactionToSelect as BankingTransactionLogic;
-            logicIsChangingSelection = false;
+            return new BankingTransactionLogic(mainWindowLogic, this, accountID);
         }
 
         #endregion
