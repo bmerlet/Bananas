@@ -43,6 +43,10 @@ namespace XamlUI.UserControls
             if (!internalDateUpdate)
             {
                 Text = date.ToShortDateString();
+
+                CaretIndex = 0;
+                SelectionStart = 0;
+                SelectionLength = Text.IndexOf("/");
             }
         }
 

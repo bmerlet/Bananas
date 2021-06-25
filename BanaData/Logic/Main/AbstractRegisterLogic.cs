@@ -53,6 +53,9 @@ namespace BanaData.Logic.Main
             var household = mainWindowLogic.Household;
             var account = household.Accounts.FindByID(accountID);
 
+            // Derived class specific action 
+            OnNewAccount(account);
+
             // Export account name
             AccountName = account.Name;
             OnPropertyChanged(() => AccountName);
@@ -177,6 +180,9 @@ namespace BanaData.Logic.Main
         #endregion
 
         #region Hooks provided by derived classes
+
+        // Called when a new account is set
+        protected virtual void OnNewAccount(Household.AccountsRow accountRow) {  }
 
         // For a bulk add of transaction, prepare the transaction list
         protected abstract void ClearTransactionList();

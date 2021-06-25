@@ -82,8 +82,11 @@ namespace BanaData.Logic.Main
 
                         DateFocus = false;
                         OnPropertyChanged(() => DateFocus);
-                        DateFocus = true;
-                        OnPropertyChanged(() => DateFocus);
+                        mainWindowLogic.GuiServices.ExecuteAsync((Action)delegate ()
+                        {
+                            DateFocus = true;
+                            OnPropertyChanged(() => DateFocus);
+                        });
                     }
                     OnPropertyChanged(() => EditedTransaction);
                     OnPropertyChanged("UpdateOverlayPosition");
@@ -112,6 +115,17 @@ namespace BanaData.Logic.Main
 
         #region Actions
 
+        protected override void OnNewAccount(Household.AccountsRow accountRow) 
+        {
+            // Manage the visibility of the medium column
+            if (IsBank != (accountRow.Type == EAccountType.Bank))
+            {
+                IsBank = accountRow.Type == EAccountType.Bank;
+                OnPropertyChanged(() => IsBank);
+                Widths.IsBankHasChanged();
+            }
+        }
+
         protected override void ClearTransactionList() => temporaryTransactionList.Clear();
         protected override void PublishTransactionList() => transactions.ReplaceRange(temporaryTransactionList);
         protected override IEnumerable<AbstractTransactionLogic> AbstractTransactions => transactions.Cast<AbstractTransactionLogic>();
@@ -120,14 +134,6 @@ namespace BanaData.Logic.Main
         // Routine to get a transaction from the DB into the list
         protected override void AddDBTransactionToList(Household.AccountsRow accountRow, Household.TransactionsRow transRow, List<LineItem> lineItems, bool bulk) 
         {
-            // ZZZ Should be done somewhere else ZZZ
-            if (IsBank != (accountRow.Type == EAccountType.Bank))
-            {
-                IsBank = accountRow.Type == EAccountType.Bank;
-                OnPropertyChanged(() => IsBank);
-            }
-            // ZZZ Should be done somewhere else ZZZ
-
             var household = mainWindowLogic.Household;
 
             // Get banking details

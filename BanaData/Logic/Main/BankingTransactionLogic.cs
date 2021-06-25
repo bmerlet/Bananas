@@ -140,7 +140,12 @@ namespace BanaData.Logic.Main
             if (backup.Equals(data))
             {
                 backup = null;
-                bankRegisterLogic.MoveDownOneTransaction(TransID < 0);
+
+                // Move down only if this transaction is actually in DB
+                if (TransID >= 0)
+                {
+                    bankRegisterLogic.MoveDownOneTransaction(false);
+                }
                 return;
             }
 
