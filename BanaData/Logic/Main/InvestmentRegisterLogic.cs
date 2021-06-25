@@ -151,8 +151,10 @@ namespace BanaData.Logic.Main
             else
             {
                 // Move the selection down one row otherwise
+                var nextTransaction = GetNextTransaction(SelectedTransaction);
+
                 logicIsChangingSelection = true;
-                OnPropertyChanged("MoveSelectionDownOneRow");
+                SelectedTransaction = nextTransaction as InvestmentTransactionLogic;
                 logicIsChangingSelection = false;
             }
         }

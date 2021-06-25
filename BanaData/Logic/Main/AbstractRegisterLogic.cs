@@ -36,6 +36,9 @@ namespace BanaData.Logic.Main
         // Transactions. The CollectionView type enables sorting on columns, and is generic
         public CollectionView Transactions { get; protected set; }
 
+        // Set to true to indicate that the overlay should focus on the date field
+        public bool DateFocus { get; protected set; }
+
         #endregion
 
         #region Actions
@@ -125,6 +128,17 @@ namespace BanaData.Logic.Main
                     atl.Balance = balance;
                 }
             }
+        }
+
+        // Get the next transaction, in the CollectionView order
+        protected AbstractTransactionLogic GetNextTransaction(AbstractTransactionLogic trans)
+        {
+            var nextTrans = Transactions.Cast<object>()
+                .SkipWhile(x => !Equals(x, trans)) //skip preceding transactions
+                .Skip(1) //skip the transaction itself
+                .FirstOrDefault();
+
+            return nextTrans as AbstractTransactionLogic;
         }
 
         // Get line item(s) from a transaction

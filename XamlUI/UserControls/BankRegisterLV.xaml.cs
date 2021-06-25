@@ -80,7 +80,6 @@ namespace XamlUI.UserControls
                 }
                 //
                 // TransactionToScrollTo: Ensure a specific transaction is visible
-                // ZZZ Currently unused
                 //
                 else if (e.PropertyName == "TransactionToScrollTo")
                 {
@@ -97,19 +96,6 @@ namespace XamlUI.UserControls
                         var elt = (FrameworkElement)VisualTreeHelper.GetChild(listView, 0);
                         ScrollViewer scrollViewer = (ScrollViewer)VisualTreeHelper.GetChild(elt, 0);
                         scrollViewer.ScrollToBottom();
-                    }
-                }
-                //
-                // Move selection down one row
-                //
-                else if (e.PropertyName == "MoveSelectionDownOneRow")
-                {
-                    if (listView.SelectedIndex >= 0 && listView.SelectedIndex < listView.Items.Count - 1)
-                    {
-                        // NOOOOOOOOOO - This breaks the binding.
-                        //listView.SelectedIndex += 1;
-
-                        listView.SetCurrentValue(ListView.SelectedIndexProperty, listView.SelectedIndex + 1);
                     }
                 }
                 //

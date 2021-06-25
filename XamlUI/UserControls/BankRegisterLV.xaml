@@ -227,7 +227,9 @@
             </Grid.ColumnDefinitions>
 
             <!-- Date-->
-            <local:DateBox Date="{Binding EditedTransaction.Date, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <local:DateBox 
+                Date="{Binding EditedTransaction.Date, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                t:FocusAttachedProperty.IsFocused="{Binding DateFocus}"/>
             
             <!-- Medium-->
             <ComboBox 

@@ -76,9 +76,14 @@ namespace BanaData.Logic.Main
                         editedTransaction = value;
                     }
 
-                    if (selectedTransaction != null)
+                    if (editedTransaction != null)
                     {
-                        selectedTransaction.BeginEdit();
+                        editedTransaction.BeginEdit();
+
+                        DateFocus = false;
+                        OnPropertyChanged(() => DateFocus);
+                        DateFocus = true;
+                        OnPropertyChanged(() => DateFocus);
                     }
                     OnPropertyChanged(() => EditedTransaction);
                     OnPropertyChanged("UpdateOverlayPosition");
@@ -162,9 +167,14 @@ namespace BanaData.Logic.Main
             else
             {
                 // Move the selection down one row otherwise
+                var nextTransaction = GetNextTransaction(SelectedTransaction);
+
                 logicIsChangingSelection = true;
-                OnPropertyChanged("MoveSelectionDownOneRow");
+                SelectedTransaction = nextTransaction as BankingTransactionLogic;
                 logicIsChangingSelection = false;
+
+                TransactionToScrollTo = SelectedTransaction;
+                OnPropertyChanged(() => TransactionToScrollTo);
             }
         }
 

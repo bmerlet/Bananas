@@ -96,6 +96,7 @@
     </Compile>
     <Compile Include="Tools\BindingProxy.cs" />
     <Compile Include="Tools\DataGridLengthConverter.cs" />
+    <Compile Include="Tools\FocusAttachedProperty.cs" />
     <Compile Include="Tools\FontWeightConverter.cs" />
     <Compile Include="Tools\GridLengthConverter.cs" />
     <Compile Include="Tools\SortAdorner.cs" />

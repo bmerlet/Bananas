@@ -67,19 +67,6 @@ namespace XamlUI.Dialogs
                     }
                 }
                 //
-                // Move selection down one row
-                //
-                else if (e.PropertyName == "MoveSelectionDownOneRow")
-                {
-                    if (listView.SelectedIndex >= 0 && listView.SelectedIndex < listView.Items.Count - 1)
-                    {
-                        // NOOOOOOOOOO - This breaks the binding.
-                        //listView.SelectedIndex += 1;
-
-                        listView.SetCurrentValue(ListView.SelectedIndexProperty, listView.SelectedIndex + 1);
-                    }
-                }
-                //
                 // Update overlay position
                 //
                 else if (e.PropertyName == "UpdateOverlayPosition")
