@@ -172,13 +172,14 @@ namespace XamlUI.UserControls
         private Popup popup;
         private ListBox selector;
 
-        //
-        // Control of popup
-        //
-        private bool IsPopupOpen
+        #endregion
+
+        #region Popup control
+
+        public bool IsPopupOpen
         {
             get => popup != null && popup.IsOpen;
-            set
+            private set
             {
                 if (popup != null)
                 {

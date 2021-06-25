@@ -128,25 +128,27 @@ namespace BanaData.Logic.Main
             Console.WriteLine($"Cancel edit transaction date {Date.ToShortDateString()} Payee {Payee} amount {Payment}");
         }
 
-        public override void EndEdit()
+        // Returns true if there is something to commit
+        public (bool needCommit, bool moveDown) ValidateEndEdit()
         {
             // Out of sequence
             if (backup == null)
             {
-                return;
+                return (false, true);
             }
 
             // No change
             if (backup.Equals(data))
             {
-                backup = null;
-
-                // Move down only if this transaction is actually in DB
                 if (TransID >= 0)
                 {
-                    bankRegisterLogic.MoveDownOneTransaction(false);
+                    backup = null;
+                    return (false, true);
                 }
-                return;
+                else
+                {
+                    return (false, false);
+                }
             }
 
             Console.WriteLine($"End edit transaction date {Date.ToShortDateString()} Payee {Payee} amount {Payment}");
@@ -158,6 +160,7 @@ namespace BanaData.Logic.Main
                 {
                     CancelEdit();
                     BeginEdit();
+                    return (false, false);
                 }
             }
 
@@ -167,28 +170,56 @@ namespace BanaData.Logic.Main
                 {
                     CancelEdit();
                     BeginEdit();
+                    return (false, false);
                 }
             }
 
-            // Commit the changes
-            bool wasEmptyTransaction = TransID < 0;
-            if (wasEmptyTransaction)
-            {
-                // Remove from the list since we are going to change the ID, which is the equality criteria,
-                // and the listview will get mightily confused
-                bankRegisterLogic.RemoveTransactionFromList(this);
-            }
+            return (true, true);
+        }
+
+        public override void EndEdit()
+        {
+            //// Out of sequence
+            //if (backup == null)
+            //{
+            //    return;
+            //}
+
+            //// No change
+            //if (backup.Equals(data))
+            //{
+            //    backup = null;
+
+            //    // Move down only if this transaction is actually in DB
+            //    if (TransID >= 0)
+            //    {
+            //        bankRegisterLogic.MoveDownOneTransaction(false);
+            //    }
+            //    return;
+            //}
+
+            //Console.WriteLine($"End edit transaction date {Date.ToShortDateString()} Payee {Payee} amount {Payment}");
+
+            //// Check the changes
+            //if (backup.Status == ETransactionStatus.Reconciled && data.Status != ETransactionStatus.Reconciled)
+            //{
+            //    if (!mainWindowLogic.YesNoQuestion("Are you sure you want to un-reconcile this transaction"))
+            //    {
+            //        CancelEdit();
+            //        BeginEdit();
+            //    }
+            //}
+
+            //if (backup.Status == ETransactionStatus.Reconciled && backup.Amount != data.Amount)
+            //{
+            //    if (!mainWindowLogic.YesNoQuestion("Are you sure you want to change the amount of this reconciled transaction"))
+            //    {
+            //        CancelEdit();
+            //        BeginEdit();
+            //    }
+            //}
 
             CommitTransactionToDataSet();
-
-            if (wasEmptyTransaction)
-            {
-                // Put the re-id'd transaction back in the list
-                bankRegisterLogic.AddTransactionBackToList(this);
-            }
-
-            // Recompute the balances
-            bankRegisterLogic.RecomputeBalances();
 
             // Notify the UI
             if (data.Date != backup.Date)
@@ -238,10 +269,6 @@ namespace BanaData.Logic.Main
 
             // Clear the backup
             backup = null;
-
-            // Ask the register to move to the next transaction,
-            // creating an empty one if needed
-            bankRegisterLogic.MoveDownOneTransaction(wasEmptyTransaction);
         }
 
         private void CommitTransactionToDataSet()

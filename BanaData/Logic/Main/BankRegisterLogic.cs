@@ -165,17 +165,55 @@ namespace BanaData.Logic.Main
             }
         }
 
-        public void MoveDownOneTransaction(bool wasEmptyTransaction)
+        public void ProcessEnter()
         {
-            if (wasEmptyTransaction)
+            var transaction = SelectedTransaction;
+            if (transaction != null)
             {
-                // Create an empty transaction if we consumed the previous one
-                AddEmptyTransactionAtBottom();
-            }
-            else
-            {
-                // Move the selection down one row otherwise
-                MoveDown();
+                bool wasEmptyTransaction = transaction.TransID < 0;
+
+                (bool needCommit, bool moveDown) = transaction.ValidateEndEdit();
+
+                if (needCommit)
+                {
+                    // Remove from transaction list if needed
+                    if (wasEmptyTransaction)
+                    {
+                        // Remove transaction from list as its ID is about to change
+                        // And the ID is what is used to determine equality.
+                        // We don't want the list to get confused.
+                        logicIsChangingSelection = true;
+                        SelectedTransaction = null;
+                        logicIsChangingSelection = false;
+                        transactions.Remove(transaction);
+                    }
+
+                    // Commit changes
+                    transaction.EndEdit();
+
+                    // Put back in list
+                    if (wasEmptyTransaction)
+                    {
+                        transactions.Add(transaction);
+                    }
+
+                    // Update balances
+                    RecomputeBalances();
+                }
+
+                if (moveDown)
+                {
+                    if (wasEmptyTransaction)
+                    {
+                        // Create an empty transaction if we consumed the previous one
+                        AddEmptyTransactionAtBottom();
+                    }
+                    else
+                    {
+                        // Move the selection down one row otherwise
+                        MoveDown();
+                    }
+                }
             }
         }
 
@@ -201,22 +239,6 @@ namespace BanaData.Logic.Main
                 SelectedTransaction = nextTransaction as BankingTransactionLogic;
                 logicIsChangingSelection = false;
             }
-        }
-
-        public void RemoveTransactionFromList(BankingTransactionLogic btl)
-        {
-            if (SelectedTransaction == btl)
-            {
-                logicIsChangingSelection = true;
-                SelectedTransaction = null;
-                logicIsChangingSelection = false;
-            }
-            transactions.Remove(btl);
-        }
-
-        public void AddTransactionBackToList(BankingTransactionLogic btl)
-        {
-            transactions.Add(btl);
         }
 
         protected override void AddEmptyTransactionAtBottom()

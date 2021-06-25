@@ -143,7 +143,7 @@ namespace XamlUI.UserControls
         {
             base.OnKeyDown(e);
 
-            if (DataContext is BankRegisterLogic && listView.SelectedItem is BankingTransactionLogic btl)
+            if (DataContext is BankRegisterLogic brl && listView.SelectedItem is BankingTransactionLogic btl)
             {
                 if (e.Key == Key.Escape)
                 {
@@ -153,7 +153,7 @@ namespace XamlUI.UserControls
                 }
                 else if (e.Key == Key.Enter || e.Key == Key.Return)
                 {
-                    btl.EndEdit();
+                    brl.ProcessEnter();
                     e.Handled = true;
                 }
             }
@@ -163,7 +163,12 @@ namespace XamlUI.UserControls
         {
             base.OnPreviewKeyDown(e);
 
-            if (DataContext is BankRegisterLogic brl)
+            bool isFromAutocompleteTextBoxWithpopupOpen =
+                e.OriginalSource is WatermarkTextBox wtb &&
+                wtb.TemplatedParent is AutoCompleteTextBox actb &&
+                actb.IsPopupOpen;
+
+            if (DataContext is BankRegisterLogic brl && !isFromAutocompleteTextBoxWithpopupOpen)
             {
                 if (e.Key == Key.Up)
                 {
