@@ -49,7 +49,7 @@ namespace BanaData.Logic.Main
                 transRow.Status,
                 lineItems,
                 investmentTransRow.Type,
-                investmentTransRow .IsSecurityIDNull() ? - 1 : investmentTransRow.SecurityID,
+                investmentTransRow.IsSecurityIDNull() ? - 1 : investmentTransRow.SecurityID,
                 investmentTransRow.IsSecurityPriceNull() ?  0 : investmentTransRow.SecurityPrice,
                 investmentTransRow.IsSecurityQuantityNull() ? 0 : investmentTransRow.SecurityQuantity,
                 investmentTransRow.Commission);

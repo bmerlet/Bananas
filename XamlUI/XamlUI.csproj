@@ -123,6 +123,7 @@
     <Compile Include="UserControls\InvestmentRegister.xaml.cs">
       <DependentUpon>InvestmentRegister.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\ListviewWithOverlay.cs" />
     <Compile Include="UserControls\OKCancel.xaml.cs">
       <DependentUpon>OKCancel.xaml</DependentUpon>
     </Compile>

@@ -111,7 +111,7 @@ namespace BanaData.Logic.Main
         public string Type
         {
             get => EnumDescriptionAttribute.GetDescription(data.Type);
-            // ZZZ set
+            set => data.Type = EnumDescriptionAttribute.MatchDescription<EInvestmentTransactionType>(value);
         }
 
         public string[] TypesSource => EnumDescriptionAttribute.GetDescriptions(typeof(EInvestmentTransactionType));
