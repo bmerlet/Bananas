@@ -105,7 +105,7 @@ namespace XamlUI.UserControls
                 futureText = futureText.Insert(CaretIndex, e.Text);
             }
 
-            if (!decimal.TryParse(futureText, out _))
+            if (!string.IsNullOrWhiteSpace(futureText) && !decimal.TryParse(futureText, out _))
             {
                 // Can't parse - don't accept
                 e.Handled = true;
@@ -146,7 +146,7 @@ namespace XamlUI.UserControls
                 }
             }
 
-            if (futureText != null)
+            if (!string.IsNullOrWhiteSpace(futureText))
             {
                 if (!decimal.TryParse(futureText, out _))
                 {

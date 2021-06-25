@@ -62,7 +62,7 @@ namespace BanaData.Logic.Main
                     {
                         // This logic is changing the selection (e.g. processing of return key)
                         selectedTransaction = value;
-                        editedTransaction = value;
+                        EditedTransaction = value;
                         TransactionToScrollTo = value;
                         OnPropertyChanged(() => SelectedTransaction);
                         OnPropertyChanged(() => TransactionToScrollTo);
@@ -70,17 +70,17 @@ namespace BanaData.Logic.Main
                     else
                     {
                         // User changed selection (e.g. by clicking on a row)
-                        if (editedTransaction != null && transactions.Contains(editedTransaction))
+                        if (EditedTransaction != null && transactions.Contains(EditedTransaction))
                         {
-                            editedTransaction.CancelEdit();
+                            EditedTransaction.CancelEdit();
                         }
                         selectedTransaction = value;
-                        editedTransaction = value;
+                        EditedTransaction = value;
                     }
 
-                    if (editedTransaction != null)
+                    if (EditedTransaction != null)
                     {
-                        editedTransaction.BeginEdit();
+                        EditedTransaction.BeginEdit();
 
                         DateFocus = false;
                         OnPropertyChanged(() => DateFocus);
@@ -100,12 +100,7 @@ namespace BanaData.Logic.Main
         public BankingTransactionLogic TransactionToScrollTo { get; private set; }
 
         // Transaction being edited
-        private BankingTransactionLogic editedTransaction;
-        public BankingTransactionLogic EditedTransaction
-        {
-            get => editedTransaction;
-            set { editedTransaction = value; OnPropertyChanged(() => EditedTransaction); }
-        }
+        public BankingTransactionLogic EditedTransaction { get; set; }
 
         // Contect menu commands
         public CommandBase DeleteTransaction { get; }
@@ -263,7 +258,7 @@ namespace BanaData.Logic.Main
 
         private void OnDeleteTransaction(object arg)
         {
-            BankingTransactionLogic btl = arg == null ? EditedTransaction : arg as BankingTransactionLogic;
+            BankingTransactionLogic btl = arg == null ? SelectedTransaction : arg as BankingTransactionLogic;
             if (btl == null)
             {
                 return;
@@ -274,6 +269,9 @@ namespace BanaData.Logic.Main
                 // Can't remove the empty transaction
                 return;
             }
+
+            // We want to select the next transaction afterwards
+            var transactionToSelect = GetNextTransaction(btl);
 
             // Cancel all changes
             btl.CancelEdit();
@@ -303,11 +301,13 @@ namespace BanaData.Logic.Main
             transactions.Remove(btl);
             Transactions.Refresh();
 
-            // Move away
-            //MoveDownOneTransaction(false);
-
             // Compute balances
             RecomputeBalances();
+
+            // Re-select
+            logicIsChangingSelection = true;
+            SelectedTransaction = transactionToSelect as BankingTransactionLogic;
+            logicIsChangingSelection = false;
         }
 
         #endregion

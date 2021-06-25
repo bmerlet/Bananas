@@ -42,11 +42,11 @@
 
             <!-- Row 1: Interest amount -->
             <TextBlock Text="Interest earned:" Grid.Row="1"/>
-            <w:AmountBox Amount="{Binding InterestAmount, Mode=TwoWay}" Grid.Row="1" Grid.Column="1" HorizontalContentAlignment="Right"/>
+            <w:AmountBox Amount="{Binding InterestAmount, Mode=TwoWay}" Grid.Row="1" Grid.Column="1" HorizontalContentAlignment="Right" KeyboardNavigation.TabIndex="2"/>
 
             <!-- Row 2: Interest date -->
             <TextBlock Text="Interest date:" Grid.Row="2"/>
-            <w:DateBox Date="{Binding InterestDate, Mode=TwoWay}"  Grid.Row="2" Grid.Column="1"/>
+            <w:DateBox Date="{Binding InterestDate, Mode=TwoWay}"  Grid.Row="2" Grid.Column="1" KeyboardNavigation.TabIndex="3"/>
 
             <!-- Row 3: Interest category -->
             <TextBlock Text="Interest category:" Grid.Row="3"/>
@@ -54,7 +54,8 @@
                         Grid.Row="3" Grid.Column="1"
                         Style="{StaticResource CategoryBoxStyle}"
                         Text="{Binding InterestCategory, Mode=TwoWay}"
-                        ItemsSource="{Binding Categories}"/>
+                        ItemsSource="{Binding Categories}"
+                        KeyboardNavigation.TabIndex="4"/>
 
         </Grid>
         <!-- Main panel -->
@@ -76,19 +77,19 @@
 
             <!-- Row 1: Prior statement end date -->
             <TextBlock Text="Prior statement end date:" Grid.Row="1"/>
-            <w:DateBox Date="{Binding PriorStatementEndDate}"  Grid.Row="1" Grid.Column="1" IsReadOnly="True" IsTabStop="False"/>
+            <w:DateBox Date="{Binding PriorStatementEndDate}"  Grid.Row="1" Grid.Column="1" IsEnabled="False"/>
 
             <!-- Row 2: Statement end date -->
             <TextBlock Text="Statement end date:" Grid.Row="2"/>
-            <w:DateBox Date="{Binding StatementEndDate, Mode=TwoWay}"  Grid.Row="2" Grid.Column="1"/>
+            <w:DateBox Date="{Binding StatementEndDate, Mode=TwoWay}"  Grid.Row="2" Grid.Column="1" KeyboardNavigation.TabIndex="0"/>
 
             <!-- Row 3: Prior balance -->
             <TextBlock Text="Prior statement balance:" Grid.Row="3"/>
-            <w:AmountBox Amount="{Binding PriorStatementBalance}" IsReadOnly="True" IsTabStop="False" Grid.Row="3" Grid.Column="1" HorizontalContentAlignment="Right"/>
+            <w:AmountBox Amount="{Binding PriorStatementBalance}" IsEnabled="False" Grid.Row="3" Grid.Column="1" HorizontalContentAlignment="Right"/>
 
             <!-- Row 4: Current balance -->
             <TextBlock Text="Statement balance:" Grid.Row="4"/>
-            <w:AmountBox Amount="{Binding StatementBalance, Mode=TwoWay}" Grid.Row="4" Grid.Column="1" HorizontalContentAlignment="Right"/>
+            <w:AmountBox Amount="{Binding StatementBalance, Mode=TwoWay}" Grid.Row="4" Grid.Column="1" HorizontalContentAlignment="Right" KeyboardNavigation.TabIndex="1"/>
         </Grid>
     </DockPanel>
 </Window>

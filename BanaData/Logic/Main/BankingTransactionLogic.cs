@@ -179,46 +179,6 @@ namespace BanaData.Logic.Main
 
         public override void EndEdit()
         {
-            //// Out of sequence
-            //if (backup == null)
-            //{
-            //    return;
-            //}
-
-            //// No change
-            //if (backup.Equals(data))
-            //{
-            //    backup = null;
-
-            //    // Move down only if this transaction is actually in DB
-            //    if (TransID >= 0)
-            //    {
-            //        bankRegisterLogic.MoveDownOneTransaction(false);
-            //    }
-            //    return;
-            //}
-
-            //Console.WriteLine($"End edit transaction date {Date.ToShortDateString()} Payee {Payee} amount {Payment}");
-
-            //// Check the changes
-            //if (backup.Status == ETransactionStatus.Reconciled && data.Status != ETransactionStatus.Reconciled)
-            //{
-            //    if (!mainWindowLogic.YesNoQuestion("Are you sure you want to un-reconcile this transaction"))
-            //    {
-            //        CancelEdit();
-            //        BeginEdit();
-            //    }
-            //}
-
-            //if (backup.Status == ETransactionStatus.Reconciled && backup.Amount != data.Amount)
-            //{
-            //    if (!mainWindowLogic.YesNoQuestion("Are you sure you want to change the amount of this reconciled transaction"))
-            //    {
-            //        CancelEdit();
-            //        BeginEdit();
-            //    }
-            //}
-
             CommitTransactionToDataSet();
 
             // Notify the UI
@@ -374,7 +334,7 @@ namespace BanaData.Logic.Main
             var lis = new LineItem[data.LineItems.Count];
             for(int i = 0; i < lis.Length; i++)
             {
-                lis[i] = new LineItem(data.LineItems[i]) { Sealed = false };
+                lis[i] = new LineItem(data.LineItems[i]) { Sealed = true };
             }
 
             // Show the split transaction dialog
