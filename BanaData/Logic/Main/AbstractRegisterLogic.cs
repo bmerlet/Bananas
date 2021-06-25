@@ -41,7 +41,7 @@ namespace BanaData.Logic.Main
 
         #endregion
 
-        #region Actions
+        #region Public Actions
 
         // Set the account to display
         public void SetAccount(int _accountID)
@@ -133,6 +133,10 @@ namespace BanaData.Logic.Main
             }
         }
 
+        #endregion
+
+        #region Utilities for derived classes
+
         // Get the next transaction, in the CollectionView order
         protected AbstractTransactionLogic GetNextTransaction(AbstractTransactionLogic trans)
         {
@@ -143,6 +147,28 @@ namespace BanaData.Logic.Main
 
             return nextTrans as AbstractTransactionLogic;
         }
+
+        // Get the previous transaction, in the CollectionView order
+        protected AbstractTransactionLogic GetPreviousTransaction(AbstractTransactionLogic trans)
+        {
+            object lastTrans = null;
+
+            foreach(var curTrans in Transactions)
+            {
+                if (curTrans.Equals(trans))
+                {
+                    break;
+                }
+
+                lastTrans = curTrans;
+            }
+
+            return lastTrans as AbstractTransactionLogic;
+        }
+
+        #endregion
+
+        #region Private utilities
 
         // Get line item(s) from a transaction
         private List<LineItem> GetLineItems(Household.TransactionsRow transRow)

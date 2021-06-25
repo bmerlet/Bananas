@@ -159,6 +159,25 @@ namespace XamlUI.UserControls
             }
         }
 
+        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        {
+            base.OnPreviewKeyDown(e);
+
+            if (DataContext is BankRegisterLogic brl)
+            {
+                if (e.Key == Key.Up)
+                {
+                    brl.MoveUp();
+                    e.Handled = true;
+                }
+                if (e.Key == Key.Down)
+                {
+                    brl.MoveDown();
+                    e.Handled = true;
+                }
+            }
+        }
+
         #endregion
 
         #region Sorting

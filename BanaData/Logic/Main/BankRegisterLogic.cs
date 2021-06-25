@@ -63,7 +63,9 @@ namespace BanaData.Logic.Main
                         // This logic is changing the selection (e.g. processing of return key)
                         selectedTransaction = value;
                         editedTransaction = value;
+                        TransactionToScrollTo = value;
                         OnPropertyChanged(() => SelectedTransaction);
+                        OnPropertyChanged(() => TransactionToScrollTo);
                     }
                     else
                     {
@@ -173,14 +175,31 @@ namespace BanaData.Logic.Main
             else
             {
                 // Move the selection down one row otherwise
-                var nextTransaction = GetNextTransaction(SelectedTransaction);
+                MoveDown();
+            }
+        }
 
+        public void MoveUp()
+        {
+            var prevTransaction = GetPreviousTransaction(SelectedTransaction);
+
+            if (prevTransaction != null)
+            {
+                logicIsChangingSelection = true;
+                SelectedTransaction = prevTransaction as BankingTransactionLogic;
+                logicIsChangingSelection = false;
+            }
+        }
+
+        public void MoveDown()
+        {
+            var nextTransaction = GetNextTransaction(SelectedTransaction);
+
+            if (nextTransaction != null)
+            {
                 logicIsChangingSelection = true;
                 SelectedTransaction = nextTransaction as BankingTransactionLogic;
                 logicIsChangingSelection = false;
-
-                TransactionToScrollTo = SelectedTransaction;
-                OnPropertyChanged(() => TransactionToScrollTo);
             }
         }
 
