@@ -93,7 +93,14 @@ namespace BanaData.Logic.Main
             {
                 if (data.LineItems.Count == 1)
                 {
-                    data.LineItems[0].Category = value;
+                    try
+                    {
+                        data.LineItems[0].Category = value;
+                    }
+                    catch(ArgumentException e)
+                    {
+                        mainWindowLogic.ErrorMessage(e.Message);
+                    }
                 }
                 else
                 {
@@ -104,8 +111,30 @@ namespace BanaData.Logic.Main
 
         public IEnumerable<CategoryItem> Categories => mainWindowLogic.Categories;
 
-        // Amount (not a UI property, needed to recompute balance)
-        public decimal Amount => data.Amount;
+        // Amount (UI property for investments, and also used to recompute balance)
+        public decimal Amount
+        {
+            get => data.Amount;
+            set
+            {
+                if (data.Amount != value)
+                {
+                    if (data.LineItems.Count == 1)
+                    {
+                        data.LineItems[0].Amount = value;
+                        OnPropertyChanged(() => PaymentString);
+                        OnPropertyChanged(() => Payment);
+                        OnPropertyChanged(() => DepositString);
+                        OnPropertyChanged(() => Deposit);
+                        OnPropertyChanged(() => AmountString);
+                    }
+                    else
+                    {
+                        mainWindowLogic.ErrorMessage("Cannot set amount on split transactions");
+                    }
+                }
+            }
+        }
 
         // Amount as a string
         public string AmountString => data.Amount.ToString("N");
@@ -125,6 +154,8 @@ namespace BanaData.Logic.Main
                         OnPropertyChanged(() => PaymentString);
                         OnPropertyChanged(() => DepositString);
                         OnPropertyChanged(() => Deposit);
+                        OnPropertyChanged(() => Amount);
+                        OnPropertyChanged(() => AmountString);
                     }
                     else
                     {
@@ -159,6 +190,8 @@ namespace BanaData.Logic.Main
                         OnPropertyChanged(() => PaymentString);
                         OnPropertyChanged(() => DepositString);
                         OnPropertyChanged(() => Payment);
+                        OnPropertyChanged(() => Amount);
+                        OnPropertyChanged(() => AmountString);
                     }
                     else
                     {

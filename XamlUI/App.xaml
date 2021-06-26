@@ -142,5 +142,10 @@
             <Setter Property="ListBoxHeight" Value="150"/>
         </Style>
 
+        <Style TargetType="{x:Type ucs:AutoCompleteTextBox}" x:Key="InvestmentTransactionSecuritySymbolStyle">
+            <Setter Property="Watermark" Value="Symbol"/>
+            <Setter Property="ListBoxHeight" Value="150"/>
+        </Style>
+
     </Application.Resources>
 </Application>

@@ -44,6 +44,7 @@ namespace BanaData.Serializations
         public double InvstWidthOfSecuritySymbolColumn = 90;
         public double InvstWidthOfSecurityQuantityColumn = 90;
         public double InvstWidthOfSecurityPriceColumn = 90;
+        public double InvstWidthOfCommissionColumn = 50;
         public double InvstWidthOfSecurityBalanceColumn = 90;
         public double InvstWidthOfAmountColumn = 90;
         public double InvstWidthOfBalanceColumn = 90;

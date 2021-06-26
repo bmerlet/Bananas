@@ -92,7 +92,7 @@ namespace XamlUI.UserControls
                     {
                         var pos = lvi.TranslatePoint(new Point(0, 0), _listView);
                         _overlay.Visibility = Visibility.Visible;
-                        _overlay.Margin = new Thickness(3, pos.Y, 0, 0);
+                        _overlay.Margin = new Thickness(3 + pos.X, pos.Y, 0, 0);
                     }
                 }
             }, DispatcherPriority.ContextIdle, null);

@@ -7,7 +7,7 @@
              xmlns:t="clr-namespace:XamlUI.Tools"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+    <Grid ClipToBounds="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -139,7 +139,7 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock 
-                                    Text="{Binding Path=SecurityQuantity}"
+                                    Text="{Binding Path=SecurityQuantityString}"
                                     Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"
                                     HorizontalAlignment="Right"/>
                             </DataTemplate>
@@ -154,13 +154,28 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock 
-                                    Text="{Binding Path=SecurityPrice}"
+                                    Text="{Binding Path=SecurityPriceString}"
                                     Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"
                                     HorizontalAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    
+
+                    <!-- Commission column-->
+                    <GridViewColumn Width="{Binding Widths.WidthOfCommissionColumn, Mode=TwoWay}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Commission" Tag="Commission" Click="OnColumnHeaderClicked"/>
+                        </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock 
+                                    Text="{Binding Path=CommissionString}"
+                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"
+                                    HorizontalAlignment="Right"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
                     <!-- Security balance column-->
                     <GridViewColumn Header="Share Bal" Width="{Binding Widths.WidthOfSecurityBalanceColumn, Mode=TwoWay}">
                         <GridViewColumn.CellTemplate>
@@ -187,7 +202,6 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-
 
                     <!-- Balance column-->
                     <GridViewColumn Header="Balance" Width="{Binding Widths.WidthOfBalanceColumn, Mode=TwoWay}">
@@ -256,33 +270,98 @@
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="{Binding Widths.WidthOfStatusColumn}"/>
-                <ColumnDefinition Width="{Binding Widths.WidthOfDateColumn}"/>
-                <ColumnDefinition Width="{Binding Widths.WidthOfTypeColumn}"/>
-                <ColumnDefinition Width="{Binding Widths.WidthOfCategoryColumn}"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <!-- Status -->
             <ComboBox
                 Grid.Column="0"
+                Width="{Binding Widths.WidthOfStatusColumn}"
                 ItemsSource="{Binding EditedTransaction.StatusSource}"
                 SelectedItem="{Binding EditedTransaction.Status, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
             <!-- Date-->
             <local:DateBox 
                 Grid.Column="1"
+                Width="{Binding Widths.WidthOfDateColumn}"
                 Date="{Binding EditedTransaction.Date, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 t:FocusAttachedProperty.IsFocused="{Binding DateFocus}"/>
 
             <!-- Type -->
             <local:AutoCompleteTextBox 
                 Grid.Column="2"
+                Width="{Binding Widths.WidthOfTypeColumn}"
                 Style="{StaticResource InvestmentTransactionTypeStyle}"
                 Text="{Binding EditedTransaction.Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 ItemSelectedCommand="{Binding EditedTransaction.TypeSelected}"
                 ItemsSource="{Binding EditedTransaction.TypesSource}"/>
 
+            <!-- Memo -->
+            <local:WatermarkTextBox 
+                Grid.Column="3"
+                Width="{Binding Widths.WidthOfMemoColumn}"
+                Text="{Binding EditedTransaction.Memo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                Watermark="Memo"/>
 
+            <!-- Security symbol -->
+            <local:AutoCompleteTextBox
+                Grid.Column="4"
+                Width="{Binding Widths.WidthOfSecuritySymbolColumn}"
+                Style="{StaticResource InvestmentTransactionSecuritySymbolStyle}"
+                Text="{Binding EditedTransaction.SecuritySymbol, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                ItemsSource="{Binding EditedTransaction.SecuritiesSource}"
+                Visibility="{Binding EditedTransaction.IsSecuritySymbolVisible, Converter={StaticResource visibilityBoolConverter}}"/>
+
+            <!-- Security quantity -->
+            <local:AmountBox
+                Grid.Column="{Binding EditedTransaction.SecurityQuantityColumnNumber}"
+                Width="{Binding Widths.WidthOfSecurityQuantityColumn}"
+                Amount="{Binding EditedTransaction.SecurityQuantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                Visibility="{Binding EditedTransaction.IsSecurityQuantityVisible, Converter={StaticResource visibilityBoolConverter}}"
+                Watermark="# shares"/>
+
+            <!-- Security price -->
+            <local:AmountBox
+                Grid.Column="{Binding EditedTransaction.SecurityPriceColumnNumber}"
+                Width="{Binding Widths.WidthOfSecurityPriceColumn}"
+                Amount="{Binding EditedTransaction.SecurityPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                Visibility="{Binding EditedTransaction.IsSecurityPriceVisible, Converter={StaticResource visibilityBoolConverter}}"
+                Watermark="Shr price"/>
+
+            <!-- Commission -->
+            <local:AmountBox
+                Grid.Column="{Binding EditedTransaction.CommissionColumnNumber}"
+                Width="{Binding Widths.WidthOfCommissionColumn}"
+                Amount="{Binding EditedTransaction.Commission, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                Visibility="{Binding EditedTransaction.IsCommissionVisible, Converter={StaticResource visibilityBoolConverter}}"
+                Watermark="Comm"/>
+
+            <!-- Dollar amount -->
+            <local:AmountBox
+                Grid.Column="{Binding EditedTransaction.AmountColumnNumber}"
+                Width="{Binding Widths.WidthOfAmountColumn}"
+                Amount="{Binding EditedTransaction.Amount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                Visibility="{Binding EditedTransaction.IsAmountVisible, Converter={StaticResource visibilityBoolConverter}}"
+                Watermark="Amount"/>
+
+            <!-- Category (tx dest) -->
+            <local:AutoCompleteTextBox 
+                Grid.Column="{Binding EditedTransaction.CategoryColumnNumber}"
+                Width="{Binding Widths.WidthOfCategoryColumn}"
+                Style="{StaticResource CategoryBoxStyle}"
+                Text="{Binding EditedTransaction.Category, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                ItemsSource="{Binding EditedTransaction.TransfersSource}"
+                Visibility="{Binding EditedTransaction.IsCategoryVisible, Converter={StaticResource visibilityBoolConverter}}"
+                Watermark="Tx dest"/>
         </Grid>
     </Grid>
 </local:ListviewWithOverlay>

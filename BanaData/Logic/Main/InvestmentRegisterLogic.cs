@@ -241,6 +241,20 @@ namespace BanaData.Logic.Main
                 }
             }
 
+            public double WidthOfCommissionColumn
+            {
+                get => mainWindowLogic.UserSettings.InvstWidthOfCommissionColumn;
+                set
+                {
+                    if (mainWindowLogic.UserSettings.InvstWidthOfCommissionColumn != value)
+                    {
+                        mainWindowLogic.UserSettings.InvstWidthOfCommissionColumn = value;
+                        mainWindowLogic.SaveUserSettings();
+                        OnPropertyChanged(() => WidthOfCommissionColumn);
+                    }
+                }
+            }
+
             public double WidthOfSecurityBalanceColumn
             {
                 get => mainWindowLogic.UserSettings.InvstWidthOfSecurityBalanceColumn;

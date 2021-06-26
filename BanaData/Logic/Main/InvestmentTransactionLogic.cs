@@ -108,6 +108,9 @@ namespace BanaData.Logic.Main
 
         #region UI Properties
 
+        //
+        // Type of transaction
+        //
         public string Type
         {
             get => EnumDescriptionAttribute.GetDescription(data.Type);
@@ -116,19 +119,56 @@ namespace BanaData.Logic.Main
 
         public string[] TypesSource => EnumDescriptionAttribute.GetDescriptions(typeof(EInvestmentTransactionType));
 
+        //
+        // Transaction description (generated, read-only)
+        //
         public string Description => GetDescription();
 
+        //
+        // Security symbol
+        //
         public string SecuritySymbol
         {
             get => GetSecuritySymbol(data.SecurityID);
-            // Set
+            set => SetSecuritySymbol(value);
         }
+        public bool IsSecuritySymbolVisible => true; // ZZZ
 
-        public string SecurityPrice => data.SecurityPrice == 0 ? "" : data.SecurityPrice.ToString("N");
+        //
+        // Security price
+        //
+        public string SecurityPriceString => data.SecurityPrice == 0 ? "" : data.SecurityPrice.ToString("N");
+        public decimal SecurityPrice
+        {
+            get => data.SecurityPrice;
+            set => data.SecurityPrice = value;
+        }
+        public int SecurityQuantityColumnNumber => 5; // ZZZ
+        public bool IsSecurityQuantityVisible => true; // ZZZ
 
-        public string SecurityQuantity => data.SecurityQuantity == 0 ? "" : data.SecurityQuantity.ToString("N");
+        //
+        // Security quantity
+        //
+        public string SecurityQuantityString => data.SecurityQuantity == 0 ? "" : data.SecurityQuantity.ToString("N");
+        public decimal SecurityQuantity
+        {
+            get => data.SecurityQuantity;
+            set => data.SecurityQuantity = value;
+        }
+        public int SecurityPriceColumnNumber => 6; // ZZZ
+        public bool IsSecurityPriceVisible => true; // ZZZ
 
-        public string Commission => data.Commission == 0 ? "" : data.Commission.ToString("N");
+        //
+        // Commission
+        //
+        public string CommissionString => data.Commission == 0 ? "" : data.Commission.ToString("N");
+        public decimal Commission
+        {
+            get => data.Commission;
+            set => data.Commission = value;
+        }
+        public int CommissionColumnNumber => 7; // ZZZ
+        public bool IsCommissionVisible => true; // ZZZ
 
         // Share balance
         // ShareBalanceString is the UI property, ShareBalance is updated by the logic
@@ -148,6 +188,18 @@ namespace BanaData.Logic.Main
         }
 
         public string ShareBalanceString { get; private set; } = "";
+
+        //
+        // Amount supplement
+        //
+        public int AmountColumnNumber => 9; // ZZZ
+        public bool IsAmountVisible => true; // ZZZ
+
+        //
+        // Category supplement
+        //
+        public int CategoryColumnNumber => 8; // ZZZ
+        public bool IsCategoryVisible => true; // ZZZ
 
         #endregion
 
@@ -247,24 +299,12 @@ namespace BanaData.Logic.Main
                     desc = $"Received ${AmountString} in LT CG from {SecuritySymbol}";
                     break;
 
-                    /*
- 
-        [EnumDescription("ROC")]
-        ReturnOnCapital,
-
-        [EnumDescription("Grant")]
-        Grant,
-
-        [EnumDescription("Vest")]
-        Vest,
-
-        [EnumDescription("Exercise")]
-        Exercise,
-
-        [EnumDescription("Expire")]
-        Expire,
-
-                     */
+                case EInvestmentTransactionType.Grant:
+                case EInvestmentTransactionType.Vest:
+                case EInvestmentTransactionType.Exercise:
+                case EInvestmentTransactionType.Expire:
+                    desc = $"{EnumDescriptionAttribute.GetDescription(data.Type)}: Not supported";
+                    break;
             }
 
             return desc;
@@ -282,6 +322,23 @@ namespace BanaData.Logic.Main
             }
 
             return result;
+        }
+
+        private void SetSecuritySymbol(string value)
+        {
+            int id = -1;
+
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                var household = mainWindowLogic.Household;
+                var securityRow = household.Securities.GetBySymbol(value);
+                if (securityRow != null)
+                {
+                    id = securityRow.ID; 
+                }
+            }
+
+            data.SecurityID = id;
         }
 
         #endregion
