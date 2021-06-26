@@ -31,6 +31,9 @@ namespace BanaData.Logic.Main
 
         #region UI properties
 
+        // Investment transaction type list
+        public CollectionView TypesSource => mainWindowLogic.InvestmentTransactionTypesView;
+
         // Security list
         public CollectionView SecuritiesView => mainWindowLogic.SecuritiesView;
 

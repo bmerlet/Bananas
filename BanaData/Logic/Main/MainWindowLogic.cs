@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Data;
 
+using Toolbox.Attributes;
 using Toolbox.UILogic;
 using Toolbox.Models;
 using BanaData.Database;
@@ -71,6 +72,17 @@ namespace BanaData.Logic.Main
                 UpdateAll();
             }
 
+            // Create list of investment transaction type
+            foreach(EInvestmentTransactionType itt in Enum.GetValues(typeof(EInvestmentTransactionType)))
+            {
+                if (itt != EInvestmentTransactionType.None)
+                {
+                    investmentTransactionTypes.Add(new InvestmentTransactionTypeItem(itt));
+                }
+            }
+            InvestmentTransactionTypesView = (CollectionView)CollectionViewSource.GetDefaultView(investmentTransactionTypes);
+            InvestmentTransactionTypesView.SortDescriptions.Add(new SortDescription("TypeString", ListSortDirection.Ascending));
+
             // Setup timer to save to disk every 5 minutes
             saveTimer.Elapsed += OnSaveTimerElapsed;
             saveTimer.Enabled = true;
@@ -105,6 +117,10 @@ namespace BanaData.Logic.Main
         // List of securities
         public readonly ObservableCollection<SecurityItem> Securities = new ObservableCollection<SecurityItem>();
         public CollectionView SecuritiesView { get; private set; }
+
+        // List of investment transaction types
+        private readonly List<InvestmentTransactionTypeItem> investmentTransactionTypes = new List<InvestmentTransactionTypeItem>();
+        public CollectionView InvestmentTransactionTypesView { get; }
 
         // Account currently displayed
         public int DisplayedAccountID { get; private set; } = -1;

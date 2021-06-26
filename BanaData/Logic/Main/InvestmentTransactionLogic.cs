@@ -117,8 +117,6 @@ namespace BanaData.Logic.Main
             set => data.Type = EnumDescriptionAttribute.MatchDescription<EInvestmentTransactionType>(value);
         }
 
-        public string[] TypesSource => EnumDescriptionAttribute.GetDescriptions(typeof(EInvestmentTransactionType));
-
         //
         // Transaction description (generated, read-only)
         //

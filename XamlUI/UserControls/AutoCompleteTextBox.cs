@@ -154,6 +154,18 @@ namespace XamlUI.UserControls
             set => SetValue(DisplayMemberProperty, value);
         }
 
+        //
+        // IsTextFromItemsSourceOnly: Only allow text that is in the items source (like a combo box)
+        //
+        public static readonly DependencyProperty IsTextFromItemsSourceOnlyProperty =
+            DependencyProperty.Register("IsTextFromItemsSourceOnly", typeof(bool), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(false));
+
+        public bool IsTextFromItemsSourceOnly
+        {
+            get => (bool)GetValue(IsTextFromItemsSourceOnlyProperty);
+            set => SetValue(IsTextFromItemsSourceOnlyProperty, value);
+        }
+
         #endregion
 
         #region Private fields
@@ -302,6 +314,22 @@ namespace XamlUI.UserControls
                         // Only one choice left
                         selector.SelectedIndex = 0;
                     }
+                    else if (IsTextFromItemsSourceOnly)
+                    {
+                        // Gotta select something
+                        if (selector.Items.Count > 0)
+                        {
+                            selector.SelectedIndex = 0;
+                        }
+                        else
+                        {
+                            // Nothing matching, consume the tab event so that the user
+                            // stays on this box
+                            e.Handled = true;
+                            return;
+                        }
+                    }
+
                     // Publish selection
                     PublishSelection();
 

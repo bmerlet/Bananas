@@ -110,10 +110,10 @@ namespace BanaData.Database
         [EnumDescription("Cash")]
         Cash,
 
-        [EnumDescription("Interest income")]
+        [EnumDescription("Int")]
         InterestIncome,
 
-        [EnumDescription("Transfer cash")]
+        [EnumDescription("XCash")]
         TransferCash,
 
         [EnumDescription("XIn")]

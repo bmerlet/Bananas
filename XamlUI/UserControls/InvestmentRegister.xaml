@@ -303,7 +303,7 @@
                 Style="{StaticResource InvestmentTransactionTypeStyle}"
                 Text="{Binding EditedTransaction.Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 ItemSelectedCommand="{Binding EditedTransaction.TypeSelected}"
-                ItemsSource="{Binding EditedTransaction.TypesSource}"/>
+                ItemsSource="{Binding TypesSource}"/>
 
             <!-- Memo -->
             <local:WatermarkTextBox 
