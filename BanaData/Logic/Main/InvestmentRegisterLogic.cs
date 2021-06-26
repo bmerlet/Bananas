@@ -9,6 +9,7 @@ using System.Windows.Data;
 using Toolbox.UILogic;
 using BanaData.Database;
 using BanaData.Logic.Items;
+using BanaData.Collections;
 
 namespace BanaData.Logic.Main
 {
@@ -19,6 +20,9 @@ namespace BanaData.Logic.Main
         public InvestmentRegisterLogic(MainWindowLogic mainWindowLogic)
             : base(mainWindowLogic)
         {
+            // Create list of all transfer categories
+            UpdateTransfersSource();
+
             // Create column width manager
             Widths = new ColumnWidths(mainWindowLogic);
         }
@@ -27,12 +31,25 @@ namespace BanaData.Logic.Main
 
         #region UI properties
 
+        // Security list
+        public CollectionView SecuritiesView => mainWindowLogic.SecuritiesView;
+
+        // Transfers
+        private readonly WpfObservableRangeCollection<CategoryItem> transfersSource = new WpfObservableRangeCollection<CategoryItem>();
+        public IEnumerable<CategoryItem> TransfersSource => transfersSource;
+
         // Column widths
         public ColumnWidths Widths { get; }
 
         #endregion
 
         #region Actions & Hooks for abstract base class
+
+        // Create list of all transfer categories
+        public void UpdateTransfersSource()
+        {
+            transfersSource.ReplaceRange(mainWindowLogic.Categories.Where(c => c.AccountID >= 0));
+        }
 
         // Routine to create a transaction from the DB
         protected override AbstractTransactionLogic CreateTransactionFromDB(Household.AccountsRow accountRow, Household.TransactionsRow transRow, List<LineItem> lineItems)

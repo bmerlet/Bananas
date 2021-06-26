@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
+using System.Windows.Data;
 
 using Toolbox.UILogic;
 using Toolbox.Models;
@@ -12,7 +15,6 @@ using BanaData.Database;
 using BanaData.Serializations;
 using BanaData.Logic.Items;
 using BanaData.Logic.Dialogs;
-using System.Timers;
 
 namespace BanaData.Logic.Main
 {
@@ -99,6 +101,10 @@ namespace BanaData.Logic.Main
 
         // List of categories, as displayed in the UI
         public readonly List<CategoryItem> Categories = new List<CategoryItem>();
+
+        // List of securities
+        public readonly ObservableCollection<SecurityItem> Securities = new ObservableCollection<SecurityItem>();
+        public CollectionView SecuritiesView { get; private set; }
 
         // Account currently displayed
         public int DisplayedAccountID { get; private set; } = -1;
@@ -236,6 +242,10 @@ namespace BanaData.Logic.Main
 
             // Compute the known categories
             BuildCategoriesList();
+            InvestmentRegister.UpdateTransfersSource();
+
+            // Compute the known securities
+            BuildSecuritiesList();
         }
 
         // Action after memorized payees are changed
@@ -420,6 +430,19 @@ namespace BanaData.Logic.Main
             }
 
             Categories.Sort();
+        }
+
+        private void BuildSecuritiesList()
+        {
+            foreach (Household.SecuritiesRow security in Household.Securities.Rows)
+            {
+                var symbol = security.IsSymbolNull() ? "" : security.Symbol;
+                Securities.Add(new SecurityItem(security.ID, security.Name, symbol, security.Type));
+            }
+
+            SecuritiesView = (CollectionView)CollectionViewSource.GetDefaultView(Securities);
+            SecuritiesView.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
+
         }
 
         #endregion

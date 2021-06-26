@@ -318,7 +318,7 @@
                 Width="{Binding Widths.WidthOfSecuritySymbolColumn}"
                 Style="{StaticResource InvestmentTransactionSecuritySymbolStyle}"
                 Text="{Binding EditedTransaction.SecuritySymbol, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                ItemsSource="{Binding EditedTransaction.SecuritiesSource}"
+                ItemsSource="{Binding SecuritiesView}"
                 Visibility="{Binding EditedTransaction.IsSecuritySymbolVisible, Converter={StaticResource visibilityBoolConverter}}"/>
 
             <!-- Security quantity -->
@@ -359,7 +359,7 @@
                 Width="{Binding Widths.WidthOfCategoryColumn}"
                 Style="{StaticResource CategoryBoxStyle}"
                 Text="{Binding EditedTransaction.Category, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                ItemsSource="{Binding EditedTransaction.TransfersSource}"
+                ItemsSource="{Binding TransfersSource}"
                 Visibility="{Binding EditedTransaction.IsCategoryVisible, Converter={StaticResource visibilityBoolConverter}}"
                 Watermark="Tx dest"/>
         </Grid>

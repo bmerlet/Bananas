@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ using Toolbox.UILogic;
 using BanaData.Logic.Main;
 using BanaData.Logic.Items;
 using BanaData.Database;
-using System.ComponentModel;
+using BanaData.Collections;
 
 namespace BanaData.Logic.Dialogs
 {
@@ -28,13 +29,8 @@ namespace BanaData.Logic.Dialogs
         {
             mainWindowLogic = _mainWindowLogic;
 
-            securitySource = new ObservableCollection<SecurityItem>();
-
-            foreach (Household.SecuritiesRow security in mainWindowLogic.Household.Securities.Rows)
-            {
-                var symbol = security.IsSymbolNull() ? "" : security.Symbol;
-                securitySource.Add(new SecurityItem(security.ID, security.Name, symbol, security.Type));
-            }
+            securitySource = new WpfObservableRangeCollection<SecurityItem>();
+            securitySource.ReplaceRange(mainWindowLogic.Securities);
 
             SecuritiesSource = (CollectionView)CollectionViewSource.GetDefaultView(securitySource);
             SecuritiesSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
@@ -51,7 +47,7 @@ namespace BanaData.Logic.Dialogs
         public SecurityItem SelectedSecurity { get; set; }
         public SecurityItem SecurityToScrollTo { get; private set; }
 
-        private readonly ObservableCollection<SecurityItem> securitySource;
+        private readonly WpfObservableRangeCollection<SecurityItem> securitySource;
         public CollectionView SecuritiesSource { get; }
 
         public CommandBase AddCommand { get; }
@@ -76,6 +72,9 @@ namespace BanaData.Logic.Dialogs
                 // Commit change
                 newSecurity = AddSecurityToDataSet(newSecurity);
 
+                // Upate main list
+                mainWindowLogic.Securities.Add(newSecurity);
+
                 // Update UI
                 securitySource.Add(newSecurity);
                 SelectedSecurity = newSecurity;
@@ -97,6 +96,10 @@ namespace BanaData.Logic.Dialogs
 
                     // Commit change
                     UpdateSecurityInDataSet(newSecurity);
+
+                    // Upate main list
+                    mainWindowLogic.Securities.Remove(SelectedSecurity);
+                    mainWindowLogic.Securities.Add(newSecurity);
 
                     // Update UI
                     securitySource.Remove(SelectedSecurity);
@@ -124,6 +127,10 @@ namespace BanaData.Logic.Dialogs
                 // Commit change
                 RemoveSecurityFromDataSet(SelectedSecurity);
 
+                // Upate main list
+                mainWindowLogic.Securities.Remove(SelectedSecurity);
+
+                // Update UI
                 securitySource.Remove(SelectedSecurity);
             }
         }
