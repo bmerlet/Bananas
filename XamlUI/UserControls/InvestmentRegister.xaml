@@ -292,12 +292,14 @@
             <!-- Date-->
             <local:DateBox 
                 Grid.Column="1"
+                KeyboardNavigation.TabIndex="0"
                 Width="{Binding Widths.WidthOfDateColumn}"
                 Date="{Binding EditedTransaction.Date, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 t:FocusAttachedProperty.IsFocused="{Binding DateFocus}"/>
 
             <!-- Type -->
             <local:AutoCompleteTextBox 
+                KeyboardNavigation.TabIndex="1"
                 Grid.Column="2"
                 Width="{Binding Widths.WidthOfTypeColumn}"
                 Style="{StaticResource InvestmentTransactionTypeStyle}"
@@ -307,6 +309,7 @@
 
             <!-- Memo -->
             <local:WatermarkTextBox 
+                KeyboardNavigation.TabIndex="2"
                 Grid.Column="3"
                 Width="{Binding Widths.WidthOfMemoColumn}"
                 Text="{Binding EditedTransaction.Memo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -314,7 +317,8 @@
 
             <!-- Security symbol -->
             <local:AutoCompleteTextBox
-                Grid.Column="4"
+                Grid.Column="{Binding EditedTransaction.SecuritySymbolColumnNumber}"
+                KeyboardNavigation.TabIndex="{Binding EditedTransaction.SecuritySymbolTabIndex}"
                 Width="{Binding Widths.WidthOfSecuritySymbolColumn}"
                 Style="{StaticResource InvestmentTransactionSecuritySymbolStyle}"
                 Text="{Binding EditedTransaction.SecuritySymbol, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -324,6 +328,7 @@
             <!-- Security quantity -->
             <local:AmountBox
                 Grid.Column="{Binding EditedTransaction.SecurityQuantityColumnNumber}"
+                KeyboardNavigation.TabIndex="{Binding EditedTransaction.SecurityQuantityTabIndex}"
                 Width="{Binding Widths.WidthOfSecurityQuantityColumn}"
                 Amount="{Binding EditedTransaction.SecurityQuantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 Visibility="{Binding EditedTransaction.IsSecurityQuantityVisible, Converter={StaticResource visibilityBoolConverter}}"
@@ -332,6 +337,7 @@
             <!-- Security price -->
             <local:AmountBox
                 Grid.Column="{Binding EditedTransaction.SecurityPriceColumnNumber}"
+                KeyboardNavigation.TabIndex="{Binding EditedTransaction.SecurityPriceTabIndex}"
                 Width="{Binding Widths.WidthOfSecurityPriceColumn}"
                 Amount="{Binding EditedTransaction.SecurityPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 Visibility="{Binding EditedTransaction.IsSecurityPriceVisible, Converter={StaticResource visibilityBoolConverter}}"
@@ -340,6 +346,7 @@
             <!-- Commission -->
             <local:AmountBox
                 Grid.Column="{Binding EditedTransaction.CommissionColumnNumber}"
+                KeyboardNavigation.TabIndex="{Binding EditedTransaction.CommissionTabIndex}"
                 Width="{Binding Widths.WidthOfCommissionColumn}"
                 Amount="{Binding EditedTransaction.Commission, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 Visibility="{Binding EditedTransaction.IsCommissionVisible, Converter={StaticResource visibilityBoolConverter}}"
@@ -348,6 +355,7 @@
             <!-- Dollar amount -->
             <local:AmountBox
                 Grid.Column="{Binding EditedTransaction.AmountColumnNumber}"
+                KeyboardNavigation.TabIndex="{Binding EditedTransaction.AmountTabIndex}"
                 Width="{Binding Widths.WidthOfAmountColumn}"
                 Amount="{Binding EditedTransaction.Amount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 Visibility="{Binding EditedTransaction.IsAmountVisible, Converter={StaticResource visibilityBoolConverter}}"
@@ -356,6 +364,7 @@
             <!-- Category (tx dest) -->
             <local:AutoCompleteTextBox 
                 Grid.Column="{Binding EditedTransaction.CategoryColumnNumber}"
+                KeyboardNavigation.TabIndex="{Binding EditedTransaction.CategoryTabIndex}"
                 Width="{Binding Widths.WidthOfCategoryColumn}"
                 Style="{StaticResource CategoryBoxStyle}"
                 Text="{Binding EditedTransaction.Category, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
