@@ -283,7 +283,7 @@ namespace XamlUI.UserControls
         private void OnEditorTextChanged(object sender, TextChangedEventArgs e)
         {
             // Update autocomplete list
-            RefreshSelector();
+           RefreshSelector();
         }
 
         //
@@ -314,7 +314,7 @@ namespace XamlUI.UserControls
                         // Only one choice left
                         selector.SelectedIndex = 0;
                     }
-                    else if (IsTextFromItemsSourceOnly)
+                    else if (IsTextFromItemsSourceOnly && selector.SelectedItem == null)
                     {
                         // Gotta select something
                         if (selector.Items.Count > 0)

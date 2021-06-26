@@ -23,6 +23,9 @@ namespace BanaData.Logic.Main
             // Create list of all transfer categories
             UpdateTransfersSource();
 
+            // Create commands
+            ShowHoldingsCommand = new CommandBase(OnShowHoldingsCommand);
+
             // Create column width manager
             Widths = new ColumnWidths(mainWindowLogic);
         }
@@ -30,6 +33,9 @@ namespace BanaData.Logic.Main
         #endregion
 
         #region UI properties
+
+        // Command to show holdings
+        public CommandBase ShowHoldingsCommand { get; }
 
         // Investment transaction type list
         public CollectionView TypesSource => mainWindowLogic.InvestmentTransactionTypesView;
@@ -123,6 +129,12 @@ namespace BanaData.Logic.Main
 
                 itl.ShareBalance = balance;
             }
+        }
+
+        // Show holdings
+        private void OnShowHoldingsCommand()
+        {
+            mainWindowLogic.ErrorMessage("Not yet implemented");
         }
 
         #endregion

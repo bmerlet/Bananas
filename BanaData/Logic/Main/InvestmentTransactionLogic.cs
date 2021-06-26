@@ -137,7 +137,7 @@ namespace BanaData.Logic.Main
         //
         // Security price
         //
-        public string SecurityPriceString => data.SecurityPrice == 0 ? "" : data.SecurityPrice.ToString("N");
+        public string SecurityPriceString => data.SecurityPrice == 0 ? "" : data.SecurityPrice.ToString("N4");
         public decimal SecurityPrice
         {
             get => data.SecurityPrice;
@@ -150,7 +150,7 @@ namespace BanaData.Logic.Main
         //
         // Security quantity
         //
-        public string SecurityQuantityString => data.SecurityQuantity == 0 ? "" : data.SecurityQuantity.ToString("N");
+        public string SecurityQuantityString => data.SecurityQuantity == 0 ? "" : data.SecurityQuantity.ToString("N4");
         public decimal SecurityQuantity
         {
             get => data.SecurityQuantity;
@@ -184,7 +184,7 @@ namespace BanaData.Logic.Main
                 if (shareBalance != value)
                 {
                     shareBalance = value;
-                    ShareBalanceString = shareBalance == decimal.MinValue ? "" : shareBalance.ToString("N");
+                    ShareBalanceString = shareBalance == decimal.MinValue ? "" : shareBalance.ToString("N4");
                     OnPropertyChanged(() => ShareBalanceString);
                 }
             }

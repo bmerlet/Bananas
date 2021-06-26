@@ -12,6 +12,7 @@ namespace XamlUI.UserControls
     class AmountBox : WatermarkTextBox
     {
         private bool internalAmountUpdate;
+        private string formatString = "N";
 
         #region Dependency Properties
 
@@ -48,7 +49,7 @@ namespace XamlUI.UserControls
                 }
                 else
                 {
-                    Text = amount.ToString("N");
+                    Text = amount.ToString(formatString);
                 }
             }
         }
@@ -77,11 +78,39 @@ namespace XamlUI.UserControls
         {
             if (Amount == 0)
             {
-                Text = showZeroAmount ? Amount.ToString("N") : "";
+                Text = showZeroAmount ? Amount.ToString(formatString) : "";
             }
         }
 
-        // ZZZ Precision
+        //
+        // Precision
+        //
+        public int Precision
+        {
+            get { return (int)GetValue(PrecisionProperty); }
+            set { SetValue(PrecisionProperty, value); }
+        }
+
+        public static readonly DependencyProperty PrecisionProperty =
+            DependencyProperty.Register("Precision", typeof(int), typeof(AmountBox), new UIPropertyMetadata(2, OnPrecisionChanged));
+
+        private static void OnPrecisionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is AmountBox ab)
+            {
+                ab.OnPrecisionChanged((int)e.NewValue);
+            }
+        }
+
+        private void OnPrecisionChanged(int precision)
+        {
+            formatString = "N" + precision.ToString();
+
+            if (ShowZeroAmount || Amount != 0)
+            {
+                Text = Amount.ToString(formatString);
+            }
+        }
 
         #endregion
 
@@ -183,7 +212,7 @@ namespace XamlUI.UserControls
             {
                 internalAmountUpdate = true;
                 Amount = decimal.Parse(Text);
-                Text = Amount.ToString("N");
+                Text = Amount.ToString(formatString);
                 internalAmountUpdate = false;
             }
         }
