@@ -52,7 +52,7 @@
 
             <!-- Row 3: Credit limit -->
             <TextBlock Text="Credit limit:" Grid.Row="3"/>
-            <w:AmountBox Amount="{Binding CreditLimit, Mode=TwoWay}" IsEnabled="{Binding CreditLimitEnabled}" Grid.Row="3" Grid.Column="1" HorizontalContentAlignment="Right"/>
+            <w:AmountBox Amount="{Binding CreditLimit, Mode=TwoWay}" IsEnabled="{Binding CreditLimitEnabled}" Grid.Row="3" Grid.Column="1"/>
 
             <!-- Row 4: Investment kind -->
             <TextBlock Text="Investment kind:" Grid.Row="4"/>

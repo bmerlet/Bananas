@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="XamlUI.UserControls.BankRegister"
+﻿<local:ListviewWithOverlay x:Class="XamlUI.UserControls.BankRegister"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -7,191 +7,273 @@
              xmlns:t="clr-namespace:XamlUI.Tools"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <!-- ====================================-->
-    <!-- ==             OBSOLETE           ==-->
-    <!-- ====================================-->
-    <!-- ==  Replaced by BankRegisterLV    ==-->
-    <!-- ====================================-->
     <Grid>
 
-        <Grid.Resources>
-
-            <!-- Templates for the date column -->
-            <DataTemplate x:Key="DateColumnTemplate">
-                <TextBlock Text="{Binding Date, StringFormat=M/d/yyyy}" HorizontalAlignment="Right"/>
-            </DataTemplate>
-            <DataTemplate x:Key="DateEditingColumnTemplate">
-                <local:DateBox Date="{Binding Date, Mode=TwoWay}"/>
-            </DataTemplate>
-
-            <!-- Templates for the check number column -->
-            <DataTemplate x:Key="CheckNumberColumnTemplate">
-                <TextBlock Text="{Binding Medium}"/>
-            </DataTemplate>
-            <DataTemplate x:Key="CheckNumberEditingColumnTemplate">
-                <ComboBox IsEditable="True" Text="{Binding Medium, Mode=TwoWay}" ItemsSource="{Binding MediumSource}"/>
-            </DataTemplate>
-
-            <!-- Templates for the payee column -->
-            <DataTemplate x:Key="PayeeColumnTemplate">
-                <TextBlock Text="{Binding Payee}"/>
-            </DataTemplate>
-            <DataTemplate x:Key="PayeeEditingColumnTemplate">
-                <local:AutoCompleteTextBox 
-                    Style="{StaticResource CategoryBoxStyle}"
-                    Text="{Binding Payee, Mode=TwoWay}"/>
-            </DataTemplate>
-
-            <DataTemplate x:Key="MemoColumnTemplate">
-                <TextBlock Text="{Binding Memo}"/>
-            </DataTemplate>
-            <DataTemplate x:Key="MemoEditingColumnTemplate">
-                <local:WatermarkTextBox Text="{Binding Memo, Mode=TwoWay}" Watermark="Memo"/>
-            </DataTemplate>
-
-            <!-- Templates for the category column -->
-            <DataTemplate x:Key="CategoryColumnTemplate">
-                <TextBlock Text="{Binding Category}"/>
-            </DataTemplate>
-            <DataTemplate x:Key="CategoryEditingColumnTemplate">
-                <local:AutoCompleteTextBox 
-                    Style="{StaticResource CategoryBoxStyle}"
-                    Text="{Binding Category, Mode=TwoWay}"
-                    ItemsSource="{Binding Categories}"/>
-            </DataTemplate>
-
-            <!-- Templates for the payment column -->
-            <DataTemplate x:Key="PaymentColumnTemplate">
-                <TextBlock Text="{Binding PaymentString}" TextAlignment="Right"/>
-            </DataTemplate>
-            <DataTemplate x:Key="PaymentEditingColumnTemplate">
-                <local:AmountBox Watermark="Payment" Amount="{Binding Payment, Mode=TwoWay}" TextAlignment="Right"/>
-            </DataTemplate>
-
-            <!-- Templates for the deposit column -->
-            <DataTemplate x:Key="DepositColumnTemplate">
-                <TextBlock Text="{Binding DepositString}" TextAlignment="Right"/>
-            </DataTemplate>
-            <DataTemplate x:Key="DepositEditingColumnTemplate">
-                <local:AmountBox Watermark="Deposit" Amount="{Binding Deposit, Mode=TwoWay}" TextAlignment="Right"/>
-            </DataTemplate>
-
-        </Grid.Resources>
-        
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
-        <Label Content="{Binding AccountName}"/>
 
-        <DataGrid
-            Name="dataGrid"
+        <TextBlock Text="{Binding AccountName}" Style="{StaticResource FormTextBlock}"/>
+
+        <!-- The listview -->
+        <ListView
+            x:Name="listView"
             Grid.Row="1"
-            AlternatingRowBackground = "LightBlue" AlternationCount = "2"
-            AutoGenerateColumns="False"
             SelectionMode="Single"
-            SelectionUnit="FullRow"
-            CanUserAddRows="False"
-            CanUserDeleteRows="True"
-            VirtualizingStackPanel.IsVirtualizing="False" 
-            ItemsSource="{Binding Transactions}">
+            SelectedItem="{Binding SelectedTransaction, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            ScrollViewer.ScrollChanged="OnListViewScrollChanged"
+            ItemsSource="{Binding Transactions, IsAsync=True}">
 
-            <DataGrid.Resources>
-                <t:BindingProxy x:Key="proxy" Data="{Binding}" />
-                <t:DataGridLengthConverter x:Key="dglConverter"/>
-            </DataGrid.Resources>
+            <!-- Make the list view items use all the horizontal space -->
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListView.ItemContainerStyle>
 
-            <DataGrid.Columns>
-                <!-- Date column -->
-                <DataGridTemplateColumn
-                    Header="Date"
-                    SortMemberPath="Date"
-                    Width="{Binding Source={StaticResource proxy}, Path=Data.WidthOfDateColumn, Mode=TwoWay, Converter={StaticResource dglConverter}}"
-                    CellTemplate="{StaticResource DateColumnTemplate}"
-                    CellEditingTemplate="{StaticResource DateEditingColumnTemplate}"/>
-
-                <!-- Medium column  -->
-                <DataGridTemplateColumn
-                    Header="Check#"
-                    SortMemberPath="Medium"
-                    Width="{Binding Source={StaticResource proxy}, Path=Data.WidthOfMediumColumn, Mode=TwoWay, Converter={StaticResource dglConverter}}"
-                    CellTemplate="{StaticResource CheckNumberColumnTemplate}"
-                    CellEditingTemplate="{StaticResource CheckNumberEditingColumnTemplate}"/>
-
-                <!-- Payee column -->
-                <DataGridTemplateColumn
-                    Header="Payee"
-                    SortMemberPath="Payee"
-                    Width="{Binding Source={StaticResource proxy}, Path=Data.WidthOfPayeeColumn, Mode=TwoWay, Converter={StaticResource dglConverter}}"
-                    CellTemplate="{StaticResource PayeeColumnTemplate}"
-                    CellEditingTemplate="{StaticResource PayeeEditingColumnTemplate}" />
-
-                <!-- Memo column -->
-                <DataGridTemplateColumn
-                    Header="Memo"
-                    SortMemberPath="Memo"
-                    Width="{Binding Source={StaticResource proxy}, Path=Data.WidthOfMemoColumn, Mode=TwoWay, Converter={StaticResource dglConverter}}"
-                    CellTemplate="{StaticResource MemoColumnTemplate}"
-                    CellEditingTemplate="{StaticResource MemoEditingColumnTemplate}" />
-                
-                <!-- Category column -->
-                <DataGridTemplateColumn
-                    Header="Category"
-                    SortMemberPath="Category"
-                    Width="{Binding Source={StaticResource proxy}, Path=Data.WidthOfCategoryColumn, Mode=TwoWay, Converter={StaticResource dglConverter}}"
-                    CellTemplate="{StaticResource CategoryColumnTemplate}"
-                    CellEditingTemplate="{StaticResource CategoryEditingColumnTemplate}" />
-
-                <!-- Payment column  -->
-                <DataGridTemplateColumn
-                    Header="Payment"
-                    SortMemberPath="Payment"
-                    Width="{Binding Source={StaticResource proxy}, Path=Data.WidthOfPaymentColumn, Mode=TwoWay, Converter={StaticResource dglConverter}}"
-                    CellTemplate="{StaticResource PaymentColumnTemplate}"
-                    CellEditingTemplate="{StaticResource PaymentEditingColumnTemplate}"/>
-
-                <!-- Status column  -->
-                <DataGridComboBoxColumn
-                    Header="Status"
-                    SelectedItemBinding="{Binding Status, Mode=TwoWay}"
-                    Width="{Binding Source={StaticResource proxy}, Path=Data.WidthOfStatusColumn, Mode=TwoWay, Converter={StaticResource dglConverter}}">
-                    <DataGridComboBoxColumn.ElementStyle>
-                        <Style TargetType="{x:Type ComboBox}">
-                            <Setter Property="ItemsSource" Value="{Binding Path=StatusSource}" />
-                        </Style>
-                    </DataGridComboBoxColumn.ElementStyle>
-                    <DataGridComboBoxColumn.EditingElementStyle>
-                        <Style TargetType="{x:Type ComboBox}">
-                            <Setter Property="ItemsSource" Value="{Binding Path=StatusSource}" />
-                        </Style>
-                    </DataGridComboBoxColumn.EditingElementStyle>
-                </DataGridComboBoxColumn>
-
-                <!-- Deposit column  -->
-                <DataGridTemplateColumn
-                    Header="Deposit"
-                    SortMemberPath="Deposit"
-                    Width="{Binding Source={StaticResource proxy}, Path=Data.WidthOfDepositColumn, Mode=TwoWay, Converter={StaticResource dglConverter}}"
-                    CellTemplate="{StaticResource DepositColumnTemplate}"
-                    CellEditingTemplate="{StaticResource DepositEditingColumnTemplate}"/>
-
-                <!-- Balance column  -->
-                <DataGridTextColumn
-                    Header="Balance" 
-                    Binding="{Binding BalanceString, Mode=OneWay}"
-                    Width="{Binding Source={StaticResource proxy}, Path=Data.WidthOfBalanceColumn, Mode=TwoWay, Converter={StaticResource dglConverter}}"
-                    IsReadOnly="True"
-                    CanUserSort="False">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="{x:Type TextBlock}">
-                            <Setter Property="HorizontalAlignment" Value="Right" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-
-            </DataGrid.Columns>
+            <!-- Context menu for listview rows -->
+            <ListView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Delete"
+                        Command="{Binding DeleteTransaction}"
+                        CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}" />
+                </ContextMenu>
+            </ListView.ContextMenu>
             
-        </DataGrid>
+            <!-- View definition -->
+            <ListView.View>
+                <GridView>
+
+                    <!-- Date column -->
+                    <GridViewColumn Width="{Binding Widths.WidthOfDateColumn, Mode=TwoWay}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Date" Tag="Date" Click="OnColumnHeaderClicked"/>
+                        </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Text="{Binding Date, StringFormat=MM/dd/yyyy}"
+                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <!-- Medium column -->
+                    <GridViewColumn Width="{Binding Widths.WidthOfMediumColumn, Mode=TwoWay}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Type" Tag="Medium" Click="OnColumnHeaderClicked"/>
+                        </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Text="{Binding Medium}"
+                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    
+                    <!-- Payee column -->
+                    <GridViewColumn Width="{Binding Widths.WidthOfPayeeColumn, Mode=TwoWay}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Payee" Tag="Payee" Click="OnColumnHeaderClicked"/>
+                        </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Text="{Binding Payee}"
+                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    
+                    <!-- Memo column-->
+                    <GridViewColumn Width="{Binding Widths.WidthOfMemoColumn, Mode=TwoWay}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Memo" Tag="Memo" Click="OnColumnHeaderClicked"/>
+                        </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Text="{Binding Memo}"
+                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <!-- Category column-->
+                    <GridViewColumn Width="{Binding Widths.WidthOfCategoryColumn, Mode=TwoWay}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Category" Tag="Category" Click="OnColumnHeaderClicked"/>
+                        </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Text="{Binding Category}"
+                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <!-- Payment column-->
+                    <GridViewColumn Width="{Binding Widths.WidthOfPaymentColumn, Mode=TwoWay}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Payment" Tag="Payment" Click="OnColumnHeaderClicked"/>
+                        </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Text="{Binding Path=PaymentString}"
+                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"
+                                    HorizontalAlignment="Right"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <!-- Status column-->
+                    <GridViewColumn Width="{Binding Widths.WidthOfStatusColumn, Mode=TwoWay}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Status" Tag="Status" Click="OnColumnHeaderClicked"/>
+                        </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Text="{Binding Path=Status}"
+                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"
+                                    HorizontalAlignment="Center"
+                                    FontWeight="Bold"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <!-- Deposit column-->
+                    <GridViewColumn Width="{Binding Widths.WidthOfDepositColumn, Mode=TwoWay}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Deposit" Tag="Deposit" Click="OnColumnHeaderClicked"/>
+                        </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock 
+                                    Text="{Binding Path=DepositString}"
+                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"
+                                    HorizontalAlignment="Right"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+
+                    <!-- Balance column-->
+                    <GridViewColumn Header="Balance" Width="{Binding Widths.WidthOfBalanceColumn, Mode=TwoWay}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Text="{Binding BalanceString, Mode=OneWay}"
+                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"
+                                    HorizontalAlignment="Right"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <!-- the overlay -->
+        <Grid
+            x:Name="overlay"
+            Margin="3,0,0,0"
+            Grid.Row="1"
+            KeyboardNavigation.TabNavigation="Cycle"
+            Visibility="Hidden">
+
+            <Grid.Resources>
+
+                <ContextMenu x:Key="TransactionContextMenu">
+                    <MenuItem Header="Delete" Command="{Binding DeleteTransaction}"/>
+                    <MenuItem Header="Split..." Command="{Binding EditedTransaction.SplitTransaction}"/>
+                </ContextMenu>
+
+                <Style TargetType="{x:Type local:DateBox}">
+                    <Setter Property="ContextMenu" Value="{StaticResource TransactionContextMenu}"/>
+                </Style>
+
+                <Style TargetType="{x:Type local:WatermarkTextBox}">
+                    <Setter Property="ContextMenu" Value="{StaticResource TransactionContextMenu}"/>
+                </Style>
+
+                <Style TargetType="ComboBox">
+                    <Setter Property="ContextMenu" Value="{StaticResource TransactionContextMenu}"/>
+                </Style>
+
+                <Style TargetType="{x:Type local:AmountBox}">
+                    <Setter Property="ContextMenu" Value="{StaticResource TransactionContextMenu}"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Right"/>
+                </Style>
+
+            </Grid.Resources>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="{Binding Widths.WidthOfDateColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfMediumColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfPayeeColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfMemoColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfCategoryColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfPaymentColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfStatusColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfDepositColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfBalanceColumn}"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Date-->
+            <local:DateBox 
+                Date="{Binding EditedTransaction.Date, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                t:FocusAttachedProperty.IsFocused="{Binding DateFocus}"/>
+            
+            <!-- Medium-->
+            <ComboBox 
+                Grid.Column="1"
+                IsEditable="True" 
+                Text="{Binding EditedTransaction.Medium, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                ItemsSource="{Binding EditedTransaction.MediumSource}"
+                Visibility="{Binding IsBank, Converter={StaticResource visibilityBoolConverter}}"/>
+
+            <!-- Payee -->
+            <local:AutoCompleteTextBox 
+                Grid.Column="2"
+                Style="{StaticResource PayeeBoxStyle}"
+                Text="{Binding EditedTransaction.Payee, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                ItemSelectedCommand="{Binding EditedTransaction.PayeeSelected}"
+                ItemsSource="{Binding EditedTransaction.Payees}"/>
+            
+            <!-- Memo -->
+            <local:WatermarkTextBox
+                Grid.Column="3"
+                Text="{Binding EditedTransaction.Memo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                Watermark="Memo"/>
+            
+            <!-- Category -->
+            <local:AutoCompleteTextBox
+                Grid.Column="4"
+                Style="{StaticResource CategoryBoxStyle}"
+                Text="{Binding EditedTransaction.Category, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                ItemsSource="{Binding EditedTransaction.Categories}"/>
+
+            <!-- Payment -->
+            <local:AmountBox
+                Grid.Column="5"
+                Watermark="Payment"
+                Amount="{Binding EditedTransaction.Payment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                IsTabStop="{Binding EditedTransaction.IsPaymentTabStop}"/>
+            
+            <!-- Deposit -->
+            <local:AmountBox
+                Grid.Column="7"
+                Watermark="Deposit" 
+                Amount="{Binding EditedTransaction.Deposit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                IsTabStop="{Binding EditedTransaction.IsDepositTabStop}"/>
+        </Grid>
     </Grid>
-</UserControl>
+</local:ListviewWithOverlay>

@@ -85,9 +85,6 @@
     <Compile Include="Dialogs\EditSplit.xaml.cs">
       <DependentUpon>EditSplit.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\EditSplitLV.xaml.cs">
-      <DependentUpon>EditSplitLV.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Dialogs\Reconcile.xaml.cs">
       <DependentUpon>Reconcile.xaml</DependentUpon>
     </Compile>
@@ -112,9 +109,6 @@
     <Compile Include="UserControls\AutoCompleteTextBox.cs" />
     <Compile Include="UserControls\BankRegister.xaml.cs">
       <DependentUpon>BankRegister.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UserControls\BankRegisterLV.xaml.cs">
-      <DependentUpon>BankRegisterLV.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\DateBox.cs" />
     <Compile Include="UserControls\DonePanel.xaml.cs">
@@ -167,10 +161,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\EditSplitLV.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Dialogs\Reconcile.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -204,10 +194,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserControls\BankRegister.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UserControls\BankRegisterLV.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

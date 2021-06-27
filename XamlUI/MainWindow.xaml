@@ -74,7 +74,7 @@
             <!-- Registers -->
             <Grid Grid.Column="2"
                 Visibility="{Binding IsBankRegisterVisible, Converter={StaticResource visibilityBoolConverter}}">
-                <ucs:BankRegisterLV DataContext="{Binding BankRegister}"/>
+                <ucs:BankRegister DataContext="{Binding BankRegister}"/>
             </Grid>
 
             <Grid Grid.Column="2"

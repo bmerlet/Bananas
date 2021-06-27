@@ -17,7 +17,7 @@
 
         <!-- Default for amount box -->
         <Style TargetType="ucs:AmountBox">
-            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="HorizontalContentAlignment" Value="Right"/>
         </Style>
 
         <!--
@@ -48,6 +48,7 @@
         <!-- Form amount box -->
         <Style TargetType="ucs:AmountBox" x:Key="FormAmountBox">
             <Setter Property="ShowZeroAmount" Value="True"/>
+            <Setter Property="HorizontalContentAlignment" Value="Right"/>
             <Setter Property="Margin" Value="5"/>
         </Style>
         

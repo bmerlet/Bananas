@@ -42,7 +42,7 @@
 
             <!-- Row 1: Interest amount -->
             <TextBlock Text="Interest earned:" Grid.Row="1"/>
-            <w:AmountBox Amount="{Binding InterestAmount, Mode=TwoWay}" Grid.Row="1" Grid.Column="1" HorizontalContentAlignment="Right" KeyboardNavigation.TabIndex="2"/>
+            <w:AmountBox Amount="{Binding InterestAmount, Mode=TwoWay}" Grid.Row="1" Grid.Column="1" KeyboardNavigation.TabIndex="2"/>
 
             <!-- Row 2: Interest date -->
             <TextBlock Text="Interest date:" Grid.Row="2"/>
@@ -85,11 +85,11 @@
 
             <!-- Row 3: Prior balance -->
             <TextBlock Text="Prior statement balance:" Grid.Row="3"/>
-            <w:AmountBox Amount="{Binding PriorStatementBalance}" IsEnabled="False" Grid.Row="3" Grid.Column="1" HorizontalContentAlignment="Right"/>
+            <w:AmountBox Amount="{Binding PriorStatementBalance}" IsEnabled="False" Grid.Row="3" Grid.Column="1"/>
 
             <!-- Row 4: Current balance -->
             <TextBlock Text="Statement balance:" Grid.Row="4"/>
-            <w:AmountBox Amount="{Binding StatementBalance, Mode=TwoWay}" Grid.Row="4" Grid.Column="1" HorizontalContentAlignment="Right" KeyboardNavigation.TabIndex="1"/>
+            <w:AmountBox Amount="{Binding StatementBalance, Mode=TwoWay}" Grid.Row="4" Grid.Column="1" KeyboardNavigation.TabIndex="1"/>
         </Grid>
     </DockPanel>
 </Window>

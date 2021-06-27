@@ -67,7 +67,7 @@
 
             <!-- Row 4: Amount -->
             <TextBlock Text="Amount:" Grid.Row="4"/>
-                <w:AmountBox Amount="{Binding AbsoluteAmount, Mode=TwoWay}" IsEnabled="{Binding AbsoluteAmountEnabled}" Grid.Row="4" Grid.Column="1" HorizontalContentAlignment="Right"/>
+                <w:AmountBox Amount="{Binding AbsoluteAmount, Mode=TwoWay}" IsEnabled="{Binding AbsoluteAmountEnabled}" Grid.Row="4" Grid.Column="1"/>
 
         </Grid>
     </DockPanel>
