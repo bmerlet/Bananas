@@ -35,15 +35,28 @@ namespace BanaData.Database
                 Household.SecuritiesRow security,
                 decimal securityPrice,
                 decimal securityQuantity,
-                decimal commision)
+                decimal commission)
             {
                 var invTransRow = NewInvestmentTransactionsRow();
 
-                UpdateInvestmentTransaction(invTransRow, transactionRow, type, security, securityPrice, securityQuantity, commision);
+                UpdateInvestmentTransaction(invTransRow, transactionRow, type, security, securityPrice, securityQuantity, commission);
 
                 Rows.Add(invTransRow);
 
                 return invTransRow;
+            }
+
+            public InvestmentTransactionsRow Update(
+                Household.TransactionsRow transactionRow,
+                EInvestmentTransactionType type,
+                Household.SecuritiesRow security,
+                decimal securityPrice,
+                decimal securityQuantity,
+                decimal commission)
+            {
+                InvestmentTransactionsRow invTransRow = GetByTransaction(transactionRow);
+
+                return UpdateInvestmentTransaction(invTransRow, transactionRow, type, security, securityPrice, securityQuantity, commission);
             }
 
             private static InvestmentTransactionsRow UpdateInvestmentTransaction(

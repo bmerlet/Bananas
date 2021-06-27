@@ -270,7 +270,43 @@ namespace BanaData.Logic.Main
         public abstract (bool needCommit, bool moveDown) ValidateEndEdit();
 
 
-        public abstract void EndEdit();
+        public virtual void EndEdit()
+        {
+            if (data.Date != backup.Date)
+            {
+                OnPropertyChanged(() => Date);
+            }
+
+            if (data.Payee != backup.Payee)
+            {
+                OnPropertyChanged(() => Payee);
+            }
+
+            if (data.Memo != backup.Memo)
+            {
+                OnPropertyChanged(() => Memo);
+            }
+
+            if (data.Category != backup.Category)
+            {
+                OnPropertyChanged(() => Category);
+            }
+
+            if (data.Status != backup.Status)
+            {
+                OnPropertyChanged(() => Status);
+            }
+
+            if (data.Amount != backup.Amount)
+            {
+                OnPropertyChanged(() => Amount);
+                OnPropertyChanged(() => AmountString);
+                OnPropertyChanged(() => PaymentString);
+                OnPropertyChanged(() => Payment);
+                OnPropertyChanged(() => DepositString);
+                OnPropertyChanged(() => Deposit);
+            }
+        }
 
         #endregion
 

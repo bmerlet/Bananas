@@ -131,21 +131,21 @@ namespace XamlUI.UserControls
         {
             base.OnPreviewKeyDown(e);
 
-            bool isFromAutocompleteTextBoxWithpopupOpen =
+            bool isFromAutoCompleteTextBoxWithPopupOpen =
                 e.OriginalSource is WatermarkTextBox wtb &&
                 wtb.TemplatedParent is AutoCompleteTextBox actb &&
                 actb.IsPopupOpen;
 
-            if (DataContext is BankRegisterLogic brl && !isFromAutocompleteTextBoxWithpopupOpen)
+            if (DataContext is AbstractRegisterLogic arl && !isFromAutoCompleteTextBoxWithPopupOpen)
             {
                 if (e.Key == Key.Up)
                 {
-                    brl.MoveUp();
+                    arl.MoveUp();
                     e.Handled = true;
                 }
                 if (e.Key == Key.Down)
                 {
-                    brl.MoveDown();
+                    arl.MoveDown();
                     e.Handled = true;
                 }
             }
@@ -159,10 +159,10 @@ namespace XamlUI.UserControls
 
         protected void OnColumnHeaderClicked(object sender, RoutedEventArgs e)
         {
-            if (DataContext is BankRegisterLogic brl)
+            if (DataContext is AbstractRegisterLogic arl)
             {
                 // Get tag name from the source
-                var sd = brl.Transactions.SortDescriptions;
+                var sd = arl.Transactions.SortDescriptions;
                 var column = sender as GridViewColumnHeader;
                 var memberName = column.Tag.ToString();
 
@@ -174,8 +174,8 @@ namespace XamlUI.UserControls
                 }
 
                 // Do the sorting
-                brl.Transactions.SortDescriptions.Clear();
-                brl.Transactions.SortDescriptions.Add(new SortDescription(memberName, direction));
+                arl.Transactions.SortDescriptions.Clear();
+                arl.Transactions.SortDescriptions.Add(new SortDescription(memberName, direction));
 
                 // Un-adorn existing adornment
                 if (sortAdorner != null)
@@ -189,7 +189,7 @@ namespace XamlUI.UserControls
                 Dispatcher.BeginInvoke((Action)delegate ()
                 {
                     // Hopefully runs after the sorting is done (??)
-                    brl.RecomputeBalances();
+                    arl.RecomputeBalances();
                 }, null);
             }
         }

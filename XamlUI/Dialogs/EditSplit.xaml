@@ -17,22 +17,33 @@
         
         <!-- OK/Cancel panel -->
         <w:OKCancel DockPanel.Dock="Bottom"/>
-        
-        <!-- Main panel -->
-        <Grid Width="500">
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+        <!-- Bottom panel: Payment/deposit combobox and total -->
+        <Grid DockPanel.Dock="Bottom">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
+            <ComboBox
+                SelectedItem="{Binding Type}" ItemsSource="{Binding TypeSource}" Width="80"
+                Grid.Column="0" Margin="5" HorizontalAlignment="Right"/>
+            <!--
+            <Button
+                Content="Adjust Amount"
+                Command="{Binding AdjustAmount}"
+                Grid.Row="1" Grid.Column="1" Width="90" Margin="5" HorizontalAlignment="Right"/>
+            -->
+            <TextBlock
+                Text="{Binding Total}"
+                Grid.Column="2" Width="80" Margin="5" TextAlignment="Right"/>
+        </Grid>
+
+        <!-- Main panel -->
+        <Grid Width="500">
 
             <!-- Top row: listview and overlay -->
-            <Grid Grid.ColumnSpan="3">
+            <Grid>
 
                 <!-- The listview -->
                 <ListView
@@ -149,19 +160,6 @@
                 </Grid>
 
             </Grid>
-            <!-- Bottom row: Payment/deposit combobox and total -->
-            <ComboBox
-                SelectedItem="{Binding Type}" ItemsSource="{Binding TypeSource}" Width="80"
-                Grid.Row="1" Grid.Column="0" Margin="5" HorizontalAlignment="Right"/>
-            <!--
-            <Button
-                Content="Adjust Amount"
-                Command="{Binding AdjustAmount}"
-                Grid.Row="1" Grid.Column="1" Width="90" Margin="5" HorizontalAlignment="Right"/>
-            -->
-            <TextBlock
-                Text="{Binding Total}"
-                Grid.Row="1" Grid.Column="2" Width="80" Margin="5" TextAlignment="Right"/>
         </Grid>
 
     </DockPanel>

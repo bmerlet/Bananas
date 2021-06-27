@@ -233,7 +233,7 @@ namespace BanaData.Logic.Main
             if (prevTransaction != null)
             {
                 logicIsChangingSelection = true;
-                SelectedTransaction = prevTransaction as BankingTransactionLogic;
+                SelectedTransaction = prevTransaction;
                 logicIsChangingSelection = false;
             }
         }
@@ -245,7 +245,7 @@ namespace BanaData.Logic.Main
             if (nextTransaction != null)
             {
                 logicIsChangingSelection = true;
-                SelectedTransaction = nextTransaction as BankingTransactionLogic;
+                SelectedTransaction = nextTransaction;
                 logicIsChangingSelection = false;
             }
         }
@@ -339,7 +339,7 @@ namespace BanaData.Logic.Main
 
             // Re-select
             logicIsChangingSelection = true;
-            SelectedTransaction = transactionToSelect as BankingTransactionLogic;
+            SelectedTransaction = transactionToSelect;
             logicIsChangingSelection = false;
         }
 
@@ -437,7 +437,7 @@ namespace BanaData.Logic.Main
                 logicIsChangingSelection = false;
 
                 // Go to the bottom
-                //TransactionToScrollTo = bankingTransaction;
+                //TransactionToScrollTo = emptyTransaction;
                 //OnPropertyChanged(() => TransactionToScrollTo);
                 OnPropertyChanged("ScrollToBottom");
             });

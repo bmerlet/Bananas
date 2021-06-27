@@ -134,7 +134,7 @@ namespace BanaData.Logic.Main
             // Out of sequence
             if (backup == null)
             {
-                return (false, true);
+                return (false, TransID >= 0);
             }
 
             // No change
@@ -182,10 +182,7 @@ namespace BanaData.Logic.Main
             CommitTransactionToDataSet();
 
             // Notify the UI
-            if (data.Date != backup.Date)
-            {
-                OnPropertyChanged(() => Date);
-            }
+            base.EndEdit();
 
             var _data = data as BankTransactionData;
             var _backup = backup as BankTransactionData;
@@ -197,34 +194,6 @@ namespace BanaData.Logic.Main
             if (_data.CheckNumber != _backup.CheckNumber)
             {
                 OnPropertyChanged(() => Medium);
-            }
-
-            if (data.Payee != backup.Payee)
-            {
-                OnPropertyChanged(() => Payee);
-            }
-
-            if (data.Memo != backup.Memo)
-            {
-                OnPropertyChanged(() => Memo);
-            }
-
-            if (data.Category != backup.Category)
-            {
-                OnPropertyChanged(() => Category);
-            }
-
-            if (data.Status != backup.Status)
-            {
-                OnPropertyChanged(() => Status);
-            }
-
-            if (data.Amount != backup.Amount)
-            {
-                OnPropertyChanged(() => PaymentString);
-                OnPropertyChanged(() => Payment);
-                OnPropertyChanged(() => DepositString);
-                OnPropertyChanged(() => Deposit);
             }
 
             // Clear the backup

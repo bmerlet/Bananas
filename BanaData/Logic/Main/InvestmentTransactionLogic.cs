@@ -114,7 +114,7 @@ namespace BanaData.Logic.Main
         public string Type
         {
             get => EnumDescriptionAttribute.GetDescription(data.Type);
-            set => SetType(EnumDescriptionAttribute.MatchDescription<EInvestmentTransactionType>(value));
+            set => SetType(EnumDescriptionAttribute.MatchDescription<EInvestmentTransactionType>(value), false);
         }
 
         //
@@ -212,25 +212,184 @@ namespace BanaData.Logic.Main
 
         public override void BeginEdit()
         {
-            // throw new NotImplementedException();
+            // Save existing data
+            if (backup == null)
+            {
+                backup = new InvestmentTransactionData(data);
+            }
+
+            Console.WriteLine($"Begin edit transaction date {Date.ToShortDateString()} Type {Type} amount {Amount}");
+
+            // Setup the boxes
+            SetType(data.Type, true);
         }
 
         public override void CancelEdit()
         {
             base.CancelEdit();
 
-            // throw new NotImplementedException();
+            // Restore data
+            if (backup != null)
+            {
+                var _backup = backup as InvestmentTransactionData;
+
+                if (data.Type != _backup.Type)
+                {
+                    SetType(_backup.Type, false);
+                    OnPropertyChanged(() => Type);
+                }
+
+                if (data.SecurityID != _backup.SecurityID)
+                {
+                    data.SecurityID = _backup.SecurityID;
+                    OnPropertyChanged(() => SecuritySymbol);
+                }
+
+                if (data.SecurityQuantity != _backup.SecurityQuantity)
+                {
+                    data.SecurityQuantity = _backup.SecurityQuantity;
+                    OnPropertyChanged(() => SecurityQuantity);
+                }
+
+                if (data.SecurityPrice != _backup.SecurityPrice)
+                {
+                    data.SecurityPrice = _backup.SecurityPrice;
+                    OnPropertyChanged(() => SecurityPrice);
+                }
+
+                if (data.Commission != _backup.Commission)
+                {
+                    data.Commission = _backup.Commission;
+                    OnPropertyChanged(() => Commission);
+                }
+
+                OnPropertyChanged(() => Description);
+
+                backup = null;
+            }
+
+            Console.WriteLine($"Cancel edit transaction date {Date.ToShortDateString()} Type {Type} amount {Payment}");
         }
 
         // Returns if there is something to commit and if we need to move down
         public override (bool needCommit, bool moveDown) ValidateEndEdit()
         {
-            return (false, false);
+            // Out of sequence
+            if (backup == null)
+            {
+                return (false, TransID >= 0);
+            }
+
+            // No change
+            if (backup.Equals(data))
+            {
+                if (TransID >= 0)
+                {
+                    backup = null;
+                    return (false, true);
+                }
+                else
+                {
+                    return (false, false);
+                }
+            }
+
+            Console.WriteLine($"End edit transaction date {Date.ToShortDateString()} Type {Type} amount {Payment}");
+
+            //
+            // Check the changes
+            //
+
+            // No type
+            if (data.Type == EInvestmentTransactionType.None)
+            {
+                mainWindowLogic.ErrorMessage("Please choose a transaction type");
+                return (false, false);
+            }
+
+            // No quantity ZZZZZZZZZZZZZZZZ More
+
+            if (backup.Status == ETransactionStatus.Reconciled && data.Status != ETransactionStatus.Reconciled)
+            {
+                if (!mainWindowLogic.YesNoQuestion("Are you sure you want to un-reconcile this transaction"))
+                {
+                    CancelEdit();
+                    BeginEdit();
+                    return (false, false);
+                }
+            }
+
+            if (backup.Status == ETransactionStatus.Reconciled && backup.Amount != data.Amount)
+            {
+                if (!mainWindowLogic.YesNoQuestion("Are you sure you want to change the amount of this reconciled transaction"))
+                {
+                    CancelEdit();
+                    BeginEdit();
+                    return (false, false);
+                }
+            }
+
+            var _backup = backup as InvestmentTransactionData;
+            if (backup.Status == ETransactionStatus.Reconciled && _backup.SecurityQuantity != data.SecurityQuantity)
+            {
+                if (!mainWindowLogic.YesNoQuestion("Are you sure you want to change the number of shares of this reconciled transaction"))
+                {
+                    CancelEdit();
+                    BeginEdit();
+                    return (false, false);
+                }
+            }
+
+            if (backup.Status == ETransactionStatus.Reconciled && _backup.SecurityID != data.SecurityID)
+            {
+                if (!mainWindowLogic.YesNoQuestion("Are you sure you want to change the security of this reconciled transaction"))
+                {
+                    CancelEdit();
+                    BeginEdit();
+                    return (false, false);
+                }
+            }
+
+            return (true, true);
         }
 
         public override void EndEdit()
         {
-            // throw new NotImplementedException();
+            CommitTransactionToDataSet();
+
+            // Notify the UI
+            base.EndEdit();
+
+            var _backup = backup as InvestmentTransactionData;
+            if (data.Type != _backup.Type)
+            {
+                OnPropertyChanged(() => Type);
+            }
+
+            if (data.SecurityID != _backup.SecurityID)
+            {
+                OnPropertyChanged(() => SecuritySymbol);
+            }
+
+            if (data.SecurityQuantity != _backup.SecurityQuantity)
+            {
+                OnPropertyChanged(() => SecurityQuantity);
+            }
+
+            if (data.SecurityPrice != _backup.SecurityPrice)
+            {
+                OnPropertyChanged(() => SecurityPrice);
+            }
+
+            if (data.Commission != _backup.Commission)
+            {
+                OnPropertyChanged(() => Commission);
+            }
+
+            OnPropertyChanged(() => Description);
+
+            // Clear the backup
+            backup = null;
         }
 
         #endregion
@@ -315,9 +474,9 @@ namespace BanaData.Logic.Main
             return desc;
         }
 
-        private void SetType(EInvestmentTransactionType value)
+        private void SetType(EInvestmentTransactionType value, bool force)
         {
-            if (value == data.Type)
+            if (value == data.Type && !force)
             {
                 return;
             }
@@ -402,6 +561,7 @@ namespace BanaData.Logic.Main
                 case EInvestmentTransactionType.Vest:
                 case EInvestmentTransactionType.Exercise:
                 case EInvestmentTransactionType.Expire:
+                case EInvestmentTransactionType.None:
                     column = ShowAmountBox(false, column);
                     column = ShowSecuritySymbol(false, column);
                     column = ShowSecurityTextBoxes(false, false, column);
@@ -521,6 +681,126 @@ namespace BanaData.Logic.Main
             }
 
             data.SecurityID = id;
+        }
+
+        private void CommitTransactionToDataSet()
+        {
+            var household = mainWindowLogic.Household;
+            var accountRow = household.Accounts.FindByID(accountID);
+
+            //
+            // Remove irrelevant input based on type
+            //
+            switch (data.Type)
+            {
+                case EInvestmentTransactionType.Cash:
+                case EInvestmentTransactionType.InterestIncome:
+                    data.SecurityID = -1;
+                    data.SecurityPrice = 0;
+                    data.SecurityQuantity = 0;
+                    data.Commission = 0;
+                    data.LineItems[0].Category = "";
+                    break;
+
+                case EInvestmentTransactionType.TransferCash:
+                case EInvestmentTransactionType.TransferCashIn:
+                case EInvestmentTransactionType.TransferCashOut:
+                case EInvestmentTransactionType.TransferMiscellaneousIncomeIn:
+                    data.SecurityID = -1;
+                    data.SecurityPrice = 0;
+                    data.SecurityQuantity = 0;
+                    data.Commission = 0;
+                    break;
+
+                case EInvestmentTransactionType.SharesIn:
+                case EInvestmentTransactionType.SharesOut:
+                    data.Commission = 0;
+                    data.LineItems[0].Amount = 0;
+                    data.LineItems[0].Category = "";
+                    break;
+
+                case EInvestmentTransactionType.Buy:
+                case EInvestmentTransactionType.Sell:
+                    data.LineItems[0].Category = "";
+                    break;
+
+                case EInvestmentTransactionType.BuyFromTransferredCash:
+                case EInvestmentTransactionType.SellAndTransferCash:
+                    break;
+
+                case EInvestmentTransactionType.Dividends:
+                case EInvestmentTransactionType.ShortTermCapitalGains:
+                case EInvestmentTransactionType.LongTermCapitalGains:
+                    data.SecurityPrice = 0;
+                    data.SecurityQuantity = 0;
+                    data.Commission = 0;
+                    data.LineItems[0].Category = "";
+                    break;
+
+                case EInvestmentTransactionType.TransferDividends:
+                case EInvestmentTransactionType.TransferShortTermCapitalGains:
+                case EInvestmentTransactionType.TransferLongTermCapitalGains:
+                    data.SecurityPrice = 0;
+                    data.SecurityQuantity = 0;
+                    data.Commission = 0;
+                    break;
+
+                case EInvestmentTransactionType.ReinvestDividends:
+                case EInvestmentTransactionType.ReinvestLongTermCapitalGains:
+                case EInvestmentTransactionType.ReinvestMediumTermCapitalGains:
+                case EInvestmentTransactionType.ReinvestShortTermCapitalGains:
+                    data.Commission = 0;
+                    data.LineItems[0].Category = "";
+                    break;
+
+                case EInvestmentTransactionType.Grant:
+                case EInvestmentTransactionType.Vest:
+                case EInvestmentTransactionType.Exercise:
+                case EInvestmentTransactionType.Expire:
+                case EInvestmentTransactionType.None:
+                    data.SecurityID = -1;
+                    data.SecurityPrice = 0;
+                    data.SecurityQuantity = 0;
+                    data.Commission = 0;
+                    data.LineItems[0].Amount = 0;
+                    data.LineItems[0].Category = "";
+                    break;
+            }
+
+            //
+            // Save to DB
+            //
+            var securityRow = data.SecurityID < 0 ? null : household.Securities.FindByID(data.SecurityID);
+
+            if (TransID < 0)
+            {
+                // Create new transaction row
+                var transactionRow = household.Transactions.Add(accountRow, data.Date, data.Payee, data.Status);
+                TransID = transactionRow.ID;
+
+                // Create new investment transaction row
+                household.InvestmentTransactions.Add(transactionRow, data.Type, securityRow, data.SecurityPrice, data.SecurityQuantity, data.Commission);
+
+                // Create the line item
+                var li = data.LineItems[0];
+                var liRow = household.LineItems.Add(transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount);
+                li.ID = liRow.ID;
+            }
+            else
+            {
+                // Update transaction row
+                var transactionRow = household.Transactions.Update(TransID, accountRow, data.Date, data.Payee, data.Status);
+
+                // Update investment transaction
+                household.InvestmentTransactions.Update(transactionRow, data.Type, securityRow, data.SecurityPrice, data.SecurityQuantity, data.Commission);
+
+                // Update the line item
+                var li = data.LineItems[0];
+                var liRow = household.LineItems.FindByID(li.ID);
+                household.LineItems.Update(liRow, transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount);
+            }
+
+            mainWindowLogic.CommitChanges();
         }
 
         #endregion
