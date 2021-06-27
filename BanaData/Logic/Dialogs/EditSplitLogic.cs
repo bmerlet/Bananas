@@ -17,13 +17,15 @@ namespace BanaData.Logic.Dialogs
     /// <summary>
     /// Logic to edit a split
     /// </summary>
+
+    #region Main dialog class
+
     public class EditSplitLogic : LogicDialogBase
     {
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
         private readonly LineItem[] oldLineItems;
-        private readonly List<CategoryItem> categories;
 
         private const string PAYMENT = "Payment";
         private const string DEPOSIT = "Deposit";
@@ -36,41 +38,136 @@ namespace BanaData.Logic.Dialogs
         {
             (mainWindowLogic, oldLineItems) = (_mainWindowLogic, _lineItems);
 
-            // Create our own copy of the category list, to avoid filter issue on nested dialogs
-            categories = new List<CategoryItem>(mainWindowLogic.Categories);
-
             // Deposit or payment?
             decimal total = oldLineItems.Sum(li => li.Amount);
             bool isDeposit = total > 0;
             Type = isDeposit ? DEPOSIT : PAYMENT;
             Total = Math.Abs(total).ToString("N");
 
+            Register = new LineItemRegister(mainWindowLogic, oldLineItems, this, isDeposit);
+        }
+
+        #endregion
+
+        #region UI properties
+
+        // Register
+        public LineItemRegister Register { get; }
+
+        // Deposit/payment Combobox
+        public string Type { get; set; }
+        public string[] TypeSource { get; } = new string[] { DEPOSIT, PAYMENT };
+
+        // Total
+        public string Total { get; private set; }
+
+        #endregion
+
+        #region Result
+
+        public LineItem[] NewLineItems { get; private set; }
+
+        #endregion
+
+        #region Actions
+
+        // Called by line item when amount changes and also when the collection of line items changes
+        public void UpdateTotal()
+        {
+            Total = Register.Transactions.Cast<GridViewLineItem>().Sum(gvli => gvli.Amount).ToString("N");
+            OnPropertyChanged(() => Total);
+        }
+
+        protected override bool? Commit()
+        {
+            // Build the new line items
+            var newLineItems = new List<LineItem>();
+
+            foreach (GridViewLineItem gvli in Register.Transactions)
+            {
+                decimal amount = Type == DEPOSIT ? gvli.Amount : -gvli.Amount;
+                LineItem li;
+                try
+                {
+                    li = LineItem.GetLineItem(mainWindowLogic, gvli.ID, gvli.Category, gvli.Memo, amount, true);
+                }
+                catch (ArgumentException e)
+                {
+                    mainWindowLogic.ErrorMessage(e.Message);
+                    return null; // Stay on dialog
+                }
+
+                newLineItems.Add(li);
+            }
+
+            // Publish them
+            NewLineItems = newLineItems.ToArray();
+
+            // Any change?
+            bool change = oldLineItems.Length != NewLineItems.Length;
+            if (!change)
+            {
+                for (int i = 0; i < oldLineItems.Length; i++)
+                {
+                    change |=
+                        oldLineItems[i].Category != NewLineItems[i].Category ||
+                        oldLineItems[i].Memo != NewLineItems[i].Memo ||
+                        oldLineItems[i].Amount != NewLineItems[i].Amount;
+                }
+            }
+
+            return change;
+        }
+
+        #endregion
+    }
+
+    #endregion
+
+    #region Line item register class
+
+    // Logic for the register part of the dialog
+    public class LineItemRegister : BaseRegisterLogic
+    {
+        #region Private members
+
+        private readonly MainWindowLogic mainWindowLogic;
+        private readonly EditSplitLogic editSplitLogic;
+        private readonly List<CategoryItem> categories;
+        //private readonly LineItem[] oldLineItems;
+
+        #endregion
+
+        #region Constructor
+
+        public LineItemRegister(MainWindowLogic _mainWindowLogic, LineItem[] oldLineItems, EditSplitLogic _editSplitLogic, bool isDeposit)
+        {
+            mainWindowLogic = _mainWindowLogic;
+            editSplitLogic = _editSplitLogic;
+
             // Build line item collection
             gridViewLineItems = new ObservableCollection<GridViewLineItem>();
             foreach (var li in oldLineItems)
             {
-                gridViewLineItems.Add(new GridViewLineItem(this, li, isDeposit, categories));
+                gridViewLineItems.Add(new GridViewLineItem(editSplitLogic, li, isDeposit));
             }
 
+            // Create our own copy of the category list, to avoid filter issue on nested dialogs
+            categories = new List<CategoryItem>(mainWindowLogic.Categories);
+
             // Update total when a line is deleted
-            gridViewLineItems.CollectionChanged += (o, e) => UpdateTotal();
+            gridViewLineItems.CollectionChanged += (o, e) => editSplitLogic.UpdateTotal();
 
             // Give the default view to the UI
-            GridViewLineItems = (CollectionView)CollectionViewSource.GetDefaultView(gridViewLineItems);
+            Transactions = (CollectionView)CollectionViewSource.GetDefaultView(gridViewLineItems);
 
             // Delete line item command
             DeleteLineItem = new CommandBase(OnDeleteLineItem);
-        }
 
-        // Activated when the window is loaded
-        public void OnLoaded()
-        {
-            // Select first line item
-            selectedLineItem = gridViewLineItems[0];
-            editedLineItem = gridViewLineItems[0];
-            OnPropertyChanged(() => SelectedLineItem);
-            OnPropertyChanged(() => EditedLineItem);
-            OnPropertyChanged("UpdateOverlayPosition");
+            // Select first transaction
+            logicIsChangingSelection = true;
+            SelectedLineItem = gridViewLineItems[0];
+            logicIsChangingSelection = false;
         }
 
         #endregion
@@ -79,7 +176,6 @@ namespace BanaData.Logic.Dialogs
 
         // Collection of line items
         private readonly ObservableCollection<GridViewLineItem> gridViewLineItems;
-        public CollectionView GridViewLineItems { get; }
 
         // Selected line item
         private GridViewLineItem selectedLineItem;
@@ -127,21 +223,16 @@ namespace BanaData.Logic.Dialogs
             set { editedLineItem = value; OnPropertyChanged(() => EditedLineItem); }
         }
 
+        public IEnumerable<CategoryItem> Categories => categories;
+
         // Delete command from context menu
         public CommandBase DeleteLineItem { get; }
 
-        // Deposit/payment Combobox
-        public string Type { get; set; }
-        public string[] TypeSource { get; } = new string[] { DEPOSIT, PAYMENT };
-
-        // Total
-        public string Total { get; private set; }
-
         // Column widths
         private double widthOfCategoryColumn = 200;
-        public double WidthOfCategoryColumn 
-        { 
-            get => widthOfCategoryColumn; 
+        public double WidthOfCategoryColumn
+        {
+            get => widthOfCategoryColumn;
             set { widthOfCategoryColumn = value; OnPropertyChanged(() => WidthOfCategoryColumn); }
         }
 
@@ -161,36 +252,70 @@ namespace BanaData.Logic.Dialogs
 
         #endregion
 
-        #region Result
-
-        public LineItem[] NewLineItems { get; private set; }
-
-        #endregion
-
         #region Actions
 
-        public void MoveOneLineDown()
+        // Activated when the window is loaded
+        public void OnLoaded()
         {
-            GridViewLineItem gvli;
+            // Select first line item
+            selectedLineItem = gridViewLineItems[0];
+            editedLineItem = gridViewLineItems[0];
+            OnPropertyChanged(() => SelectedLineItem);
+            OnPropertyChanged(() => EditedLineItem);
+            OnPropertyChanged("UpdateOverlayPosition");
+        }
 
-            int ix = gridViewLineItems.IndexOf(SelectedLineItem);
-            if (ix >= gridViewLineItems.Count - 1)
+        public override void MoveUp()
+        {
+            if (GetPreviousTransaction(SelectedLineItem) is GridViewLineItem prevTransaction)
             {
-                // Need to add a new item
-                var lineItem = new LineItem(mainWindowLogic, -1, "", -1, -1, "", 0, true);
-                gvli = new GridViewLineItem(this, lineItem, false, categories);
-                gridViewLineItems.Add(gvli);
+                logicIsChangingSelection = true;
+                SelectedLineItem = prevTransaction;
+                logicIsChangingSelection = false;
+            }
+        }
+
+        public override void MoveDown()
+        {
+            if (GetNextTransaction(SelectedLineItem) is GridViewLineItem nextTransaction)
+            {
+                logicIsChangingSelection = true;
+                SelectedLineItem = nextTransaction;
+                logicIsChangingSelection = false;
+            }
+        }
+
+
+        public override void ProcessEnter()
+        {
+            if (selectedLineItem != null)
+            {
+                selectedLineItem.EndEdit();
+            }
+
+            if (GetNextTransaction(selectedLineItem) is GridViewLineItem nextTransaction)
+            {
+                logicIsChangingSelection = true;
+                SelectedLineItem = nextTransaction;
+                logicIsChangingSelection = false;
             }
             else
             {
-                // move to next
-                gvli = gridViewLineItems[ix + 1];
-            }
+                // Need to add a new item
+                var lineItem = new LineItem(mainWindowLogic, -1, "", -1, -1, "", 0, true);
+                var gvli = new GridViewLineItem(editSplitLogic, lineItem, false);
+                gridViewLineItems.Add(gvli);
 
-            // Select it
-            logicIsChangingSelection = true;
-            SelectedLineItem = gvli;
-            logicIsChangingSelection = false;
+                logicIsChangingSelection = true;
+                SelectedLineItem = gvli;
+                logicIsChangingSelection = false;
+            }
+        }
+
+
+        public override void RecomputeBalances()
+        {
+            editSplitLogic.UpdateTotal();
         }
 
         private void OnDeleteLineItem(object arg)
@@ -206,6 +331,7 @@ namespace BanaData.Logic.Dialogs
                 mainWindowLogic.ErrorMessage("Cannot remove the last line item");
                 return;
             }
+
             if (gvli == editedLineItem)
             {
                 // Select next line item (if it exists) or previous one
@@ -226,166 +352,118 @@ namespace BanaData.Logic.Dialogs
             gridViewLineItems.Remove(gvli);
         }
 
-        // ZZZ Obsolete
-        public GridViewLineItem BuildNewLineItem()
-        {
-            var lineItem = new LineItem(mainWindowLogic, -1, "", -1, -1, "", 0, true);
-            var result = new GridViewLineItem(this, lineItem, false, categories);
-
-            return result;
-        }
-
-        // Called by line item when amount changes and also when the collection of line items changes
-        public void UpdateTotal()
-        {
-            Total = gridViewLineItems.Sum(gvli => gvli.Amount).ToString("N");
-            OnPropertyChanged(() => Total);
-        }
-
-        protected override bool? Commit()
-        {
-            // Build the new line items
-            var newLineItems = new List<LineItem>();
-
-            foreach (var gvli in gridViewLineItems)
-            {
-                decimal amount = Type == DEPOSIT ? gvli.Amount : -gvli.Amount;
-                LineItem li;
-                try
-                {
-                    li = LineItem.GetLineItem(mainWindowLogic, gvli.ID, gvli.Category, gvli.Memo, amount, true);
-                }
-                catch(ArgumentException e)
-                {
-                    mainWindowLogic.ErrorMessage(e.Message);
-                    return null; // Stay on dialog
-                }
-
-                newLineItems.Add(li);
-            }
-
-            // Publish them
-            NewLineItems = newLineItems.ToArray();
-
-            // Any change?
-            bool change = oldLineItems.Length != NewLineItems.Length;
-            if (!change)
-            {
-                for(int i = 0; i < oldLineItems.Length; i++)
-                {
-                    change |=
-                        oldLineItems[i].Category != NewLineItems[i].Category ||
-                        oldLineItems[i].Memo != NewLineItems[i].Memo ||
-                        oldLineItems[i].Amount != NewLineItems[i].Amount;
-                }
-            }
-
-            return change;
-        }
-
-        #endregion
-
-        #region Supporting classes
-
-        // A line item, as presented in the edit split dialog
-        public class GridViewLineItem : LogicBase, IEditableObject
-        {
-            private struct GridViewLineItemData
-            {
-                public string Memo;
-                public string Category;
-                public decimal Amount;
-            }
-
-            private GridViewLineItemData data;
-            private GridViewLineItemData backup;
-            private bool editing;
-            private readonly EditSplitLogic logic;
-
-            // Default constructor
-            // It is needed because when UserCanAddRows is set, the datagrid verifies that there is
-            // a default constructor. But it is actually not used since we hijack the AddingNewItem
-            // datagrid event and create the object ourself using the explicit constructor.
-            public GridViewLineItem() => throw new NotImplementedException();
-
-            // Explicit constructor
-            public GridViewLineItem(EditSplitLogic _logic, LineItem lineItem, bool deposit, IEnumerable<CategoryItem> categories) =>
-                (logic, ID, data.Memo, data.Category, Categories, data.Amount) = 
-                (_logic, lineItem.ID, lineItem.Memo, lineItem.Category, categories, deposit ? lineItem.Amount : -lineItem.Amount);
-
-            public readonly int ID;
-
-            //
-            // UI properties
-            //
-
-            // Memo
-            public string Memo
-            { 
-                get => data.Memo;
-                set => data.Memo = value;
-            }
-
-            // Category and the supporting categories
-            public string Category 
-            {
-                get => data.Category;
-                set => data.Category = value;
-            }
-            public IEnumerable<CategoryItem> Categories { get; }
-
-            // Amount, and its string representation
-            public decimal Amount
-            {
-                get => data.Amount;
-                set
-                {
-                    data.Amount = value;
-                    OnPropertyChanged(() => AmountString);
-                    logic.UpdateTotal();
-                }
-            }
-            public string AmountString => data.Amount.ToString("N");
-
-            public void BeginEdit()
-            {
-                if (!editing)
-                {
-                    // Backup the data
-                    backup = data;
-                    editing = true;
-                }
-            }
-
-            public void EndEdit()
-            {
-                if (editing)
-                {
-                    // Publish data
-                    editing = false;
-                    OnPropertyChanged(() => Category);
-                    OnPropertyChanged(() => Memo);
-                    OnPropertyChanged(() => Amount);
-                    OnPropertyChanged(() => AmountString);
-                }
-                logic.MoveOneLineDown();
-            }
-
-            public void CancelEdit()
-            {
-                if (editing)
-                {
-                    // Recover from backup data
-                    editing = false;
-                    data = backup;
-                    OnPropertyChanged(() => Category);
-                    OnPropertyChanged(() => Memo);
-                    OnPropertyChanged(() => Amount);
-                    OnPropertyChanged(() => AmountString);
-                }
-            }
-        }
-
         #endregion
     }
+
+    #endregion
+
+    #region Line item class
+
+    // A line item, as presented in the edit split dialog
+    public class GridViewLineItem : LogicBase, IEditableObject
+    {
+        private struct GridViewLineItemData
+        {
+            public string Memo;
+            public string Category;
+            public decimal Amount;
+        }
+
+        private GridViewLineItemData data;
+        private GridViewLineItemData backup;
+        private bool editing;
+        private readonly EditSplitLogic logic;
+
+        // Explicit constructor
+        public GridViewLineItem(EditSplitLogic _logic, LineItem lineItem, bool deposit) =>
+            (logic, ID, data.Memo, data.Category, data.Amount) =
+            (_logic, lineItem.ID, lineItem.Memo, lineItem.Category, deposit ? lineItem.Amount : -lineItem.Amount);
+
+        public readonly int ID;
+
+        //
+        // UI properties
+        //
+
+        // Memo
+        public string Memo
+        {
+            get => data.Memo;
+            set => data.Memo = value;
+        }
+
+        // Category
+        public string Category
+        {
+            get => data.Category;
+            set => data.Category = value;
+        }
+
+        // Amount, and its string representation
+        public decimal Amount
+        {
+            get => data.Amount;
+            set
+            {
+                data.Amount = value;
+                OnPropertyChanged(() => AmountString);
+                logic.UpdateTotal();
+            }
+        }
+        public string AmountString => data.Amount.ToString("N");
+
+        public void BeginEdit()
+        {
+            if (!editing)
+            {
+                // Backup the data
+                backup = data;
+                editing = true;
+            }
+        }
+
+        public void EndEdit()
+        {
+            if (editing)
+            {
+                // Publish data
+                editing = false;
+                OnPropertyChanged(() => Category);
+                OnPropertyChanged(() => Memo);
+                OnPropertyChanged(() => Amount);
+                OnPropertyChanged(() => AmountString);
+            }
+        }
+
+        public void CancelEdit()
+        {
+            if (editing)
+            {
+                // Recover from backup data
+                editing = false;
+                data = backup;
+                OnPropertyChanged(() => Category);
+                OnPropertyChanged(() => Memo);
+                OnPropertyChanged(() => Amount);
+                OnPropertyChanged(() => AmountString);
+            }
+        }
+
+        public override bool Equals(object obj)
+        {
+            return
+                obj is GridViewLineItem o &&
+                o.Category == Category &&
+                o.Memo == Memo &&
+                o.Amount == Amount;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+    }
+
+    #endregion
 }
+

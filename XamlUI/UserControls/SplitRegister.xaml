@@ -1,0 +1,124 @@
+﻿<local:ListviewWithOverlay x:Class="XamlUI.UserControls.SplitRegister"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:XamlUI.UserControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+
+        <!-- The listview -->
+        <ListView
+                    Height="300"
+                    x:Name="listView"
+                    SelectionMode="Single"
+                    SelectedItem="{Binding SelectedLineItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    ScrollViewer.ScrollChanged="OnListViewScrollChanged"
+                    ItemsSource="{Binding Transactions}">
+
+            <!-- Make the list view items use all the horizontal space -->
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListView.ItemContainerStyle>
+
+            <!-- Context menu for listview rows -->
+            <ListView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Delete"
+                        Command="{Binding DeleteLineItem}"
+                        CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}" />
+                </ContextMenu>
+            </ListView.ContextMenu>
+
+            <!-- View definition -->
+            <ListView.View>
+                <GridView>
+
+                    <!-- Category column-->
+                    <GridViewColumn DisplayMemberBinding="{Binding Category}" Width="{Binding WidthOfCategoryColumn, Mode=TwoWay}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Category"/>
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
+
+                    <!-- Memo column-->
+                    <GridViewColumn DisplayMemberBinding="{Binding Memo}" Width="{Binding WidthOfMemoColumn, Mode=TwoWay}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Memo"/>
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
+
+                    <!-- Amount column-->
+                    <GridViewColumn Width="{Binding WidthOfAmountColumn, Mode=TwoWay}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Amount"/>
+                        </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=AmountString}" HorizontalAlignment="Right"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                </GridView>
+            </ListView.View>
+
+        </ListView>
+
+        <!-- The overlay -->
+        <Grid
+             x:Name="overlay"
+             KeyboardNavigation.TabNavigation="Cycle"
+             Visibility="Hidden">
+
+            <Grid.Resources>
+
+                <ContextMenu x:Key="TransactionContextMenu">
+                    <MenuItem Header="Delete" Command="{Binding DeleteLineItem}"/>
+                </ContextMenu>
+
+                <Style TargetType="{x:Type local:WatermarkTextBox}">
+                    <Setter Property="ContextMenu" Value="{StaticResource TransactionContextMenu}"/>
+                </Style>
+
+                <Style TargetType="{x:Type local:AmountBox}">
+                    <Setter Property="ContextMenu" Value="{StaticResource TransactionContextMenu}"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Right"/>
+                </Style>
+
+            </Grid.Resources>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="{Binding WidthOfCategoryColumn}"/>
+                <ColumnDefinition Width="{Binding WidthOfMemoColumn}"/>
+                <ColumnDefinition Width="{Binding WidthOfAmountColumn}"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Category -->
+            <local:AutoCompleteTextBox
+                Grid.Column="0"
+                Style="{StaticResource CategoryBoxStyle}"
+                Text="{Binding EditedLineItem.Category, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                ItemsSource="{Binding Categories}"/>
+
+            <!-- Memo -->
+            <local:WatermarkTextBox
+                Grid.Column="1"
+                Text="{Binding EditedLineItem.Memo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                Watermark="Memo"/>
+
+            <!-- Amount -->
+            <local:AmountBox
+                Grid.Column="2"
+                Watermark="Amount"
+                Amount="{Binding EditedLineItem.Amount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        </Grid>
+    </Grid>
+</local:ListviewWithOverlay>

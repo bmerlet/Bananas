@@ -13,7 +13,7 @@ using System.ComponentModel;
 
 namespace BanaData.Logic.Main
 {
-    public abstract class AbstractRegisterLogic : LogicBase
+    public abstract class AbstractRegisterLogic : BaseRegisterLogic
     {
         #region Private members
 
@@ -51,9 +51,6 @@ namespace BanaData.Logic.Main
         // Name of the account
         public string AccountName { get; private set; }
 
-        // Transactions. The CollectionView type enables sorting on columns, and is generic
-        public CollectionView Transactions { get; protected set; }
-
         //
         // Selected transaction
         //
@@ -67,9 +64,6 @@ namespace BanaData.Logic.Main
 
         // Transaction being edited
         public AbstractTransactionLogic EditedTransaction { get; protected set; }
-
-        // Transaction to show
-        public AbstractTransactionLogic TransactionToScrollTo { get; protected set; }
 
         // Set to true to indicate that the overlay should focus on the date field
         public bool DateFocus { get; protected set; }
@@ -157,7 +151,7 @@ namespace BanaData.Logic.Main
             }
         }
 
-        public void ProcessEnter()
+        public override void ProcessEnter()
         {
             var transaction = SelectedTransaction;
             if (transaction != null)
@@ -210,7 +204,7 @@ namespace BanaData.Logic.Main
         }
 
         // Recompute cash balance
-        public virtual void RecomputeBalances()
+        public override void RecomputeBalances()
         {
             decimal balance = 0;
             foreach (var o in Transactions)
@@ -226,11 +220,9 @@ namespace BanaData.Logic.Main
             }
         }
 
-        public void MoveUp()
+        public override void MoveUp()
         {
-            var prevTransaction = GetPreviousTransaction(SelectedTransaction);
-
-            if (prevTransaction != null)
+            if (GetPreviousTransaction(SelectedTransaction) is AbstractTransactionLogic prevTransaction)
             {
                 logicIsChangingSelection = true;
                 SelectedTransaction = prevTransaction;
@@ -238,11 +230,9 @@ namespace BanaData.Logic.Main
             }
         }
 
-        public void MoveDown()
+        public override void MoveDown()
         {
-            var nextTransaction = GetNextTransaction(SelectedTransaction);
-
-            if (nextTransaction != null)
+            if (GetNextTransaction(SelectedTransaction) is AbstractTransactionLogic nextTransaction)
             {
                 logicIsChangingSelection = true;
                 SelectedTransaction = nextTransaction;
@@ -253,35 +243,6 @@ namespace BanaData.Logic.Main
         #endregion
 
         #region Utilities for derived classes
-
-        // Get the next transaction, in the CollectionView order
-        protected AbstractTransactionLogic GetNextTransaction(AbstractTransactionLogic trans)
-        {
-            var nextTrans = Transactions.Cast<object>()
-                .SkipWhile(x => !Equals(x, trans)) //skip preceding transactions
-                .Skip(1) //skip the transaction itself
-                .FirstOrDefault();
-
-            return nextTrans as AbstractTransactionLogic;
-        }
-
-        // Get the previous transaction, in the CollectionView order
-        protected AbstractTransactionLogic GetPreviousTransaction(AbstractTransactionLogic trans)
-        {
-            object lastTrans = null;
-
-            foreach(var curTrans in Transactions)
-            {
-                if (curTrans.Equals(trans))
-                {
-                    break;
-                }
-
-                lastTrans = curTrans;
-            }
-
-            return lastTrans as AbstractTransactionLogic;
-        }
 
         private void OnDeleteTransaction(object arg)
         {
@@ -299,7 +260,7 @@ namespace BanaData.Logic.Main
             }
 
             // We want to select the next transaction afterwards
-            var transactionToSelect = GetNextTransaction(atl);
+            var transactionToSelect = GetNextTransaction(atl) as AbstractTransactionLogic;
 
             // Cancel all changes
             atl.CancelEdit();

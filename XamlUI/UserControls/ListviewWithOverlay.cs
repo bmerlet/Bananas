@@ -36,15 +36,15 @@ namespace XamlUI.UserControls
             base.OnPropertyChanged(e);
 
             // Listen to logic changes when data context is set 
-            if (e.Property.Name == "DataContext" && e.NewValue is AbstractRegisterLogic arl)
+            if (e.Property.Name == "DataContext" && e.NewValue is BaseRegisterLogic brl)
             {
-                arl.PropertyChanged += OnDataContextPropertyChanged;
+                brl.PropertyChanged += OnDataContextPropertyChanged;
             }
         }
 
         private void OnDataContextPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (DataContext is AbstractRegisterLogic arl)
+            if (DataContext is BaseRegisterLogic brl)
             {
                 //
                 // TransactionToScrollTo: Ensure a specific transaction is visible
@@ -52,7 +52,7 @@ namespace XamlUI.UserControls
                 if (e.PropertyName == "TransactionToScrollTo")
                 {
                     _listView.UpdateLayout();
-                    _listView.ScrollIntoView(arl.TransactionToScrollTo);
+                    _listView.ScrollIntoView(brl.TransactionToScrollTo);
                 }
                 //
                 // Scroll to bottom: Go to the bottom of the listview
@@ -84,10 +84,10 @@ namespace XamlUI.UserControls
         {
             Dispatcher.BeginInvoke((Action)delegate ()
             {
-                if (_listView.SelectedItem is AbstractTransactionLogic atl)
+                if (_listView.SelectedItem != null)
                 {
                     _listView.UpdateLayout();
-                    ListViewItem lvi = (ListViewItem)_listView.ItemContainerGenerator.ContainerFromItem(atl);
+                    ListViewItem lvi = (ListViewItem)_listView.ItemContainerGenerator.ContainerFromItem(_listView.SelectedItem);
                     if (lvi != null)
                     {
                         var pos = lvi.TranslatePoint(new Point(0, 0), _listView);
@@ -111,17 +111,17 @@ namespace XamlUI.UserControls
         {
             base.OnKeyDown(e);
 
-            if (DataContext is AbstractRegisterLogic arl && _listView.SelectedItem is AbstractTransactionLogic atl)
+            if (DataContext is BaseRegisterLogic brl && _listView.SelectedItem is IEditableObject editableObject)
             {
                 if (e.Key == Key.Escape)
                 {
-                    atl.CancelEdit();
-                    atl.BeginEdit();
+                    editableObject.CancelEdit();
+                    editableObject.BeginEdit();
                     e.Handled = true;
                 }
                 else if (e.Key == Key.Enter || e.Key == Key.Return)
                 {
-                    arl.ProcessEnter();
+                    brl.ProcessEnter();
                     e.Handled = true;
                 }
             }
@@ -136,16 +136,16 @@ namespace XamlUI.UserControls
                 wtb.TemplatedParent is AutoCompleteTextBox actb &&
                 actb.IsPopupOpen;
 
-            if (DataContext is AbstractRegisterLogic arl && !isFromAutoCompleteTextBoxWithPopupOpen)
+            if (DataContext is BaseRegisterLogic brl && !isFromAutoCompleteTextBoxWithPopupOpen)
             {
                 if (e.Key == Key.Up)
                 {
-                    arl.MoveUp();
+                    brl.MoveUp();
                     e.Handled = true;
                 }
                 if (e.Key == Key.Down)
                 {
-                    arl.MoveDown();
+                    brl.MoveDown();
                     e.Handled = true;
                 }
             }
@@ -159,10 +159,10 @@ namespace XamlUI.UserControls
 
         protected void OnColumnHeaderClicked(object sender, RoutedEventArgs e)
         {
-            if (DataContext is AbstractRegisterLogic arl)
+            if (DataContext is BaseRegisterLogic brl)
             {
                 // Get tag name from the source
-                var sd = arl.Transactions.SortDescriptions;
+                var sd = brl.Transactions.SortDescriptions;
                 var column = sender as GridViewColumnHeader;
                 var memberName = column.Tag.ToString();
 
@@ -174,8 +174,8 @@ namespace XamlUI.UserControls
                 }
 
                 // Do the sorting
-                arl.Transactions.SortDescriptions.Clear();
-                arl.Transactions.SortDescriptions.Add(new SortDescription(memberName, direction));
+                brl.Transactions.SortDescriptions.Clear();
+                brl.Transactions.SortDescriptions.Add(new SortDescription(memberName, direction));
 
                 // Un-adorn existing adornment
                 if (sortAdorner != null)
@@ -189,7 +189,7 @@ namespace XamlUI.UserControls
                 Dispatcher.BeginInvoke((Action)delegate ()
                 {
                     // Hopefully runs after the sorting is done (??)
-                    arl.RecomputeBalances();
+                    brl.RecomputeBalances();
                 }, null);
             }
         }

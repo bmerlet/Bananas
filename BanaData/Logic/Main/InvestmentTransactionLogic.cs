@@ -17,7 +17,7 @@ namespace BanaData.Logic.Main
         #region Private fields
 
         // Parent logics
-        private readonly InvestmentRegisterLogic investmentRegisterLogic;
+        //private readonly InvestmentRegisterLogic investmentRegisterLogic;
 
         // Our data
         private new readonly InvestmentTransactionData data;
@@ -28,21 +28,15 @@ namespace BanaData.Logic.Main
 
         public InvestmentTransactionLogic(
             MainWindowLogic _mainWindowLogic,
-            InvestmentRegisterLogic _investmentRegisterLogic,
             int _accountID,
             int transID,
             InvestmentTransactionData _data)
-            : base(_mainWindowLogic, _accountID, transID, _data)
-        {
-            (investmentRegisterLogic, data) =
-                (_investmentRegisterLogic, _data);
-        }
+            : base(_mainWindowLogic, _accountID, transID, _data) => data = _data;
 
         public InvestmentTransactionLogic(
             MainWindowLogic _mainWindowLogic,
-            InvestmentRegisterLogic _investmentRegisterLogic,
             int _accountID)
-            : this(_mainWindowLogic, _investmentRegisterLogic, _accountID, -1,
+            : this(_mainWindowLogic, _accountID, -1,
                   new InvestmentTransactionData(DateTime.Today, "", ETransactionStatus.Pending, new LineItem[] { new LineItem(_mainWindowLogic, -1, "", -1, -1, "", 0, false) },
                     EInvestmentTransactionType.None, -1, 0, 0, 0)) { }
 
