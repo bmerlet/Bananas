@@ -72,17 +72,7 @@ namespace BanaData.Logic.Main
         public string Memo
         {
             get => data.Memo;
-            set
-            {
-                if (data.LineItems.Count == 1)
-                {
-                    data.LineItems[0].Memo = value;
-                }
-                else
-                {
-                    mainWindowLogic.ErrorMessage("Cannot add memo to split transactions");
-                }
-            }
+            set => data.Memo = value;
         }
 
         // Category
@@ -249,6 +239,12 @@ namespace BanaData.Logic.Main
                     OnPropertyChanged(() => Payee);
                 }
 
+                if (data.Memo != backup.Memo)
+                {
+                    data.Memo = backup.Memo;
+                    OnPropertyChanged(() => Memo);
+                }
+
                 if (data.Status != backup.Status)
                 {
                     data.Status = backup.Status;
@@ -258,7 +254,8 @@ namespace BanaData.Logic.Main
                 data.LineItems.Clear();
                 backup.LineItems.ForEach(li => data.LineItems.Add(new LineItem(li)));
 
-                OnPropertyChanged(() => Memo);
+                OnPropertyChanged(() => Amount);
+                OnPropertyChanged(() => AmountString);
                 OnPropertyChanged(() => Category);
                 OnPropertyChanged(() => PaymentString);
                 OnPropertyChanged(() => Payment);
@@ -280,6 +277,11 @@ namespace BanaData.Logic.Main
             if (data.Payee != backup.Payee)
             {
                 OnPropertyChanged(() => Payee);
+            }
+
+            if (data.Memo != backup.Memo)
+            {
+                OnPropertyChanged(() => Memo);
             }
 
             if (data.Memo != backup.Memo)
@@ -369,11 +371,12 @@ namespace BanaData.Logic.Main
             protected BaseTransactionData(
                 DateTime date,
                 string payee,
+                string memo,
                 ETransactionStatus status,
                 IEnumerable<LineItem> lineItems)
             {
-                (Date, Payee, Status) =
-                    (date, payee, status);
+                (Date, Payee, Memo, Status) =
+                    (date, payee, memo, status);
 
                 LineItems.AddRange(lineItems);
             }
@@ -381,8 +384,8 @@ namespace BanaData.Logic.Main
             // Clone
             protected BaseTransactionData(BaseTransactionData src)
             {
-                (Date, Payee, Status) =
-                    (src.Date, src.Payee, src.Status);
+                (Date, Payee, Memo, Status) =
+                    (src.Date, src.Payee, src.Memo, src.Status);
 
                 src.LineItems.ForEach(li => LineItems.Add(new LineItem(li)));
             }
@@ -390,12 +393,13 @@ namespace BanaData.Logic.Main
             // Properties
             public DateTime Date;
             public string Payee;
+            public string Memo;
             public ETransactionStatus Status;
             public readonly List<LineItem> LineItems = new List<LineItem>();
 
             // Show either the first line item when no split or a summary
-            public string Memo => LineItems.Count == 1 ? LineItems[0].Memo : "";
             public string Category => LineItems.Count == 1 ? LineItems[0].Category : "<Split>";
+
             public decimal Amount => LineItems.Sum(li => li.Amount);
 
             public override bool Equals(object obj)
@@ -407,6 +411,7 @@ namespace BanaData.Logic.Main
                         o.Date.Equals(Date) &&
                         o.Payee == Payee &&
                         o.Amount == Amount &&
+                        o.Memo == Memo &&
                         o.Status == Status &&
                         o.LineItems.Count == LineItems.Count;
 

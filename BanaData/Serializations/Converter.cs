@@ -383,6 +383,7 @@ namespace BanaData.Serializations
             decimal amountToCheck = 0;
             decimal otherMysteriousAmount = 0;
             string payee = null;
+            string memo = null;
             ETransactionStatus status = ETransactionStatus.Pending;
             ETransactionMedium medium = ETransactionMedium.None;
             uint checkNumber = 0;
@@ -418,8 +419,13 @@ namespace BanaData.Serializations
                         decimal.TryParse(l.Substring(1), out otherMysteriousAmount);
                         break;
 
-                    case 'E':
                     case 'M':
+                        // Main memo
+                        memo = l.Substring(1);
+                        break;
+
+                    case 'E':
+                        // Line item memo
                         lineItemHolder.memo = l.Substring(1);
                         break;
 
@@ -466,10 +472,13 @@ namespace BanaData.Serializations
             }
 
             // Create main transaction
-            var transRow = household.Transactions.Add(accountRow, date, payee, status);
+            var transRow = household.Transactions.Add(accountRow, date, payee, memo, status);
 
             // Add bank-specific stuff
-            household.BankingTransactions.Add(transRow, medium, checkNumber);
+            if (accountRow.Type == EAccountType.Bank)
+            {
+                household.BankingTransactions.Add(transRow, medium, checkNumber);
+            }
 
             // Add the line item(s)
             lineItemHodlers.Add(lineItemHolder);
@@ -498,7 +507,7 @@ namespace BanaData.Serializations
             decimal otherMysteriousAmount = 0;
             string payee = null;
             ETransactionStatus status = ETransactionStatus.Pending;
-            EMemorizedTransactionType type = EMemorizedTransactionType.None;
+            //EMemorizedTransactionType type = EMemorizedTransactionType.None;
 
             List<LineItemHolder> lineItemHodlers = new List<LineItemHolder>();
             var lineItemHolder = new LineItemHolder();
@@ -552,7 +561,7 @@ namespace BanaData.Serializations
 
                     // Payment/deposit
                     case 'K':
-                        type = ParseMemorizedTransactionType(l.Substring(1));
+                        //type = ParseMemorizedTransactionType(l.Substring(1));
                         break;
 
                     case 'S':
@@ -711,8 +720,8 @@ namespace BanaData.Serializations
                 throw new InvalidDataException("QIF parser: Mysterious amount not the same as regular amount - " + amount + " - " + otherMysteriousAmount);
             }
 
-            var transRow = household.Transactions.Add(accountRow, date, altMemo, status);
-            household.LineItems.Add(transRow, transfer, targetRow, mainMemo, amount);
+            var transRow = household.Transactions.Add(accountRow, date, altMemo, mainMemo, status);
+            household.LineItems.Add(transRow, transfer, targetRow, null, amount);
             household.InvestmentTransactions.Add(transRow, type, securityRow, securityPrice, securityQuantity, commission);
         }
 
@@ -754,8 +763,6 @@ namespace BanaData.Serializations
                     throw new InvalidDataException("Unknown security symbol (db): " + l);
                 }
 
-                decimal price = 0;
-
                 // The price may in the m a/b, or a/b format
                 string mainStr = "0";
                 string numStr = "0";
@@ -789,7 +796,7 @@ namespace BanaData.Serializations
                     throw new InvalidDataException("Garbled security price: " + l);
                 }
 
-                price = main + num / denom;
+                decimal price = main + num / denom;
 
                 // Parse date
                 subComps = comps[2].Split('"');
@@ -838,7 +845,7 @@ namespace BanaData.Serializations
 
         private static ETransactionStatus ParseTransactionStatus(string statusStr)
         {
-            ETransactionStatus status = ETransactionStatus.Pending;
+            ETransactionStatus status;
 
             switch (statusStr)
             {
@@ -897,31 +904,31 @@ namespace BanaData.Serializations
             return type;
         }
 
-        private static EMemorizedTransactionType ParseMemorizedTransactionType(string typeStr)
-        {
-            EMemorizedTransactionType type;
+        //private static EMemorizedTransactionType ParseMemorizedTransactionType(string typeStr)
+        //{
+        //    EMemorizedTransactionType type;
 
-            switch (typeStr)
-            {
-                case "P":
-                    type = EMemorizedTransactionType.Payment;
-                    break;
-                case "D":
-                    type = EMemorizedTransactionType.Deposit;
-                    break;
-                case "C":
-                    type = EMemorizedTransactionType.Check;
-                    break;
-                default:
-                    throw new InvalidDataException("Unknown memorized transaction type: " + typeStr);
-            }
+        //    switch (typeStr)
+        //    {
+        //        case "P":
+        //            type = EMemorizedTransactionType.Payment;
+        //            break;
+        //        case "D":
+        //            type = EMemorizedTransactionType.Deposit;
+        //            break;
+        //        case "C":
+        //            type = EMemorizedTransactionType.Check;
+        //            break;
+        //        default:
+        //            throw new InvalidDataException("Unknown memorized transaction type: " + typeStr);
+        //    }
 
-            return type;
-        }
+        //    return type;
+        //}
 
         private static EInvestmentTransactionType ParseInvestmentTransactionType(string typeStr)
         {
-            EInvestmentTransactionType type = EInvestmentTransactionType.None;
+            EInvestmentTransactionType type;
 
             switch (typeStr)
             {

@@ -38,39 +38,48 @@ namespace BanaData.Database
 
         partial class TransactionsDataTable
         {
-            public TransactionsRow Add(AccountsRow accountRow, DateTime date, string payee, ETransactionStatus status)
+            public TransactionsRow Add(AccountsRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status)
             {
                 var transactionRow = NewTransactionsRow();
 
-                UpdateTransaction(transactionRow, accountRow, date, payee, status);
+                UpdateTransaction(transactionRow, accountRow, date, payee, memo, status);
 
                 Rows.Add(transactionRow);
 
                 return transactionRow;
             }
 
-            public TransactionsRow Update(int transactionID, AccountsRow accountRow, DateTime date, string payee, ETransactionStatus status)
+            public TransactionsRow Update(int transactionID, AccountsRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status)
             {
                 var transactionRow = FindByID(transactionID);
 
-                UpdateTransaction(transactionRow, accountRow, date, payee, status);
+                UpdateTransaction(transactionRow, accountRow, date, payee, memo, status);
 
                 return transactionRow;
             }
 
-            private static TransactionsRow UpdateTransaction(TransactionsRow transactionRow, AccountsRow accountRow, DateTime date, string payee, ETransactionStatus status)
+            private static TransactionsRow UpdateTransaction(TransactionsRow transactionRow, AccountsRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status)
             {
                 transactionRow.AccountID = accountRow.ID;
 
                 transactionRow.Date = date;
 
-                if (payee == null)
+                if (string.IsNullOrWhiteSpace(payee))
                 {
                     transactionRow.SetPayeeNull();
                 }
                 else
                 {
                     transactionRow.Payee = payee;
+                }
+
+                if (string.IsNullOrWhiteSpace(memo))
+                {
+                    transactionRow.SetMemoNull();
+                }
+                else
+                {
+                    transactionRow.Memo = memo;
                 }
 
                 transactionRow.Status = status;

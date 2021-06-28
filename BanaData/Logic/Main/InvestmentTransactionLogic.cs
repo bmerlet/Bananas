@@ -37,7 +37,7 @@ namespace BanaData.Logic.Main
             MainWindowLogic _mainWindowLogic,
             int _accountID)
             : this(_mainWindowLogic, _accountID, -1,
-                  new InvestmentTransactionData(DateTime.Today, "", ETransactionStatus.Pending, new LineItem[] { new LineItem(_mainWindowLogic, -1, "", -1, -1, "", 0, false) },
+                  new InvestmentTransactionData(DateTime.Today, "", "", ETransactionStatus.Pending, new LineItem[] { new LineItem(_mainWindowLogic, -1, "", -1, -1, "", 0, false) },
                     EInvestmentTransactionType.None, -1, 0, 0, 0)) { }
 
         #endregion
@@ -769,7 +769,7 @@ namespace BanaData.Logic.Main
             if (TransID < 0)
             {
                 // Create new transaction row
-                var transactionRow = household.Transactions.Add(accountRow, data.Date, data.Payee, data.Status);
+                var transactionRow = household.Transactions.Add(accountRow, data.Date, data.Payee, data.Memo, data.Status);
                 TransID = transactionRow.ID;
 
                 // Create new investment transaction row
@@ -783,7 +783,7 @@ namespace BanaData.Logic.Main
             else
             {
                 // Update transaction row
-                var transactionRow = household.Transactions.Update(TransID, accountRow, data.Date, data.Payee, data.Status);
+                var transactionRow = household.Transactions.Update(TransID, accountRow, data.Date, data.Memo, data.Payee, data.Status);
 
                 // Update investment transaction
                 household.InvestmentTransactions.Update(transactionRow, data.Type, securityRow, data.SecurityPrice, data.SecurityQuantity, data.Commission);
@@ -807,6 +807,7 @@ namespace BanaData.Logic.Main
             public InvestmentTransactionData(
                 DateTime date,
                 string payee,
+                string memo,
                 ETransactionStatus status,
                 IEnumerable<LineItem> lineItems,
                 EInvestmentTransactionType type,
@@ -814,7 +815,7 @@ namespace BanaData.Logic.Main
                 decimal securityPrice,
                 decimal securityQuantity,
                 decimal commission)
-                : base(date, payee, status, lineItems) =>
+                : base(date, payee, memo, status, lineItems) =>
                 (Type, SecurityID, SecurityPrice, SecurityQuantity, Commission) =
                     (type, securityID, securityPrice, securityQuantity, commission);
 

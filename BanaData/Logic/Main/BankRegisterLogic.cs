@@ -19,7 +19,6 @@ namespace BanaData.Logic.Main
         public BankRegisterLogic(MainWindowLogic mainWindowLogic)
             :  base(mainWindowLogic)
         {
-
             // Create column width manager
             Widths = new ColumnWidths(mainWindowLogic, this);
         }
@@ -66,6 +65,7 @@ namespace BanaData.Logic.Main
                 transBankRow == null ? ETransactionMedium.None : transBankRow.Medium,
                 transBankRow == null ? 0 : (transBankRow.IsCheckNumberNull() ? 0 : (uint)transBankRow.CheckNumber),
                 transRow.IsPayeeNull() ? "" : transRow.Payee,
+                transRow.IsMemoNull() ? "" : transRow.Memo,
                 transRow.Status,
                 lineItems);
 

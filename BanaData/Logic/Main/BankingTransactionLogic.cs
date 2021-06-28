@@ -39,7 +39,7 @@ namespace BanaData.Logic.Main
         // To create new transactions (not in DB yet)
         public BankingTransactionLogic(MainWindowLogic _mainWindowLogic, BankRegisterLogic _bankRegisterLogic, int _accountID)
             : this(_mainWindowLogic, _bankRegisterLogic, _accountID, -1,
-                  new BankTransactionData(DateTime.Today, ETransactionMedium.None, 0, "", ETransactionStatus.Pending,
+                  new BankTransactionData(DateTime.Today, ETransactionMedium.None, 0, "", "", ETransactionStatus.Pending,
                       new LineItem[] { new LineItem(_mainWindowLogic, -1, "", -1, -1, "", 0, false) }))
         {
         }
@@ -208,7 +208,7 @@ namespace BanaData.Logic.Main
             if (TransID < 0)
             {
                 // Create new transaction row
-                var transactionRow = household.Transactions.Add(accountRow, data.Date, data.Payee, data.Status);
+                var transactionRow = household.Transactions.Add(accountRow, data.Date, data.Payee, data.Memo, data.Status);
                 TransID = transactionRow.ID;
 
                 // Create new banking transaction row if needed
@@ -228,7 +228,7 @@ namespace BanaData.Logic.Main
             else
             {
                 // Update transaction row
-                var transactionRow = household.Transactions.Update(TransID, accountRow, data.Date, data.Payee, data.Status);
+                var transactionRow = household.Transactions.Update(TransID, accountRow, data.Date, data.Payee, data.Memo, data.Status);
 
                 // Update banking transaction if needed
                 if (bankRegisterLogic.IsBank)
@@ -318,7 +318,6 @@ namespace BanaData.Logic.Main
                     data.LineItems.Add(li);
                 }
 
-                OnPropertyChanged(() => Memo);
                 OnPropertyChanged(() => Category);
                 OnPropertyChanged(() => PaymentString);
                 OnPropertyChanged(() => Payment);
@@ -421,9 +420,10 @@ namespace BanaData.Logic.Main
                 ETransactionMedium medium,
                 uint checkNumber,
                 string payee,
+                string memo,
                 ETransactionStatus status,
                 IEnumerable<LineItem> lineItems)
-                : base(date, payee, status, lineItems) => (Medium, CheckNumber) = (medium, checkNumber);
+                : base(date, payee, memo, status, lineItems) => (Medium, CheckNumber) = (medium, checkNumber);
 
             // Clone
             public BankTransactionData(BankTransactionData src)

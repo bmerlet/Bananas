@@ -72,6 +72,7 @@ namespace BanaData.Logic.Main
             var transactionData = new InvestmentTransactionLogic.InvestmentTransactionData(
                 transRow.Date,
                 transRow.IsPayeeNull() ? "" : transRow.Payee,
+                transRow.IsMemoNull() ? "" : transRow.Memo,
                 transRow.Status,
                 lineItems,
                 investmentTransRow.Type,

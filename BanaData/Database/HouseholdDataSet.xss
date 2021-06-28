@@ -10,7 +10,7 @@
     <Shape ID="DesignTable:Categories" ZOrder="9" X="335" Y="483" Height="143" Width="153" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="139" />
     <Shape ID="DesignTable:Securities" ZOrder="23" X="843" Y="38" Height="105" Width="150" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="101" />
     <Shape ID="DesignTable:SecurityPrices" ZOrder="22" X="1025" Y="104" Height="105" Width="150" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="101" />
-    <Shape ID="DesignTable:Transactions" ZOrder="17" X="370" Y="47" Height="124" Width="150" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="120" />
+    <Shape ID="DesignTable:Transactions" ZOrder="17" X="370" Y="47" Height="143" Width="150" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="139" />
     <Shape ID="DesignTable:LineItems" ZOrder="8" X="555" Y="262" Height="162" Width="150" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="158" />
     <Shape ID="DesignTable:BankingTransactions" ZOrder="6" X="303" Y="243" Height="105" Width="168" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="101" />
     <Shape ID="DesignTable:InvestmentTransactions" ZOrder="15" X="599" Y="46" Height="162" Width="204" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="158" />
@@ -47,7 +47,7 @@
       <RoutePoints>
         <Point>
           <X>495</X>
-          <Y>171</Y>
+          <Y>190</Y>
         </Point>
         <Point>
           <X>495</X>
@@ -63,7 +63,7 @@
       <RoutePoints>
         <Point>
           <X>424</X>
-          <Y>171</Y>
+          <Y>190</Y>
         </Point>
         <Point>
           <X>424</X>
