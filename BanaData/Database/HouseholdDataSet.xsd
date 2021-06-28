@@ -75,7 +75,6 @@
             <xs:sequence>
               <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
               <xs:element name="TransactionID" msprop:Generator_ColumnVarNameInTable="columnTransactionID" msprop:Generator_ColumnPropNameInRow="TransactionID" msprop:Generator_ColumnPropNameInTable="TransactionIDColumn" msprop:Generator_UserColumnName="TransactionID" type="xs:int" />
-              <xs:element name="IsTransfer" msprop:Generator_ColumnVarNameInTable="columnIsTransfer" msprop:Generator_ColumnPropNameInRow="IsTransfer" msprop:Generator_ColumnPropNameInTable="IsTransferColumn" msprop:Generator_UserColumnName="IsTransfer" type="xs:boolean" />
               <xs:element name="AccountID" msprop:Generator_ColumnVarNameInTable="columnAccountID" msprop:Generator_ColumnPropNameInRow="AccountID" msprop:Generator_ColumnPropNameInTable="AccountIDColumn" msprop:Generator_UserColumnName="AccountID" type="xs:int" minOccurs="0" />
               <xs:element name="CategoryID" msprop:Generator_ColumnVarNameInTable="columnCategoryID" msprop:Generator_ColumnPropNameInRow="CategoryID" msprop:Generator_ColumnPropNameInTable="CategoryIDColumn" msprop:Generator_UserColumnName="CategoryID" type="xs:int" minOccurs="0" />
               <xs:element name="Memo" msprop:Generator_ColumnVarNameInTable="columnMemo" msprop:Generator_ColumnPropNameInRow="Memo" msprop:Generator_ColumnPropNameInTable="MemoColumn" msprop:Generator_UserColumnName="Memo" type="xs:string" minOccurs="0" />
@@ -141,6 +140,15 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
+        <xs:element name="Transfers" msprop:Generator_TableClassName="TransfersDataTable" msprop:Generator_TableVarName="tableTransfers" msprop:Generator_TablePropName="Transfers" msprop:Generator_RowDeletingName="TransfersRowDeleting" msprop:Generator_RowChangingName="TransfersRowChanging" msprop:Generator_RowEvHandlerName="TransfersRowChangeEventHandler" msprop:Generator_RowDeletedName="TransfersRowDeleted" msprop:Generator_UserTableName="Transfers" msprop:Generator_RowChangedName="TransfersRowChanged" msprop:Generator_RowEvArgName="TransfersRowChangeEvent" msprop:Generator_RowClassName="TransfersRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
+              <xs:element name="SourceLineItemID" msprop:Generator_ColumnVarNameInTable="columnSourceLineItemID" msprop:Generator_ColumnPropNameInRow="SourceLineItemID" msprop:Generator_ColumnPropNameInTable="SourceLineItemIDColumn" msprop:Generator_UserColumnName="SourceLineItemID" type="xs:int" />
+              <xs:element name="TargetLineItemID" msprop:Generator_ColumnVarNameInTable="columnTargetLineItemID" msprop:Generator_ColumnPropNameInRow="TargetLineItemID" msprop:Generator_ColumnPropNameInTable="TargetLineItemIDColumn" msprop:Generator_UserColumnName="TargetLineItemID" type="xs:int" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
       </xs:choice>
     </xs:complexType>
     <xs:unique name="Constraint1" msdata:PrimaryKey="true">
@@ -195,6 +203,18 @@
       <xs:selector xpath=".//mstns:ReconcileInfo" />
       <xs:field xpath="mstns:ID" />
     </xs:unique>
+    <xs:unique name="Transfers_Constraint1" msdata:ConstraintName="Constraint1">
+      <xs:selector xpath=".//mstns:Transfers" />
+      <xs:field xpath="mstns:ID" />
+    </xs:unique>
+    <xs:keyref name="FK_LineItems_Transfers1" refer="LineItems_Constraint1" msprop:rel_Generator_UserChildTable="Transfers" msprop:rel_Generator_ChildPropName="GetTransfersRowsByFK_LineItems_Transfers1" msprop:rel_Generator_UserRelationName="FK_LineItems_Transfers1" msprop:rel_Generator_ParentPropName="LineItemsRowByFK_LineItems_Transfers1" msprop:rel_Generator_RelationVarName="relationFK_LineItems_Transfers1" msprop:rel_Generator_UserParentTable="LineItems">
+      <xs:selector xpath=".//mstns:Transfers" />
+      <xs:field xpath="mstns:TargetLineItemID" />
+    </xs:keyref>
+    <xs:keyref name="FK_LineItems_Transfers" refer="LineItems_Constraint1" msprop:rel_Generator_UserChildTable="Transfers" msprop:rel_Generator_ChildPropName="GetTransfersRowsByFK_LineItems_Transfers" msprop:rel_Generator_UserRelationName="FK_LineItems_Transfers" msprop:rel_Generator_ParentPropName="LineItemsRowByFK_LineItems_Transfers" msprop:rel_Generator_RelationVarName="relationFK_LineItems_Transfers" msprop:rel_Generator_UserParentTable="LineItems">
+      <xs:selector xpath=".//mstns:Transfers" />
+      <xs:field xpath="mstns:SourceLineItemID" />
+    </xs:keyref>
     <xs:keyref name="FK_Accounts_ReconcileInfo" refer="Constraint1" msprop:rel_Generator_UserChildTable="ReconcileInfo" msprop:rel_Generator_ChildPropName="GetReconcileInfoRows" msprop:rel_Generator_UserRelationName="FK_Accounts_ReconcileInfo" msprop:rel_Generator_RelationVarName="relationFK_Accounts_ReconcileInfo" msprop:rel_Generator_UserParentTable="Accounts" msprop:rel_Generator_ParentPropName="AccountsRow">
       <xs:selector xpath=".//mstns:ReconcileInfo" />
       <xs:field xpath="mstns:AccountID" />

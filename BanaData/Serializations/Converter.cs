@@ -11,7 +11,7 @@ using BanaData.Database;
 
 namespace BanaData.Serializations
 {
-    public class Converter
+    static class Converter
     {
         private const string deletedAccountStr = "Deleted Account";
 
@@ -32,12 +32,16 @@ namespace BanaData.Serializations
                         ParseOneSection(sr, household, ref accountRow);
                     }
                 }
+
+                // Find other sides of transfers
+                PairTransfers(household);
             }
             //catch (Exception e)
             //{
             //    Console.WriteLine("Parser exception: " + e.Message);
             //    household = null;
             //}
+
 
             household.AcceptChanges();
         }
@@ -371,10 +375,10 @@ namespace BanaData.Serializations
 
         private class LineItemHolder
         {
-            public bool transfer = false;
-            public DataRow target = null;
-            public string memo = null;
-            public decimal amount = 0;
+            public int AccountID = -1;
+            public int CategoryID = -1;
+            public string Memo = null;
+            public decimal Amount = 0;
         }
 
         private static void ParseOneBankTransaction(TextReader sr, Household household, Household.AccountsRow accountRow)
@@ -403,15 +407,16 @@ namespace BanaData.Serializations
                 switch (l[0])
                 {
                     case 'D':
+                        // Date
                         date = ParseDate(l.Substring(1));
                         break;
 
                     case 'T':
                     case '$':
-                        decimal.TryParse(l.Substring(1), out lineItemHolder.amount);
+                        decimal.TryParse(l.Substring(1), out lineItemHolder.Amount);
                         if (!parsingSplitLineItem)
                         {
-                            amountToCheck = lineItemHolder.amount;
+                            amountToCheck = lineItemHolder.Amount;
                         }
                         break;
 
@@ -426,19 +431,21 @@ namespace BanaData.Serializations
 
                     case 'E':
                         // Line item memo
-                        lineItemHolder.memo = l.Substring(1);
+                        lineItemHolder.Memo = l.Substring(1);
                         break;
 
                     case 'P':
+                        // Payee
                         payee = l.Substring(1);
                         break;
                     
                     case 'C':
+                        // Transaction status
                         status = ParseTransactionStatus(l.Substring(1));
                         break;
                     
                     case 'L':
-                        lineItemHolder.target = ParseTransactionTarget(household, accountRow, l.Substring(1), out lineItemHolder.transfer);
+                        (lineItemHolder.AccountID, lineItemHolder.CategoryID) = ParseTransactionTarget(household, accountRow, l.Substring(1));
                         break;
                     
                     case 'N':
@@ -453,7 +460,7 @@ namespace BanaData.Serializations
                             lineItemHolder = new LineItemHolder();
                         }
                         parsingSplitLineItem = true;
-                        lineItemHolder.target = ParseTransactionTarget(household, accountRow, l.Substring(1), out lineItemHolder.transfer);
+                        (lineItemHolder.AccountID, lineItemHolder.CategoryID) = ParseTransactionTarget(household, accountRow, l.Substring(1));
                         break;
 
                     default:
@@ -484,7 +491,12 @@ namespace BanaData.Serializations
             lineItemHodlers.Add(lineItemHolder);
             foreach (var lih in lineItemHodlers)
             {
-                household.LineItems.Add(transRow, lih.transfer, lih.target, lih.memo, lih.amount);
+                household.LineItems.Add(
+                    transRow, 
+                    lih.CategoryID,
+                    lih.AccountID, 
+                    lih.Memo, 
+                    lih.Amount);
             }
         }
 
@@ -526,10 +538,10 @@ namespace BanaData.Serializations
                     // Amount
                     case 'T':
                     case '$':
-                        decimal.TryParse(l.Substring(1), out lineItemHolder.amount);
+                        decimal.TryParse(l.Substring(1), out lineItemHolder.Amount);
                         if (!parsingSplitLineItem)
                         {
-                            amountToCheck = lineItemHolder.amount;
+                            amountToCheck = lineItemHolder.Amount;
                         }
                         break;
 
@@ -541,7 +553,7 @@ namespace BanaData.Serializations
                     // Memo
                     case 'E':
                     case 'M':
-                        lineItemHolder.memo = l.Substring(1);
+                        lineItemHolder.Memo = l.Substring(1);
                         break;
 
                     // Payee name
@@ -556,7 +568,7 @@ namespace BanaData.Serializations
 
                     // Category
                     case 'L':
-                        lineItemHolder.target = ParseTransactionTarget(household, account, l.Substring(1), out lineItemHolder.transfer);
+                        (lineItemHolder.AccountID, lineItemHolder.CategoryID) = ParseTransactionTarget(household, account, l.Substring(1));
                         break;
 
                     // Payment/deposit
@@ -572,7 +584,7 @@ namespace BanaData.Serializations
                             lineItemHolder = new LineItemHolder();
                         }
                         parsingSplitLineItem = true;
-                        lineItemHolder.target = ParseTransactionTarget(household, account, l.Substring(1), out lineItemHolder.transfer);
+                        (lineItemHolder.AccountID, lineItemHolder.CategoryID) = ParseTransactionTarget(household, account, l.Substring(1));
                         break;
 
                     case 'A':
@@ -597,7 +609,11 @@ namespace BanaData.Serializations
             lineItemHodlers.Add(lineItemHolder);
             foreach (var lih in lineItemHodlers)
             {
-                household.MemorizedLineItems.Add(memorizedPayees, lih.transfer, lih.target, lih.memo, lih.amount);
+                household.MemorizedLineItems.Add(memorizedPayees,
+                    lih.CategoryID,
+                    lih.AccountID,
+                    lih.Memo, 
+                    lih.Amount);
             }
         }
 
@@ -620,9 +636,9 @@ namespace BanaData.Serializations
             decimal amount = 0;
             decimal otherMysteriousAmount = 0;
             string mainMemo = null;
-            DataRow targetRow = null;
-            bool transfer = false;
             string altMemo = null;
+            int categoryAccountID = -1;
+            int categoryID = -1;
             ETransactionStatus status = ETransactionStatus.Pending;
             EInvestmentTransactionType type = EInvestmentTransactionType.None;
             Household.SecuritiesRow securityRow = null;
@@ -698,7 +714,7 @@ namespace BanaData.Serializations
                         break;
 
                     case 'L':
-                        targetRow = ParseTransactionTarget(household, accountRow, arg, out transfer);
+                        (categoryAccountID, categoryID) = ParseTransactionTarget(household, accountRow, l.Substring(1));
                         break;
 
                     case 'N':
@@ -721,7 +737,7 @@ namespace BanaData.Serializations
             }
 
             var transRow = household.Transactions.Add(accountRow, date, altMemo, mainMemo, status);
-            household.LineItems.Add(transRow, transfer, targetRow, null, amount);
+            household.LineItems.Add(transRow, categoryID, categoryAccountID, null, amount);
             household.InvestmentTransactions.Add(transRow, type, securityRow, securityPrice, securityQuantity, commission);
         }
 
@@ -1020,10 +1036,10 @@ namespace BanaData.Serializations
             return type;
         }
 
-        private static DataRow ParseTransactionTarget(Household household, Household.AccountsRow currentAccount, string target, out bool transfer)
+        private static (int accountID, int categoryID) ParseTransactionTarget(Household household, Household.AccountsRow currentAccount, string target)
         {
-            transfer = false;
-            DataRow result = null;
+            int accountID = -1;
+            int categoryID = -1;
 
             if (target == "")
             {
@@ -1036,12 +1052,12 @@ namespace BanaData.Serializations
                 target = target.Substring(1, ix - 1);
                 if (target != deletedAccountStr)
                 {
-                    transfer = true;
-                    result = household.Accounts.GetByName(target);
-                    if (result == null)
+                    var accountRow = household.Accounts.GetByName(target);
+                    if (accountRow == null)
                     {
                         throw new InvalidDataException("Unknown destination account: " + target);
                     }
+                    accountID = accountRow.ID;
                 }
             }
             else
@@ -1054,25 +1070,29 @@ namespace BanaData.Serializations
                 }
 
                 // Category
-                result = household.Categories.GetByFullName(target);
+                var categoryRow = household.Categories.GetByFullName(target);
 
                 // Special case of _DivInc|[<currentAccount>}
-                if (result == null)
+                if (categoryRow == null)
                 {
                     if (target == "_DivInc|[" + currentAccount.Name + "]")
                     {
                         // Transfer to self
-                        result = currentAccount;
-                        transfer = true;
+                        accountID = currentAccount.ID;
                     }
                 }
+                else
+                {
+                    categoryID = categoryRow.ID;
+                }
 
-                if (result == null)
+                if (categoryID < 0 && accountID < 0)
                 {
                     throw new InvalidDataException("Unknown category: " + target);
                 }
             }
-            return result;
+
+            return (accountID, categoryID);
         }
 
         private static void SkipToNextType(TextReader sr)
@@ -1080,6 +1100,83 @@ namespace BanaData.Serializations
             while (sr.Peek() != '!')
             {
                 sr.ReadLine();
+            }
+        }
+
+        #endregion
+
+        #region Pair transfers
+
+        private static void PairTransfers(Household household)
+        {
+            var pairs = new List<Tuple<int, int>>();
+
+            // Go over all line items
+            foreach(Household.LineItemsRow sourceLineItemRow in household.LineItems.Rows)
+            {
+                // Find transfers
+                if (!sourceLineItemRow.IsAccountIDNull())
+                {
+                    // Found one. Verify we don't know about it already
+                    if (pairs.Find(p => p.Item2 == sourceLineItemRow.ID) != null)
+                    {
+                        // Already in
+                        continue;
+                    }
+
+                    var sourceTransactionRow = household.Transactions.FindByID(sourceLineItemRow.TransactionID);
+                    int targetAccountID = sourceLineItemRow.AccountID;
+                    Tuple<int, int> tuple = null;
+
+                    // Look for transactions on the same date in the target account
+                    foreach (Household.TransactionsRow targetTransactionRow in household.Transactions.Rows)
+                    {
+                        var diffDate = sourceTransactionRow.Date.Subtract(targetTransactionRow.Date);
+
+                        if (Math.Abs(diffDate.Days) <= 2 &&
+                            targetTransactionRow.AccountID == targetAccountID)
+                        {
+                            // Look in line item of the same amount that are transfer to the source account
+                            foreach (Household.LineItemsRow targetLineItemRow in targetTransactionRow.GetLineItemsRows())
+                            {
+                                if (!targetLineItemRow.IsAccountIDNull() &&
+                                    targetLineItemRow.AccountID == sourceTransactionRow.AccountID &&
+                                    Math.Abs(targetLineItemRow.Amount) == Math.Abs(sourceLineItemRow.Amount)) // Refine abs ZZZ
+                                {
+                                    // Found pair!
+                                    tuple = new Tuple<int, int>(sourceLineItemRow.ID, targetLineItemRow.ID);
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (tuple != null)
+                        {
+                            break;
+                        }
+                    }
+
+                    if (tuple == null)
+                    {
+                        var targetAccountRow = household.Accounts.FindByID(targetAccountID);
+                        Console.WriteLine($"Cannot pair trans from account {sourceTransactionRow.AccountsRow.Name} to {targetAccountRow} on {sourceTransactionRow.Date} for ${sourceLineItemRow.Amount}");
+                    }
+                    else
+                    {
+                        pairs.Add(tuple);
+                    }
+                }
+            }
+
+            // Add the pairs to the DB
+            Console.WriteLine($"Found {pairs.Count} transfers");
+
+            foreach(var pair in pairs)
+            {
+                var row = household.Transfers.NewTransfersRow();
+                row.SourceLineItemID = pair.Item1;
+                row.TargetLineItemID = pair.Item2;
+                household.Transfers.AddTransfersRow(row);
             }
         }
 

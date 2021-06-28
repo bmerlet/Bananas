@@ -320,7 +320,7 @@ namespace BanaData.Logic.Main
                 int catID = -1;
                 int catAccntID = -1;
                 string category = "";
-                if (dbli.IsTransfer && !dbli.IsAccountIDNull())
+                if (!dbli.IsAccountIDNull())
                 {
                     var destAccount = household.Accounts.FindByID(dbli.AccountID);
                     category = "[" + destAccount.Name + "]";
