@@ -131,6 +131,7 @@ namespace BanaData.Logic.Main
             RecomputeBalances();
         }
 
+        // Update transaction status (e.g. after reconcile)
         public void UpdateAllTransactionStatus()
         {
             // Return if we are not active
@@ -151,6 +152,7 @@ namespace BanaData.Logic.Main
             }
         }
 
+        // User hit enter on the register
         public override void ProcessEnter()
         {
             var transaction = SelectedTransaction;
@@ -259,6 +261,13 @@ namespace BanaData.Logic.Main
                 return;
             }
 
+            // Can't remove a transfer if the other end is in a split
+            if (atl.IsTransferWithOtherEndInASplit())
+            {
+                mainWindowLogic.ErrorMessage("This transaction cannot be deleted because the transfer target is part of a split transaction");
+                return;
+            }
+
             // We want to select the next transaction afterwards
             var transactionToSelect = GetNextTransaction(atl) as AbstractTransactionLogic;
 
@@ -266,30 +275,7 @@ namespace BanaData.Logic.Main
             atl.CancelEdit();
 
             // Delete from dataset
-            var household = mainWindowLogic.Household;
-            var accountRow = household.Accounts.FindByID(accountID);
-            var transactionRow = household.Transactions.FindByID(atl.TransID);
-
-            // Delete all line items
-            var lineItems = household.LineItems.GetByTransaction(transactionRow);
-            foreach (var lineItem in lineItems)
-            {
-                lineItem.Delete();
-            }
-
-            // Delete banking or investment transaction
-            if (accountRow.Type == EAccountType.Bank)
-            {
-                household.BankingTransactions.GetByTransaction(transactionRow).Delete();
-            }
-            else if (accountRow.Type == EAccountType.Investment)
-            {
-                household.InvestmentTransactions.GetByTransaction(transactionRow).Delete();
-            }
-
-            // Finally delete the transaction
-            transactionRow.Delete();
-            mainWindowLogic.CommitChanges();
+            atl.DeleteTransactionFromDataset(atl.TransID);
 
             // Delete from list
             transactions.Remove(atl);
@@ -303,6 +289,7 @@ namespace BanaData.Logic.Main
             SelectedTransaction = transactionToSelect;
             logicIsChangingSelection = false;
         }
+
 
         #endregion
 

@@ -1171,12 +1171,9 @@ namespace BanaData.Serializations
             // Add the pairs to the DB
             Console.WriteLine($"Found {pairs.Count} transfers");
 
-            foreach(var pair in pairs)
+            foreach (var pair in pairs)
             {
-                var row = household.Transfers.NewTransfersRow();
-                row.SourceLineItemID = pair.Item1;
-                row.TargetLineItemID = pair.Item2;
-                household.Transfers.AddTransfersRow(row);
+                household.Transfers.Add(pair.Item1, pair.Item2);
             }
         }
 

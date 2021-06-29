@@ -324,6 +324,118 @@ namespace BanaData.Logic.Main
             }
         }
 
+        // Is this transaction a transfer, and if yes, is the other end in a split?
+        public bool IsTransferWithOtherEndInASplit()
+        {
+            foreach (var li in data.LineItems)
+            {
+                if (IsTransferWithOtherEndInASplit(li))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        protected bool IsTransferWithOtherEndInASplit(LineItem li)
+        {
+            var household = mainWindowLogic.Household;
+
+            if (li.CategoryAccountID >= 0)
+            {
+                // We have a transfer!
+                var otherEnd = household.Transfers.GetOtherEnd(li.ID);
+                if (otherEnd != null)
+                {
+                    var otherTransaction = household.Transactions.FindByID(otherEnd.CategoryID); 
+                    var otherLineItems = household.LineItems.GetByTransaction(otherTransaction);
+                    if (otherLineItems.Length > 1)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        // Create a mirror transaction. Amount is the amount as seen from the mirror transaction
+        protected void CreateMirrorTransactionForTransfer(int targetAccountID, decimal amount)
+        {
+            var household = mainWindowLogic.Household;
+            var accountRow = household.Accounts.FindByID(targetAccountID);
+
+            // Create new transaction row
+            var transactionRow = household.Transactions.Add(accountRow, data.Date, "", data.Memo, ETransactionStatus.Pending);
+            TransID = transactionRow.ID;
+
+            // Create banking/investment transaction as needed
+            if (accountRow.Type == EAccountType.Bank)
+            {
+                household.BankingTransactions.Add(transactionRow, ETransactionMedium.Transfer, 0);
+            }
+            else if (accountRow.Type == EAccountType.Investment)
+            {
+                var type = amount > 0 ? EInvestmentTransactionType.TransferCashIn : EInvestmentTransactionType.TransferCashOut;
+                household.InvestmentTransactions.Add(transactionRow, type, null, 0, 0, 0);
+            }
+
+            // Create the one line item
+            household.LineItems.Add(transactionRow, -1, accountID, null, amount);
+
+            // Create the transfer record
+            household.Transfers.Add(accountID, targetAccountID);
+        }
+
+        public void DeleteTransactionFromDataset(int transID, bool alsoDeleteOtherEndOfTransfer = true)
+        {
+            // Delete from dataset
+            var household = mainWindowLogic.Household;
+            var accountRow = household.Accounts.FindByID(accountID);
+            var transactionRow = household.Transactions.FindByID(transID);
+            Household.TransfersRow tx = null;
+
+            // Delete all line items
+            var lineItems = household.LineItems.GetByTransaction(transactionRow);
+            foreach (var lineItem in lineItems)
+            {
+                if (alsoDeleteOtherEndOfTransfer)
+                {
+                    // Delete other end of transfer
+                    var txOtherEnd = household.Transfers.GetOtherEnd(lineItem.ID);
+                    if (txOtherEnd != null)
+                    {
+                        // Remember to delete the transfer row
+                        tx = household.Transfers.GetByLineItem(lineItem);
+                        DeleteTransactionFromDataset(txOtherEnd.TransactionID, false); // recurse
+                    }
+                }
+
+                lineItem.Delete();
+            }
+
+            // Delete banking or investment transaction
+            if (accountRow.Type == EAccountType.Bank)
+            {
+                household.BankingTransactions.GetByTransaction(transactionRow).Delete();
+            }
+            else if (accountRow.Type == EAccountType.Investment)
+            {
+                household.InvestmentTransactions.GetByTransaction(transactionRow).Delete();
+            }
+
+            // Finally delete the transaction
+            transactionRow.Delete();
+
+            // And the transfer tracker
+            if (tx != null)
+            {
+                tx.Delete();
+            }
+
+            mainWindowLogic.CommitChanges();
+        }
+
         // Status string management
         private string GetStatusString()
         {
