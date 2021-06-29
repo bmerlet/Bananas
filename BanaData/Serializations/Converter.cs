@@ -1177,7 +1177,7 @@ namespace BanaData.Serializations
                         Console.WriteLine($"Cannot pair trans from account {sourceTransactionRow.AccountsRow.Name} to {targetAccountRow} on {sourceTransactionRow.Date} for ${sourceLineItemRow.Amount}");
                         Console.WriteLine("Changing category to <none>");
 
-                        sourceLineItemRow.AccountID = -1;
+                        sourceLineItemRow.SetAccountIDNull();
                     }
                     else
                     {
@@ -1203,17 +1203,20 @@ namespace BanaData.Serializations
 
                 Household.TransactionsRow transactionToDelete = null;
                 Household.LineItemsRow lineItemToDelete = null;
+                Household.LineItemsRow lineItemToKeep = null;
 
                 // If one of the transaction is a split, delete the other
                 if (lineItemsRow1.Length > 1)
                 {
                     transactionToDelete = transactionRow2;
                     lineItemToDelete = lineItemRow2;
+                    lineItemToKeep = lineItemRow1;
                 }
                 else if (lineItemsRow2.Length > 1)
                 {
                     transactionToDelete = transactionRow1;
                     lineItemToDelete = lineItemRow1;
+                    lineItemToKeep = lineItemRow2;
                 }
                 else
                 {
@@ -1229,6 +1232,7 @@ namespace BanaData.Serializations
                     {
                         transactionToDelete = transactionRow2;
                         lineItemToDelete = lineItemRow2;
+                        lineItemToKeep = lineItemRow1;
                     }
                     else if (accountRow2.Type == EAccountType.Investment &&
                         household.InvestmentTransactions.GetByTransaction(transactionRow2) is Household.InvestmentTransactionsRow investmentTransactionRow2 &&
@@ -1238,6 +1242,7 @@ namespace BanaData.Serializations
                     {
                         transactionToDelete = transactionRow1;
                         lineItemToDelete = lineItemRow1;
+                        lineItemToKeep = lineItemRow2;
                     }
                     else
                     {
@@ -1247,15 +1252,20 @@ namespace BanaData.Serializations
                             // No 1 is the source
                             transactionToDelete = transactionRow2;
                             lineItemToDelete = lineItemRow2;
+                            lineItemToKeep = lineItemRow1;
                         }
                         else
                         {
                             // No 2 is the source
                             transactionToDelete = transactionRow2;
                             lineItemToDelete = lineItemRow2;
+                            lineItemToKeep = lineItemRow1;
                         }
                     }
                 }
+
+                // Memorize the status of the transaction we are about to delete
+                lineItemToKeep.TransferStatus = transactionToDelete.Status;
 
                 // Delete line item
                 lineItemToDelete.Delete();

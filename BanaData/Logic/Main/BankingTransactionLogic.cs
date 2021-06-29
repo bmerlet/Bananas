@@ -38,7 +38,7 @@ namespace BanaData.Logic.Main
 
         // To create new transactions (not in DB yet)
         public BankingTransactionLogic(MainWindowLogic _mainWindowLogic, BankRegisterLogic _bankRegisterLogic, int _accountID)
-            : this(_mainWindowLogic, _bankRegisterLogic, _accountID, -1,
+            : this(_mainWindowLogic, _bankRegisterLogic, _accountID, AbstractTransactionLogic.TRANSID_NOT_COMMITTED,
                   new BankTransactionData(DateTime.Today, ETransactionMedium.None, 0, "", "", ETransactionStatus.Pending,
                       new LineItem[] { new LineItem(_mainWindowLogic, -1, "", -1, -1, "", 0, false) }))
         {
@@ -154,6 +154,20 @@ namespace BanaData.Logic.Main
             Console.WriteLine($"End edit transaction date {Date.ToShortDateString()} Payee {Payee} amount {Payment}");
 
             // Check the changes
+            if (TransID == TRANSID_TRANSFER_FILLIN)
+            {
+                // We only allow changing the status, as it is stored in the transfer line item
+                var tmpData = new BankTransactionData(data as BankTransactionData);
+                tmpData.Status = backup.Status;
+                if (!tmpData.Equals(backup))
+                {
+                    mainWindowLogic.ErrorMessage("Cannot edit this end of the transfer - please edit the other end");
+                    CancelEdit();
+                    BeginEdit();
+                    return (false, false);
+                }
+            }
+
             if (backup.Status == ETransactionStatus.Reconciled && data.Status != ETransactionStatus.Reconciled)
             {
                 if (!mainWindowLogic.YesNoQuestion("Are you sure you want to un-reconcile this transaction"))
@@ -205,7 +219,7 @@ namespace BanaData.Logic.Main
             var household = mainWindowLogic.Household;
             var accountRow = household.Accounts.FindByID(accountID);
 
-            if (TransID < 0)
+            if (TransID == TRANSID_NOT_COMMITTED)
             {
                 // Create new transaction row
                 var transactionRow = household.Transactions.Add(accountRow, data.Date, data.Payee, data.Memo, data.Status);
@@ -224,6 +238,13 @@ namespace BanaData.Logic.Main
                     var liRow = household.LineItems.Add(transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount);
                     li.ID = liRow.ID;
                 }
+            }
+            else if (TransID == TRANSID_TRANSFER_FILLIN)
+            {
+                // Modification of status for transfer pseudo-transaction
+                // The status for the transactionless end of the transfer is kept in the transfer line item row 
+                var liRow = household.LineItems.FindByID(data.LineItems[0].ID);
+                liRow.TransferStatus = data.Status;
             }
             else
             {
@@ -392,20 +413,6 @@ namespace BanaData.Logic.Main
             }
 
             return result + 1;
-        }
-
-        #endregion
-
-        #region Overrides
-
-        public override bool Equals(object obj)
-        {
-            return obj is BankingTransactionLogic o && TransID == o.TransID;
-        }
-
-        public override int GetHashCode()
-        {
-            return TransID.GetHashCode();
         }
 
         #endregion

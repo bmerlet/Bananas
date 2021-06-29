@@ -36,7 +36,7 @@ namespace BanaData.Logic.Main
         public InvestmentTransactionLogic(
             MainWindowLogic _mainWindowLogic,
             int _accountID)
-            : this(_mainWindowLogic, _accountID, -1,
+            : this(_mainWindowLogic, _accountID, AbstractTransactionLogic.TRANSID_NOT_COMMITTED,
                   new InvestmentTransactionData(DateTime.Today, "", "", ETransactionStatus.Pending, new LineItem[] { new LineItem(_mainWindowLogic, -1, "", -1, -1, "", 0, false) },
                     EInvestmentTransactionType.None, -1, 0, 0, 0)) { }
 
@@ -252,6 +252,21 @@ namespace BanaData.Logic.Main
             //
             // Check the changes
             //
+
+            // Dead end of transfer
+            if (TransID == TRANSID_TRANSFER_FILLIN)
+            {
+                // We only allow changing the status, as it is stored in the transfer line item
+                var tmpData = new InvestmentTransactionData(data);
+                tmpData.Status = backup.Status;
+                if (!tmpData.Equals(backup))
+                {
+                    mainWindowLogic.ErrorMessage("Cannot edit this end of the transfer - please edit the other end");
+                    CancelEdit();
+                    BeginEdit();
+                    return (false, false);
+                }
+            }
 
             // No type
             if (data.Type == EInvestmentTransactionType.None)
@@ -725,7 +740,7 @@ namespace BanaData.Logic.Main
             //
             var securityRow = data.SecurityID < 0 ? null : household.Securities.FindByID(data.SecurityID);
 
-            if (TransID < 0)
+            if (TransID == TRANSID_NOT_COMMITTED)
             {
                 // Create new transaction row
                 var transactionRow = household.Transactions.Add(accountRow, data.Date, data.Payee, data.Memo, data.Status);
@@ -738,6 +753,13 @@ namespace BanaData.Logic.Main
                 var li = data.LineItems[0];
                 var liRow = household.LineItems.Add(transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount);
                 li.ID = liRow.ID;
+            }
+            else if (TransID == TRANSID_TRANSFER_FILLIN)
+            {
+                // Modification of status for transfer pseudo-transaction
+                // The status for the transactionless end of the transfer is kept in the transfer line item row 
+                var liRow = household.LineItems.FindByID(data.LineItems[0].ID);
+                liRow.TransferStatus = data.Status;
             }
             else
             {

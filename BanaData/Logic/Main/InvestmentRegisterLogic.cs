@@ -76,7 +76,7 @@ namespace BanaData.Logic.Main
                 transRow.Status,
                 lineItems,
                 investmentTransRow.Type,
-                investmentTransRow.IsSecurityIDNull() ? - 1 : investmentTransRow.SecurityID,
+                investmentTransRow.IsSecurityIDNull() ? -1 : investmentTransRow.SecurityID,
                 investmentTransRow.IsSecurityPriceNull() ?  0 : investmentTransRow.SecurityPrice,
                 investmentTransRow.IsSecurityQuantityNull() ? 0 : investmentTransRow.SecurityQuantity,
                 investmentTransRow.Commission);
@@ -102,7 +102,7 @@ namespace BanaData.Logic.Main
 
             var lineItem = new LineItem(
                 mainWindowLogic,
-                -2, // ZZZZ Use define
+                otherLineItemRow.ID,        // A bit confusing, but we store the transfer line item ID here to be able to modify the TransferStatus
                 "[" + otherAccountRow.Name + "]",
                 -1,
                 otherAccountRow.ID,
@@ -113,7 +113,7 @@ namespace BanaData.Logic.Main
                 otherTransRow.Date,
                 "",
                 otherTransRow.IsMemoNull() ? "" : otherTransRow.Memo,
-                otherTransRow.Status,
+                otherLineItemRow.TransferStatus,
                 new LineItem[] { lineItem },
                 lineItem.Amount > 0 ? EInvestmentTransactionType.TransferCashIn : EInvestmentTransactionType.TransferCashOut,
                 -1, 0, 0, 0);

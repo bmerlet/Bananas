@@ -13,7 +13,7 @@ namespace BanaData.Logic.Main
 {
     public abstract class AbstractTransactionLogic : LogicBase, IEditableObject
     {
-        #region Private members
+        #region Protected members
 
         // Parent logic
         protected readonly MainWindowLogic mainWindowLogic;
@@ -27,6 +27,9 @@ namespace BanaData.Logic.Main
         // Backup of data (taken at edit start)
         protected BaseTransactionData backup;
 
+        public const int TRANSID_NOT_COMMITTED = -1;
+        public const int TRANSID_TRANSFER_FILLIN = -2;
+ 
         #endregion
 
         #region Constructor

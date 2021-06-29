@@ -83,7 +83,11 @@ namespace BanaData.Logic.Main
                 if (selectedAccount != value)
                 {
                     selectedAccount = value;
-                    AccountClicked?.Invoke(this, new AccountClickedEventArgs(selectedAccount.AccountID));
+                    if (value != null)
+                    {
+                        AccountClicked?.Invoke(this, new AccountClickedEventArgs(selectedAccount.AccountID));
+                    }
+                    OnPropertyChanged(() => SelectedAccount);
                 }
             }
         }

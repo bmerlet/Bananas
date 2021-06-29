@@ -90,7 +90,7 @@ namespace BanaData.Logic.Main
 
             var lineItem = new LineItem(
                 mainWindowLogic,
-                -2, // ZZZZ Use define
+                otherLineItemRow.ID,        // A bit confusing, but we store the transfer line item ID here to be able to modify the TransferStatus
                 "[" + otherAccountRow.Name + "]",
                 -1,
                 otherAccountRow.ID,
@@ -103,10 +103,10 @@ namespace BanaData.Logic.Main
                 0,
                 "",
                 otherTransRow.IsMemoNull() ? "" : otherTransRow.Memo,
-                otherTransRow.Status,
+                otherLineItemRow.TransferStatus,
                 new LineItem[] { lineItem });
 
-            var bankingTransaction = new BankingTransactionLogic(mainWindowLogic, this, accountID, -2, transactionData);
+            var bankingTransaction = new BankingTransactionLogic(mainWindowLogic, this, accountID, AbstractTransactionLogic.TRANSID_TRANSFER_FILLIN, transactionData);
 
             return bankingTransaction;
         }

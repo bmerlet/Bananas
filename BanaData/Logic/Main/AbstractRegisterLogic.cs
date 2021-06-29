@@ -172,7 +172,7 @@ namespace BanaData.Logic.Main
             var transaction = SelectedTransaction;
             if (transaction != null)
             {
-                bool wasEmptyTransaction = transaction.TransID < 0;
+                bool wasEmptyTransaction = transaction.TransID == AbstractTransactionLogic.TRANSID_NOT_COMMITTED;
 
                 (bool needCommit, bool moveDown) = transaction.ValidateEndEdit();
 

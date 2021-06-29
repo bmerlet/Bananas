@@ -59,9 +59,9 @@ namespace BanaData.Logic.Main
             BankRegister = new BankRegisterLogic(this);
             InvestmentRegister = new InvestmentRegisterLogic(this);
 
-            BankAccountGroup.AccountClicked += (o, e) => OnBankAccountClicked(e.AccountID);
+            BankAccountGroup.AccountClicked += (o, e) => OnBankAccountClicked(o as AccountGroupLogic, e.AccountID);
             InvestmentAccountGroup.AccountClicked += (o, e) => OnInvestmentAccountClicked(e.AccountID);
-            AssetAccountGroup.AccountClicked += (o, e) => OnBankAccountClicked(e.AccountID);
+            AssetAccountGroup.AccountClicked += (o, e) => OnBankAccountClicked(o as AccountGroupLogic, e.AccountID);
 
             if (UserSettings.LastFileOpened != null)
             {
@@ -271,8 +271,18 @@ namespace BanaData.Logic.Main
             BuildMemorizedPayeeList();
         }
 
-        public void OnBankAccountClicked(int accountID)
+        public void OnBankAccountClicked(AccountGroupLogic sender, int accountID)
         {
+            InvestmentAccountGroup.SelectedAccount = null;
+            if (sender == AssetAccountGroup)
+            {
+                BankAccountGroup.SelectedAccount = null;
+            }
+            else
+            {
+                AssetAccountGroup.SelectedAccount = null;
+            }
+
             BankRegister.SetAccount(accountID);
             DisplayedAccountID = accountID;
             MainMenuLogic.Reconcile.SetCanExecute(accountID >= 0);
@@ -284,6 +294,9 @@ namespace BanaData.Logic.Main
 
         public void OnInvestmentAccountClicked(int accountID)
         {
+            BankAccountGroup.SelectedAccount = null;
+            AssetAccountGroup.SelectedAccount = null;
+
             InvestmentRegister.SetAccount(accountID);
             DisplayedAccountID = accountID;
             MainMenuLogic.Reconcile.SetCanExecute(accountID >= 0);

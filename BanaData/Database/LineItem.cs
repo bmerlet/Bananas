@@ -13,6 +13,16 @@ namespace BanaData.Database
 {
     public partial class Household
     {
+        partial class LineItemsRow
+        {
+            // Bridges to local enum types
+            public ETransactionStatus TransferStatus
+            {
+                get { return (ETransactionStatus)ITransferStatus; }
+                set { ITransferStatus = (int)value; }
+            }
+        }
+
         partial class LineItemsDataTable
         {
             public LineItemsRow[] GetByTransaction(Household.TransactionsRow transactionRow)

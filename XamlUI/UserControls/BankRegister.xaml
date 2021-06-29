@@ -267,7 +267,13 @@
                 Watermark="Payment"
                 Amount="{Binding EditedTransaction.Payment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 IsTabStop="{Binding EditedTransaction.IsPaymentTabStop}"/>
-            
+
+            <!-- Status -->
+            <ComboBox
+                Grid.Column="6"
+                ItemsSource="{Binding EditedTransaction.StatusSource}"
+                SelectedItem="{Binding EditedTransaction.Status, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
             <!-- Deposit -->
             <local:AmountBox
                 Grid.Column="7"
