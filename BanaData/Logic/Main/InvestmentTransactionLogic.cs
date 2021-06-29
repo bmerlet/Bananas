@@ -44,56 +44,15 @@ namespace BanaData.Logic.Main
 
         #region Logic Properties
 
-        public bool IsCashIn =>
-            data.Type == EInvestmentTransactionType.Cash ||
-            data.Type == EInvestmentTransactionType.InterestIncome ||
-            data.Type == EInvestmentTransactionType.Dividends ||
-            data.Type == EInvestmentTransactionType.ShortTermCapitalGains ||
-            data.Type == EInvestmentTransactionType.LongTermCapitalGains ||
-            data.Type == EInvestmentTransactionType.TransferCash ||
-            data.Type == EInvestmentTransactionType.TransferCashIn ||
-            data.Type == EInvestmentTransactionType.TransferMiscellaneousIncomeIn ||
-            data.Type == EInvestmentTransactionType.ReturnOnCapital ||
-            data.Type == EInvestmentTransactionType.Exercise ||
-            data.Type == EInvestmentTransactionType.Sell;
+        public bool IsCashIn => Household.InvestmentTransactionsRow.CashIn(data.Type);
 
-        public bool IsCashOut =>
-            data.Type == EInvestmentTransactionType.TransferCashOut ||
-            data.Type == EInvestmentTransactionType.Buy;
+        public bool IsCashOut => Household.InvestmentTransactionsRow.CashOut(data.Type);
 
-        public bool IsSecurityIn =>
-            data.Type == EInvestmentTransactionType.SharesIn ||
-            data.Type == EInvestmentTransactionType.BuyFromTransferredCash ||
-            data.Type == EInvestmentTransactionType.ReinvestDividends ||
-            data.Type == EInvestmentTransactionType.ReinvestShortTermCapitalGains ||
-            data.Type == EInvestmentTransactionType.ReinvestMediumTermCapitalGains ||
-            data.Type == EInvestmentTransactionType.ReinvestLongTermCapitalGains ||
-            data.Type == EInvestmentTransactionType.Buy;
+        public bool IsSecurityIn => Household.InvestmentTransactionsRow.SecurityIn(data.Type);
 
-        public bool IsSecurityOut =>
-            data.Type == EInvestmentTransactionType.SharesOut ||
-            data.Type == EInvestmentTransactionType.SellAndTransferCash ||
-            data.Type == EInvestmentTransactionType.Sell;
+        public bool IsSecurityOut => Household.InvestmentTransactionsRow.SecurityOut(data.Type);
 
-        public override decimal AmountForCashBalance
-        {
-            get
-            {
-                decimal result = 0;
-                if (data.Amount != 0)
-                {
-                    if (IsCashIn)
-                    {
-                        result = data.Amount;
-                    }
-                    else if (IsCashOut)
-                    {
-                        result = -data.Amount;
-                    }
-                }
-                return result;
-            }
-        }
+        public override decimal AmountForCashBalance => (IsCashIn || IsCashOut) ? data.Amount : 0;
 
         public int SecurityID => data.SecurityID;
         public decimal SecurityQuantityDecimal => data.SecurityQuantity;

@@ -20,6 +20,62 @@ namespace BanaData.Database
                 get { return (EInvestmentTransactionType)IType; }
                 set { IType = (int)value; }
             }
+
+            public bool IsCashIn => CashIn(Type);
+            public bool IsCashOut => CashOut(Type);
+            public bool IsTransferIn => TransferIn(Type);
+            public bool IsTransferOut => TransferOut(Type);
+            public bool IsSecurityIn => SecurityIn(Type);
+            public bool IsSecurityOut => SecurityOut(Type);
+
+            // Transactions that add to the cash balance
+            static public bool CashIn(EInvestmentTransactionType type) =>
+                type == EInvestmentTransactionType.Cash ||
+                type == EInvestmentTransactionType.InterestIncome ||
+                type == EInvestmentTransactionType.Dividends ||
+                type == EInvestmentTransactionType.ShortTermCapitalGains ||
+                type == EInvestmentTransactionType.LongTermCapitalGains ||
+                type == EInvestmentTransactionType.TransferCash ||
+                type == EInvestmentTransactionType.TransferCashIn ||
+                type == EInvestmentTransactionType.TransferMiscellaneousIncomeIn ||
+                type == EInvestmentTransactionType.ReturnOnCapital ||
+                type == EInvestmentTransactionType.Sell;
+
+            // Transactions that remove from the cash balance
+            static public bool CashOut(EInvestmentTransactionType type) =>
+                type == EInvestmentTransactionType.TransferCashOut ||
+                type == EInvestmentTransactionType.Buy;
+
+            // Transactions that transfer cash into the account 
+            static public bool TransferIn(EInvestmentTransactionType type) =>
+                type == EInvestmentTransactionType.TransferCash ||
+                type == EInvestmentTransactionType.TransferCashIn ||
+                type == EInvestmentTransactionType.BuyFromTransferredCash ||
+                type == EInvestmentTransactionType.TransferMiscellaneousIncomeIn;
+
+            // Transactions that transfer cash out of the the account 
+            static public bool TransferOut(EInvestmentTransactionType type) =>
+                type == EInvestmentTransactionType.TransferCashOut ||
+                type == EInvestmentTransactionType.SellAndTransferCash ||
+                type == EInvestmentTransactionType.TransferDividends ||
+                type == EInvestmentTransactionType.TransferShortTermCapitalGains ||
+                type == EInvestmentTransactionType.TransferLongTermCapitalGains;
+
+            // Transactions that adds more shares of a security
+            static public bool SecurityIn(EInvestmentTransactionType type) =>
+                type == EInvestmentTransactionType.SharesIn ||
+                type == EInvestmentTransactionType.BuyFromTransferredCash ||
+                type == EInvestmentTransactionType.ReinvestDividends ||
+                type == EInvestmentTransactionType.ReinvestShortTermCapitalGains ||
+                type == EInvestmentTransactionType.ReinvestMediumTermCapitalGains ||
+                type == EInvestmentTransactionType.ReinvestLongTermCapitalGains ||
+                type == EInvestmentTransactionType.Buy;
+
+            // Transactions that removes some shares of a security
+            static public bool SecurityOut(EInvestmentTransactionType type) =>
+                type == EInvestmentTransactionType.SharesOut ||
+                type == EInvestmentTransactionType.SellAndTransferCash ||
+                type == EInvestmentTransactionType.Sell;
         }
 
         partial class InvestmentTransactionsDataTable

@@ -22,15 +22,9 @@ namespace BanaData.Database
             this.lots = new List<Lot>();
         }
 
-        public decimal CashBalance
-        {
-            get { return cashBalance; }
-        }
+        public decimal CashBalance => cashBalance;
 
-        public List<Lot> Lots
-        {
-            get { return lots; }
-        }
+        public IEnumerable<Lot> Lots => lots;
 
         public void ApplyTransaction(Household household, Household.TransactionsRow transaction)
         {
@@ -46,63 +40,24 @@ namespace BanaData.Database
 
             // Don't! The commission is taken into account in the transaction's amount
             //cashBalance -= investmentTransaction.Commission;
-
-            switch (investmentTransaction.Type)
+            if (investmentTransaction.IsCashIn || investmentTransaction.IsCashOut)
             {
-                case EInvestmentTransactionType.Cash:
-                case EInvestmentTransactionType.InterestIncome:
-                case EInvestmentTransactionType.Dividends:
-                case EInvestmentTransactionType.ShortTermCapitalGains:
-                case EInvestmentTransactionType.LongTermCapitalGains:
-                case EInvestmentTransactionType.TransferCash:
-                case EInvestmentTransactionType.TransferCashIn:
-                case EInvestmentTransactionType.TransferMiscellaneousIncomeIn:
-                case EInvestmentTransactionType.ReturnOnCapital:
-                case EInvestmentTransactionType.Exercise:
-                    cashBalance += transaction.GetAmount();
-                    break;
-
-                case EInvestmentTransactionType.TransferCashOut:
-                    cashBalance -= transaction.GetAmount();
-                    break;
-
-                case EInvestmentTransactionType.SharesIn:
-                case EInvestmentTransactionType.BuyFromTransferredCash:
-                case EInvestmentTransactionType.ReinvestDividends:
-                case EInvestmentTransactionType.ReinvestShortTermCapitalGains:
-                case EInvestmentTransactionType.ReinvestMediumTermCapitalGains:
-                case EInvestmentTransactionType.ReinvestLongTermCapitalGains:
-                    AddShares(transaction.Date, security, investmentTransaction.SecurityQuantity);
-                    break;
-
-                case EInvestmentTransactionType.Buy:
-                    cashBalance -= transaction.GetAmount();
-                    AddShares(transaction.Date, security, investmentTransaction.SecurityQuantity);
-                    break;
-
-                case EInvestmentTransactionType.SharesOut:
-                case EInvestmentTransactionType.SellAndTransferCash:
-                    RemoveShares(transaction.Date, security, investmentTransaction.SecurityQuantity);
-                    break;
-                case EInvestmentTransactionType.Sell:
-                    cashBalance += transaction.GetAmount();
-                    RemoveShares(transaction.Date, security, investmentTransaction.SecurityQuantity);
-                    break;
-
-                case EInvestmentTransactionType.Grant:
-                case EInvestmentTransactionType.Vest:
-                case EInvestmentTransactionType.Expire:
-                    break;
-
-                // ZZZ
-                case EInvestmentTransactionType.TransferDividends:
-                case EInvestmentTransactionType.TransferLongTermCapitalGains:
-                case EInvestmentTransactionType.TransferShortTermCapitalGains:
-                    break;
-
-                default:
-                    throw new InvalidOperationException("Unknown operation " + investmentTransaction.Type);
+                cashBalance += transaction.GetAmount();
             }
+
+            if (investmentTransaction.IsSecurityIn)
+            {
+                AddShares(transaction.Date, security, investmentTransaction.SecurityQuantity);
+            }
+            else if (investmentTransaction.IsSecurityOut)
+            {
+                RemoveShares(transaction.Date, security, investmentTransaction.SecurityQuantity);
+            }
+        }
+
+        public void ApplyTransfer(Household household, Household.LineItemsRow lineItem)
+        {
+            cashBalance -= lineItem.Amount;
         }
 
         private void AddShares(DateTime date, Household.SecuritiesRow security, decimal quantity)

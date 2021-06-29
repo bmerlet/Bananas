@@ -69,7 +69,6 @@
     <Compile Include="Database\Security.cs" />
     <Compile Include="Database\SecurityPrice.cs" />
     <Compile Include="Database\Transaction.cs" />
-    <Compile Include="Database\Transfers.cs" />
     <Compile Include="Logic\Dialogs\EditAccountLogic.cs" />
     <Compile Include="Logic\Dialogs\EditAccountsLogic.cs" />
     <Compile Include="Logic\Dialogs\EditCategoriesLogic.cs" />

@@ -105,6 +105,20 @@ namespace BanaData.Logic.Main
                 temporaryTransactionList.Add(trans);
             }
 
+            // Now find all transfers to this account ID from a difffernet account and create placeholder transactions
+            foreach (Household.LineItemsRow lineItemRow in household.LineItems.Rows)
+            {
+                if (!lineItemRow.IsAccountIDNull() && lineItemRow.AccountID == accountID)
+                {
+                    var transferTransactionRow = household.Transactions.FindByID(lineItemRow.TransactionID);
+                    if (transferTransactionRow.AccountID != accountID)
+                    {
+                        var trans = CreateMirrorTransaction(account, lineItemRow);
+                        temporaryTransactionList.Add(trans);
+                    }
+                }
+            }
+
             // Publish the transactions
             transactions.ReplaceRange(temporaryTransactionList);
 
@@ -261,13 +275,6 @@ namespace BanaData.Logic.Main
                 return;
             }
 
-            // Can't remove a transfer if the other end is in a split
-            if (atl.IsTransferWithOtherEndInASplit())
-            {
-                mainWindowLogic.ErrorMessage("This transaction cannot be deleted because the transfer target is part of a split transaction");
-                return;
-            }
-
             // We want to select the next transaction afterwards
             var transactionToSelect = GetNextTransaction(atl) as AbstractTransactionLogic;
 
@@ -403,6 +410,11 @@ namespace BanaData.Logic.Main
             Household.AccountsRow account,
             Household.TransactionsRow transRow,
             List<LineItem> lineItems);
+
+        // Create a mirror pseudo-transaction for transfers
+        protected abstract AbstractTransactionLogic CreateMirrorTransaction(
+            Household.AccountsRow account,
+            Household.LineItemsRow lineItem);
 
         // Creaste an empty transaction
         protected abstract AbstractTransactionLogic CreateEmptyTransaction();

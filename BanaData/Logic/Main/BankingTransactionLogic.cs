@@ -174,22 +174,6 @@ namespace BanaData.Logic.Main
                 }
             }
 
-            // Check that if a transfer was deleted or changed in the line items, it is not in a split on the other side
-            foreach(var prevLineItem in backup.LineItems.Where(li => li.CategoryAccountID >= 0))
-            {
-                var curLineItem = data.LineItems.FirstOrDefault(li => li.CategoryAccountID == prevLineItem.CategoryAccountID);
-                if (curLineItem == null || curLineItem.Amount != prevLineItem.Amount)
-                {
-                    if (IsTransferWithOtherEndInASplit(prevLineItem))
-                    {
-                        mainWindowLogic.ErrorMessage("This transfer cannot be modified or deleted because the transfer target is part of a split transaction");
-                        CancelEdit();
-                        BeginEdit();
-                        return (false, false);
-                    }
-                }
-            }
-
             return (true, true);
         }
 
@@ -239,12 +223,6 @@ namespace BanaData.Logic.Main
                 {
                     var liRow = household.LineItems.Add(transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount);
                     li.ID = liRow.ID;
-
-                    // Create transfer mirror transaction
-                    if (li.CategoryAccountID >= 0)
-                    {
-                        CreateMirrorTransactionForTransfer(li.CategoryAccountID, -li.Amount);
-                    }
                 }
             }
             else
@@ -268,16 +246,6 @@ namespace BanaData.Logic.Main
                     if (li.ID >= 0 && data.LineItems.FirstOrDefault(l => l.ID == li.ID) == null)
                     {
                         household.LineItems.FindByID(li.ID).Delete();
-
-                        // Delete mirror transaction for transfers
-                        if (li.CategoryAccountID >= 0)
-                        {
-                            var txOtherEnd = household.Transfers.GetOtherEnd(li.ID);
-                            if (txOtherEnd != null)
-                            {
-                                DeleteTransactionFromDataset(txOtherEnd.TransactionID, false);
-                            }
-                        }
                     }
                 }
                 // Second update or create the other ones
@@ -287,31 +255,11 @@ namespace BanaData.Logic.Main
                     {
                         var liRow = household.LineItems.FindByID(li.ID);
                         household.LineItems.Update(liRow, transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount);
-
-                        // Update transfer mirror transaction
-                        if (li.CategoryAccountID >= 0)
-                        {
-                            var liOtherEnd = household.Transfers.GetOtherEnd(li.ID);
-                            if (liOtherEnd != null)
-                            {
-                                var transOtherEnd = household.Transactions.FindByID(liOtherEnd.TransactionID);
-                                var accountOtherEnd = household.Accounts.FindByID(transOtherEnd.AccountID);
-                                decimal amountOtherEnd = accountOtherEnd.Type == EAccountType.Investment ? Math.Abs(li.Amount) : -li.Amount;
-                                household.LineItems.Update(liOtherEnd, transOtherEnd, liOtherEnd.CategoryID, liOtherEnd.AccountID, liOtherEnd.Memo, amountOtherEnd);
-                                // ZZZ Need to update investment transaction XIn/XOut if amount has changed sign ZZZZZZZZZZZ
-                            }
-                        }
                     }
                     else
                     {
                         var liRow = household.LineItems.Add(transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount);
                         li.ID = liRow.ID;
-
-                        // Create transfer mirror transaction
-                        if (li.CategoryAccountID >= 0)
-                        {
-                            CreateMirrorTransactionForTransfer(li.CategoryAccountID, -li.Amount);
-                        }
                     }
                 }
             }

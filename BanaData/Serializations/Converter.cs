@@ -736,6 +736,11 @@ namespace BanaData.Serializations
                 throw new InvalidDataException("QIF parser: Mysterious amount not the same as regular amount - " + amount + " - " + otherMysteriousAmount);
             }
 
+            if (Household.InvestmentTransactionsRow.CashOut(type) || Household.InvestmentTransactionsRow.TransferOut(type))
+            {
+                amount = -amount;
+            }
+
             var transRow = household.Transactions.Add(accountRow, date, altMemo, mainMemo, status);
             household.LineItems.Add(transRow, categoryID, categoryAccountID, null, amount);
             household.InvestmentTransactions.Add(transRow, type, securityRow, securityPrice, securityQuantity, commission);
@@ -1111,7 +1116,9 @@ namespace BanaData.Serializations
         {
             var pairs = new List<Tuple<int, int>>();
 
+            //
             // Go over all line items
+            //
             foreach(Household.LineItemsRow sourceLineItemRow in household.LineItems.Rows)
             {
                 // Find transfers
@@ -1126,6 +1133,13 @@ namespace BanaData.Serializations
 
                     var sourceTransactionRow = household.Transactions.FindByID(sourceLineItemRow.TransactionID);
                     int targetAccountID = sourceLineItemRow.AccountID;
+
+                    // Skip transfers to self
+                    if (targetAccountID == sourceTransactionRow.AccountID)
+                    {
+                        continue;
+                    }
+
                     Tuple<int, int> tuple = null;
 
                     // Look for transactions on the same date in the target account
@@ -1141,7 +1155,8 @@ namespace BanaData.Serializations
                             {
                                 if (!targetLineItemRow.IsAccountIDNull() &&
                                     targetLineItemRow.AccountID == sourceTransactionRow.AccountID &&
-                                    Math.Abs(targetLineItemRow.Amount) == Math.Abs(sourceLineItemRow.Amount)) // Refine abs ZZZ
+                                    Math.Abs(targetLineItemRow.Amount) == Math.Abs(sourceLineItemRow.Amount) && // Refine abs ZZZ
+                                    pairs.Find(p => p.Item2 == targetLineItemRow.ID) == null) // Not used already
                                 {
                                     // Found pair!
                                     tuple = new Tuple<int, int>(sourceLineItemRow.ID, targetLineItemRow.ID);
@@ -1160,6 +1175,9 @@ namespace BanaData.Serializations
                     {
                         var targetAccountRow = household.Accounts.FindByID(targetAccountID);
                         Console.WriteLine($"Cannot pair trans from account {sourceTransactionRow.AccountsRow.Name} to {targetAccountRow} on {sourceTransactionRow.Date} for ${sourceLineItemRow.Amount}");
+                        Console.WriteLine("Changing category to <none>");
+
+                        sourceLineItemRow.AccountID = -1;
                     }
                     else
                     {
@@ -1168,12 +1186,91 @@ namespace BanaData.Serializations
                 }
             }
 
-            // Add the pairs to the DB
             Console.WriteLine($"Found {pairs.Count} transfers");
 
+            //
+            // Remove one end of the pair
+            //
             foreach (var pair in pairs)
             {
-                household.Transfers.Add(pair.Item1, pair.Item2);
+                var lineItemRow1 = household.LineItems.FindByID(pair.Item1);
+                var transactionRow1 = household.Transactions.FindByID(lineItemRow1.TransactionID);
+                var lineItemsRow1 = household.LineItems.GetByTransaction(transactionRow1);
+
+                var lineItemRow2 = household.LineItems.FindByID(pair.Item2);
+                var transactionRow2 = household.Transactions.FindByID(lineItemRow2.TransactionID);
+                var lineItemsRow2 = household.LineItems.GetByTransaction(transactionRow2);
+
+                Household.TransactionsRow transactionToDelete = null;
+                Household.LineItemsRow lineItemToDelete = null;
+
+                // If one of the transaction is a split, delete the other
+                if (lineItemsRow1.Length > 1)
+                {
+                    transactionToDelete = transactionRow2;
+                    lineItemToDelete = lineItemRow2;
+                }
+                else if (lineItemsRow2.Length > 1)
+                {
+                    transactionToDelete = transactionRow1;
+                    lineItemToDelete = lineItemRow1;
+                }
+                else
+                {
+                    // If one of the transactions is an investment transaction involving securities, delete the other
+                    var accountRow1 = household.Accounts.FindByID(transactionRow1.AccountID);
+                    var accountRow2 = household.Accounts.FindByID(transactionRow2.AccountID);
+
+                    if (accountRow1.Type == EAccountType.Investment &&
+                        household.InvestmentTransactions.GetByTransaction(transactionRow1) is Household.InvestmentTransactionsRow investmentTransactionRow1 &&
+                        investmentTransactionRow1.Type != EInvestmentTransactionType.TransferCash &&
+                        investmentTransactionRow1.Type != EInvestmentTransactionType.TransferCashIn &&
+                        investmentTransactionRow1.Type != EInvestmentTransactionType.TransferCashOut)
+                    {
+                        transactionToDelete = transactionRow2;
+                        lineItemToDelete = lineItemRow2;
+                    }
+                    else if (accountRow2.Type == EAccountType.Investment &&
+                        household.InvestmentTransactions.GetByTransaction(transactionRow2) is Household.InvestmentTransactionsRow investmentTransactionRow2 &&
+                        investmentTransactionRow2.Type != EInvestmentTransactionType.TransferCash &&
+                        investmentTransactionRow2.Type != EInvestmentTransactionType.TransferCashIn &&
+                        investmentTransactionRow2.Type != EInvestmentTransactionType.TransferCashOut)
+                    {
+                        transactionToDelete = transactionRow1;
+                        lineItemToDelete = lineItemRow1;
+                    }
+                    else
+                    {
+                        // Arbitrarily delete the destination (where the funds go to)
+                        if (lineItemRow1.Amount < 0)
+                        {
+                            // No 1 is the source
+                            transactionToDelete = transactionRow2;
+                            lineItemToDelete = lineItemRow2;
+                        }
+                        else
+                        {
+                            // No 2 is the source
+                            transactionToDelete = transactionRow2;
+                            lineItemToDelete = lineItemRow2;
+                        }
+                    }
+                }
+
+                // Delete line item
+                lineItemToDelete.Delete();
+
+                // Delete transaction
+                var accountOfTransactionToDeleteRow = household.Accounts.FindByID(transactionToDelete.AccountID);
+                if (accountOfTransactionToDeleteRow.Type == EAccountType.Investment)
+                {
+                    household.InvestmentTransactions.GetByTransaction(transactionToDelete).Delete();
+                }
+                else if (accountOfTransactionToDeleteRow.Type == EAccountType.Bank)
+                {
+                    household.BankingTransactions.GetByTransaction(transactionToDelete).Delete();
+                }
+                transactionToDelete.Delete();
             }
         }
 

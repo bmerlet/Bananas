@@ -51,28 +51,42 @@ namespace BanaData.Database
             // Get the balance of a banking account
             public decimal GetBankingBalance()
             {
-                decimal balance = 0;
-
-                var accountToTransactions = Table.ChildRelations["FK_Accounts_Transactions"];
-                foreach (Household.TransactionsRow transaction in GetChildRows(accountToTransactions))
-                {
-                    balance += transaction.GetAmount();
-                }
-
-                return balance;
+                return GetBankingBalance(false);
             }
 
             // Get the reconciled balance of a banking account
             public decimal GetBankingReconciledBalance()
             {
+                return GetBankingBalance(true, ETransactionStatus.Reconciled);
+            }
+
+            // Get the balance of a banking account
+            private decimal GetBankingBalance(bool filter, ETransactionStatus statusToFilterOn = ETransactionStatus.Pending)
+            {
                 decimal balance = 0;
 
+                // Find balance from all transactions
                 var accountToTransactions = Table.ChildRelations["FK_Accounts_Transactions"];
                 foreach (Household.TransactionsRow transaction in GetChildRows(accountToTransactions))
                 {
-                    if (transaction.Status == ETransactionStatus.Reconciled)
+                    if (!filter || transaction.Status == statusToFilterOn)
                     {
                         balance += transaction.GetAmount();
+                    }
+                }
+
+                // Add tansfers to/from that account
+                var accountToLineItem = Table.ChildRelations["Accounts_LineItems"];
+                foreach (Household.LineItemsRow lineItemRow in GetChildRows(accountToLineItem))
+                {
+                    var transRow = ((Household)Table.DataSet).Transactions.FindByID(lineItemRow.TransactionID);
+                    if (transRow.AccountID != ID)
+                    {
+                        if (!filter ||
+                            (((Household)Table.DataSet).Transactions.FindByID(lineItemRow.TransactionID) is Household.TransactionsRow trans && trans.Status == statusToFilterOn))
+                        {
+                            balance -= lineItemRow.Amount;
+                        }
                     }
                 }
 
@@ -96,9 +110,20 @@ namespace BanaData.Database
                 // Compute the portfolio
                 var portfolio = new Portfolio();
                 var accountToTransaction = Table.ChildRelations["FK_Accounts_Transactions"];
-                foreach (var transRow in GetChildRows(accountToTransaction))
+                foreach (Household.TransactionsRow transRow in GetChildRows(accountToTransaction))
                 {
-                    portfolio.ApplyTransaction(household, transRow as Household.TransactionsRow);
+                    portfolio.ApplyTransaction(household, transRow);
+                }
+
+                // Add tansfers to/from that account
+                var accountToLineItem = Table.ChildRelations["Accounts_LineItems"];
+                foreach (Household.LineItemsRow lineItemRow in GetChildRows(accountToLineItem))
+                {
+                    var transRow = household.Transactions.FindByID(lineItemRow.TransactionID);
+                    if (transRow.AccountID != ID)
+                    {
+                        portfolio.ApplyTransfer(household, lineItemRow);
+                    }
                 }
 
                 // Get latest price for the securities in the portfolio

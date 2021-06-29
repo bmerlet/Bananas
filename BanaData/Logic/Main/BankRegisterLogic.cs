@@ -79,6 +79,39 @@ namespace BanaData.Logic.Main
             return new BankingTransactionLogic(mainWindowLogic, this, accountID);
         }
 
+        // Create a mirror pseudo-transaction for transfers
+        protected override AbstractTransactionLogic CreateMirrorTransaction(
+            Household.AccountsRow accountRow,
+            Household.LineItemsRow otherLineItemRow)
+        {
+            var household = mainWindowLogic.Household;
+            var otherTransRow = household.Transactions.FindByID(otherLineItemRow.TransactionID);
+            var otherAccountRow = household.Accounts.FindByID(otherTransRow.AccountID);
+
+            var lineItem = new LineItem(
+                mainWindowLogic,
+                -2, // ZZZZ Use define
+                "[" + otherAccountRow.Name + "]",
+                -1,
+                otherAccountRow.ID,
+                otherLineItemRow.IsMemoNull() ? "" : otherLineItemRow.Memo,
+                -otherLineItemRow.Amount, false);
+
+            var transactionData = new BankingTransactionLogic.BankTransactionData(
+                otherTransRow.Date,
+                ETransactionMedium.None,
+                0,
+                "",
+                otherTransRow.IsMemoNull() ? "" : otherTransRow.Memo,
+                otherTransRow.Status,
+                new LineItem[] { lineItem });
+
+            var bankingTransaction = new BankingTransactionLogic(mainWindowLogic, this, accountID, -2, transactionData);
+
+            return bankingTransaction;
+        }
+
+
         #endregion
 
         #region Supporting classes
