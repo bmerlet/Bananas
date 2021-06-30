@@ -283,7 +283,12 @@ namespace BanaData.Logic.Main
                 AssetAccountGroup.SelectedAccount = null;
             }
 
-            BankRegister.SetAccount(accountID);
+            OnBankAccountClicked(accountID);
+        }
+
+        private void OnBankAccountClicked(int accountID, int transactionID = int.MinValue, int lineItemID = int.MinValue)
+        { 
+            BankRegister.SetAccount(accountID, transactionID, lineItemID);
             DisplayedAccountID = accountID;
             MainMenuLogic.Reconcile.SetCanExecute(accountID >= 0);
             IsInvestmentRegisterVisible = false;
@@ -292,18 +297,35 @@ namespace BanaData.Logic.Main
             OnPropertyChanged(() => IsBankRegisterVisible);
         }
 
-        public void OnInvestmentAccountClicked(int accountID)
+        public void OnInvestmentAccountClicked(int accountID, int transactionID = int.MinValue, int lineItemID = int.MinValue)
         {
             BankAccountGroup.SelectedAccount = null;
             AssetAccountGroup.SelectedAccount = null;
 
-            InvestmentRegister.SetAccount(accountID);
+            InvestmentRegister.SetAccount(accountID, transactionID, lineItemID);
             DisplayedAccountID = accountID;
             MainMenuLogic.Reconcile.SetCanExecute(accountID >= 0);
             IsInvestmentRegisterVisible = true;
             IsBankRegisterVisible = false;
             OnPropertyChanged(() => IsInvestmentRegisterVisible);
             OnPropertyChanged(() => IsBankRegisterVisible);
+        }
+
+        public void GotoTransaction(int accountID, int transactionID, int lineItemID)
+        {
+            BankAccountGroup.SelectedAccount = null;
+            AssetAccountGroup.SelectedAccount = null;
+            InvestmentAccountGroup.SelectedAccount = null;
+
+            var accountRow = Household.Accounts.FindByID(accountID);
+            if (accountRow.Type == EAccountType.Investment)
+            {
+                OnInvestmentAccountClicked(accountID, transactionID, lineItemID);
+            }
+            else
+            {
+                OnBankAccountClicked(accountID, transactionID, lineItemID);
+            }
         }
 
         #endregion

@@ -76,7 +76,7 @@ namespace BanaData.Logic.Main
         #region Public Actions
 
         // Set the account to display
-        public void SetAccount(int _accountID)
+        public void SetAccount(int _accountID, int transactionID, int lineItemID)
         {
             // Remember which account we are displaying 
             accountID = _accountID;
@@ -122,8 +122,43 @@ namespace BanaData.Logic.Main
             // Publish the transactions
             transactions.ReplaceRange(temporaryTransactionList);
 
-            // Add new empty transaction at the bottom
-            AddEmptyTransactionAtBottom();
+            // If asked to go to a specific transaction, go there
+            if (transactionID != int.MinValue && lineItemID != int.MinValue)
+            {
+                // Add new empty transaction at the bottom but don't select it
+                AddEmptyTransactionAtBottom(true);
+
+                // Find the transaction to select
+                AbstractTransactionLogic transToSelect;
+                if (transactionID == AbstractTransactionLogic.TRANSID_TRANSFER_FILLIN)
+                {
+                    transToSelect = transactions.FirstOrDefault(t => t.TransID == transactionID && t.FillInLineItemID == lineItemID);
+                }
+                else
+                {
+                    transToSelect = transactions.FirstOrDefault(t => t.TransID == transactionID);
+                }
+
+                if (transToSelect != null)
+                {
+                    mainWindowLogic.GuiServices.ExecuteAsync((Action)delegate ()
+                    {
+                        logicIsChangingSelection = true;
+                        SelectedTransaction = transToSelect;
+                        logicIsChangingSelection = false;
+
+                        TransactionToScrollTo = transToSelect;
+                        OnPropertyChanged(() => TransactionToScrollTo);
+                    });
+
+                }
+
+            }
+            else
+            {
+                // Add new empty transaction at the bottom and select it
+                AddEmptyTransactionAtBottom(true);
+            }
 
             // Compute balances
             RecomputeBalances();
@@ -204,7 +239,7 @@ namespace BanaData.Logic.Main
                     if (wasEmptyTransaction)
                     {
                         // Create an empty transaction if we consumed the previous one
-                        AddEmptyTransactionAtBottom();
+                        AddEmptyTransactionAtBottom(true);
                     }
                     else
                     {
@@ -374,24 +409,27 @@ namespace BanaData.Logic.Main
         }
 
         // Add an empty transaction at the bottom of the register
-        private void AddEmptyTransactionAtBottom()
+        private void AddEmptyTransactionAtBottom(bool selectIt)
         {
             // Add new empty transaction at the bottom
             var emptyTransaction = CreateEmptyTransaction();
             transactions.Add(emptyTransaction);
 
             // Select it
-            mainWindowLogic.GuiServices.ExecuteAsync((Action)delegate ()
+            if (selectIt)
             {
-                logicIsChangingSelection = true;
-                SelectedTransaction = emptyTransaction;
-                logicIsChangingSelection = false;
+                mainWindowLogic.GuiServices.ExecuteAsync((Action)delegate ()
+                {
+                    logicIsChangingSelection = true;
+                    SelectedTransaction = emptyTransaction;
+                    logicIsChangingSelection = false;
 
                 // Go to the bottom
                 //TransactionToScrollTo = emptyTransaction;
                 //OnPropertyChanged(() => TransactionToScrollTo);
                 OnPropertyChanged("ScrollToBottom");
-            });
+                });
+            }
         }
 
         #endregion

@@ -38,14 +38,22 @@ namespace BanaData.Logic.Main
             MainWindowLogic _mainWindowLogic, int _accountID, int _transID, BaseTransactionData _data)
         {
             (mainWindowLogic, accountID, TransID, data) = (_mainWindowLogic, _accountID, _transID, _data);
+
+            GotoOtherSideOfTransfer = new CommandBase(OnGotoOtherSideOfTransfer);
+            GotoOtherSideOfTransfer.SetCanExecute(
+                TransID == TRANSID_TRANSFER_FILLIN ||
+                data.LineItems.Find(li => li.CategoryAccountID >= 0) != null);
         }
 
         #endregion
 
         #region Logic properties
 
-        // Transaction id, -1 if not in DB yet
+        // Transaction id, -1 if not in DB yet, -2 if transfer fill-in
         public int TransID;
+
+        // For fill-in transactions, line item ID
+        public int FillInLineItemID => (TransID == TRANSID_TRANSFER_FILLIN) ? data.LineItems[0].ID : -1;
 
         // Amount to use for cash balance computation
         public abstract decimal AmountForCashBalance { get; }
@@ -223,6 +231,9 @@ namespace BanaData.Logic.Main
             (data.Status == ETransactionStatus.Reconciled ? ETransactionState.Reconciled : ETransactionState.Idle) |
             (TransID == TRANSID_TRANSFER_FILLIN ? ETransactionState.TransferFillIn : ETransactionState.Idle);
 
+        // Commands
+        public CommandBase GotoOtherSideOfTransfer { get; }
+
         #endregion
 
         #region Abstract implementation of IEditableObject
@@ -375,6 +386,23 @@ namespace BanaData.Logic.Main
             transactionRow.Delete();
 
             mainWindowLogic.CommitChanges();
+        }
+
+        private void OnGotoOtherSideOfTransfer()
+        {
+            var household = mainWindowLogic.Household;
+
+            if (TransID == TRANSID_TRANSFER_FILLIN)
+            {
+                var liRow = household.LineItems.FindByID(data.LineItems[0].ID);
+                var transRow = household.Transactions.FindByID(liRow.TransactionID);
+                mainWindowLogic.GotoTransaction(transRow.AccountID, transRow.ID, data.LineItems[0].ID);
+            }
+            else
+            {
+                var li = data.LineItems.Find(l => l.CategoryAccountID >= 0);
+                mainWindowLogic.GotoTransaction(li.CategoryAccountID, TRANSID_TRANSFER_FILLIN, li.ID);
+            }
         }
 
         // Status string management
