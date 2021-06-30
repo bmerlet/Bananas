@@ -39,7 +39,7 @@
                     <!-- Clear column -->
                     <GridViewColumn Width="30">
                         <GridViewColumn.Header>
-                            <GridViewColumnHeader Content="Date"/>
+                            <GridViewColumnHeader Content="Clr"/>
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>

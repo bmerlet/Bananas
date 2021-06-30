@@ -164,7 +164,6 @@ namespace BanaData.Logic.Main
             get => GetStatusString();
             set => ParseStatusString(value);
         }
-        public ETransactionStatus StatusAsEnum => data.Status;
 
         public string[] StatusSource { get; } = new string[] { "", "c", "R" };
 
@@ -323,12 +322,28 @@ namespace BanaData.Logic.Main
         #region Actions
 
         // Called by on behalf of reconcile to update status on transaction if needed
-        public void UpdateStatus(ETransactionStatus newStatus)
+        public void UpdateStatus()
         {
-            if (data.Status != newStatus)
+            var household = mainWindowLogic.Household;
+
+            if (TransID == TRANSID_TRANSFER_FILLIN)
             {
-                data.Status = newStatus;
-                OnPropertyChanged(() => Status);
+                var liRow = household.LineItems.FindByID(data.LineItems[0].ID);
+                if (data.Status != liRow.TransferStatus)
+                {
+                    data.Status = liRow.TransferStatus;
+                    OnPropertyChanged(() => Status);
+                }
+            }
+            else if (TransID != TRANSID_NOT_COMMITTED)
+            {
+                var trRow = household.Transactions.FindByID(TransID);
+
+                if (data.Status != trRow.Status)
+                {
+                    data.Status = trRow.Status;
+                    OnPropertyChanged(() => Status);
+                }
             }
         }
 

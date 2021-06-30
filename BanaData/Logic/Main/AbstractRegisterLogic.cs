@@ -158,11 +158,7 @@ namespace BanaData.Logic.Main
 
             foreach (var tr in transactions)
             {
-                if (tr.TransID >= 0)
-                {
-                    var trRow = household.Transactions.FindByID(tr.TransID);
-                    tr.UpdateStatus(trRow.Status);
-                }
+                tr.UpdateStatus();
             }
         }
 

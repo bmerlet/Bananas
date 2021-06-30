@@ -83,7 +83,7 @@ namespace BanaData.Database
                     if (transRow.AccountID != ID)
                     {
                         if (!filter ||
-                            (((Household)Table.DataSet).Transactions.FindByID(lineItemRow.TransactionID) is Household.TransactionsRow trans && trans.Status == statusToFilterOn))
+                            (((Household)Table.DataSet).Transactions.FindByID(lineItemRow.TransactionID) is TransactionsRow trans && trans.Status == statusToFilterOn))
                         {
                             balance -= lineItemRow.Amount;
                         }
@@ -93,12 +93,28 @@ namespace BanaData.Database
                 return balance;
             }
 
-            // Get the reconciled balance of a banking account
-            public IEnumerable<Household.TransactionsRow> GetUnreconciledTransactions()
+            // Get the unreconciled transactions of a banking account
+            public IEnumerable<TransactionsRow> GetUnreconciledTransactions()
             {
                 var accountToTransactions = Table.ChildRelations["FK_Accounts_Transactions"];
 
-                return GetChildRows(accountToTransactions).Cast<Household.TransactionsRow>().Where(tr => tr.Status != ETransactionStatus.Reconciled);
+                return GetChildRows(accountToTransactions)
+                    .Cast<TransactionsRow>()
+                    .Where(tr => tr.Status != ETransactionStatus.Reconciled);
+            }
+
+            // Get the unreconciled transfer to a banking account
+            public IEnumerable<LineItemsRow> GetUnreconciledTransfers()
+            {
+                var houshold = (Household)Table.DataSet;
+
+                // Add tansfers to/from that account
+                var accountToLineItem = Table.ChildRelations["Accounts_LineItems"];
+
+                return GetChildRows(accountToLineItem)
+                    .Cast<LineItemsRow>()
+                    .Where(li => houshold.Transactions.FindByID(li.TransactionID).AccountID != ID)
+                    .Where(li => li.TransferStatus != ETransactionStatus.Reconciled);
             }
 
             // Get the balance of an investment account

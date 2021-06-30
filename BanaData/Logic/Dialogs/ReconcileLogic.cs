@@ -198,8 +198,16 @@ namespace BanaData.Logic.Dialogs
             {
                 foreach (TransactionToReconcile tr in trList.Transactions)
                 {
-                    var transRow = household.Transactions.FindByID(tr.ID);
-                    transRow.Status = tr.IsCleared == true ? newStatus : ETransactionStatus.Pending;
+                    if (tr.IsTransferFillIn)
+                    {
+                        var liRow = household.LineItems.FindByID(tr.ID);
+                        liRow.TransferStatus = tr.IsCleared == true ? newStatus : ETransactionStatus.Pending;
+                    }
+                    else
+                    {
+                        var transRow = household.Transactions.FindByID(tr.ID);
+                        transRow.Status = tr.IsCleared == true ? newStatus : ETransactionStatus.Pending;
+                    }
                 }
             }
         }
@@ -240,6 +248,7 @@ namespace BanaData.Logic.Dialogs
                 var accountRow = household.Accounts.FindByID(accountID);
                 IsBank = accountRow.Type == EAccountType.Bank;
 
+                // Process regular transactions
                 foreach (Household.TransactionsRow tr in accountRow.GetUnreconciledTransactions())
                 {
                     // Compute amount
@@ -273,7 +282,32 @@ namespace BanaData.Logic.Dialogs
                         tr.Date,
                         medium,
                         tr.IsPayeeNull() ? "" : tr.Payee,
-                        deposit ? amount : -amount);
+                        deposit ? amount : -amount,
+                        false);
+
+                    transaction.TransactionCleared += OnTransactionCleared;
+                    transactions.Add(transaction);
+                }
+
+                // Process transfer fill-ins
+                foreach(Household.LineItemsRow li in accountRow.GetUnreconciledTransfers())
+                {
+                    decimal amount = -li.Amount;
+
+                    // We want only deposit or payments
+                    if (amount >= 0 ^ deposit)
+                    {
+                        continue;
+                    }
+
+                    var transaction = new TransactionToReconcile(
+                        li.ID,
+                        li.TransferStatus == ETransactionStatus.Cleared,
+                        household.Transactions.FindByID(li.TransactionID).Date,
+                        "",
+                        "",
+                        deposit ? amount : -amount,
+                        true);
 
                     transaction.TransactionCleared += OnTransactionCleared;
                     transactions.Add(transaction);
@@ -343,12 +377,13 @@ namespace BanaData.Logic.Dialogs
         public class TransactionToReconcile : LogicBase
         {
             // Constructor
-            public TransactionToReconcile(int id, bool _isCleared, DateTime date, string medium, string payee, decimal amount) =>
-                (ID, isCleared, Date, Medium, Payee, DecimalAmount) =
-                (id, _isCleared, date, medium, payee, amount);
+            public TransactionToReconcile(int id, bool _isCleared, DateTime date, string medium, string payee, decimal amount, bool isTransferFillIn) =>
+                (ID, isCleared, Date, Medium, Payee, DecimalAmount, IsTransferFillIn) =
+                (id, _isCleared, date, medium, payee, amount, isTransferFillIn);
 
             // Identifier - transaction ID
             public readonly int ID;
+            public bool IsTransferFillIn;
             public readonly decimal DecimalAmount;
 
             // Event
