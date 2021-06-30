@@ -192,5 +192,13 @@ namespace BanaData.Database
         None
     }
 
+    // Composite transaction state foir the UI
+    [Flags]
+    public enum ETransactionState
+    {
+        Idle = 0,
+        Reconciled = 1,
+        TransferFillIn = 2
+    }
 
 }

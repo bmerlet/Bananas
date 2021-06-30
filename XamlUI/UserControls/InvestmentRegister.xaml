@@ -62,7 +62,7 @@
                             <DataTemplate>
                                 <TextBlock
                                     Text="{Binding Path=Status}"
-                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"
+                                    Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"
                                     HorizontalAlignment="Center"
                                     FontWeight="Bold"/>
                             </DataTemplate>
@@ -78,7 +78,7 @@
                             <DataTemplate>
                                 <TextBlock
                                     Text="{Binding Date, StringFormat=MM/dd/yyyy}"
-                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"/>
+                                    Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -92,7 +92,7 @@
                             <DataTemplate>
                                 <TextBlock
                                     Text="{Binding Type}"
-                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"/>
+                                    Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -106,7 +106,7 @@
                             <DataTemplate>
                                 <TextBlock
                                     Text="{Binding Description}"
-                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"/>
+                                    Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -120,7 +120,7 @@
                             <DataTemplate>
                                 <TextBlock
                                     Text="{Binding Memo}"
-                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"/>
+                                    Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -134,7 +134,7 @@
                             <DataTemplate>
                                 <TextBlock 
                                     Text="{Binding Path=SecuritySymbol}"
-                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"/>
+                                    Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -148,7 +148,7 @@
                             <DataTemplate>
                                 <TextBlock 
                                     Text="{Binding Path=SecurityQuantityString}"
-                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"
+                                    Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"
                                     HorizontalAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
@@ -163,7 +163,7 @@
                             <DataTemplate>
                                 <TextBlock 
                                     Text="{Binding Path=SecurityPriceString}"
-                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"
+                                    Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"
                                     HorizontalAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
@@ -178,7 +178,7 @@
                             <DataTemplate>
                                 <TextBlock 
                                     Text="{Binding Path=CommissionString}"
-                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"
+                                    Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"
                                     HorizontalAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
@@ -190,7 +190,7 @@
                             <DataTemplate>
                                 <TextBlock 
                                     Text="{Binding Path=ShareBalanceString}"
-                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"
+                                    Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"
                                     HorizontalAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
@@ -205,7 +205,7 @@
                             <DataTemplate>
                                 <TextBlock 
                                     Text="{Binding Path=AmountString}"
-                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"
+                                    Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"
                                     HorizontalAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
@@ -217,7 +217,7 @@
                             <DataTemplate>
                                 <TextBlock
                                     Text="{Binding BalanceString, Mode=OneWay}"
-                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"
+                                    Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"
                                     HorizontalAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
@@ -232,7 +232,7 @@
                             <DataTemplate>
                                 <TextBlock
                                     Text="{Binding Category}"
-                                    Foreground="{Binding StatusAsEnum, Converter={StaticResource transactionStatusToBrushConverter}}"/>
+                                    Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

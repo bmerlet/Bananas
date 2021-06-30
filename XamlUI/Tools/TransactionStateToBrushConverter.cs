@@ -10,16 +10,25 @@ using BanaData.Database;
 
 namespace XamlUI.Tools
 {
-    sealed class TransactionStatusToBrushConverter : IValueConverter
+    sealed class TransactionStateToBrushConverter : IValueConverter
     {
+        static SolidColorBrush MyDarkGray = new SolidColorBrush(Color.FromRgb(100, 100, 100));
+
         // Convert a transaction status to a brush color
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             var brush = Brushes.Black;
 
-            if (value is ETransactionStatus status && status == ETransactionStatus.Reconciled)
+            if (value is ETransactionState state)
             {
-                brush = Brushes.Gray;
+                if (state.HasFlag(ETransactionState.Reconciled))
+                {
+                    brush = state.HasFlag(ETransactionState.TransferFillIn) ? Brushes.DarkSlateBlue : MyDarkGray;
+                }
+                else if (state.HasFlag(ETransactionState.TransferFillIn))
+                {
+                    brush = Brushes.DarkBlue;
+                }
             }
 
             return brush;

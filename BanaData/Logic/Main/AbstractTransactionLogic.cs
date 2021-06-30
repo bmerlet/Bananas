@@ -219,6 +219,11 @@ namespace BanaData.Logic.Main
         // (see PropertyGroupDescription in BankRegisterLogic constructor)
         public string GroupSorter => (TransID == -1) ? "Z" : "A";
 
+        // Composite transaction status, for the forecolor of the transaction
+        public ETransactionState TransactionState =>
+            (data.Status == ETransactionStatus.Reconciled ? ETransactionState.Reconciled : ETransactionState.Idle) |
+            (TransID == TRANSID_TRANSFER_FILLIN ? ETransactionState.TransferFillIn : ETransactionState.Idle);
+
         #endregion
 
         #region Abstract implementation of IEditableObject
