@@ -43,7 +43,7 @@ namespace BanaData.Logic.Dialogs
             PriorStatementEndDate = accountRow.IsLastStatementDateNull() ? new DateTime(2021, 01, 01) : accountRow.LastStatementDate;
 
             // Compute last reconciled balance
-            PriorStatementBalance = accountRow.GetBankingReconciledBalance();
+            PriorStatementBalance = accountRow.GetReconciledBalance();
 
             // Guess the statement end date
             StatementEndDate = PriorStatementEndDate.AddMonths(1);

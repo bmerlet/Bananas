@@ -189,8 +189,6 @@ namespace BanaData.Logic.Main
                 return;
             }
 
-            var household = mainWindowLogic.Household;
-
             foreach (var tr in transactions)
             {
                 tr.UpdateStatus();

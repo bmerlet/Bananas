@@ -257,8 +257,7 @@ namespace BanaData.Logic.Main
             if (TransID == TRANSID_TRANSFER_FILLIN)
             {
                 // We only allow changing the status, as it is stored in the transfer line item
-                var tmpData = new InvestmentTransactionData(data);
-                tmpData.Status = backup.Status;
+                var tmpData = new InvestmentTransactionData(data) { Status = backup.Status };
                 if (!tmpData.Equals(backup))
                 {
                     mainWindowLogic.ErrorMessage("Cannot edit this end of the transfer - please edit the other end");

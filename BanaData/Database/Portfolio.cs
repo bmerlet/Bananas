@@ -40,6 +40,7 @@ namespace BanaData.Database
 
             // Don't! The commission is taken into account in the transaction's amount
             //cashBalance -= investmentTransaction.Commission;
+
             if (investmentTransaction.IsCashIn || investmentTransaction.IsCashOut)
             {
                 cashBalance += transaction.GetAmount();

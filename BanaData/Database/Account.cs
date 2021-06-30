@@ -48,20 +48,20 @@ namespace BanaData.Database
                 }
             }
 
-            // Get the balance of a banking account
-            public decimal GetBankingBalance()
+            // Get the balance of an account
+            public decimal GetBalance()
             {
-                return GetBankingBalance(false);
+                return GetBalance(false);
             }
 
-            // Get the reconciled balance of a banking account
-            public decimal GetBankingReconciledBalance()
+            // Get the reconciled balance of an account
+            public decimal GetReconciledBalance()
             {
-                return GetBankingBalance(true, ETransactionStatus.Reconciled);
+                return GetBalance(true, ETransactionStatus.Reconciled);
             }
 
             // Get the balance of a banking account
-            private decimal GetBankingBalance(bool filter, ETransactionStatus statusToFilterOn = ETransactionStatus.Pending)
+            private decimal GetBalance(bool filter, ETransactionStatus statusToFilterOn = ETransactionStatus.Pending)
             {
                 decimal balance = 0;
 
@@ -71,7 +71,18 @@ namespace BanaData.Database
                 {
                     if (!filter || transaction.Status == statusToFilterOn)
                     {
-                        balance += transaction.GetAmount();
+                        if (Type == EAccountType.Investment)
+                        {
+                            var investmentTransaction = Type == EAccountType.Investment ? ((Household)Table.DataSet).InvestmentTransactions.GetByTransaction(transaction) : null;
+                            if (investmentTransaction.IsCashIn || investmentTransaction.IsCashOut)
+                            {
+                                balance += transaction.GetAmount();
+                            }
+                        }
+                        else
+                        {
+                            balance += transaction.GetAmount();
+                        }
                     }
                 }
 

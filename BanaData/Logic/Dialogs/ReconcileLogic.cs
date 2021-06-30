@@ -35,7 +35,7 @@ namespace BanaData.Logic.Dialogs
 
             // Get account info
             var accountRow = household.Accounts.FindByID(accountID);
-            PriorStatementBalance = accountRow.GetBankingReconciledBalance();
+            PriorStatementBalance = accountRow.GetReconciledBalance();
 
             // Get reconcile info
             var accountsToReconcileInfo = household.ReconcileInfo.ParentRelations["FK_Accounts_ReconcileInfo"];

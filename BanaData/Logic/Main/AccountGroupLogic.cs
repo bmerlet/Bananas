@@ -129,7 +129,7 @@ namespace BanaData.Logic.Main
                 decimal balance =
                     type == EType.Investment ?
                     acct.GetInvestmentValue() :
-                    acct.GetBankingBalance();
+                    acct.GetBalance();
 
                 if (AccountsAndBalances.Count <= ix ||
                     AccountsAndBalances[ix].AccountID != acct.ID ||

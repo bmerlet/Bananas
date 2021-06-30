@@ -141,6 +141,7 @@ namespace BanaData.Logic.Dialogs
 
                 // Update UI
                 mainWindowLogic.Categories.Add(newCategory);
+                mainWindowLogic.Categories.Sort();
                 var newEditCategory = new EditCategoryItem(newCategory, false);
                 categoriesSource.Add(newEditCategory);
                 SelectedCategory = newEditCategory;
@@ -173,6 +174,7 @@ namespace BanaData.Logic.Dialogs
                     categoriesSource.Remove(SelectedCategory);
 
                     mainWindowLogic.Categories.Add(updatedCategory);
+                    mainWindowLogic.Categories.Sort();
                     var updatedEditCategory = new EditCategoryItem(updatedCategory, oldIsInUse);
                     categoriesSource.Add(updatedEditCategory);
                     SelectedCategory = updatedEditCategory;
