@@ -91,6 +91,9 @@
     <Compile Include="Dialogs\ReconcileInfo.xaml.cs">
       <DependentUpon>ReconcileInfo.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\ShowCapitalGains.xaml.cs">
+      <DependentUpon>ShowCapitalGains.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tools\BindingProxy.cs" />
     <Compile Include="Tools\DataGridLengthConverter.cs" />
     <Compile Include="Tools\FocusAttachedProperty.cs" />
@@ -169,6 +172,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\ReconcileInfo.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\ShowCapitalGains.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

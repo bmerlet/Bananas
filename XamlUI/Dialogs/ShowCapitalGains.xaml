@@ -1,0 +1,76 @@
+﻿<Window x:Class="XamlUI.Dialogs.ShowCapitalGains"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:XamlUI.Dialogs"
+        xmlns:w="clr-namespace:XamlUI.UserControls"
+        Icon="/XamlUI;component/Images/Bananas.ico"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        mc:Ignorable="d"
+        Title="Capital gains" Height="350" Width="600">
+    
+    <Window.Resources>
+        <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}"/>
+    </Window.Resources>
+
+    <DockPanel>
+        <!-- Done panel -->
+        <w:DonePanel DockPanel.Dock="Bottom"/>
+
+        <!-- Description -->
+        <TextBlock Text="{Binding Description}" DockPanel.Dock="Top"/>
+        
+        <!-- Capital gains -->
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Long term capital gains:"/>
+            <TextBlock Text="{Binding LongTermGain, StringFormat=C2}" Grid.Column="2"/>
+
+            <ListView 
+                Grid.ColumnSpan="3" Grid.Row="1" 
+                ItemsSource="{Binding LongTermLots}">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Date" Width="80" DisplayMemberBinding="{Binding Date, StringFormat=MM/dd/yyyy}"/>
+                        <GridViewColumn Header="Quantity" Width="80" DisplayMemberBinding="{Binding TotalQuantity, StringFormat=N4}"/>
+                        <GridViewColumn Header="Quantity used" Width="80" DisplayMemberBinding="{Binding QuantityUsed, StringFormat=N4}"/>
+                        <GridViewColumn Header="Cost basis" Width="80" DisplayMemberBinding="{Binding CostBasis, StringFormat=C4}"/>
+                        <GridViewColumn Header="Gain" Width="80" DisplayMemberBinding="{Binding Gain, StringFormat=C2}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+
+            <TextBlock Text="Short term capital gains:" Grid.Row="2"/>
+            <TextBlock Text="{Binding ShortTermGain, StringFormat=C2}" Grid.Row="2" Grid.Column="2"/>
+
+            <ListView 
+                Grid.ColumnSpan="3" Grid.Row="3" 
+                ItemsSource="{Binding ShortTermLots}">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Date" Width="80" DisplayMemberBinding="{Binding Date, StringFormat=MM/dd/yyyy}"/>
+                        <GridViewColumn Header="Quantity" Width="80" DisplayMemberBinding="{Binding TotalQuantity, StringFormat=N4}"/>
+                        <GridViewColumn Header="Quantity used" Width="80" DisplayMemberBinding="{Binding QuantityUsed, StringFormat=N4}"/>
+                        <GridViewColumn Header="Cost basis" Width="80" DisplayMemberBinding="{Binding CostBasis, StringFormat=C4}"/>
+                        <GridViewColumn Header="Gain" Width="80" DisplayMemberBinding="{Binding Gain, StringFormat=C2}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Grid>
+
+        <!-- Capital gains listview -->
+    </DockPanel>
+</Window>

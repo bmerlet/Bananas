@@ -9,6 +9,7 @@ using Toolbox.Attributes;
 using Toolbox.UILogic;
 using BanaData.Database;
 using BanaData.Logic.Items;
+using BanaData.Logic.Dialogs;
 
 namespace BanaData.Logic.Main
 {
@@ -31,7 +32,13 @@ namespace BanaData.Logic.Main
             int _accountID,
             int transID,
             InvestmentTransactionData _data)
-            : base(_mainWindowLogic, _accountID, transID, _data) => data = _data;
+            : base(_mainWindowLogic, _accountID, transID, _data)
+        {
+            data = _data;
+
+            ShowCapitalGains = new CommandBase(OnShowCapitalGains);
+            ShowCapitalGains.SetCanExecute(data.Type == EInvestmentTransactionType.Sell || data.Type == EInvestmentTransactionType.SellAndTransferCash);
+        }
 
         public InvestmentTransactionLogic(
             MainWindowLogic _mainWindowLogic,
@@ -158,6 +165,11 @@ namespace BanaData.Logic.Main
         public int CategoryColumnNumber { get; private set; }
         public int CategoryTabIndex { get; private set; }
         public bool IsCategoryVisible { get; private set; }
+
+        //
+        // Command to show capital gains on a sale
+        //
+        public CommandBase ShowCapitalGains { get; }
 
         #endregion
 
@@ -775,6 +787,11 @@ namespace BanaData.Logic.Main
             }
 
             mainWindowLogic.CommitChanges();
+        }
+
+        private void OnShowCapitalGains()
+        {
+            mainWindowLogic.GuiServices.ShowDialog(new ShowCapitalGainsLogic(mainWindowLogic, TransID));
         }
 
         #endregion

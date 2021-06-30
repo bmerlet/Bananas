@@ -174,6 +174,29 @@ namespace BanaData.Database
                 // Get latest price for the securities in the portfolio
                 return portfolio.GetSecurities();
             }
+
+            // Get the portfolio at a specific date
+            public Portfolio GetPortfolio(DateTime? date)
+            {
+                // Handle to the dataset
+                var household = Table.DataSet as Household;
+
+                // Compute the portfolio
+                var portfolio = new Portfolio();
+                var accountToTransaction = Table.ChildRelations["FK_Accounts_Transactions"];
+                foreach (TransactionsRow transRow in GetChildRows(accountToTransaction))
+                {
+                    if (date.HasValue && transRow.Date.CompareTo(date.Value) >= 0)
+                    {
+                        continue;
+                    }
+
+                    portfolio.ApplyTransaction(household, transRow);
+                }
+
+                // Get latest price for the securities in the portfolio
+                return portfolio;
+            }
         }
 
         partial class AccountsDataTable

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace BanaData.Database
 { 
-    class Portfolio
+    public class Portfolio
     {
         decimal cashBalance;
         private readonly List<Lot> lots;
@@ -48,11 +48,11 @@ namespace BanaData.Database
 
             if (investmentTransaction.IsSecurityIn)
             {
-                AddShares(transaction.Date, security, investmentTransaction.SecurityQuantity);
+                AddShares(transaction.Date, security, investmentTransaction.SecurityQuantity, investmentTransaction.SecurityPrice);
             }
             else if (investmentTransaction.IsSecurityOut)
             {
-                RemoveShares(transaction.Date, security, investmentTransaction.SecurityQuantity);
+                RemoveShares(security, investmentTransaction.SecurityQuantity);
             }
         }
 
@@ -61,14 +61,14 @@ namespace BanaData.Database
             cashBalance -= lineItem.Amount;
         }
 
-        private void AddShares(DateTime date, Household.SecuritiesRow security, decimal quantity)
+        private void AddShares(DateTime date, Household.SecuritiesRow security, decimal quantity, decimal securityPrice)
         {
-            lots.Add(new Lot(date, security, quantity));
+            lots.Add(new Lot(date, security, quantity, securityPrice));
         }
 
-        private void RemoveShares(DateTime date, Household.SecuritiesRow security, decimal quantity)
+        private void RemoveShares(Household.SecuritiesRow security, decimal quantity)
         {
-            // ZZZ FIFO for now
+            // Only FIFO supported
             while (quantity > 0)
             {
                 // Find most ancient lot for this security
@@ -89,13 +89,41 @@ namespace BanaData.Database
                     // Remove shares from the lot
                     var ix = lots.IndexOf(lot);
                     decimal newLotQuantity = lot.Quantity - quantity;
-                    lots[ix] = new Lot(lot.Date, lot.Security, newLotQuantity);
+                    lots[ix] = new Lot(lot.Date, lot.Security, newLotQuantity, lot.SecurityPrice);
+                    quantity = 0;
+                }
+            }
+        }
+
+        public IEnumerable<Lot> GetLotsUsedForSale(Household.SecuritiesRow security, decimal quantity)
+        {
+            // List of used lots
+            var usedLots = new List<Lot>();
+
+            // List of lots for this security
+            var availableLots = lots.FindAll(l => l.Security.ID == security.ID);
+
+            // Only FIFO supported
+            while (quantity > 0)
+            {
+                var lot = availableLots.First();
+
+                if (quantity >= availableLots[0].Quantity)
+                {
+                    // This lot is completely used up
+                    usedLots.Add(lot);
+                    availableLots.RemoveAt(0);
+                    quantity -= lot.Quantity;
+                }
+                else
+                {
+                    // This lot is partially used up
+                    usedLots.Add(lot);
                     quantity = 0;
                 }
             }
 
-            // Negative lots fake:
-            // lots.Add(new Lot(date, security, -quantity));
+            return usedLots;
         }
 
         public decimal GetValuation()

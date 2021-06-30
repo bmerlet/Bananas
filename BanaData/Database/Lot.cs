@@ -10,20 +10,18 @@ using System.Threading.Tasks;
 
 namespace BanaData.Database
 {
-    class Lot
+    public class Lot
     {
-        public Lot(DateTime date, Household.SecuritiesRow security, decimal quantity)
-        {
-            Date = date;
-            Security = security;
-            Quantity = quantity;
-        }
+        public Lot(DateTime date, Household.SecuritiesRow security, decimal quantity, decimal securityPrice) =>
+            (Date, Security, Quantity, SecurityPrice) = (date, security, quantity, securityPrice);
 
-        public DateTime Date;
+        public DateTime Date { get; }
 
-        public Household.SecuritiesRow Security { get; private set; }
+        public Household.SecuritiesRow Security { get; }
 
-        public decimal Quantity { get; private set; }
+        public decimal Quantity { get; }
+
+        public decimal SecurityPrice { get; }
 
         public decimal GetValuation()
         {
@@ -37,7 +35,8 @@ namespace BanaData.Database
                 obj is Lot o &&
                 o.Date == Date &&
                 o.Security == Security &&
-                o.Quantity == Quantity;
+                o.Quantity == Quantity &&
+                o.SecurityPrice == SecurityPrice;
         }
 
         public override int GetHashCode()
@@ -46,6 +45,7 @@ namespace BanaData.Database
             hashCode = hashCode * -1521134295 + Date.GetHashCode();
             hashCode = hashCode * -1521134295 + EqualityComparer<Household.SecuritiesRow>.Default.GetHashCode(Security);
             hashCode = hashCode * -1521134295 + Quantity.GetHashCode();
+            hashCode = hashCode * -1521134295 + SecurityPrice.GetHashCode();
             return hashCode;
         }
     }

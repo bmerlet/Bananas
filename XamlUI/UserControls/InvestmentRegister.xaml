@@ -254,6 +254,7 @@
                 <ContextMenu x:Key="TransactionContextMenu">
                     <MenuItem Header="Delete" Command="{Binding DeleteTransaction}"/>
                     <MenuItem Header="Go to other side of transfer" Command="{Binding EditedTransaction.GotoOtherSideOfTransfer}"/>
+                    <MenuItem Header="View capital gains..." Command="{Binding EditedTransaction.ShowCapitalGains}"/>
                 </ContextMenu>
 
                 <Style TargetType="{x:Type local:DateBox}">
