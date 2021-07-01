@@ -32,15 +32,6 @@
                 </Style>
             </ListView.ItemContainerStyle>
 
-            <!-- Context menu for listview rows -->
-            <ListView.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="Delete"
-                        Command="{Binding DeleteTransaction}"
-                        CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}" />
-                </ContextMenu>
-            </ListView.ContextMenu>
-            
             <!-- View definition -->
             <ListView.View>
                 <GridView>

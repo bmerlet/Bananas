@@ -291,8 +291,7 @@ namespace BanaData.Logic.Main
 
         private void OnDeleteTransaction(object arg)
         {
-            AbstractTransactionLogic atl = arg == null ? SelectedTransaction : arg as AbstractTransactionLogic;
-
+            var atl = SelectedTransaction;
             if (atl == null)
             {
                 return;

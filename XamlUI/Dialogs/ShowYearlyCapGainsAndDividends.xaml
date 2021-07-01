@@ -8,9 +8,92 @@
         Icon="/XamlUI;component/Images/Bananas.ico"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
+        SizeToContent="Width"
         mc:Ignorable="d"
-        Title="Yearly capital gains and dividends" Height="350" Width="600">
-    <Grid>
+        Title="Yearly capital gains and dividends" Height="350">
+    <DockPanel>
+
+        <!-- Done panel -->
+        <w:DonePanel DockPanel.Dock="Bottom"/>
+
+        <!-- Controls -->
+        <Grid DockPanel.Dock="Top">
+            <Grid.Resources>
+                <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}"/>
+                <Style TargetType="ComboBox" BasedOn="{StaticResource FormComboBox}"/>
+                <Style TargetType="CheckBox" BasedOn="{StaticResource FormCheckBox}"/>
+            </Grid.Resources>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Year:"/>
+            <ComboBox 
+                Grid.Column="1"
+                ItemsSource="{Binding YearSource, StringFormat=yyyy}"
+                SelectedItem="{Binding SelectedYear, Mode=TwoWay, StringFormat=yyyy}"/>
+            <CheckBox
+                Grid.Column="3"
+                Content="Show interest"
+                IsChecked="{Binding IsShowingInterest, Mode=TwoWay}"/>
+        </Grid>
         
-    </Grid>
+        <!-- Totals-->
+        <Grid DockPanel.Dock="Bottom">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="{Binding DividendColumnWidth}"/>
+                <ColumnDefinition Width="{Binding STCGColumnWidth}"/>
+                <ColumnDefinition Width="{Binding LTCGColumnWidth}"/>
+                <ColumnDefinition Width="{Binding InterestColumnWidth}"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="1" Text="{Binding TotalDividend, StringFormat=C2}" HorizontalAlignment="Right"/>
+            <TextBlock Grid.Column="2" Text="{Binding TotalSTCG, StringFormat=C2}" HorizontalAlignment="Right"/>
+            <TextBlock Grid.Column="3" Text="{Binding TotalLTCG, StringFormat=C2}" HorizontalAlignment="Right"/>
+            <TextBlock Grid.Column="4" Text="{Binding TotalInterest, StringFormat=C2}" HorizontalAlignment="Right"/>
+        </Grid>
+
+        <!-- Main listview -->
+        <ListView
+           ItemsSource="{Binding Transactions}">
+            
+            <ListView.Resources>
+                <DataTemplate x:Key="DateColumnTemplate">
+                    <TextBlock Text="{Binding Date, StringFormat=MM/dd/yyyy}" HorizontalAlignment="Right"/>
+                </DataTemplate>
+                <DataTemplate x:Key="DividendColumnTemplate">
+                    <TextBlock Text="{Binding Dividend}" HorizontalAlignment="Right"/>
+                </DataTemplate>
+                <DataTemplate x:Key="STCGColumnTemplate">
+                    <TextBlock Text="{Binding STCG}" HorizontalAlignment="Right"/>
+                </DataTemplate>
+                <DataTemplate x:Key="LTCGColumnTemplate">
+                    <TextBlock Text="{Binding LTCG}" HorizontalAlignment="Right"/>
+                </DataTemplate>
+                <DataTemplate x:Key="InterestColumnTemplate">
+                    <TextBlock Text="{Binding Interest}" HorizontalAlignment="Right"/>
+                </DataTemplate>
+            </ListView.Resources>
+
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListView.ItemContainerStyle>
+
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Date" Width="80" CellTemplate="{StaticResource DateColumnTemplate}"/>
+                    <GridViewColumn Header="Description" Width="200" DisplayMemberBinding="{Binding Description}"/>
+                    <GridViewColumn Header="Dividends" Width="{Binding DividendColumnWidth, Mode=TwoWay}" CellTemplate="{StaticResource DividendColumnTemplate}"/>
+                    <GridViewColumn Header="Short term CG" Width="{Binding STCGColumnWidth, Mode=TwoWay}" CellTemplate="{StaticResource STCGColumnTemplate}"/>
+                    <GridViewColumn Header="Long term CG" Width="{Binding LTCGColumnWidth, Mode=TwoWay}" CellTemplate="{StaticResource LTCGColumnTemplate}"/>
+                    <GridViewColumn Header="Interest" Width="{Binding InterestColumnWidth, Mode=TwoWay}" CellTemplate="{StaticResource InterestColumnTemplate}"/>
+                </GridView>                
+            </ListView.View>
+        </ListView>
+    </DockPanel>
 </Window>
