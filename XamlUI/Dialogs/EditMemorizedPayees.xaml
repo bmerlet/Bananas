@@ -41,7 +41,10 @@
                     <GridViewColumn Header="Amount" Width="80">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Amount, StringFormat=C2}" HorizontalAlignment="Right" Foreground="Red" />
+                                <TextBlock 
+                                    Text="{Binding Amount, Converter={StaticResource amountToStringConverter}}"
+                                    Foreground="{Binding Amount, Converter={StaticResource amountToColorConverter}}"
+                                    HorizontalAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

@@ -157,8 +157,8 @@ namespace BanaData.Logic.Main
             if (TransID == TRANSID_TRANSFER_FILLIN)
             {
                 // We only allow changing the status, as it is stored in the transfer line item
-                var tmpData = new BankTransactionData(data as BankTransactionData);
-                tmpData.Status = backup.Status;
+                var tmpData = new BankTransactionData(data as BankTransactionData) { Status = backup.Status };
+                
                 if (!tmpData.Equals(backup))
                 {
                     mainWindowLogic.ErrorMessage("Cannot edit this end of the transfer - please edit the other end");
@@ -311,9 +311,7 @@ namespace BanaData.Logic.Main
 
                 OnPropertyChanged(() => Memo);
                 OnPropertyChanged(() => Category);
-                OnPropertyChanged(() => PaymentString);
                 OnPropertyChanged(() => Payment);
-                OnPropertyChanged(() => DepositString);
                 OnPropertyChanged(() => Deposit);
             }
         }
@@ -340,9 +338,7 @@ namespace BanaData.Logic.Main
                 }
 
                 OnPropertyChanged(() => Category);
-                OnPropertyChanged(() => PaymentString);
                 OnPropertyChanged(() => Payment);
-                OnPropertyChanged(() => DepositString);
                 OnPropertyChanged(() => Deposit);
             }
         }

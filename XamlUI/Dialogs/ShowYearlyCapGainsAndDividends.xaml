@@ -26,15 +26,20 @@
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="120"/>
                 <ColumnDefinition Width="20"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            
             <TextBlock Text="Year:"/>
-            <ComboBox 
+            <ComboBox
+                Padding="0"
                 Grid.Column="1"
-                ItemsSource="{Binding YearSource, StringFormat=yyyy}"
-                SelectedItem="{Binding SelectedYear, Mode=TwoWay, StringFormat=yyyy}"/>
+                ItemsSource="{Binding YearSource}"
+                SelectedItem="{Binding SelectedYear, Mode=TwoWay}"/>
             <CheckBox
                 Grid.Column="3"
                 Content="Show interest"
@@ -43,17 +48,25 @@
         
         <!-- Totals-->
         <Grid DockPanel.Dock="Bottom">
+            <Grid.Resources>
+                <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}">
+                    <Setter Property="Margin" Value="2,5"/>
+                </Style>
+            </Grid.Resources>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="{Binding DateColumnWidth}"/>
+                <ColumnDefinition Width="{Binding AccountColumnWidth}"/>
+                <ColumnDefinition Width="{Binding SymbolColumnWidth}"/>
+                <ColumnDefinition Width="{Binding DescriptionColumnWidth}"/>
                 <ColumnDefinition Width="{Binding DividendColumnWidth}"/>
                 <ColumnDefinition Width="{Binding STCGColumnWidth}"/>
                 <ColumnDefinition Width="{Binding LTCGColumnWidth}"/>
                 <ColumnDefinition Width="{Binding InterestColumnWidth}"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="1" Text="{Binding TotalDividend, StringFormat=C2}" HorizontalAlignment="Right"/>
-            <TextBlock Grid.Column="2" Text="{Binding TotalSTCG, StringFormat=C2}" HorizontalAlignment="Right"/>
-            <TextBlock Grid.Column="3" Text="{Binding TotalLTCG, StringFormat=C2}" HorizontalAlignment="Right"/>
-            <TextBlock Grid.Column="4" Text="{Binding TotalInterest, StringFormat=C2}" HorizontalAlignment="Right"/>
+            <TextBlock Grid.Column="4" Text="{Binding TotalDividend, StringFormat=C2}" HorizontalAlignment="Right"/>
+            <TextBlock Grid.Column="5" Text="{Binding TotalSTCG, StringFormat=C2}" HorizontalAlignment="Right"/>
+            <TextBlock Grid.Column="6" Text="{Binding TotalLTCG, StringFormat=C2}" HorizontalAlignment="Right"/>
+            <TextBlock Grid.Column="7" Text="{Binding TotalInterest, StringFormat=C2}" HorizontalAlignment="Right"/>
         </Grid>
 
         <!-- Main listview -->
@@ -65,16 +78,28 @@
                     <TextBlock Text="{Binding Date, StringFormat=MM/dd/yyyy}" HorizontalAlignment="Right"/>
                 </DataTemplate>
                 <DataTemplate x:Key="DividendColumnTemplate">
-                    <TextBlock Text="{Binding Dividend}" HorizontalAlignment="Right"/>
+                    <TextBlock 
+                        Text="{Binding Dividend, Converter={StaticResource amountToStringConverter}}"
+                        Foreground="{Binding Dividend, Converter={StaticResource amountToColorConverter}}"
+                        HorizontalAlignment="Right"/>
                 </DataTemplate>
                 <DataTemplate x:Key="STCGColumnTemplate">
-                    <TextBlock Text="{Binding STCG}" HorizontalAlignment="Right"/>
+                    <TextBlock
+                        Text="{Binding STCG, Converter={StaticResource amountToStringConverter}}"
+                        Foreground="{Binding STCG, Converter={StaticResource amountToColorConverter}}"
+                        HorizontalAlignment="Right"/>
                 </DataTemplate>
                 <DataTemplate x:Key="LTCGColumnTemplate">
-                    <TextBlock Text="{Binding LTCG}" HorizontalAlignment="Right"/>
+                    <TextBlock
+                        Text="{Binding LTCG, Converter={StaticResource amountToStringConverter}}"
+                        Foreground="{Binding LTCG, Converter={StaticResource amountToColorConverter}}"
+                        HorizontalAlignment="Right"/>
                 </DataTemplate>
                 <DataTemplate x:Key="InterestColumnTemplate">
-                    <TextBlock Text="{Binding Interest}" HorizontalAlignment="Right"/>
+                    <TextBlock
+                        Text="{Binding Interest, Converter={StaticResource amountToStringConverter}}"
+                        Foreground="{Binding Interest, Converter={StaticResource amountToColorConverter}}"
+                        HorizontalAlignment="Right"/>
                 </DataTemplate>
             </ListView.Resources>
 
@@ -86,12 +111,62 @@
 
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Date" Width="80" CellTemplate="{StaticResource DateColumnTemplate}"/>
-                    <GridViewColumn Header="Description" Width="200" DisplayMemberBinding="{Binding Description}"/>
-                    <GridViewColumn Header="Dividends" Width="{Binding DividendColumnWidth, Mode=TwoWay}" CellTemplate="{StaticResource DividendColumnTemplate}"/>
-                    <GridViewColumn Header="Short term CG" Width="{Binding STCGColumnWidth, Mode=TwoWay}" CellTemplate="{StaticResource STCGColumnTemplate}"/>
-                    <GridViewColumn Header="Long term CG" Width="{Binding LTCGColumnWidth, Mode=TwoWay}" CellTemplate="{StaticResource LTCGColumnTemplate}"/>
-                    <GridViewColumn Header="Interest" Width="{Binding InterestColumnWidth, Mode=TwoWay}" CellTemplate="{StaticResource InterestColumnTemplate}"/>
+                    <!-- Date column -->
+                    <GridViewColumn Width="{Binding DateColumnWidth, Mode=TwoWay}" CellTemplate="{StaticResource DateColumnTemplate}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Date" Tag="Date" Click="OnColumnHeaderClicked"/>
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
+
+                    <!-- Account name column -->
+                    <GridViewColumn Width="{Binding AccountColumnWidth, Mode=TwoWay}" DisplayMemberBinding="{Binding Account}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Account" Tag="Account" Click="OnColumnHeaderClicked"/>
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
+
+                    <!-- Symbol column -->
+                    <GridViewColumn Width="{Binding SymbolColumnWidth, Mode=TwoWay}" DisplayMemberBinding="{Binding Symbol}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Symbol" Tag="Symbol" Click="OnColumnHeaderClicked"/>
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
+
+                    <!-- Description column -->
+                    <GridViewColumn Width="{Binding DescriptionColumnWidth, Mode=TwoWay}" DisplayMemberBinding="{Binding Description}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Description" Tag="Description" Click="OnColumnHeaderClicked"/>
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
+
+                    <!-- Dividends column -->
+                    <GridViewColumn Width="{Binding DividendColumnWidth, Mode=TwoWay}" CellTemplate="{StaticResource DividendColumnTemplate}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Dividends" Tag="Dividends" Click="OnColumnHeaderClicked"/>
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
+
+                    <!-- STCG column -->
+                    <GridViewColumn Width="{Binding STCGColumnWidth, Mode=TwoWay}" CellTemplate="{StaticResource STCGColumnTemplate}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Short term CG" Tag="STCG" Click="OnColumnHeaderClicked"/>
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
+
+                    <!-- LTCG column -->
+                    <GridViewColumn Width="{Binding LTCGColumnWidth, Mode=TwoWay}" CellTemplate="{StaticResource LTCGColumnTemplate}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Long term CG" Tag="LTCG" Click="OnColumnHeaderClicked"/>
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
+
+                    <!-- Interest column -->
+                    <GridViewColumn Width="{Binding InterestColumnWidth, Mode=TwoWay}" CellTemplate="{StaticResource InterestColumnTemplate}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Interest" Tag="Interest" Click="OnColumnHeaderClicked"/>
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
+
                 </GridView>                
             </ListView.View>
         </ListView>

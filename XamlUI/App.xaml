@@ -13,6 +13,9 @@
         <t:VisibilityBoolConverter x:Key="visibilityBoolConverter"/>
         <t:FontWeightConverter x:Key="fontWeightConverter"/>
         <t:TransactionStateToBrushConverter x:Key="transactionStateToBrushConverter"/>
+        <t:AmountToStringConverter x:Key="amountToStringConverter"/>
+        <t:AmountToStringNoNegativeConverter x:Key="amountToStringNoNegativeConverter"/>
+        <t:AmountToColorConverter x:Key="amountToColorConverter"/>
 
 
         <!-- Default for amount box -->
@@ -33,11 +36,13 @@
         <!-- Form combo box -->
         <Style TargetType="ComboBox" x:Key="FormComboBox">
             <Setter Property="Margin" Value="5"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
 
         <!-- Form check box -->
         <Style TargetType="CheckBox" x:Key="FormCheckBox">
             <Setter Property="Margin" Value="5"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
 
         <!-- Form watermark -->
@@ -130,7 +135,10 @@
                                 <ColumnDefinition Width="100"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="{Binding Payee}"/>
-                            <TextBlock Text="{Binding Amount, StringFormat=C2}"   Grid.Column="1" Margin="3,0" HorizontalAlignment="Right" Foreground="Red"/>
+                            <TextBlock 
+                                Text="{Binding Amount, Converter={StaticResource amountToStringConverter}}"
+                                Foreground="{Binding Amount, Converter={StaticResource amountToColorConverter}}"
+                                Grid.Column="1" Margin="3,0" HorizontalAlignment="Right"/>
                             <TextBlock Text="{Binding Category}" Grid.Column="2" Foreground="Blue"/>
                             <TextBlock Text="{Binding Memo}"     Grid.Column="3" Margin="3,0,0,0"/>
                         </Grid>

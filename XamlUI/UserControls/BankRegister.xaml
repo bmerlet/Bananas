@@ -114,7 +114,7 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock
-                                    Text="{Binding Path=PaymentString}"
+                                    Text="{Binding Path=Payment, Converter={StaticResource amountToStringNoNegativeConverter}}"
                                     Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"
                                     HorizontalAlignment="Right"/>
                             </DataTemplate>
@@ -145,7 +145,7 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock 
-                                    Text="{Binding Path=DepositString}"
+                                    Text="{Binding Path=Deposit, Converter={StaticResource amountToStringNoNegativeConverter}}"
                                     Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"
                                     HorizontalAlignment="Right"/>
                             </DataTemplate>

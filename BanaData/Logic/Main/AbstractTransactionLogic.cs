@@ -123,9 +123,7 @@ namespace BanaData.Logic.Main
                     if (data.LineItems.Count == 1)
                     {
                         data.LineItems[0].Amount = value;
-                        OnPropertyChanged(() => PaymentString);
                         OnPropertyChanged(() => Payment);
-                        OnPropertyChanged(() => DepositString);
                         OnPropertyChanged(() => Deposit);
                         OnPropertyChanged(() => AmountString);
                     }
@@ -141,7 +139,6 @@ namespace BanaData.Logic.Main
         public string AmountString => data.Amount.ToString("N");
 
         // Payment
-        public string PaymentString => data.Amount > 0 ? "" : (-data.Amount).ToString("N");
         public decimal Payment
         {
             get => -data.Amount;
@@ -152,8 +149,6 @@ namespace BanaData.Logic.Main
                     if (data.LineItems.Count == 1)
                     {
                         data.LineItems[0].Amount = -value;
-                        OnPropertyChanged(() => PaymentString);
-                        OnPropertyChanged(() => DepositString);
                         OnPropertyChanged(() => Deposit);
                         OnPropertyChanged(() => Amount);
                         OnPropertyChanged(() => AmountString);
@@ -176,7 +171,6 @@ namespace BanaData.Logic.Main
         public string[] StatusSource { get; } = new string[] { "", "c", "R" };
 
         // Deposit
-        public string DepositString => data.Amount <= 0 ? "" : data.Amount.ToString("N");
         public decimal Deposit
         {
             get => data.Amount;
@@ -187,8 +181,6 @@ namespace BanaData.Logic.Main
                     if (data.LineItems.Count == 1)
                     {
                         data.LineItems[0].Amount = value;
-                        OnPropertyChanged(() => PaymentString);
-                        OnPropertyChanged(() => DepositString);
                         OnPropertyChanged(() => Payment);
                         OnPropertyChanged(() => Amount);
                         OnPropertyChanged(() => AmountString);
@@ -275,9 +267,7 @@ namespace BanaData.Logic.Main
                 OnPropertyChanged(() => Amount);
                 OnPropertyChanged(() => AmountString);
                 OnPropertyChanged(() => Category);
-                OnPropertyChanged(() => PaymentString);
                 OnPropertyChanged(() => Payment);
-                OnPropertyChanged(() => DepositString);
                 OnPropertyChanged(() => Deposit);
             }
         }
@@ -321,9 +311,7 @@ namespace BanaData.Logic.Main
             {
                 OnPropertyChanged(() => Amount);
                 OnPropertyChanged(() => AmountString);
-                OnPropertyChanged(() => PaymentString);
                 OnPropertyChanged(() => Payment);
-                OnPropertyChanged(() => DepositString);
                 OnPropertyChanged(() => Deposit);
             }
         }

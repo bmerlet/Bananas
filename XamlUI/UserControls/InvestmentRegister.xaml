@@ -138,7 +138,7 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock 
-                                    Text="{Binding Path=SecurityQuantityString}"
+                                    Text="{Binding Path=SecurityQuantity, Converter={StaticResource amountToStringConverter}, ConverterParameter=N4}"
                                     Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"
                                     HorizontalAlignment="Right"/>
                             </DataTemplate>
@@ -153,7 +153,7 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock 
-                                    Text="{Binding Path=SecurityPriceString}"
+                                    Text="{Binding Path=SecurityPrice, Converter={StaticResource amountToStringConverter}, ConverterParameter=C4}"
                                     Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"
                                     HorizontalAlignment="Right"/>
                             </DataTemplate>
@@ -168,7 +168,7 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock 
-                                    Text="{Binding Path=CommissionString}"
+                                    Text="{Binding Path=CommissionString, Converter={StaticResource amountToStringConverter}}"
                                     Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"
                                     HorizontalAlignment="Right"/>
                             </DataTemplate>
@@ -190,12 +190,12 @@
                     <!-- Amount column-->
                     <GridViewColumn Width="{Binding Widths.WidthOfAmountColumn, Mode=TwoWay}">
                         <GridViewColumn.Header>
-                            <GridViewColumnHeader Content="Amount" Tag="AmountString" Click="OnColumnHeaderClicked"/>
+                            <GridViewColumnHeader Content="Amount" Tag="Amount" Click="OnColumnHeaderClicked"/>
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock 
-                                    Text="{Binding Path=AmountString}"
+                                    Text="{Binding Path=Amount, Converter={StaticResource amountToStringConverter}}"
                                     Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"
                                     HorizontalAlignment="Right"/>
                             </DataTemplate>

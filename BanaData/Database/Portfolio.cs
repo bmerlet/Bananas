@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace BanaData.Database
-{ 
+{
     public class Portfolio
     {
         decimal cashBalance;
@@ -145,5 +145,75 @@ namespace BanaData.Database
         {
             return lots.Select(l => l.Security.ID).Distinct();
         }
+
+        static public ComputeSaleCapitalGainsResult ComputeSaleCapitalGains(Household household, int transactionID)
+        {
+            // init  results
+            decimal longTermGain = 0;
+            var longTermLots = new List<UsedLot>();
+            decimal shortTermGain = 0;
+            var shortTermLots = new List<UsedLot>();
+
+            // Get transaction info
+            var transactionRow = household.Transactions.FindByID(transactionID);
+            var investmentTransactionRow = household.InvestmentTransactions.GetByTransaction(transactionRow);
+            var securityRow = household.Securities.FindByID(investmentTransactionRow.SecurityID);
+            var accountRow = household.Accounts.FindByID(transactionRow.AccountID);
+
+            decimal quantity = investmentTransactionRow.SecurityQuantity;
+            decimal price = investmentTransactionRow.SecurityPrice;
+
+            string description = $"Sale of {quantity:N4} shares of {securityRow.Symbol} at ${price:N4}";
+            if (investmentTransactionRow.Commission != 0)
+            {
+                description += $" with a {investmentTransactionRow.Commission:C2} commision";
+
+                // Recompute the price taking commission into account
+                price = transactionRow.GetAmount() / quantity;
+            }
+
+            // Figure out the portfolio for this account at the transaction date
+            var portfolio = accountRow.GetPortfolio(transactionRow.Date);
+
+            // Get the used lots
+            var usedLots = portfolio.GetLotsUsedForSale(securityRow, investmentTransactionRow.SecurityQuantity);
+            foreach (var lot in usedLots)
+            {
+                decimal quantityUsed = Math.Min(lot.Quantity, quantity);
+                decimal gain = (price - lot.SecurityPrice) * quantityUsed;
+
+                var usedLot = new UsedLot(lot.Date, lot.Quantity, quantityUsed, lot.SecurityPrice, gain);
+                if (transactionRow.Date.Subtract(lot.Date).TotalDays > 365) // ZZZ
+                {
+                    longTermLots.Add(usedLot);
+                    longTermGain += gain;
+                }
+                else
+                {
+                    shortTermLots.Add(usedLot);
+                    shortTermGain += gain;
+                }
+
+                quantity -= quantityUsed;
+            }
+
+            return new ComputeSaleCapitalGainsResult(description, longTermGain, longTermLots, shortTermGain, shortTermLots);
+        }
+
+        // Result from method above
+        public class ComputeSaleCapitalGainsResult
+        {
+            public ComputeSaleCapitalGainsResult(string description, decimal longTermGain, IEnumerable<UsedLot> longTermLots, decimal shortTermGain, IEnumerable<UsedLot> shortTermLots) =>
+                (Description, LongTermGain, LongTermLots, ShortTermGain, ShortTermLots) = (description, longTermGain, longTermLots, shortTermGain, shortTermLots);
+
+            public readonly string Description;
+
+            public readonly decimal LongTermGain;
+            public readonly IEnumerable<UsedLot> LongTermLots;
+
+            public readonly decimal ShortTermGain;
+            public readonly IEnumerable<UsedLot> ShortTermLots;
+        }
+
     }
 }

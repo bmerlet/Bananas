@@ -58,7 +58,7 @@
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Path=AmountString}" HorizontalAlignment="Right"/>
+                                <TextBlock Text="{Binding Path=Amount, StringFormat=C2}" HorizontalAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

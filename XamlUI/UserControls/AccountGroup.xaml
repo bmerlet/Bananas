@@ -60,7 +60,10 @@
                     <GridViewColumn Width="100">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Balance, StringFormat=C2}" TextAlignment="Right" />
+                                <TextBlock 
+                                    Text="{Binding Balance, StringFormat=C2}"
+                                    Foreground="{Binding Balance, Converter={StaticResource amountToColorConverter}}"
+                                    TextAlignment="Right" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

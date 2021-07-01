@@ -406,11 +406,9 @@ namespace BanaData.Logic.Dialogs
             set
             {
                 data.Amount = value;
-                OnPropertyChanged(() => AmountString);
                 logic.UpdateTotal();
             }
         }
-        public string AmountString => data.Amount.ToString("N");
 
         public void BeginEdit()
         {
@@ -431,7 +429,6 @@ namespace BanaData.Logic.Dialogs
                 OnPropertyChanged(() => Category);
                 OnPropertyChanged(() => Memo);
                 OnPropertyChanged(() => Amount);
-                OnPropertyChanged(() => AmountString);
             }
         }
 
@@ -445,7 +442,6 @@ namespace BanaData.Logic.Dialogs
                 OnPropertyChanged(() => Category);
                 OnPropertyChanged(() => Memo);
                 OnPropertyChanged(() => Amount);
-                OnPropertyChanged(() => AmountString);
             }
         }
 

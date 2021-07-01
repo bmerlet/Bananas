@@ -60,6 +60,12 @@ namespace BanaData.Database
                 return GetBalance(true, ETransactionStatus.Reconciled);
             }
 
+            public IEnumerable<TransactionsRow> GetTransactions()
+            {
+                var accountToTransactions = Table.ChildRelations["FK_Accounts_Transactions"];
+                return GetChildRows(accountToTransactions).Cast<TransactionsRow>();
+            }
+
             // Get the balance of a banking account
             private decimal GetBalance(bool filter, ETransactionStatus statusToFilterOn = ETransactionStatus.Pending)
             {

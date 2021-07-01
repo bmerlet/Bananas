@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace BanaData.Database
 {
+    /// <summary>
+    /// An amount of security bought at one point in time
+    /// </summary>
     public class Lot
     {
         public Lot(DateTime date, Household.SecuritiesRow security, decimal quantity, decimal securityPrice) =>
@@ -49,4 +52,20 @@ namespace BanaData.Database
             return hashCode;
         }
     }
+
+    /// <summary>
+    /// UI-oriented representation of a lot used for a sale
+    /// </summary>
+    public class UsedLot
+    {
+        public UsedLot(DateTime date, decimal totalQuantity, decimal quantityUsed, decimal costBasis, decimal gain) =>
+            (Date, TotalQuantity, QuantityUsed, CostBasis, Gain) = (date, totalQuantity, quantityUsed, costBasis, gain);
+
+        public DateTime Date { get; }
+        public decimal TotalQuantity { get; }
+        public decimal QuantityUsed { get; }
+        public decimal CostBasis { get; }
+        public decimal Gain { get; }
+    }
+
 }

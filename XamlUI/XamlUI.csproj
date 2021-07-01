@@ -97,6 +97,8 @@
     <Compile Include="Dialogs\ShowYearlyCapGainsAndDividends.xaml.cs">
       <DependentUpon>ShowYearlyCapGainsAndDividends.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tools\AmountToColorConverter.cs" />
+    <Compile Include="Tools\AmountToStringConverter.cs" />
     <Compile Include="Tools\BindingProxy.cs" />
     <Compile Include="Tools\DataGridLengthConverter.cs" />
     <Compile Include="Tools\FocusAttachedProperty.cs" />

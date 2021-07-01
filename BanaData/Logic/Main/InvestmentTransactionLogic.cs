@@ -97,7 +97,6 @@ namespace BanaData.Logic.Main
         //
         // Security price
         //
-        public string SecurityPriceString => data.SecurityPrice == 0 ? "" : data.SecurityPrice.ToString("N4");
         public decimal SecurityPrice
         {
             get => data.SecurityPrice;
@@ -110,7 +109,6 @@ namespace BanaData.Logic.Main
         //
         // Security quantity
         //
-        public string SecurityQuantityString => data.SecurityQuantity == 0 ? "" : data.SecurityQuantity.ToString("N4");
         public decimal SecurityQuantity
         {
             get => data.SecurityQuantity;
@@ -123,7 +121,6 @@ namespace BanaData.Logic.Main
         //
         // Commission
         //
-        public string CommissionString => data.Commission == 0 ? "" : data.Commission.ToString("N");
         public decimal Commission
         {
             get => data.Commission;
