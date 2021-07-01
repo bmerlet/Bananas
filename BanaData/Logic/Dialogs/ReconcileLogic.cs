@@ -357,7 +357,7 @@ namespace BanaData.Logic.Dialogs
 
             private void UpdateClearedTotal()
             {
-                TotalCleared = transactions.Sum(tr => tr.IsCleared == true ? tr.DecimalAmount : 0);
+                TotalCleared = transactions.Sum(tr => tr.IsCleared == true ? tr.Amount : 0);
                 OnPropertyChanged(() => TotalCleared);
 
                 NumberOfCheckedItems = "Cleared transactions: " + transactions.Count(tr => tr.IsCleared == true);
@@ -378,13 +378,12 @@ namespace BanaData.Logic.Dialogs
         {
             // Constructor
             public TransactionToReconcile(int id, bool _isCleared, DateTime date, string medium, string payee, decimal amount, bool isTransferFillIn) =>
-                (ID, isCleared, Date, Medium, Payee, DecimalAmount, IsTransferFillIn) =
+                (ID, isCleared, Date, Medium, Payee, Amount, IsTransferFillIn) =
                 (id, _isCleared, date, medium, payee, amount, isTransferFillIn);
 
             // Identifier - transaction ID
             public readonly int ID;
             public bool IsTransferFillIn;
-            public readonly decimal DecimalAmount;
 
             // Event
             public event EventHandler TransactionCleared;
@@ -409,7 +408,7 @@ namespace BanaData.Logic.Dialogs
             public DateTime Date { get; }
             public string Medium { get; }
             public string Payee { get; }
-            public string Amount => DecimalAmount.ToString("N");
+            public decimal Amount { get; }
         }
 
         #endregion

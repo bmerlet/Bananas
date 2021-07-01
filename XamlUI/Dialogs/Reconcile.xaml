@@ -68,13 +68,13 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock Text="Prior statement balance:"/>
-                    <TextBlock Text="{Binding PriorStatementBalance}" HorizontalAlignment="Right" Grid.Column="1"/>
+                    <TextBlock Text="{Binding PriorStatementBalance, StringFormat=C2}" HorizontalAlignment="Right" Grid.Column="1"/>
                     <TextBlock Text="Cleared balance:" Grid.Row="1"/>
-                    <TextBlock Text="{Binding ClearedBalance}" HorizontalAlignment="Right" Grid.Column="1" Grid.Row="1"/>
+                    <TextBlock Text="{Binding ClearedBalance, StringFormat=C2}" HorizontalAlignment="Right" Grid.Column="1" Grid.Row="1"/>
                     <TextBlock Text="Statement Balance:" Grid.Row="2"/>
-                    <TextBlock Text="{Binding StatementBalance}" HorizontalAlignment="Right" Grid.Column="1" Grid.Row="2"/>
+                    <TextBlock Text="{Binding StatementBalance, StringFormat=C2}" HorizontalAlignment="Right" Grid.Column="1" Grid.Row="2"/>
                     <TextBlock Text="Difference:" Grid.Row="3"/>
-                    <TextBlock Text="{Binding BalanceToClear}" HorizontalAlignment="Right" Grid.Column="1" Grid.Row="3"/>
+                    <TextBlock Text="{Binding BalanceToClear, StringFormat=C2}" HorizontalAlignment="Right" Grid.Column="1" Grid.Row="3"/>
                 </Grid>
 
             </Border>

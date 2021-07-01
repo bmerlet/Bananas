@@ -38,6 +38,8 @@ namespace BanaData.Logic.Main
             Reconcile.SetCanExecute(false);
             UpdateStockPrices = new CommandBase(OnUpdateStockPrices);
 
+            ShowYearlyCapGainsAndDividends = new CommandBase(OnShowYearlyCapGainsAndDividends);
+
             Test = new CommandBase(OnTest);
         }
 
@@ -221,6 +223,16 @@ namespace BanaData.Logic.Main
         {
             get => !mainWindow.UserSettings.HideClosedAccounts;
             set { mainWindow.UserSettings.HideClosedAccounts = !value; mainWindow.UpdateAll(); }
+        }
+
+        //
+        // Show yearly capital gains and dividends
+        //
+        public CommandBase ShowYearlyCapGainsAndDividends { get; }
+
+        private void OnShowYearlyCapGainsAndDividends()
+        {
+            mainWindow.GuiServices.ShowDialog(new ShowYearlyCapGainsAndDividendsLogic(mainWindow));
         }
 
         #endregion

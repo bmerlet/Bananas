@@ -93,7 +93,7 @@ namespace BanaData.Logic.Main
         }
 
         // Combined balance
-        public string Balance { get; private set; }
+        public decimal Balance { get; private set; }
 
         #endregion
 
@@ -101,18 +101,20 @@ namespace BanaData.Logic.Main
 
         public decimal UpdateAccountsAndBalances()
         {
+            var household = mainWindow.Household;
+
             // Get list of accounts from database
             IEnumerable<Household.AccountsRow> accounts =  Enumerable.Empty<Household.AccountsRow>();
             switch(type)
             {
                 case EType.Banking:
-                    accounts = mainWindow.Household.Accounts.GetBankingAccounts();
+                    accounts = household.Accounts.GetBankingAccounts();
                     break;
                 case EType.Investment:
-                    accounts = mainWindow.Household.Accounts.GetInvestmentAccounts();
+                    accounts = household.Accounts.GetInvestmentAccounts();
                     break;
                 case EType.Asset:
-                    accounts = mainWindow.Household.Accounts.GetAssetAccounts();
+                    accounts = household.Accounts.GetAssetAccounts();
                     break;
             }
 
@@ -134,7 +136,7 @@ namespace BanaData.Logic.Main
                 if (AccountsAndBalances.Count <= ix ||
                     AccountsAndBalances[ix].AccountID != acct.ID ||
                     AccountsAndBalances[ix].AccountName != acct.Name ||
-                    AccountsAndBalances[ix].DecimalBalance != balance)
+                    AccountsAndBalances[ix].Balance != balance)
                 {
                     var aab = new AccountAndBalance(acct.ID, acct.Name, balance);
                     if (ix < AccountsAndBalances.Count)
@@ -157,14 +159,12 @@ namespace BanaData.Logic.Main
                 AccountsAndBalances.RemoveAt(ix);
             }
 
-            var totalBalanceStr = totalBalance.ToString("N");
-            if (totalBalanceStr != Balance)
-            {
-                Balance = totalBalanceStr;
-            }
 
-            // Force refresh (for winforms)
-            OnPropertyChanged(() => Balance);
+            if (totalBalance != Balance)
+            {
+                Balance = totalBalance;
+                OnPropertyChanged(() => Balance);
+            }
 
             return totalBalance;
         }
@@ -175,24 +175,19 @@ namespace BanaData.Logic.Main
 
         public class AccountAndBalance
         {
-            public AccountAndBalance(int accountID, string accountName, decimal balance)
-            {
-                AccountID = accountID;
-                AccountName = accountName;
-                Balance = balance.ToString("N");
-                DecimalBalance = balance;
-            }
+            public AccountAndBalance(int accountID, string accountName, decimal balance) =>
+                (AccountID, AccountName, Balance) = (accountID, accountName, balance);
 
             // Properties for logic
-            public readonly decimal DecimalBalance;
             public readonly int AccountID;
 
             // UI Properties
+
             // Account name
             public string AccountName { get; }
 
             // Account balance
-            public string Balance { get; }
+            public decimal Balance { get; }
         }
 
         #endregion

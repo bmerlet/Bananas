@@ -8,8 +8,9 @@
         Icon="/XamlUI;component/Images/Bananas.ico"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
+        SizeToContent="Width"
         mc:Ignorable="d"
-        Title="Capital gains" Height="350" Width="600">
+        Title="Capital gains" Height="350">
     
     <Window.Resources>
 
@@ -67,11 +68,11 @@
 
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="Date" Width="80" CellTemplate="{StaticResource DateColumnTemplate}"/>
-                        <GridViewColumn Header="Quantity" Width="80" CellTemplate="{StaticResource TotalQuantityColumnTemplate}"/>
-                        <GridViewColumn Header="Quantity used" Width="80" CellTemplate="{StaticResource QuantityUsedColumnTemplate}"/>
-                        <GridViewColumn Header="Cost basis" Width="80" CellTemplate="{StaticResource CostBasisColumnTemplate}"/>
-                        <GridViewColumn Header="Gain" Width="80" CellTemplate="{StaticResource GainColumnTemplate}"/>
+                        <GridViewColumn Header="Date" Width="90" CellTemplate="{StaticResource DateColumnTemplate}"/>
+                        <GridViewColumn Header="Quantity" Width="90" CellTemplate="{StaticResource TotalQuantityColumnTemplate}"/>
+                        <GridViewColumn Header="Quantity used" Width="90" CellTemplate="{StaticResource QuantityUsedColumnTemplate}"/>
+                        <GridViewColumn Header="Cost basis" Width="90" CellTemplate="{StaticResource CostBasisColumnTemplate}"/>
+                        <GridViewColumn Header="Gain" Width="100" CellTemplate="{StaticResource GainColumnTemplate}"/>
                     </GridView>
                 </ListView.View>
             </ListView>

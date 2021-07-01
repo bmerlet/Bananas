@@ -153,6 +153,10 @@ namespace XamlUI
             {
                 dialog = new ShowCapitalGains(showCapitalGainsLogic);
             }
+            else if (logic is ShowYearlyCapGainsAndDividendsLogic showYearlyCapGainsAndDividendsLogic)
+            {
+                dialog = new ShowYearlyCapGainsAndDividends(showYearlyCapGainsAndDividendsLogic);
+            }
             else
             {
                 throw new NotImplementedException();

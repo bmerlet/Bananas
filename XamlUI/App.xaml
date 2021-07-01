@@ -130,7 +130,7 @@
                                 <ColumnDefinition Width="100"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="{Binding Payee}"/>
-                            <TextBlock Text="{Binding Amount}"   Grid.Column="1" Margin="3,0" HorizontalAlignment="Right" Foreground="Red"/>
+                            <TextBlock Text="{Binding Amount, StringFormat=C2}"   Grid.Column="1" Margin="3,0" HorizontalAlignment="Right" Foreground="Red"/>
                             <TextBlock Text="{Binding Category}" Grid.Column="2" Foreground="Blue"/>
                             <TextBlock Text="{Binding Memo}"     Grid.Column="3" Margin="3,0,0,0"/>
                         </Grid>

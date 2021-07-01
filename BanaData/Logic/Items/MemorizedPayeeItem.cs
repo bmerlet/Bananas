@@ -17,14 +17,14 @@ namespace BanaData.Logic.Items
 
             if (lineItems.Length == 1)
             {
-                (Category, Memo, Amount, AmountString, IsSplit) = 
-                    (lineItems[0].Category, lineItems[0].Memo, lineItems[0].Amount, lineItems[0].AmountString, false);
+                (Category, Memo, Amount, IsSplit) = 
+                    (lineItems[0].Category, lineItems[0].Memo, lineItems[0].Amount, false);
             }
             else
             {
                 decimal sum = lineItems.Sum(li => li.Amount);
-                (Category, Memo, Amount, AmountString, IsSplit) = 
-                    ("<Split>", "", sum, sum.ToString("N"), true);
+                (Category, Memo, Amount, IsSplit) = 
+                    ("<Split>", "", sum, true);
             }
         }
 
@@ -36,7 +36,6 @@ namespace BanaData.Logic.Items
         public bool? IsSplit { get; }
         public string Memo { get; }
         public decimal Amount { get; }
-        public string AmountString { get; }
 
         public int CompareTo(MemorizedPayeeItem other)
         {

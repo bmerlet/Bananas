@@ -38,6 +38,7 @@
             </MenuItem>
             <MenuItem Header="View">
                 <MenuItem Header="Show closed accounts" IsCheckable="True" IsChecked="{Binding ShowClosedAccounts}"/>
+                <MenuItem Header="Show yearly capital gains and dividends" Command="{Binding ShowYearlyCapGainsAndDividends}"/>
             </MenuItem>
             <MenuItem Header="Test" Command="{Binding Test}"/>
         </Menu>
@@ -64,8 +65,8 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="100"/>
                         </Grid.ColumnDefinitions>
-                        <Label Content="Net Worth:"/>
-                        <Label Content="{Binding NetWorth}" Grid.Column="1" HorizontalAlignment="Right"/>
+                        <TextBlock Text="Net Worth:" Margin="5"/>
+                        <TextBlock Text="{Binding NetWorth, StringFormat=C2}" Grid.Column="1" HorizontalAlignment="Right" Margin="5"/>
                     </Grid>
                     <Grid/>
                 </DockPanel>

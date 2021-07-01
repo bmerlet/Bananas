@@ -168,7 +168,7 @@ namespace BanaData.Logic.Main
         public AccountGroupLogic InvestmentAccountGroup { get; private set; }
         public AccountGroupLogic AssetAccountGroup { get; private set; }
 
-        public string NetWorth { get; private set; }
+        public decimal NetWorth { get; private set; }
 
         // The bank register
         public BankRegisterLogic BankRegister { get; private set; }
@@ -244,13 +244,11 @@ namespace BanaData.Logic.Main
         public void UpdateAll()
         {
             // Update accounts
-            decimal netWorth = 0;
+            NetWorth = 0;
+            NetWorth += BankAccountGroup.UpdateAccountsAndBalances();
+            NetWorth += InvestmentAccountGroup.UpdateAccountsAndBalances();
+            NetWorth += AssetAccountGroup.UpdateAccountsAndBalances();
 
-            netWorth += BankAccountGroup.UpdateAccountsAndBalances();
-            netWorth += InvestmentAccountGroup.UpdateAccountsAndBalances();
-            netWorth += AssetAccountGroup.UpdateAccountsAndBalances();
-
-            NetWorth = netWorth.ToString("N");
             OnPropertyChanged(() => NetWorth);
 
             // Compute the memorized payees
