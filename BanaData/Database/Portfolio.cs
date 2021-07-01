@@ -56,10 +56,12 @@ namespace BanaData.Database
             }
         }
 
+#pragma warning disable IDE0060 // Remove unused parameter
         public void ApplyTransfer(Household household, Household.LineItemsRow lineItem)
         {
             cashBalance -= lineItem.Amount;
         }
+#pragma warning restore IDE0060 // Remove unused parameter
 
         private void AddShares(DateTime date, Household.SecuritiesRow security, decimal quantity, decimal securityPrice)
         {

@@ -12,7 +12,23 @@
         Title="Capital gains" Height="350" Width="600">
     
     <Window.Resources>
-        <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}"/>
+
+        <DataTemplate x:Key="DateColumnTemplate">
+            <TextBlock Text="{Binding Date, StringFormat=MM/dd/yyyy}" HorizontalAlignment="Right"/>
+        </DataTemplate>
+        <DataTemplate x:Key="TotalQuantityColumnTemplate">
+            <TextBlock Text="{Binding TotalQuantity, StringFormat=N4}" HorizontalAlignment="Right"/>
+        </DataTemplate>
+        <DataTemplate x:Key="QuantityUsedColumnTemplate">
+            <TextBlock Text="{Binding QuantityUsed, StringFormat=N4}" HorizontalAlignment="Right"/>
+        </DataTemplate>
+        <DataTemplate x:Key="CostBasisColumnTemplate">
+            <TextBlock Text="{Binding CostBasis, StringFormat=C4}" HorizontalAlignment="Right"/>
+        </DataTemplate>
+        <DataTemplate x:Key="GainColumnTemplate">
+            <TextBlock Text="{Binding Gain, StringFormat=C2}" HorizontalAlignment="Right"/>
+        </DataTemplate>
+
     </Window.Resources>
 
     <DockPanel>
@@ -20,7 +36,7 @@
         <w:DonePanel DockPanel.Dock="Bottom"/>
 
         <!-- Description -->
-        <TextBlock Text="{Binding Description}" DockPanel.Dock="Top"/>
+        <TextBlock Text="{Binding Description}" DockPanel.Dock="Top" Style="{StaticResource FormTextBlock}"/>
         
         <!-- Capital gains -->
         <Grid DockPanel.Dock="Top">
@@ -36,36 +52,50 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Text="Long term capital gains:"/>
-            <TextBlock Text="{Binding LongTermGain, StringFormat=C2}" Grid.Column="2"/>
+            <TextBlock Text="Long term capital gains:" Style="{StaticResource FormTextBlock}"/>
+            <TextBlock Text="{Binding LongTermGain, StringFormat=C2}" Grid.Column="2" FontWeight="Bold" HorizontalAlignment="Right" Style="{StaticResource FormTextBlock}"/>
 
             <ListView 
                 Grid.ColumnSpan="3" Grid.Row="1" 
                 ItemsSource="{Binding LongTermLots}">
+                
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="Date" Width="80" DisplayMemberBinding="{Binding Date, StringFormat=MM/dd/yyyy}"/>
-                        <GridViewColumn Header="Quantity" Width="80" DisplayMemberBinding="{Binding TotalQuantity, StringFormat=N4}"/>
-                        <GridViewColumn Header="Quantity used" Width="80" DisplayMemberBinding="{Binding QuantityUsed, StringFormat=N4}"/>
-                        <GridViewColumn Header="Cost basis" Width="80" DisplayMemberBinding="{Binding CostBasis, StringFormat=C4}"/>
-                        <GridViewColumn Header="Gain" Width="80" DisplayMemberBinding="{Binding Gain, StringFormat=C2}"/>
+                        <GridViewColumn Header="Date" Width="80" CellTemplate="{StaticResource DateColumnTemplate}"/>
+                        <GridViewColumn Header="Quantity" Width="80" CellTemplate="{StaticResource TotalQuantityColumnTemplate}"/>
+                        <GridViewColumn Header="Quantity used" Width="80" CellTemplate="{StaticResource QuantityUsedColumnTemplate}"/>
+                        <GridViewColumn Header="Cost basis" Width="80" CellTemplate="{StaticResource CostBasisColumnTemplate}"/>
+                        <GridViewColumn Header="Gain" Width="80" CellTemplate="{StaticResource GainColumnTemplate}"/>
                     </GridView>
                 </ListView.View>
             </ListView>
 
-            <TextBlock Text="Short term capital gains:" Grid.Row="2"/>
-            <TextBlock Text="{Binding ShortTermGain, StringFormat=C2}" Grid.Row="2" Grid.Column="2"/>
+            <TextBlock Text="Short term capital gains:" Grid.Row="2" Style="{StaticResource FormTextBlock}"/>
+            <TextBlock Text="{Binding ShortTermGain, StringFormat=C2}" Grid.Row="2" Grid.Column="2" FontWeight="Bold" HorizontalAlignment="Right" Style="{StaticResource FormTextBlock}"/>
 
             <ListView 
                 Grid.ColumnSpan="3" Grid.Row="3" 
                 ItemsSource="{Binding ShortTermLots}">
-                <ListView.View>
+                
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+                
+                    <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="Date" Width="80" DisplayMemberBinding="{Binding Date, StringFormat=MM/dd/yyyy}"/>
-                        <GridViewColumn Header="Quantity" Width="80" DisplayMemberBinding="{Binding TotalQuantity, StringFormat=N4}"/>
-                        <GridViewColumn Header="Quantity used" Width="80" DisplayMemberBinding="{Binding QuantityUsed, StringFormat=N4}"/>
-                        <GridViewColumn Header="Cost basis" Width="80" DisplayMemberBinding="{Binding CostBasis, StringFormat=C4}"/>
-                        <GridViewColumn Header="Gain" Width="80" DisplayMemberBinding="{Binding Gain, StringFormat=C2}"/>
+                        <GridViewColumn Header="Date" Width="80" CellTemplate="{StaticResource DateColumnTemplate}"/>
+                        <GridViewColumn Header="Quantity" Width="80" CellTemplate="{StaticResource TotalQuantityColumnTemplate}"/>
+                        <GridViewColumn Header="Quantity used" Width="80" CellTemplate="{StaticResource QuantityUsedColumnTemplate}"/>
+                        <GridViewColumn Header="Cost basis" Width="80" CellTemplate="{StaticResource CostBasisColumnTemplate}"/>
+                        <GridViewColumn Header="Gain" Width="80" CellTemplate="{StaticResource GainColumnTemplate}"/>
                     </GridView>
                 </ListView.View>
             </ListView>

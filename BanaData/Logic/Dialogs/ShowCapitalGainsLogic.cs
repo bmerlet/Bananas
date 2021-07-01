@@ -30,18 +30,27 @@ namespace BanaData.Logic.Dialogs
             var securityRow = household.Securities.FindByID(investmentTransactionRow.SecurityID);
             var accountRow = household.Accounts.FindByID(transactionRow.AccountID);
 
-            Description = $"Sale of {investmentTransactionRow.SecurityQuantity:N4} shares of {securityRow.Symbol} at ${investmentTransactionRow.SecurityPrice:N4}";
+            decimal quantity = investmentTransactionRow.SecurityQuantity;
+            decimal price = investmentTransactionRow.SecurityPrice;
+
+            Description = $"Sale of {quantity:N4} shares of {securityRow.Symbol} at ${price:N4}";
+            if (investmentTransactionRow.Commission != 0)
+            {
+                Description += $" with a {investmentTransactionRow.Commission:C2} commision";
+
+                // Recompute the price taking commission into account
+                price = transactionRow.GetAmount() / quantity;
+            }
             
             // Figure out the portfolio for this account at the transaction date
             var portfolio = accountRow.GetPortfolio(transactionRow.Date);
 
             // Get the used lots
             var usedLots = portfolio.GetLotsUsedForSale(securityRow, investmentTransactionRow.SecurityQuantity);
-            decimal quantity = investmentTransactionRow.SecurityQuantity;
             foreach(var lot in usedLots)
             {
                 decimal quantityUsed = Math.Min(lot.Quantity, quantity);
-                decimal gain = (investmentTransactionRow.SecurityPrice - lot.SecurityPrice) * quantityUsed;
+                decimal gain = (price - lot.SecurityPrice) * quantityUsed;
 
                 var usedLot = new UsedLot(lot.Date, lot.Quantity, quantityUsed, lot.SecurityPrice, gain);
                 if (transactionRow.Date.Subtract(lot.Date).TotalDays > 365) // ZZZ
@@ -63,12 +72,12 @@ namespace BanaData.Logic.Dialogs
 
         public decimal LongTermGain { get; private set; }
 
-        private List<UsedLot> longTermLots = new List<UsedLot>();
+        private readonly List<UsedLot> longTermLots = new List<UsedLot>();
         public IEnumerable<UsedLot> LongTermLots => longTermLots;
 
         public decimal ShortTermGain { get; private set; }
 
-        private List<UsedLot> shortTermLots = new List<UsedLot>();
+        private readonly List<UsedLot> shortTermLots = new List<UsedLot>();
         public IEnumerable<UsedLot> ShortTermLots => shortTermLots;
 
         public class UsedLot
