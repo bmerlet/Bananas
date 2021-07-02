@@ -32,19 +32,13 @@ namespace BanaData.Logic.Dialogs
 
             foreach (Household.AccountsRow acct in mainWindowLogic.Household.Accounts.Rows)
             {
-                bool investment = acct.Type == EAccountType.Investment;
-
                 // Skip hidden accounts if required
                 if (acct.Hidden && mainWindowLogic.UserSettings.HideClosedAccounts)
                 {
                     continue;
                 }
 
-                var desc = acct.IsDescriptionNull() ? "" : acct.Description;
-                decimal creditLimit = acct.IsCreditLimitNull() ? 0 : acct.CreditLimit;
-                EInvestmentKind kind = acct.IsIKindNull() ? EInvestmentKind.Invalid : acct.Kind;
-
-                accountsSource.Add(new AccountItem(acct.ID, acct.Name, desc, acct.Type, creditLimit, kind, acct.Hidden));
+                accountsSource.Add(AccountItem.CreateFromDB(acct));
             }
 
             AccountsSource = (CollectionView)CollectionViewSource.GetDefaultView(accountsSource);

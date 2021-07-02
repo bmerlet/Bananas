@@ -17,7 +17,14 @@ namespace BanaData.Logic.Dialogs
 {
     public class ShowYearlyCapGainsAndDividendsLogic : LogicBase
     {
+        #region Privatew members
+
         private readonly MainWindowLogic mainWindowLogic;
+        private readonly List<Household.AccountsRow> shownAccounts = new List<Household.AccountsRow>();
+
+        #endregion
+
+        #region Constructor
 
         public ShowYearlyCapGainsAndDividendsLogic(MainWindowLogic _mainWindowLogic)
         {
@@ -28,19 +35,32 @@ namespace BanaData.Logic.Dialogs
             var years = new List<int>();
             for (int i = 0; i < 15; i++) // Go back 15 years
             {
-                years.Add(thisYear - i);                
+                years.Add(thisYear - i);
             }
             YearSource = years.ToArray();
             SelectedYear = years[0];
+
+            // Setup accounts
+            foreach(Household.AccountsRow accountRow in mainWindowLogic.Household.Accounts.Rows)
+            {
+                if (!accountRow.Name.Contains(" IRA"))  // ZZZZZZZ FIXME
+                {
+                    shownAccounts.Add(accountRow);
+                }
+            }
 
             // Setup transaction view
             Transactions = (CollectionView)CollectionViewSource.GetDefaultView(transactions);
             Transactions.SortDescriptions.Add(new SortDescription("Date", ListSortDirection.Ascending));
 
+            // Pick accounts command
+            PickAccountsCommand = new CommandBase(OnPickAccountsCommand);
+
             // Build transaction list
             UpdateTransactions();
         }
 
+        #endregion
 
         #region UI properties
 
@@ -79,18 +99,62 @@ namespace BanaData.Logic.Dialogs
             }
         }
 
+        //
+        // Show dividends or not
+        //
+        private bool isShowingDividends = true;
+        public bool? IsShowingDividends
+        {
+            get => isShowingDividends;
+            set
+            {
+                if (isShowingDividends != value)
+                {
+                    isShowingDividends = value == true;
+                    UpdateTransactions();
+                }
+            }
+        }
+
+        //
+        // Show dividends or not
+        //
+        private bool isShowingCapGains = true;
+        public bool? IsShowingCapGains
+        {
+            get => isShowingCapGains;
+            set
+            {
+                if (isShowingCapGains != value)
+                {
+                    isShowingCapGains = value == true;
+                    UpdateTransactions();
+                }
+            }
+        }
+
+        //
+        // Pick accounts
+        //
+        public CommandBase PickAccountsCommand { get; }
+
+        //
         // Transactions
+        //
         private readonly WpfObservableRangeCollection<TransactionItem> transactions = new WpfObservableRangeCollection<TransactionItem>();
         public CollectionView Transactions { get; }
 
+        //
         // Totals
+        //
         public decimal TotalDividend { get; private set; }
         public decimal TotalSTCG { get; private set; }
         public decimal TotalLTCG { get; private set; }
         public decimal TotalInterest { get; private set; }
 
+        //
         // Widths
-        // ZZZ Propagate
+        //
         private double dateColumnWidth = 80;
         public double DateColumnWidth
         {
@@ -205,6 +269,8 @@ namespace BanaData.Logic.Dialogs
 
         #endregion
 
+        #region Actions
+
         private void UpdateTransactions()
         {
             var household = mainWindowLogic.Household;
@@ -216,13 +282,13 @@ namespace BanaData.Logic.Dialogs
             TotalLTCG = 0;
             TotalInterest = 0;
 
-            // Go through all the investment accounts
-            foreach (var accountRow in household.Accounts.GetInvestmentAccounts())
+            // Go through all shown accounts
+            foreach (var accountRow in shownAccounts)
             {
                 var accountName = accountRow.Name;
 
-                // ZZZZZZZZ Horrible
-                if (accountName.Contains(" IRA"))
+                // Perf: Skip non-investment accounts altogether if not computing interest
+                if (accountRow.Type != EAccountType.Investment && !isShowingInterest)
                 {
                     continue;
                 }
@@ -235,9 +301,10 @@ namespace BanaData.Logic.Dialogs
 
                     // Capture dividends
                     var type = investmentTransactionRow.Type;
-                    if (type == EInvestmentTransactionType.Dividends || 
-                        type == EInvestmentTransactionType.ReinvestDividends ||
-                        type == EInvestmentTransactionType.TransferDividends)
+                    if (isShowingDividends &&
+                        (type == EInvestmentTransactionType.Dividends || 
+                         type == EInvestmentTransactionType.ReinvestDividends ||
+                         type == EInvestmentTransactionType.TransferDividends))
                     {
                         string symbol = household.Securities.FindByID(investmentTransactionRow.SecurityID).Symbol;
                         string description = EnumDescriptionAttribute.GetDescription(type);
@@ -248,9 +315,10 @@ namespace BanaData.Logic.Dialogs
                     }
 
                     // Capture STCG
-                    if (type == EInvestmentTransactionType.ShortTermCapitalGains ||
-                        type == EInvestmentTransactionType.ReinvestShortTermCapitalGains ||
-                        type == EInvestmentTransactionType.TransferShortTermCapitalGains)
+                    if (isShowingCapGains && 
+                        (type == EInvestmentTransactionType.ShortTermCapitalGains ||
+                         type == EInvestmentTransactionType.ReinvestShortTermCapitalGains ||
+                         type == EInvestmentTransactionType.TransferShortTermCapitalGains))
                     {
                         string symbol = household.Securities.FindByID(investmentTransactionRow.SecurityID).Symbol;
                         string description = EnumDescriptionAttribute.GetDescription(type);
@@ -261,9 +329,10 @@ namespace BanaData.Logic.Dialogs
                     }
 
                     // Capture LTCG
-                    if (type == EInvestmentTransactionType.LongTermCapitalGains ||
-                        type == EInvestmentTransactionType.ReinvestLongTermCapitalGains ||
-                        type == EInvestmentTransactionType.TransferLongTermCapitalGains)
+                    if (isShowingCapGains && 
+                        (type == EInvestmentTransactionType.LongTermCapitalGains ||
+                         type == EInvestmentTransactionType.ReinvestLongTermCapitalGains ||
+                         type == EInvestmentTransactionType.TransferLongTermCapitalGains))
                     {
                         string symbol = household.Securities.FindByID(investmentTransactionRow.SecurityID).Symbol;
                         string description = EnumDescriptionAttribute.GetDescription(type);
@@ -274,8 +343,9 @@ namespace BanaData.Logic.Dialogs
                     }
 
                     // Capture share sales
-                    if (type == EInvestmentTransactionType.Sell ||
-                        type == EInvestmentTransactionType.SellAndTransferCash)
+                    if (isShowingCapGains && 
+                        (type == EInvestmentTransactionType.Sell ||
+                         type == EInvestmentTransactionType.SellAndTransferCash))
                     {
                         string symbol = household.Securities.FindByID(investmentTransactionRow.SecurityID).Symbol;
                         var sale = Portfolio.ComputeSaleCapitalGains(household, transactionRow.ID);
@@ -295,6 +365,19 @@ namespace BanaData.Logic.Dialogs
             OnPropertyChanged(() => TotalLTCG);
             OnPropertyChanged(() => TotalInterest);
         }
+
+        private void OnPickAccountsCommand()
+        {
+            var logic = new AccountPickerLogic(mainWindowLogic, shownAccounts);
+            if (mainWindowLogic.GuiServices.ShowDialog(logic))
+            {
+                shownAccounts.Clear();
+                shownAccounts.AddRange(logic.PickedAccounts);
+                UpdateTransactions();
+            }
+        }
+
+        #endregion
 
         #region Supporting classes
 

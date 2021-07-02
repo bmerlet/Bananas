@@ -10,7 +10,7 @@
         WindowStartupLocation="CenterOwner"
         SizeToContent="Width"
         mc:Ignorable="d"
-        Title="Yearly capital gains and dividends" Height="350">
+        Title="Yearly capital gains and dividends" Height="450">
     <DockPanel>
 
         <!-- Done panel -->
@@ -22,12 +22,16 @@
                 <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}"/>
                 <Style TargetType="ComboBox" BasedOn="{StaticResource FormComboBox}"/>
                 <Style TargetType="CheckBox" BasedOn="{StaticResource FormCheckBox}"/>
+                <Style TargetType="Button" BasedOn="{StaticResource FormButton}"/>
             </Grid.Resources>
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="120"/>
-                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
@@ -41,9 +45,21 @@
                 ItemsSource="{Binding YearSource}"
                 SelectedItem="{Binding SelectedYear, Mode=TwoWay}"/>
             <CheckBox
+                Grid.Column="2"
+                Content="Show dividends"
+                IsChecked="{Binding IsShowingDividends, Mode=TwoWay}"/>
+            <CheckBox
                 Grid.Column="3"
+                Content="Show capital gains"
+                IsChecked="{Binding IsShowingCapGains, Mode=TwoWay}"/>
+            <CheckBox
+                Grid.Column="4"
                 Content="Show interest"
                 IsChecked="{Binding IsShowingInterest, Mode=TwoWay}"/>
+            <Button
+                Grid.Column="6" Width="100"
+                Content="Pick accounts..."
+                Command="{Binding PickAccountsCommand}"/>
         </Grid>
         
         <!-- Totals-->

@@ -23,6 +23,16 @@ namespace BanaData.Logic.Items
             (ID, Name, Description, Type, CreditLimit, InvestmentKind, Hidden) = 
             (id, src.Name, src.Description, src.Type, src.CreditLimit, src.InvestmentKind, src.Hidden);
 
+        // Factory from DB row
+        public static AccountItem CreateFromDB(Household.AccountsRow accountsRow)
+        {
+            var desc = accountsRow.IsDescriptionNull() ? "" : accountsRow.Description;
+            decimal creditLimit = accountsRow.IsCreditLimitNull() ? 0 : accountsRow.CreditLimit;
+            EInvestmentKind kind = accountsRow.IsIKindNull() ? EInvestmentKind.Invalid : accountsRow.Kind;
+
+            return new AccountItem(accountsRow.ID, accountsRow.Name, desc, accountsRow.Type, creditLimit, kind, accountsRow.Hidden);
+        }
+
         public readonly int ID;
 
         public string Name { get; }
