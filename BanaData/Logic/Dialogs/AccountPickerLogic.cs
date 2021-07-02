@@ -9,6 +9,7 @@ using System.Windows.Data;
 using BanaData.Database;
 using BanaData.Logic.Items;
 using BanaData.Logic.Main;
+using Toolbox.UILogic;
 using Toolbox.UILogic.Dialogs;
 
 namespace BanaData.Logic.Dialogs
@@ -36,16 +37,31 @@ namespace BanaData.Logic.Dialogs
             // Setup account view
             Accounts = (CollectionView)CollectionViewSource.GetDefaultView(accounts);
             Accounts.SortDescriptions.Add(new SortDescription("AccountItem.Name", ListSortDirection.Ascending));
-        }
 
-        #endregion
+            // Setup commands
+            ClearAllCommand = new CommandBase(OnClearAllCommand);
+            SelectAllCommand = new CommandBase(OnSelectAllCommand);
+            SelectInvestmentCommand = new CommandBase(OnSelectInvestmentCommand);
+            SelectBankingCommand = new CommandBase(OnSelectBankingCommand);
+    }
 
-        #region UI properties
+    #endregion
+
+    #region UI properties
 
         //
         // List of accounts
+        //
         private readonly ObservableCollection<AccountPickerItem> accounts = new ObservableCollection<AccountPickerItem>();
-        public CollectionView Accounts;
+        public CollectionView Accounts { get; }
+
+        //
+        // Buttons
+        //
+        public CommandBase ClearAllCommand { get; }
+        public CommandBase SelectAllCommand { get; }
+        public CommandBase SelectInvestmentCommand { get; }
+        public CommandBase SelectBankingCommand { get; }
 
         #endregion
 
@@ -66,24 +82,70 @@ namespace BanaData.Logic.Dialogs
                 }
             }
 
+            PickedAccounts = pickedAccounts;
+
             // Err on the side of caution
             return true;
+        }
+
+        private void OnClearAllCommand()
+        {
+            foreach(var acct in accounts)
+            {
+                acct.IsSelected = false;
+            }
+        }
+
+        private void OnSelectAllCommand()
+        {
+            foreach (var acct in accounts)
+            {
+                acct.IsSelected = true;
+            }
+        }
+
+        private void OnSelectInvestmentCommand()
+        {
+            foreach (var acct in accounts)
+            {
+                acct.IsSelected = acct.AccountRow.Type == EAccountType.Investment;
+            }
+        }
+
+        private void OnSelectBankingCommand()
+        {
+            foreach (var acct in accounts)
+            {
+                acct.IsSelected = acct.AccountRow.Type == EAccountType.Bank;
+            }
         }
 
         #endregion
 
         #region Supporting class
 
-        public class AccountPickerItem
+        public class AccountPickerItem : LogicBase
         {
             public AccountPickerItem(Household.AccountsRow accountRow, bool selected) =>
-                (AccountRow, AccountItem, IsSelected) = (accountRow, AccountItem.CreateFromDB(accountRow), selected);
+                (AccountRow, AccountItem, isSelected) = (accountRow, AccountItem.CreateFromDB(accountRow), selected);
 
             public readonly Household.AccountsRow AccountRow;
 
             public AccountItem AccountItem { get; }
 
-            public bool? IsSelected { get; set; } 
+            private bool ?isSelected;
+            public bool? IsSelected
+            {
+                get => isSelected;
+                set
+                {
+                    if (isSelected != value)
+                    {
+                        isSelected = value;
+                    }
+                    OnPropertyChanged(() => IsSelected);
+                }
+            }
         }
 
         #endregion

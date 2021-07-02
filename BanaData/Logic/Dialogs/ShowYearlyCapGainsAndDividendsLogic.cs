@@ -12,15 +12,17 @@ using Toolbox.Attributes;
 using BanaData.Logic.Main;
 using BanaData.Collections;
 using BanaData.Database;
+using BanaData.Logic.Items;
 
 namespace BanaData.Logic.Dialogs
 {
     public class ShowYearlyCapGainsAndDividendsLogic : LogicBase
     {
-        #region Privatew members
+        #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
         private readonly List<Household.AccountsRow> shownAccounts = new List<Household.AccountsRow>();
+        private readonly List<int> interestCategories = new List<int>();
 
         #endregion
 
@@ -40,12 +42,21 @@ namespace BanaData.Logic.Dialogs
             YearSource = years.ToArray();
             SelectedYear = years[0];
 
-            // Setup accounts
+            // Setup accounts - skip IRAs as they are not taxable
             foreach(Household.AccountsRow accountRow in mainWindowLogic.Household.Accounts.Rows)
             {
-                if (!accountRow.Name.Contains(" IRA"))  // ZZZZZZZ FIXME
+                if (!(accountRow.Type == EAccountType.Investment) || !(accountRow.Kind == EInvestmentKind.TraditionalIRA))
                 {
                     shownAccounts.Add(accountRow);
+                }
+            }
+
+            // Find the categories that hold interest income
+            foreach(Household.CategoriesRow categoryRow in mainWindowLogic.Household.Categories.Rows)
+            {
+                if (!categoryRow.IsTaxInfoNull() && CategoryItem.TaxInfoDictionary[categoryRow.TaxInfo].Contains("Interest income"))
+                {
+                    interestCategories.Add(categoryRow.ID);
                 }
             }
 
@@ -282,78 +293,110 @@ namespace BanaData.Logic.Dialogs
             TotalLTCG = 0;
             TotalInterest = 0;
 
-            // Go through all shown accounts
-            foreach (var accountRow in shownAccounts)
+            //
+            // Compute interests
+            //
+            if (isShowingInterest)
             {
-                var accountName = accountRow.Name;
-
-                // Perf: Skip non-investment accounts altogether if not computing interest
-                if (accountRow.Type != EAccountType.Investment && !isShowingInterest)
+                // Go through all shown accounts
+                foreach (var accountRow in shownAccounts)
                 {
-                    continue;
+                    var accountName = accountRow.Name;
+
+                    // Go through all the transactions for that year
+                    foreach (Household.TransactionsRow transactionRow in accountRow.GetTransactions().Where(tr => tr.Date.Year == selectedYear))
+                    {
+                        // Go through all the line items
+                        foreach(var li in household.LineItems.GetByTransaction(transactionRow))
+                        {
+                            if (!li.IsCategoryIDNull() && interestCategories.Contains(li.CategoryID))
+                            {
+                                string description = transactionRow.IsPayeeNull() ? "Interest" : transactionRow.Payee;
+                                tempTransList.Add(new TransactionItem(transactionRow.Date, accountName, "", description, 0, 0, 0, li.Amount));
+                                TotalInterest += li.Amount;
+                            }
+                        }
+                    }
                 }
+            }
 
-                // Go through all the transactions for that year
-                foreach (Household.TransactionsRow transactionRow in accountRow.GetTransactions().Where(tr => tr.Date.Year == selectedYear))
+            //
+            // Compute Dividends and CG
+            //
+            if (isShowingDividends || isShowingCapGains)
+            {
+                foreach (var accountRow in shownAccounts)
                 {
-                    // Get the investment transaction
-                    var investmentTransactionRow = household.InvestmentTransactions.GetByTransaction(transactionRow);
+                    var accountName = accountRow.Name;
 
-                    // Capture dividends
-                    var type = investmentTransactionRow.Type;
-                    if (isShowingDividends &&
-                        (type == EInvestmentTransactionType.Dividends || 
-                         type == EInvestmentTransactionType.ReinvestDividends ||
-                         type == EInvestmentTransactionType.TransferDividends))
+                    // Perf: Skip non-investment accounts altogether if not computing interest
+                    if (accountRow.Type != EAccountType.Investment && !isShowingInterest)
                     {
-                        string symbol = household.Securities.FindByID(investmentTransactionRow.SecurityID).Symbol;
-                        string description = EnumDescriptionAttribute.GetDescription(type);
-                        decimal amount = transactionRow.GetAmount() * (type == EInvestmentTransactionType.TransferDividends ? -1 : 1);
-                        tempTransList.Add(new TransactionItem(transactionRow.Date, accountName, symbol, description, amount, 0, 0, 0));
-
-                        TotalDividend += amount;
+                        continue;
                     }
 
-                    // Capture STCG
-                    if (isShowingCapGains && 
-                        (type == EInvestmentTransactionType.ShortTermCapitalGains ||
-                         type == EInvestmentTransactionType.ReinvestShortTermCapitalGains ||
-                         type == EInvestmentTransactionType.TransferShortTermCapitalGains))
+                    // Go through all the transactions for that year
+                    foreach (Household.TransactionsRow transactionRow in accountRow.GetTransactions().Where(tr => tr.Date.Year == selectedYear))
                     {
-                        string symbol = household.Securities.FindByID(investmentTransactionRow.SecurityID).Symbol;
-                        string description = EnumDescriptionAttribute.GetDescription(type);
-                        decimal amount = transactionRow.GetAmount() * (type == EInvestmentTransactionType.TransferShortTermCapitalGains ? -1 : 1);
-                        tempTransList.Add(new TransactionItem(transactionRow.Date, accountName, symbol, description, 0, amount, 0, 0));
+                        // Get the investment transaction
+                        var investmentTransactionRow = household.InvestmentTransactions.GetByTransaction(transactionRow);
 
-                        TotalSTCG += amount;
-                    }
+                        // Capture dividends
+                        var type = investmentTransactionRow.Type;
+                        if (isShowingDividends &&
+                            (type == EInvestmentTransactionType.Dividends ||
+                             type == EInvestmentTransactionType.ReinvestDividends ||
+                             type == EInvestmentTransactionType.TransferDividends))
+                        {
+                            string symbol = household.Securities.FindByID(investmentTransactionRow.SecurityID).Symbol;
+                            string description = EnumDescriptionAttribute.GetDescription(type);
+                            decimal amount = transactionRow.GetAmount() * (type == EInvestmentTransactionType.TransferDividends ? -1 : 1);
+                            tempTransList.Add(new TransactionItem(transactionRow.Date, accountName, symbol, description, amount, 0, 0, 0));
 
-                    // Capture LTCG
-                    if (isShowingCapGains && 
-                        (type == EInvestmentTransactionType.LongTermCapitalGains ||
-                         type == EInvestmentTransactionType.ReinvestLongTermCapitalGains ||
-                         type == EInvestmentTransactionType.TransferLongTermCapitalGains))
-                    {
-                        string symbol = household.Securities.FindByID(investmentTransactionRow.SecurityID).Symbol;
-                        string description = EnumDescriptionAttribute.GetDescription(type);
-                        decimal amount = transactionRow.GetAmount() * (type == EInvestmentTransactionType.TransferLongTermCapitalGains ? -1 : 1);
-                        tempTransList.Add(new TransactionItem(transactionRow.Date, accountName, symbol, description, 0, 0, amount, 0));
+                            TotalDividend += amount;
+                        }
 
-                        TotalLTCG += amount;
-                    }
+                        // Capture STCG
+                        if (isShowingCapGains &&
+                            (type == EInvestmentTransactionType.ShortTermCapitalGains ||
+                             type == EInvestmentTransactionType.ReinvestShortTermCapitalGains ||
+                             type == EInvestmentTransactionType.TransferShortTermCapitalGains))
+                        {
+                            string symbol = household.Securities.FindByID(investmentTransactionRow.SecurityID).Symbol;
+                            string description = EnumDescriptionAttribute.GetDescription(type);
+                            decimal amount = transactionRow.GetAmount() * (type == EInvestmentTransactionType.TransferShortTermCapitalGains ? -1 : 1);
+                            tempTransList.Add(new TransactionItem(transactionRow.Date, accountName, symbol, description, 0, amount, 0, 0));
 
-                    // Capture share sales
-                    if (isShowingCapGains && 
-                        (type == EInvestmentTransactionType.Sell ||
-                         type == EInvestmentTransactionType.SellAndTransferCash))
-                    {
-                        string symbol = household.Securities.FindByID(investmentTransactionRow.SecurityID).Symbol;
-                        var sale = Portfolio.ComputeSaleCapitalGains(household, transactionRow.ID);
+                            TotalSTCG += amount;
+                        }
 
-                        tempTransList.Add(new TransactionItem(transactionRow.Date, accountName, symbol, sale.Description, 0, sale.ShortTermGain, sale.LongTermGain, 0));
+                        // Capture LTCG
+                        if (isShowingCapGains &&
+                            (type == EInvestmentTransactionType.LongTermCapitalGains ||
+                             type == EInvestmentTransactionType.ReinvestLongTermCapitalGains ||
+                             type == EInvestmentTransactionType.TransferLongTermCapitalGains))
+                        {
+                            string symbol = household.Securities.FindByID(investmentTransactionRow.SecurityID).Symbol;
+                            string description = EnumDescriptionAttribute.GetDescription(type);
+                            decimal amount = transactionRow.GetAmount() * (type == EInvestmentTransactionType.TransferLongTermCapitalGains ? -1 : 1);
+                            tempTransList.Add(new TransactionItem(transactionRow.Date, accountName, symbol, description, 0, 0, amount, 0));
 
-                        TotalSTCG += sale.ShortTermGain;
-                        TotalLTCG += sale.LongTermGain;
+                            TotalLTCG += amount;
+                        }
+
+                        // Capture share sales
+                        if (isShowingCapGains &&
+                            (type == EInvestmentTransactionType.Sell ||
+                             type == EInvestmentTransactionType.SellAndTransferCash))
+                        {
+                            string symbol = household.Securities.FindByID(investmentTransactionRow.SecurityID).Symbol;
+                            var sale = Portfolio.ComputeSaleCapitalGains(household, transactionRow.ID);
+
+                            tempTransList.Add(new TransactionItem(transactionRow.Date, accountName, symbol, sale.Description, 0, sale.ShortTermGain, sale.LongTermGain, 0));
+
+                            TotalSTCG += sale.ShortTermGain;
+                            TotalLTCG += sale.LongTermGain;
+                        }
                     }
                 }
             }

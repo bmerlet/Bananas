@@ -289,6 +289,14 @@ namespace BanaData.Serializations
                 // By convention ,accounts with a name starting with _CLOSED are hidden
                 // (QIF does not have a flag for hidden accounts)
                 bool hidden = name.StartsWith("_CLOSED");
+
+                // By convention, investment accounts with " IRA" in them are traditional IRA
+                // (QIF does not have a flag for traditional IRAs)
+                if (type == EAccountType.Investment && kind == EInvestmentKind.Brokerage && name.Contains(" IRA"))
+                {
+                    kind = EInvestmentKind.TraditionalIRA;
+                }
+
                 household.Accounts.Add(name, description, type, creditLimit, kind, hidden);
             }
         }

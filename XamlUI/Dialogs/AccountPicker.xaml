@@ -4,9 +4,63 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:XamlUI.Dialogs"
+        xmlns:w="clr-namespace:XamlUI.UserControls"
         mc:Ignorable="d"
-        Title="Account picker" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        Title="Account picker"        
+        Icon="/XamlUI;component/Images/Bananas.ico"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        SizeToContent="WidthAndHeight">
+    <DockPanel>
+
+        <!-- OK/Cancel panel -->
+        <w:OKCancel DockPanel.Dock="Bottom"/>
+
+        <!-- Control panel -->
+        <Grid DockPanel.Dock="Top">
+            <Grid.Resources>
+                <Style TargetType="Button" BasedOn="{StaticResource FormButton}"/>
+            </Grid.Resources>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Content="Clear all" Command="{Binding ClearAllCommand}"/>
+            <Button Content="Select all" Command="{Binding SelectAllCommand}" Grid.Column="1"/>
+            <Button Content="Select investment" Command="{Binding SelectInvestmentCommand}" Grid.Column="2"/>
+            <Button Content="Select banking" Command="{Binding SelectBankingCommand}" Grid.Column="3"/>
+
+        </Grid>
+
+        <!-- Main panel: Listview of accounts -->
+        <ListView
+            Height="300"
+            SelectionMode="Single"
+            ItemsSource="{Binding Accounts}">
+
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Sel" Width="40">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Name" Width="200" DisplayMemberBinding="{Binding AccountItem.Name}"/>
+                    <GridViewColumn Header="Description" Width="200" DisplayMemberBinding="{Binding AccoutItem.Description}"/>
+                    <GridViewColumn Header="Type" Width="85">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding AccountItem.TypeString}" Foreground="Blue" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </DockPanel>
 </Window>

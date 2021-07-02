@@ -44,6 +44,9 @@ namespace BanaData.Database
         [EnumDescription("401k")]
         _401k,
 
+        [EnumDescription("Traditional IRA")]
+        TraditionalIRA,
+
         [EnumDescription("N/A")]
         Invalid
     };

@@ -158,7 +158,7 @@
                     <!-- Dividends column -->
                     <GridViewColumn Width="{Binding DividendColumnWidth, Mode=TwoWay}" CellTemplate="{StaticResource DividendColumnTemplate}">
                         <GridViewColumn.Header>
-                            <GridViewColumnHeader Content="Dividends" Tag="Dividends" Click="OnColumnHeaderClicked"/>
+                            <GridViewColumnHeader Content="Dividends" Tag="Dividend" Click="OnColumnHeaderClicked"/>
                         </GridViewColumn.Header>
                     </GridViewColumn>
 
