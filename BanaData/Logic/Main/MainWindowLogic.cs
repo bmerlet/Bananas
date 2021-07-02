@@ -199,7 +199,7 @@ namespace BanaData.Logic.Main
         {
             if (file.EndsWith(".QIF", StringComparison.InvariantCultureIgnoreCase))
             {
-                Converter.ConvertFromQIF(file, Household);
+                QIFParser.ConvertFromQIF(file, Household);
 
                 // Save to a .XBAN (ZZZ Revisit later)
                 file = file.Substring(0, file.Length - 3) + "xban";

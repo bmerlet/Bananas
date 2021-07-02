@@ -11,11 +11,11 @@ using BanaData.Database;
 
 namespace BanaData.Serializations
 {
-    static class Converter
+    static class QIFParser
     {
         private const string deletedAccountStr = "Deleted Account";
 
-        #region QIF parser
+        #region QIF main parser
 
         public static void ConvertFromQIF(string fileName, Household household)
         {
