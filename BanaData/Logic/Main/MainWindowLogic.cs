@@ -182,9 +182,9 @@ namespace BanaData.Logic.Main
 
         #region Services
 
-        public void ErrorMessage(string message)
+        public void ErrorMessage(string message, string title = "Error")
         {
-            var logic = new ErrorLogic(message);
+            var logic = new ErrorLogic(message, title);
             GuiServices.ShowDialog(logic);
         }
 
@@ -201,6 +201,10 @@ namespace BanaData.Logic.Main
             {
                 var parser = new QIFParser(Household);
                 parser.ConvertFromQIF(file);
+                if (!string.IsNullOrEmpty(parser.Log))
+                {
+                    ErrorMessage(parser.Log, "Import results");
+                }
 
                 // Save to a .XBAN (ZZZ Revisit later)
                 file = file.Substring(0, file.Length - 3) + "xban";
@@ -224,7 +228,7 @@ namespace BanaData.Logic.Main
                 Household.AcceptChanges();
                 if (Household.HasErrors)
                 {
-                    GuiServices.ShowDialog(new ErrorLogic("Error in dataset"));
+                    ErrorMessage("Error in dataset");
                 }
 
                 Dirty = true;

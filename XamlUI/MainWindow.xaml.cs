@@ -93,7 +93,7 @@ namespace XamlUI
             }
             if (logic is ErrorLogic errorLogic)
             {
-                MessageBox.Show(errorLogic.Error, "Error");
+                MessageBox.Show(errorLogic.Error, errorLogic.Title);
                 return false;
             }
             if (logic is QuestionLogic questionLogic)

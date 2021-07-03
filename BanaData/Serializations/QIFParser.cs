@@ -16,6 +16,7 @@ namespace BanaData.Serializations
         #region Constants
 
         private const string deletedAccountStr = "Deleted Account";
+        private readonly string eol = Environment.NewLine;
 
         #endregion
 
@@ -41,6 +42,7 @@ namespace BanaData.Serializations
 
         public void ConvertFromQIF(string fileName)
         {
+            Log = "";
             household.Clear();
             household.AcceptChanges();
             Household.AccountsRow accountRow = null;
@@ -52,6 +54,14 @@ namespace BanaData.Serializations
                     accountRow = ParseOneSection(sr, accountRow);
                 }
             }
+
+            // Log what we got
+            Log += $"Imported {household.Accounts.Rows.Count:N0} accounts" + eol;
+            Log += $"Imported {household.Categories.Rows.Count:N0} categories" + eol;
+            Log += $"Imported {household.Securities.Rows.Count:N0} securities" + eol;
+            Log += $"Imported {household.Transactions.Rows.Count:N0} transactions" + eol;
+            Log += $"Imported {household.MemorizedPayees.Rows.Count:N0} memorized payees" + eol;
+            Log += eol;
 
             // Find other sides of transfers
             PairTransfers();
@@ -1209,8 +1219,9 @@ namespace BanaData.Serializations
                     if (tuple == null)
                     {
                         var targetAccountRow = household.Accounts.FindByID(targetAccountID);
-                        Console.WriteLine($"Cannot pair trans from account {sourceTransactionRow.AccountsRow.Name} to {targetAccountRow} on {sourceTransactionRow.Date} for ${sourceLineItemRow.Amount}");
-                        Console.WriteLine("Changing category to <none>");
+                        Log += $"Warning: Could not pair transaction on account {sourceTransactionRow.AccountsRow.Name}" + eol+
+                            $"to/from account {targetAccountRow.Name} on {sourceTransactionRow.Date} for ${sourceLineItemRow.Amount};" + eol;
+                        Log += "Changing category to <none>." + eol;
 
                         sourceLineItemRow.SetAccountIDNull();
                     }
@@ -1221,7 +1232,7 @@ namespace BanaData.Serializations
                 }
             }
 
-            Console.WriteLine($"Found {pairs.Count} transfers");
+            Log += $"Paired {pairs.Count} transfers." + eol;
 
             //
             // Remove one end of the pair

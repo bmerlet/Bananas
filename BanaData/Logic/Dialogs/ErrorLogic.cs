@@ -10,9 +10,10 @@ namespace BanaData.Logic.Dialogs
 {
     public class ErrorLogic : LogicBase
     {
-        public ErrorLogic(string error) => Error = error;
+        public ErrorLogic(string error, string title) => (Error, Title) = (error, title);
 
         public string Error { get; }
+        public string Title { get; }
     }
 
     public class QuestionLogic : LogicBase
