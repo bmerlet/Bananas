@@ -15,7 +15,7 @@
     <Shape ID="DesignTable:BankingTransactions" ZOrder="7" X="287" Y="211" Height="105" Width="168" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="101" />
     <Shape ID="DesignTable:InvestmentTransactions" ZOrder="1" X="592" Y="22" Height="162" Width="204" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="158" />
     <Shape ID="DesignTable:MemorizedLineItems" ZOrder="14" X="699" Y="443" Height="162" Width="188" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="158" />
-    <Shape ID="DesignTable:MemorizedPayees" ZOrder="13" X="909" Y="438" Height="86" Width="171" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="82" />
+    <Shape ID="DesignTable:MemorizedPayees" ZOrder="13" X="909" Y="438" Height="105" Width="171" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="101" />
     <Shape ID="DesignTable:ReconcileInfo" ZOrder="8" X="50" Y="353" Height="162" Width="150" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="158" />
   </Shapes>
   <Connectors>

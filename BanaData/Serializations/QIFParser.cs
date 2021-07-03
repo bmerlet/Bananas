@@ -11,42 +11,55 @@ using BanaData.Database;
 
 namespace BanaData.Serializations
 {
-    static class QIFParser
+    class QIFParser
     {
+        #region Constants
+
         private const string deletedAccountStr = "Deleted Account";
+
+        #endregion
+
+        #region Private members
+
+        private readonly Household household;
+
+        #endregion
+
+        #region Constructor
+
+        public QIFParser(Household _household) => household = _household;
+
+        #endregion
+
+        #region Log
+
+        public string Log { get; private set; } = "";
+
+        #endregion
 
         #region QIF main parser
 
-        public static void ConvertFromQIF(string fileName, Household household)
+        public void ConvertFromQIF(string fileName)
         {
             household.Clear();
             household.AcceptChanges();
             Household.AccountsRow accountRow = null;
 
-            //try
+            using (var sr = new StreamReader(fileName))
             {
-                using (var sr = new StreamReader(fileName))
+                while (!sr.EndOfStream)
                 {
-                    while (!sr.EndOfStream)
-                    {
-                        ParseOneSection(sr, household, ref accountRow);
-                    }
+                    accountRow = ParseOneSection(sr, accountRow);
                 }
-
-                // Find other sides of transfers
-                PairTransfers(household);
             }
-            //catch (Exception e)
-            //{
-            //    Console.WriteLine("Parser exception: " + e.Message);
-            //    household = null;
-            //}
 
+            // Find other sides of transfers
+            PairTransfers();
 
             household.AcceptChanges();
         }
 
-        private static void ParseOneSection(StreamReader sr, Household household, ref Household.AccountsRow accountRow)
+        private Household.AccountsRow ParseOneSection(StreamReader sr, Household.AccountsRow accountRow)
         {
             var sectionStr = sr.ReadLine();
             if (!sectionStr.StartsWith("!"))
@@ -67,32 +80,32 @@ namespace BanaData.Serializations
                                 SkipToNextType(sr);
                                 break;
                             case "Cat":
-                                ParseCategories(sr, household);
+                                ParseCategories(sr);
                                 break;
                             case "Security":
-                                ParseSecurities(sr, household);
+                                ParseSecurities(sr);
                                 break;
                             case "Bank":
-                                ParseBankTransactions(sr, household, accountRow);
+                                ParseBankTransactions(sr, accountRow);
                                 break;
                             case "CCard":
-                                ParseBankTransactions(sr, household, accountRow);
+                                ParseBankTransactions(sr, accountRow);
                                 break;
                             case "Cash":
-                                ParseBankTransactions(sr, household, accountRow);
+                                ParseBankTransactions(sr, accountRow);
                                 break;
                             case "Oth A":
                             case "Oth L":
-                                ParseBankTransactions(sr, household, accountRow);
+                                ParseBankTransactions(sr, accountRow);
                                 break;
                             case "Invst":
-                                ParseInvestmentTransactions(sr, household, accountRow);
+                                ParseInvestmentTransactions(sr, accountRow);
                                 break;
                             case "Memorized":
-                                ParseMemorizedPayees(sr, household, accountRow);
+                                ParseMemorizedPayees(sr, accountRow);
                                 break;
                             case "Prices":
-                                ParseSecurityPrices(sr, household);
+                                ParseSecurityPrices(sr);
                                 break;
 
                             default:
@@ -102,7 +115,7 @@ namespace BanaData.Serializations
                     break;
 
                 case "Account":
-                    ParseAccounts(sr, household, ref accountRow);
+                    accountRow = ParseAccounts(sr);
                     break;
 
                 case "Option":
@@ -134,21 +147,23 @@ namespace BanaData.Serializations
                 default:
                     throw new InvalidDataException("QIF parser: unknown section type: " + sectionStr);
             }
+
+            return accountRow;
         }
 
         #endregion
 
         #region Parse QIF Category
 
-        private static void ParseCategories(StreamReader sr, Household household)
+        private void ParseCategories(StreamReader sr)
         {
             while (sr.Peek() != '!' && !sr.EndOfStream)
             {
-                ParseOneCategory(sr, household);
+                ParseOneCategory(sr);
             }
         }
 
-        private static void ParseOneCategory(TextReader sr, Household household)
+        private void ParseOneCategory(TextReader sr)
         {
             string path = null;
             string description = null;
@@ -197,15 +212,19 @@ namespace BanaData.Serializations
 
         #region Parse QIF account
 
-        private static void ParseAccounts(StreamReader sr, Household household, ref Household.AccountsRow curAccount)
+        private Household.AccountsRow ParseAccounts(StreamReader sr)
         {
+            Household.AccountsRow result = null;
+
             while (sr.Peek() != '!' && !sr.EndOfStream)
             {
-                ParseOneAccount(sr, household, ref curAccount);
+                result = ParseOneAccount(sr);
             }
+
+            return result;
         }
 
-        private static void ParseOneAccount(TextReader sr, Household household, ref Household.AccountsRow curAccount)
+        private Household.AccountsRow ParseOneAccount(TextReader sr)
         {
             string name = null;
             string description = null;
@@ -283,8 +302,8 @@ namespace BanaData.Serializations
             }
 
             // Create account if it does not exist, and make it the current account
-            curAccount = household.Accounts.GetByName(name);
-            if (curAccount == null)
+            var accountRow = household.Accounts.GetByName(name);
+            if (accountRow == null)
             {
                 // By convention ,accounts with a name starting with _CLOSED are hidden
                 // (QIF does not have a flag for hidden accounts)
@@ -299,21 +318,23 @@ namespace BanaData.Serializations
 
                 household.Accounts.Add(name, description, type, creditLimit, kind, hidden);
             }
+
+            return accountRow;
         }
 
         #endregion
 
         #region Parse QIF security
 
-        private static void ParseSecurities(StreamReader sr, Household household)
+        private void ParseSecurities(StreamReader sr)
         {
             while (sr.Peek() != '!' && !sr.EndOfStream)
             {
-                ParseOneSecurity(sr, household);
+                ParseOneSecurity(sr);
             }
         }
 
-        private static void ParseOneSecurity(TextReader sr, Household household)
+        private void ParseOneSecurity(TextReader sr)
         {
             string name = null;
             string symbol = null;
@@ -368,7 +389,7 @@ namespace BanaData.Serializations
 
         # region Parse QIF transactions
 
-        private static void ParseBankTransactions(StreamReader sr, Household household, Household.AccountsRow account)
+        private void ParseBankTransactions(StreamReader sr, Household.AccountsRow account)
         {
             if (account == null)
             {
@@ -377,7 +398,7 @@ namespace BanaData.Serializations
 
             while (sr.Peek() != '!' && !sr.EndOfStream)
             {
-                ParseOneBankTransaction(sr, household, account);
+                ParseOneBankTransaction(sr, account);
             }
         }
 
@@ -389,7 +410,7 @@ namespace BanaData.Serializations
             public decimal Amount = 0;
         }
 
-        private static void ParseOneBankTransaction(TextReader sr, Household household, Household.AccountsRow accountRow)
+        private void ParseOneBankTransaction(TextReader sr, Household.AccountsRow accountRow)
         {
             DateTime date = DateTime.MinValue;
             decimal amountToCheck = 0;
@@ -508,124 +529,7 @@ namespace BanaData.Serializations
             }
         }
 
-        private static void ParseMemorizedPayees(StreamReader sr, Household household, Household.AccountsRow account)
-        {
-            if (account == null)
-            {
-                throw new InvalidDataException("Memorized transaction without current account");
-            }
-
-            while (sr.Peek() != '!' && !sr.EndOfStream)
-            {
-                ParseOneMemorizedPayee(sr, household, account);
-            }
-        }
-
-        private static void ParseOneMemorizedPayee(TextReader sr, Household household, Household.AccountsRow account)
-        {
-            decimal amountToCheck = 0;
-            decimal otherMysteriousAmount = 0;
-            string payee = null;
-            ETransactionStatus status = ETransactionStatus.Pending;
-            //EMemorizedTransactionType type = EMemorizedTransactionType.None;
-
-            List<LineItemHolder> lineItemHodlers = new List<LineItemHolder>();
-            var lineItemHolder = new LineItemHolder();
-            bool parsingSplitLineItem = false;
-
-            while (true)
-            {
-                var l = sr.ReadLine();
-                if ((l == null) || (l == "^"))
-                {
-                    break;
-                }
-
-                switch (l[0])
-                {
-                    // Amount
-                    case 'T':
-                    case '$':
-                        decimal.TryParse(l.Substring(1), out lineItemHolder.Amount);
-                        if (!parsingSplitLineItem)
-                        {
-                            amountToCheck = lineItemHolder.Amount;
-                        }
-                        break;
-
-                    // Amount again
-                    case 'U':
-                        decimal.TryParse(l.Substring(1), out otherMysteriousAmount);
-                        break;
-
-                    // Memo
-                    case 'E':
-                    case 'M':
-                        lineItemHolder.Memo = l.Substring(1);
-                        break;
-
-                    // Payee name
-                    case 'P':
-                        payee = l.Substring(1);
-                        break;
-
-                    // Status (none/cleared/reconciled)
-                    case 'C':
-                        status = ParseTransactionStatus(l.Substring(1));
-                        break;
-
-                    // Category
-                    case 'L':
-                        (lineItemHolder.AccountID, lineItemHolder.CategoryID) = ParseTransactionTarget(household, account, l.Substring(1));
-                        break;
-
-                    // Payment/deposit
-                    case 'K':
-                        //type = ParseMemorizedTransactionType(l.Substring(1));
-                        break;
-
-                    case 'S':
-                        // Indicates beginning of a new split line item - commit previous one if any
-                        if (parsingSplitLineItem)
-                        {
-                            lineItemHodlers.Add(lineItemHolder);
-                            lineItemHolder = new LineItemHolder();
-                        }
-                        parsingSplitLineItem = true;
-                        (lineItemHolder.AccountID, lineItemHolder.CategoryID) = ParseTransactionTarget(household, account, l.Substring(1));
-                        break;
-
-                    case 'A':
-                        // Address (up to 6 lines) - ignore.
-                        break;
-
-                    default:
-                        throw new InvalidDataException("Unknown transaction attribute: " + l);
-                }
-            }
-
-            // Check we have all info
-            if (amountToCheck != otherMysteriousAmount)
-            {
-                throw new InvalidDataException("QIF parser: Mysterious amount not the same as regular amount - " + amountToCheck + " - " + otherMysteriousAmount);
-            }
-
-            // Create memorized payee
-            var memorizedPayees = household.MemorizedPayees.Add(payee, status);
-
-            // Add the line item(s)
-            lineItemHodlers.Add(lineItemHolder);
-            foreach (var lih in lineItemHodlers)
-            {
-                household.MemorizedLineItems.Add(memorizedPayees,
-                    lih.CategoryID,
-                    lih.AccountID,
-                    lih.Memo, 
-                    lih.Amount);
-            }
-        }
-
-        private static void ParseInvestmentTransactions(StreamReader sr, Household household, Household.AccountsRow account)
+        private void ParseInvestmentTransactions(StreamReader sr, Household.AccountsRow account)
         {
             if (account == null)
             {
@@ -634,11 +538,11 @@ namespace BanaData.Serializations
 
             while (sr.Peek() != '!' && !sr.EndOfStream)
             {
-                ParseOneInvestmentTransaction(sr, household, account);
+                ParseOneInvestmentTransaction(sr, account);
             }
         }
 
-        private static void ParseOneInvestmentTransaction(TextReader sr, Household household, Household.AccountsRow accountRow)
+        private void ParseOneInvestmentTransaction(TextReader sr, Household.AccountsRow accountRow)
         {
             DateTime date = DateTime.MinValue;
             decimal amount = 0;
@@ -756,17 +660,142 @@ namespace BanaData.Serializations
 
         #endregion
 
-        #region Parse QIF security prices
+        #region Parse memorized payee
 
-        private static void ParseSecurityPrices(StreamReader sr, Household household)
+        private void ParseMemorizedPayees(StreamReader sr, Household.AccountsRow account)
         {
+            if (account == null)
+            {
+                throw new InvalidDataException("Memorized transaction without current account");
+            }
+
             while (sr.Peek() != '!' && !sr.EndOfStream)
             {
-                ParseOneSecurityPrice(sr, household);
+                ParseOneMemorizedPayee(sr, account);
             }
         }
 
-        private static void ParseOneSecurityPrice(TextReader sr, Household household)
+        private void ParseOneMemorizedPayee(TextReader sr, Household.AccountsRow account)
+        {
+            decimal amountToCheck = 0;
+            decimal otherMysteriousAmount = 0;
+            string payee = null;
+            string memo = null;
+            ETransactionStatus status = ETransactionStatus.Pending;
+            //EMemorizedTransactionType type = EMemorizedTransactionType.None;
+
+            List<LineItemHolder> lineItemHodlers = new List<LineItemHolder>();
+            var lineItemHolder = new LineItemHolder();
+            bool parsingSplitLineItem = false;
+
+            while (true)
+            {
+                var l = sr.ReadLine();
+                if ((l == null) || (l == "^"))
+                {
+                    break;
+                }
+
+                switch (l[0])
+                {
+                    // Amount
+                    case 'T':
+                    case '$':
+                        decimal.TryParse(l.Substring(1), out lineItemHolder.Amount);
+                        if (!parsingSplitLineItem)
+                        {
+                            amountToCheck = lineItemHolder.Amount;
+                        }
+                        break;
+
+                    // Amount again
+                    case 'U':
+                        decimal.TryParse(l.Substring(1), out otherMysteriousAmount);
+                        break;
+
+                    // Memo
+                    case 'M':
+                        memo = l.Substring(1);
+                        break;
+
+                    case 'E':
+                        lineItemHolder.Memo = l.Substring(1);
+                        break;
+
+                    // Payee name
+                    case 'P':
+                        payee = l.Substring(1);
+                        break;
+
+                    // Status (none/cleared/reconciled)
+                    case 'C':
+                        status = ParseTransactionStatus(l.Substring(1));
+                        break;
+
+                    // Category
+                    case 'L':
+                        (lineItemHolder.AccountID, lineItemHolder.CategoryID) = ParseTransactionTarget(household, account, l.Substring(1));
+                        break;
+
+                    // Payment/deposit
+                    case 'K':
+                        //type = ParseMemorizedTransactionType(l.Substring(1));
+                        break;
+
+                    case 'S':
+                        // Indicates beginning of a new split line item - commit previous one if any
+                        if (parsingSplitLineItem)
+                        {
+                            lineItemHodlers.Add(lineItemHolder);
+                            lineItemHolder = new LineItemHolder();
+                        }
+                        parsingSplitLineItem = true;
+                        (lineItemHolder.AccountID, lineItemHolder.CategoryID) = ParseTransactionTarget(household, account, l.Substring(1));
+                        break;
+
+                    case 'A':
+                        // Address (up to 6 lines) - ignore.
+                        break;
+
+                    default:
+                        throw new InvalidDataException("Unknown transaction attribute: " + l);
+                }
+            }
+
+            // Check we have all info
+            if (amountToCheck != otherMysteriousAmount)
+            {
+                throw new InvalidDataException("QIF parser: Mysterious amount not the same as regular amount - " + amountToCheck + " - " + otherMysteriousAmount);
+            }
+
+            // Create memorized payee
+            var memorizedPayees = household.MemorizedPayees.Add(payee, status, memo);
+
+            // Add the line item(s)
+            lineItemHodlers.Add(lineItemHolder);
+            foreach (var lih in lineItemHodlers)
+            {
+                household.MemorizedLineItems.Add(memorizedPayees,
+                    lih.CategoryID,
+                    lih.AccountID,
+                    lih.Memo,
+                    lih.Amount);
+            }
+        }
+
+        #endregion
+
+        #region Parse QIF security prices
+
+        private void ParseSecurityPrices(StreamReader sr)
+        {
+            while (sr.Peek() != '!' && !sr.EndOfStream)
+            {
+                ParseOneSecurityPrice(sr);
+            }
+        }
+
+        private void ParseOneSecurityPrice(TextReader sr)
         {
             while (true)
             {
@@ -834,8 +863,6 @@ namespace BanaData.Serializations
                 {
                     household.SecurityPrices.Add(securityRow, date, price);
                 }
-
-
             }
         }
 
@@ -1120,7 +1147,7 @@ namespace BanaData.Serializations
 
         #region Pair transfers
 
-        private static void PairTransfers(Household household)
+        private void PairTransfers()
         {
             var pairs = new List<Tuple<int, int>>();
 

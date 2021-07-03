@@ -21,28 +21,37 @@ namespace BanaData.Database
 
         partial class MemorizedPayeesDataTable
         {
-            public MemorizedPayeesRow Add(string payee, ETransactionStatus status)
+            public MemorizedPayeesRow Add(string payee, ETransactionStatus status, string memo)
             {
                 var memorizedPayeeRow = NewMemorizedPayeesRow();
 
-                UpdateMemorisedPayee(memorizedPayeeRow, payee, status);
+                UpdateMemorisedPayee(memorizedPayeeRow, payee, status, memo);
 
                 Rows.Add(memorizedPayeeRow);
 
                 return memorizedPayeeRow;
             }
 
-            public MemorizedPayeesRow Update(MemorizedPayeesRow memorizedPayeeRow, string payee, ETransactionStatus status)
+            public MemorizedPayeesRow Update(MemorizedPayeesRow memorizedPayeeRow, string payee, ETransactionStatus status, string memo)
             {
-                UpdateMemorisedPayee(memorizedPayeeRow, payee, status);
+                UpdateMemorisedPayee(memorizedPayeeRow, payee, status, memo);
 
                 return memorizedPayeeRow;
             }
 
-            private static MemorizedPayeesRow UpdateMemorisedPayee(MemorizedPayeesRow memorizedPayeesRow, string payee, ETransactionStatus status)
+            private static MemorizedPayeesRow UpdateMemorisedPayee(MemorizedPayeesRow memorizedPayeesRow, string payee, ETransactionStatus status, string memo)
             {
                 memorizedPayeesRow.Payee = payee;
                 memorizedPayeesRow.Status = status;
+
+                if (string.IsNullOrWhiteSpace(memo))
+                {
+                    memorizedPayeesRow.SetMemoNull();
+                }
+                else
+                {
+                    memorizedPayeesRow.Memo = memo;
+                }
 
                 return memorizedPayeesRow;
             }

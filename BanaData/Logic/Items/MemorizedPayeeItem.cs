@@ -11,20 +11,20 @@ namespace BanaData.Logic.Items
     /// </summary>
     public class MemorizedPayeeItem : IComparable<MemorizedPayeeItem>
     {
-        public MemorizedPayeeItem(int id, string payee, LineItem[] lineItems)
+        public MemorizedPayeeItem(int id, string payee, string memo, LineItem[] lineItems)
         {
             (ID, Payee, LineItems) = (id, payee, lineItems);
 
             if (lineItems.Length == 1)
             {
                 (Category, Memo, Amount, IsSplit) = 
-                    (lineItems[0].Category, lineItems[0].Memo, lineItems[0].Amount, false);
+                    (lineItems[0].Category, memo, lineItems[0].Amount, false);
             }
             else
             {
                 decimal sum = lineItems.Sum(li => li.Amount);
                 (Category, Memo, Amount, IsSplit) = 
-                    ("<Split>", "", sum, true);
+                    ("<Split>", memo, sum, true);
             }
         }
 

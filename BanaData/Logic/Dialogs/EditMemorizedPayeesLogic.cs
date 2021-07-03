@@ -63,7 +63,7 @@ namespace BanaData.Logic.Dialogs
         private void OnAddMemorizedPayee()
         {
             // Create new memorized payee
-            var newMemorizedPayee = new MemorizedPayeeItem(-1, "", new LineItem[1] { new LineItem(mainWindowLogic, -1, "", -1, -1, "", 0, true) });
+            var newMemorizedPayee = new MemorizedPayeeItem(-1, "", "", new LineItem[1] { new LineItem(mainWindowLogic, -1, "", -1, -1, "", 0, true) });
 
             var logic = new EditMemorizedPayeeLogic(mainWindowLogic, newMemorizedPayee, true);
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
@@ -124,7 +124,7 @@ namespace BanaData.Logic.Dialogs
             var household = mainWindowLogic.Household;
 
             // Commit new payee
-            var newPayeeRow = household.MemorizedPayees.Add(newPayee.Payee, ETransactionStatus.Pending);
+            var newPayeeRow = household.MemorizedPayees.Add(newPayee.Payee, ETransactionStatus.Pending, newPayee.Memo);
 
             // Commit all line items
             var newLineItems = new List<LineItem>();
@@ -140,7 +140,7 @@ namespace BanaData.Logic.Dialogs
             mainWindowLogic.UpdateMemorizedPayees();
 
             // Recreate memorized payee with correct ID
-            return new MemorizedPayeeItem(newPayeeRow.ID, newPayeeRow.Payee, newLineItems.ToArray());
+            return new MemorizedPayeeItem(newPayeeRow.ID, newPayeeRow.Payee, newPayee.Memo, newLineItems.ToArray());
         }
 
         private MemorizedPayeeItem UpdateMemorizedPayeeInDataSet(MemorizedPayeeItem newPayee)
@@ -149,7 +149,7 @@ namespace BanaData.Logic.Dialogs
 
             // Update the memorized payee
             var payeeRow = household.MemorizedPayees.FindByID(newPayee.ID);
-            household.MemorizedPayees.Update(payeeRow, newPayee.Payee, ETransactionStatus.Pending);
+            household.MemorizedPayees.Update(payeeRow, newPayee.Payee, ETransactionStatus.Pending, newPayee.Memo);
 
             // Get existing line items
             var oldLineItems = household.MemorizedLineItems.GetByMemorizedPayee(payeeRow);
@@ -188,8 +188,8 @@ namespace BanaData.Logic.Dialogs
             mainWindowLogic.CommitChanges();
             mainWindowLogic.UpdateMemorizedPayees();
 
-            // Recreate memorized payee with correct line item ID
-            return new MemorizedPayeeItem(payeeRow.ID, payeeRow.Payee, newMemorizedLineItems.ToArray());
+            // Recreate memorized payee with correct line item IDs
+            return new MemorizedPayeeItem(payeeRow.ID, payeeRow.Payee, newPayee.Memo, newMemorizedLineItems.ToArray());
         }
 
         private void RemoveMemorizedPayeeFromDataSet(MemorizedPayeeItem payee)

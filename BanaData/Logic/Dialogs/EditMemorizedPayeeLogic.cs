@@ -38,6 +38,7 @@ namespace BanaData.Logic.Dialogs
             // Setup UI properties
             EditSplit = new CommandBase(OnEditSplit);
             Payee = item.Payee;
+            Memo = item.Memo;
             UpdateAfterLineItemChanges();
         }
 
@@ -48,9 +49,8 @@ namespace BanaData.Logic.Dialogs
         // Name of payee
         public string Payee { get; set; }
 
-        // Memo (when not split)
+        // Memo
         public string Memo { get; set; }
-        public bool? MemoEnabled { get; private set; }
 
         // Category (when not split)
         public string Category { get; set; }
@@ -98,8 +98,6 @@ namespace BanaData.Logic.Dialogs
             {
                 Category = "<Split>";
                 CategoryEnabled = false;
-                Memo = "";
-                MemoEnabled = false;
                 TypeEnabled = false;
                 AbsoluteAmountEnabled = false;
             }
@@ -107,8 +105,6 @@ namespace BanaData.Logic.Dialogs
             {
                 Category = lineItems[0].Category;
                 CategoryEnabled = true;
-                Memo = lineItems[0].Memo;
-                MemoEnabled = true;
                 TypeEnabled = true;
                 AbsoluteAmountEnabled = true;
             }
@@ -119,8 +115,6 @@ namespace BanaData.Logic.Dialogs
 
             OnPropertyChanged(() => Category);
             OnPropertyChanged(() => CategoryEnabled);
-            OnPropertyChanged(() => Memo);
-            OnPropertyChanged(() => MemoEnabled);
             OnPropertyChanged(() => Type);
             OnPropertyChanged(() => TypeEnabled);
             OnPropertyChanged(() => AbsoluteAmount);
@@ -137,7 +131,7 @@ namespace BanaData.Logic.Dialogs
             }
 
             bool change
-                = add || item.Payee != Payee || item.LineItems.Length != lineItems.Length;
+                = add || item.Payee != Payee || item.Memo != Memo || item.LineItems.Length != lineItems.Length;
 
             if (!change)
             {
@@ -159,7 +153,6 @@ namespace BanaData.Logic.Dialogs
                 {
                     // non split case - see if anything is different
                     if (item.Category != Category ||
-                        item.Memo != Memo ||
                         item.Amount != GetAmountFromControls())
                     {
                         change = true;
@@ -186,16 +179,16 @@ namespace BanaData.Logic.Dialogs
             {
                 if (string.IsNullOrWhiteSpace(Category))
                 {
-                    lineItems[0] = new LineItem(mainWindowLogic, lineItems[0].ID, "", -1, -1, Memo, GetAmountFromControls(), true);
+                    lineItems[0] = new LineItem(mainWindowLogic, lineItems[0].ID, "", -1, -1, "", GetAmountFromControls(), true);
                 }
                 else
                 {
                     var categoryItem = Categories.First(c => c.FullName == Category);
-                    lineItems[0] = new LineItem(mainWindowLogic, lineItems[0].ID, Category, categoryItem.ID, categoryItem.AccountID, Memo, GetAmountFromControls(), true);
+                    lineItems[0] = new LineItem(mainWindowLogic, lineItems[0].ID, Category, categoryItem.ID, categoryItem.AccountID, "", GetAmountFromControls(), true);
                 }
             }
 
-            var result = new MemorizedPayeeItem(item.ID, Payee, lineItems);
+            var result = new MemorizedPayeeItem(item.ID, Payee, Memo, lineItems);
 
             return result;
         }

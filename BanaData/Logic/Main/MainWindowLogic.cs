@@ -199,7 +199,8 @@ namespace BanaData.Logic.Main
         {
             if (file.EndsWith(".QIF", StringComparison.InvariantCultureIgnoreCase))
             {
-                QIFParser.ConvertFromQIF(file, Household);
+                var parser = new QIFParser(Household);
+                parser.ConvertFromQIF(file);
 
                 // Save to a .XBAN (ZZZ Revisit later)
                 file = file.Substring(0, file.Length - 3) + "xban";
@@ -417,7 +418,7 @@ namespace BanaData.Logic.Main
                     lineItems.Add(new LineItem(this, dbli.ID, category, categoryID, categoryAccountID, memo, dbli.Amount, true));
                 }
 
-                var mp = new MemorizedPayeeItem(mpr.ID, mpr.Payee, lineItems.ToArray());
+                var mp = new MemorizedPayeeItem(mpr.ID, mpr.Payee, mpr.IsMemoNull() ? "" : mpr.Memo, lineItems.ToArray());
 
                 MemorizedPayees.Add(mp);
             }

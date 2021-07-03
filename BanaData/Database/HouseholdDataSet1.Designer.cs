@@ -3816,6 +3816,8 @@ namespace BanaData.Database {
             
             private global::System.Data.DataColumn columnIStatus;
             
+            private global::System.Data.DataColumn columnMemo;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public MemorizedPayeesDataTable() {
@@ -3875,6 +3877,14 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public global::System.Data.DataColumn MemoColumn {
+                get {
+                    return this.columnMemo;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -3910,12 +3920,13 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public MemorizedPayeesRow AddMemorizedPayeesRow(string Payee, int IStatus) {
+            public MemorizedPayeesRow AddMemorizedPayeesRow(string Payee, int IStatus, string Memo) {
                 MemorizedPayeesRow rowMemorizedPayeesRow = ((MemorizedPayeesRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
                         Payee,
-                        IStatus};
+                        IStatus,
+                        Memo};
                 rowMemorizedPayeesRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowMemorizedPayeesRow);
                 return rowMemorizedPayeesRow;
@@ -3948,6 +3959,7 @@ namespace BanaData.Database {
                 this.columnID = base.Columns["ID"];
                 this.columnPayee = base.Columns["Payee"];
                 this.columnIStatus = base.Columns["IStatus"];
+                this.columnMemo = base.Columns["Memo"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -3959,6 +3971,8 @@ namespace BanaData.Database {
                 base.Columns.Add(this.columnPayee);
                 this.columnIStatus = new global::System.Data.DataColumn("IStatus", typeof(int), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnIStatus);
+                this.columnMemo = new global::System.Data.DataColumn("Memo", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnMemo);
                 this.Constraints.Add(new global::System.Data.UniqueConstraint("Constraint1", new global::System.Data.DataColumn[] {
                                 this.columnID}, true));
                 this.columnID.AutoIncrement = true;
@@ -3966,6 +3980,7 @@ namespace BanaData.Database {
                 this.columnID.ReadOnly = true;
                 this.columnID.Unique = true;
                 this.columnPayee.AllowDBNull = false;
+                this.columnIStatus.AllowDBNull = false;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -5825,12 +5840,7 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public int IStatus {
                 get {
-                    try {
-                        return ((int)(this[this.tableMemorizedPayees.IStatusColumn]));
-                    }
-                    catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'IStatus\' in table \'MemorizedPayees\' is DBNull.", e);
-                    }
+                    return ((int)(this[this.tableMemorizedPayees.IStatusColumn]));
                 }
                 set {
                     this[this.tableMemorizedPayees.IStatusColumn] = value;
@@ -5839,14 +5849,30 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public bool IsIStatusNull() {
-                return this.IsNull(this.tableMemorizedPayees.IStatusColumn);
+            public string Memo {
+                get {
+                    try {
+                        return ((string)(this[this.tableMemorizedPayees.MemoColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Memo\' in table \'MemorizedPayees\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableMemorizedPayees.MemoColumn] = value;
+                }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public void SetIStatusNull() {
-                this[this.tableMemorizedPayees.IStatusColumn] = global::System.Convert.DBNull;
+            public bool IsMemoNull() {
+                return this.IsNull(this.tableMemorizedPayees.MemoColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public void SetMemoNull() {
+                this[this.tableMemorizedPayees.MemoColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]

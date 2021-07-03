@@ -124,7 +124,8 @@
             <xs:sequence>
               <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
               <xs:element name="Payee" msprop:Generator_ColumnVarNameInTable="columnPayee" msprop:Generator_ColumnPropNameInRow="Payee" msprop:Generator_ColumnPropNameInTable="PayeeColumn" msprop:Generator_UserColumnName="Payee" type="xs:string" />
-              <xs:element name="IStatus" msprop:Generator_ColumnVarNameInTable="columnIStatus" msprop:Generator_ColumnPropNameInRow="IStatus" msprop:Generator_ColumnPropNameInTable="IStatusColumn" msprop:Generator_UserColumnName="IStatus" type="xs:int" minOccurs="0" />
+              <xs:element name="IStatus" msprop:Generator_ColumnVarNameInTable="columnIStatus" msprop:Generator_ColumnPropNameInRow="IStatus" msprop:Generator_ColumnPropNameInTable="IStatusColumn" msprop:Generator_UserColumnName="IStatus" type="xs:int" />
+              <xs:element name="Memo" msprop:Generator_ColumnVarNameInTable="columnMemo" msprop:Generator_ColumnPropNameInRow="Memo" msprop:Generator_ColumnPropNameInTable="MemoColumn" msprop:Generator_UserColumnName="Memo" type="xs:string" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>

@@ -46,7 +46,7 @@
 
             <!-- Row 1: Memo -->
             <TextBlock Text="Memo:" Grid.Row="1"/>
-            <w:WatermarkTextBox Text="{Binding Memo, Mode=TwoWay}" IsEnabled="{Binding MemoEnabled}" Watermark="Memo" Grid.Row="1" Grid.Column="1"/>
+            <w:WatermarkTextBox Text="{Binding Memo, Mode=TwoWay}" Watermark="Memo" Grid.Row="1" Grid.Column="1"/>
 
             <!-- Row 2: Category -->
             <TextBlock Text="Category:" Grid.Row="2"/>
