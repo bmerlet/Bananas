@@ -197,11 +197,7 @@ namespace BanaData.Logic.Main
 
         public void OpenFile(string file)
         {
-            if (file.EndsWith(".QIF", StringComparison.InvariantCultureIgnoreCase))
-            {
-                ImportQIF(file);
-            }
-            else if (file.EndsWith(".XBAN", StringComparison.InvariantCultureIgnoreCase))
+            if (file.EndsWith(".XBAN", StringComparison.InvariantCultureIgnoreCase))
             {
                 ReadFromFile(file);
             }
@@ -211,7 +207,7 @@ namespace BanaData.Logic.Main
 
         public void ImportQIF(string file)
         {
-            var parser = new QIFParser(Household);
+            var parser = new QIFParser(this);
             parser.ImportFromQIF(file);
             if (!string.IsNullOrEmpty(parser.Log))
             {
@@ -223,15 +219,22 @@ namespace BanaData.Logic.Main
             UserSettings.LastFileOpened = file;
 
             SaveToFile(file);
+            UpdateAll();
         }
 
         public void MergeQIF(string file)
         {
-            var parser = new QIFParser(Household);
-            Dirty |= parser.MergeFromQIF(file);
+            var parser = new QIFParser(this);
+            bool change = parser.MergeFromQIF(file);
             if (!string.IsNullOrEmpty(parser.Log))
             {
                 ErrorMessage(parser.Log, "Merge results");
+            }
+
+            if (change)
+            {
+                Dirty = true;
+                UpdateAll();
             }
         }
 
@@ -383,6 +386,8 @@ namespace BanaData.Logic.Main
         {
             try
             {
+                Household.Clear();
+                Household.AcceptChanges();
                 Household.ReadXml(file);
             }
             catch (Exception e)

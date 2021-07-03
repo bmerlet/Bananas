@@ -8,6 +8,7 @@ using System.IO;
 using System.Data;
 
 using BanaData.Database;
+using BanaData.Logic.Main;
 
 namespace BanaData.Serializations
 {
@@ -22,6 +23,7 @@ namespace BanaData.Serializations
 
         #region Private members
 
+        private readonly MainWindowLogic mainWindowLogic;
         private readonly Household household;
         private bool merging;
         private readonly List<string> accountNames = new List<string>();
@@ -30,7 +32,8 @@ namespace BanaData.Serializations
 
         #region Constructor
 
-        public QIFParser(Household _household) => household = _household;
+        public QIFParser(MainWindowLogic _mainWindowLogic) =>
+            (mainWindowLogic, household) = (_mainWindowLogic, _mainWindowLogic.Household);
 
         #endregion
 
@@ -41,31 +44,45 @@ namespace BanaData.Serializations
         private class Tracker
         {
             public Tracker(string item) => Item = item;
-            public readonly string Item;
-            public int Added;
-            public int Updated;
-            public int Unchanged;
 
+            // Name of tracked items
+            public readonly string Item;
+
+            // Counters
+            public int Added => AddedIDs.Count;
+            public int Deleted => DeletedIDs.Count;
+            public int Updated;
+            public int Unchanged => FoundIDs.Count;
+
+            // Convenience
+            public bool HasChange => Added != 0 || Updated != 0;
+
+            // List of IDs found and added (to reconcile items)
+            public readonly List<int> FoundIDs = new List<int>();
+            public readonly List<int> AddedIDs = new List<int>();
+            public readonly List<int> DeletedIDs = new List<int>();
+
+            // Pretty output
             public override string ToString()
             {
                 return $"{Item}: {Added} added, {Updated} updated, {Unchanged} unchanged.";
             }
-
-            public bool HasChange => Added != 0 || Updated != 0;
         }
 
         private Tracker accountTracker;
         private Tracker categoryTracker;
+        private Tracker securityTracker;
+        private Tracker bankTransactionTracker;
+        private Tracker investmentTransactionTracker;
 
         #endregion
 
-        #region QIF main parser
+        #region Entry points
 
         public void ImportFromQIF(string fileName)
         {
             // Init
             Log = "";
-            Household.AccountsRow accountRow = null;
             accountNames.Clear();
             merging = false;
 
@@ -74,13 +91,7 @@ namespace BanaData.Serializations
             household.AcceptChanges();
 
             // Parse the file
-            using (var sr = new StreamReader(fileName))
-            {
-                while (!sr.EndOfStream)
-                {
-                    accountRow = ParseOneSection(sr, accountRow);
-                }
-            }
+            ParseFile(fileName);
 
             // Log what we got
             Log += $"Imported {household.Accounts.Rows.Count:N0} accounts" + eol;
@@ -100,27 +111,23 @@ namespace BanaData.Serializations
         {
             // Init
             Log = "";
-            Household.AccountsRow accountRow = null;
             accountNames.Clear();
             merging = true;
             accountTracker = new Tracker("Accounts");
             categoryTracker = new Tracker("Categories");
+            securityTracker = new Tracker("Securities");
+            bankTransactionTracker = new Tracker("Banking transactions");
+            investmentTransactionTracker = new Tracker("Investment transactions");
 
             // Parse the file
-            using (var sr = new StreamReader(fileName))
-            {
-                while (!sr.EndOfStream)
-                {
-                    accountRow = ParseOneSection(sr, accountRow);
-                }
-            }
+            ParseFile(fileName);
 
             // Log what we got
             Log += accountTracker.ToString() + eol;
             Log += categoryTracker.ToString() + eol;
-            //Log += $"Imported {household.Securities.Rows.Count:N0} securities" + eol;
-            //Log += $"Imported {household.Transactions.Rows.Count:N0} transactions" + eol;
-            //Log += $"Imported {household.MemorizedPayees.Rows.Count:N0} memorized payees" + eol;
+            Log += securityTracker.ToString() + eol;
+            Log += bankTransactionTracker.ToString() + eol;
+            Log += investmentTransactionTracker.ToString() + eol;
             Log += eol;
 
             // Find other sides of transfers
@@ -128,7 +135,24 @@ namespace BanaData.Serializations
 
             household.AcceptChanges();
 
-            return accountTracker.HasChange | categoryTracker.HasChange;
+            return accountTracker.HasChange | categoryTracker.HasChange | securityTracker.HasChange;
+        }
+
+        #endregion
+
+        #region QIF main parser
+
+        // Parse a QIF file file
+        private void ParseFile(string fileName)
+        {
+            using (var sr = new StreamReader(fileName))
+            {
+                Household.AccountsRow accountRow = null;
+                while (!sr.EndOfStream)
+                {
+                    accountRow = ParseOneSection(sr, accountRow);
+                }
+            }
         }
 
         private Household.AccountsRow ParseOneSection(StreamReader sr, Household.AccountsRow accountRow)
@@ -294,19 +318,20 @@ namespace BanaData.Serializations
             if (existingCategoryRow == null)
             {
                 // New category
-                household.Categories.Add(name, description, parentRow, income, taxInfo);
-                categoryTracker.Added += 1;
+                var newRow = household.Categories.Add(name, description, parentRow, income, taxInfo);
+                categoryTracker.AddedIDs.Add(newRow.ID);
             }
             else if (household.Categories.HasSame(existingCategoryRow, description, income, taxInfo))
             {
                 // Exactly the same
-                categoryTracker.Unchanged += 1;
+                categoryTracker.FoundIDs.Add(existingCategoryRow.ID);
             }
             else
             {
                 // Updated category
                 household.Categories.Update(existingCategoryRow, name, description, parentRow, income, taxInfo);
                 categoryTracker.Updated += 1;
+                categoryTracker.FoundIDs.Add(existingCategoryRow.ID);
             }
         }
 
@@ -317,10 +342,16 @@ namespace BanaData.Serializations
         private Household.AccountsRow ParseAccounts(StreamReader sr)
         {
             Household.AccountsRow result = null;
+            bool firstTime = accountNames.Count == 0;
 
             while (sr.Peek() != '!' && !sr.EndOfStream)
             {
                 result = ParseOneAccount(sr);
+            }
+
+            if (merging && firstTime)
+            {
+                ReconcileMergedAccounts();
             }
 
             return result;
@@ -437,18 +468,19 @@ namespace BanaData.Serializations
             {
                 // New account
                 accountRow = CreateAccount(name, description, type, creditLimit, kind);
-                accountTracker.Added += 1;
+                accountTracker.AddedIDs.Add(accountRow.ID);
             }
             else if (household.Accounts.HasSame(accountRow, description, type, creditLimit, kind))
             {
                 // Exactly the same
-                accountTracker.Unchanged += 1;
+                accountTracker.FoundIDs.Add(accountRow.ID);
             }
             else
             {
                 // Updated account
                 household.Accounts.Update(accountRow.ID, name, description, type, creditLimit, kind, accountRow.Hidden);
                 accountTracker.Updated += 1;
+                accountTracker.FoundIDs.Add(accountRow.ID);
             }
 
             return accountRow;
@@ -468,6 +500,53 @@ namespace BanaData.Serializations
             }
 
             return household.Accounts.Add(name, description, type, creditLimit, kind, hidden);
+        }
+
+        private void ReconcileMergedAccounts()
+        {
+            if (accountTracker.FoundIDs.Count == household.Accounts.Rows.Count)
+            {
+                // No problem, existing accounts have not changed
+                return;
+            }
+
+            // See if we have a rename scenario
+            bool again = true;
+            while (again && accountTracker.AddedIDs.Count > 0)
+            {
+                // Find deleted accounts
+                foreach (Household.AccountsRow accountRow in household.Accounts.Rows)
+                {
+                    if (!accountTracker.FoundIDs.Contains(accountRow.ID))
+                    {
+                        bool rename = false;
+
+                        foreach(var addedID in accountTracker.AddedIDs)
+                        {
+                            var addedRow = household.Accounts.FindByID(addedID);
+                            var question = $"Was the account {accountRow.Name} renamed to {addedRow.Name}?";
+                            if (mainWindowLogic.YesNoQuestion(question))
+                            {
+                                // Ha, this was really a rename
+                                var name = addedRow.Name;
+                                accountTracker.AddedIDs.Remove(addedRow.ID);
+                                addedRow.Delete();
+                                accountRow.Name = name;
+                                accountTracker.FoundIDs.Add(accountRow.ID);
+
+                                again = true;
+                                rename = true;
+                                break;
+                            }
+                        }
+                        if (rename)
+                        {
+                            break;
+                        }
+                        accountTracker.DeletedIDs.Add(accountRow.ID);
+                    }
+                }
+            }
         }
 
         #endregion
@@ -531,7 +610,7 @@ namespace BanaData.Serializations
             if (merging)
             {
                 // Merge security
-                // ZZZZZZZZZZ
+                MergeSecurity(name, symbol, type);
             }
             else
             {
@@ -539,6 +618,29 @@ namespace BanaData.Serializations
                 household.Securities.Add(name, symbol, type);
             }
 
+        }
+
+        private void MergeSecurity(string name, string symbol, ESecurityType type)
+        {
+            var existingSecurityRow = household.Securities.GetByName(name);
+            if (existingSecurityRow == null)
+            {
+                // New  security
+                var newRow = household.Securities.Add(name, symbol, type);
+                securityTracker.AddedIDs.Add(newRow.ID);
+            }
+            else if (household.Securities.HasSame(existingSecurityRow, symbol, type))
+            {
+                // Exactly the same
+                securityTracker.FoundIDs.Add(existingSecurityRow.ID);
+            }
+            else
+            {
+                // Updated security
+                household.Securities.Update(existingSecurityRow.ID, name, symbol, type);
+                securityTracker.Updated += 1;
+                securityTracker.FoundIDs.Add(existingSecurityRow.ID);
+            }
         }
 
         #endregion
@@ -668,13 +770,118 @@ namespace BanaData.Serializations
 
             if (merging)
             {
-                // ZZZZZZZZZZZZ
+                MergeBankingTransaction(accountRow, date, payee, memo, status, medium, checkNumber, lineItemHolders);
             }
             else
             {
                 // Create transaction
                 CreateBankingTransaction(accountRow, date, payee, memo, status, medium, checkNumber, lineItemHolders);
             }
+        }
+
+        private void MergeBankingTransaction(
+            Household.AccountsRow accountRow,
+            DateTime date,
+            string payee,
+            string memo,
+            ETransactionStatus status,
+            ETransactionMedium medium,
+            uint checkNumber,
+            List<LineItemHolder> lineItemHolders)
+        {
+            var transAlmostTheSame = new List<Household.TransactionsRow>();
+
+            // Try to find this exact same transaction
+            foreach (var transRow in accountRow.GetTransactions())
+            {
+                if (!household.Transactions.HasSame(transRow, date, payee, memo, status))
+                {
+                    continue;
+                }
+
+                // Found same transaction, see if it has the same line items
+                var lineItemRows = household.LineItems.GetByTransaction(transRow);
+                if (lineItemRows.Length != lineItemHolders.Count)
+                {
+                    // Not the same number of line items, but the rest matched...
+                    transAlmostTheSame.Add(transRow);
+                    continue;
+                }
+
+                // Compare the line items
+                bool lineItemsMatch = true;
+                for (int i = 0; i < lineItemRows.Length; i++)
+                {
+                    if (!household.LineItems.HasSame(lineItemRows[i], lineItemHolders[i].CategoryID, lineItemHolders[i].AccountID, lineItemHolders[i].Memo, lineItemHolders[i].Amount))
+                    {
+                        lineItemsMatch = false;
+                        break;
+                    }
+                }
+
+                if (!lineItemsMatch)
+                {
+                    // Not the same line item(s), but the rest matched...
+                    transAlmostTheSame.Add(transRow);
+                    continue;
+                }
+
+                // Compare banking transaction if applicable
+                if (accountRow.Type == EAccountType.Bank)
+                {
+                    var bankingTransactionRow = household.BankingTransactions.GetByTransaction(transRow);
+                    if (!household.BankingTransactions.HasSame(bankingTransactionRow, medium, checkNumber))
+                    {
+                        // Not the same line medimu/check number, but the rest matched...
+                        transAlmostTheSame.Add(transRow);
+                        continue;
+                    }
+                }
+
+                // Miracle! we found the exact same transaction
+                bankTransactionTracker.FoundIDs.Add(transRow.ID);
+                return;
+            }
+
+            // This may be the end of a transfer that was deleted by the pairing algorithm
+            if (lineItemHolders.Count == 1 && lineItemHolders[0].AccountID >= 0)
+            {
+                foreach(Household.LineItemsRow li in household.LineItems.Rows)
+                {
+                    if (!li.IsAccountIDNull() && li.AccountID == accountRow.ID &&
+                        !li.IsITransferStatusNull() &&
+                        li.Amount == -lineItemHolders[0].Amount)
+                    {
+                        // Verify this transaction took place in the account targetted by our line item
+                        var trans = household.Transactions.FindByID(li.TransactionID);
+                        if (trans.AccountID == lineItemHolders[0].AccountID)
+                        {
+                            // Found you
+                            bankTransactionTracker.FoundIDs.Add(li.ID); // ZZZ ???
+                            return;
+                        }
+                    }
+                }
+            }
+
+            // Let's see if this is one of the transfers that are incorrect in the QIF
+            // and that were modified to have an undefined category
+            if (transAlmostTheSame.Count == 1 && lineItemHolders.Count == 1)
+            {
+                var transRow = transAlmostTheSame[0];
+                var lineItemRows = household.LineItems.GetByTransaction(transRow);
+                if (lineItemRows.Length == 1 &&
+                    household.LineItems.HasSame(lineItemRows[0], lineItemHolders[0].CategoryID, -1, lineItemHolders[0].Memo, lineItemHolders[0].Amount))
+                {
+                    // Yeah, that's it
+                    bankTransactionTracker.FoundIDs.Add(transRow.ID);
+                    return;
+                }
+            }
+
+            // Create a new one, the user can delete the extra ones
+            var newTrans = CreateBankingTransaction(accountRow, date, payee, memo, status, medium, checkNumber, lineItemHolders);
+            bankTransactionTracker.AddedIDs.Add(newTrans.ID);
         }
 
         private Household.TransactionsRow CreateBankingTransaction(

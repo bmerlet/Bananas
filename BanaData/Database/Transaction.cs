@@ -58,6 +58,40 @@ namespace BanaData.Database
                 return transactionRow;
             }
 
+            public bool HasSame(TransactionsRow transactionRow, DateTime date, string payee, string memo, ETransactionStatus status)
+            {
+                if (transactionRow.Date != date || transactionRow.Status != status)
+                {
+                    return false;
+                }
+
+                if (transactionRow.IsPayeeNull())
+                {
+                    if (!string.IsNullOrWhiteSpace(payee))
+                    {
+                        return false;
+                    }
+                }
+                else if (transactionRow.Payee != payee)
+                {
+                    return false;
+                }
+
+                if (transactionRow.IsMemoNull())
+                {
+                    if (!string.IsNullOrWhiteSpace(memo))
+                    {
+                        return false;
+                    }
+                }
+                else if (transactionRow.Memo != memo)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
             private static TransactionsRow UpdateTransaction(TransactionsRow transactionRow, AccountsRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status)
             {
                 transactionRow.AccountID = accountRow.ID;

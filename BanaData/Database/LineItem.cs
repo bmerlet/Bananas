@@ -49,6 +49,40 @@ namespace BanaData.Database
                 return lineItemRow;
             }
 
+            public bool HasSame(LineItemsRow lineItemRow, int categoryID, int categoryAccountID, string memo, decimal amount)
+            {
+                int rowCategoryID = lineItemRow.IsCategoryIDNull() ? -1 : lineItemRow.CategoryID;
+                if (rowCategoryID != categoryID)
+                {
+                    return false;
+                }
+
+                int rowCategoryAccountID = lineItemRow.IsAccountIDNull() ? -1 : lineItemRow.AccountID;
+                if (rowCategoryAccountID != categoryAccountID)
+                {
+                    return false;
+                }
+
+                if (lineItemRow.IsMemoNull())
+                {
+                    if (!string.IsNullOrWhiteSpace(memo))
+                    {
+                        return false;
+                    }
+                }
+                else if (lineItemRow.Memo != memo)
+                {
+                    return false;
+                }
+
+                if (lineItemRow.Amount != amount)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
             private static LineItemsRow UpdateLineItem(LineItemsRow lineItemRow, TransactionsRow transactionRow, int categoryId, int categoryAccountId, string memo, decimal amount)
             {
                 lineItemRow.TransactionID = transactionRow.ID;

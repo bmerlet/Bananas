@@ -82,6 +82,23 @@ namespace BanaData.Database
                 return UpdateSecurity(secRow, name, symbol, type);
             }
 
+            public bool HasSame(SecuritiesRow secRow, string symbol, ESecurityType type)
+            {
+                if (secRow.IsSymbolNull())
+                {
+                    if (!string.IsNullOrWhiteSpace(symbol))
+                    {
+                        return false;
+                    }
+                }
+                else if (secRow.Symbol != symbol)
+                {
+                    return false;
+                }
+
+                return secRow.Type == type;
+            }
+
             private static SecuritiesRow UpdateSecurity(SecuritiesRow secRow, string name, string symbol, ESecurityType type)
             {
                 secRow.Name = name;

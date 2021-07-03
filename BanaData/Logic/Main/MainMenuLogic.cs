@@ -56,8 +56,7 @@ namespace BanaData.Logic.Main
 
         private void OnOpen()
         {
-            string ZZZfile = @"C:\Users\bmerlet\Documents\Lab\Projects\C#\Bananas\sgbjm.qif";
-            OpenFileLogic logic = new OpenFileLogic(ZZZfile, "Banana files (*.xban)|*.xban|Quicken Interchange Format files (*.QIF)|*.QIF|Any file (*.*)|*.*", "Open file");
+            OpenFileLogic logic = new OpenFileLogic(mainWindow.UserSettings.LastFileOpened, "Banana files (*.xban)|*.xban|Any file (*.*)|*.*", "Open file");
             if (mainWindow.GuiServices.ShowDialog(logic))
             {
                 mainWindow.OpenFile(logic.File);

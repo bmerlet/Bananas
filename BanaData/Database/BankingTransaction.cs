@@ -49,6 +49,22 @@ namespace BanaData.Database
                 return bankTransRow;
             }
 
+            public bool HasSame(BankingTransactionsRow bankTransRow, ETransactionMedium medium, uint checkNumber)
+            {
+                if (bankTransRow.Medium != medium)
+                {
+                    return false;
+                }
+
+                if (bankTransRow.Medium == ETransactionMedium.Check &&
+                    bankTransRow.CheckNumber != checkNumber)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
             private static BankingTransactionsRow UpdateBankTransaction(BankingTransactionsRow bankTransRow, TransactionsRow transactionRow, ETransactionMedium medium, uint checkNumber)
             {
                 bankTransRow.TransactionID = transactionRow.ID;
