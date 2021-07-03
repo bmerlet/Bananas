@@ -11,15 +11,17 @@ namespace BanaData.Logic.Dialogs
 {
     public class OpenFileLogic : LogicBase
     {
-        public OpenFileLogic(string lastFile, string filter)
+        public OpenFileLogic(string lastFile, string filter, string title)
         {
             InitialDirectory = Path.GetDirectoryName(lastFile);
             File = Path.GetFileName(lastFile);
             Filter = filter;
+            Title = title;
         }
 
         public string InitialDirectory { get; }
-        public string File { get; set; }
         public string Filter { get; }
+        public string File { get; set; }
+        public string Title { get; }
     }
 }

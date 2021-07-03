@@ -23,6 +23,8 @@
         <Menu DockPanel.Dock="Top" DataContext="{Binding MainMenuLogic}">
             <MenuItem Header="File">
                 <MenuItem Header="Open..." Command="{Binding Open}" InputGestureText="^O"/>
+                <MenuItem Header="Import..." Command="{Binding Import}"/>
+                <MenuItem Header="Merge..." Command="{Binding Merge}"/>
                 <MenuItem Header="Save" Command="{Binding Save}" InputGestureText="^S"/>
                 <MenuItem Header="Exit" Command="{Binding Exit}"/>
             </MenuItem>

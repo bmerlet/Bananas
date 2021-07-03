@@ -199,18 +199,7 @@ namespace BanaData.Logic.Main
         {
             if (file.EndsWith(".QIF", StringComparison.InvariantCultureIgnoreCase))
             {
-                var parser = new QIFParser(Household);
-                parser.ConvertFromQIF(file);
-                if (!string.IsNullOrEmpty(parser.Log))
-                {
-                    ErrorMessage(parser.Log, "Import results");
-                }
-
-                // Save to a .XBAN (ZZZ Revisit later)
-                file = file.Substring(0, file.Length - 3) + "xban";
-                UserSettings.LastFileOpened = file;
-
-                SaveToFile(file);
+                ImportQIF(file);
             }
             else if (file.EndsWith(".XBAN", StringComparison.InvariantCultureIgnoreCase))
             {
@@ -218,6 +207,32 @@ namespace BanaData.Logic.Main
             }
 
             UpdateAll();
+        }
+
+        public void ImportQIF(string file)
+        {
+            var parser = new QIFParser(Household);
+            parser.ImportFromQIF(file);
+            if (!string.IsNullOrEmpty(parser.Log))
+            {
+                ErrorMessage(parser.Log, "Import results");
+            }
+
+            // Save to a .XBAN (ZZZ Revisit later)
+            file = file.Substring(0, file.Length - 3) + "xban";
+            UserSettings.LastFileOpened = file;
+
+            SaveToFile(file);
+        }
+
+        public void MergeQIF(string file)
+        {
+            var parser = new QIFParser(Household);
+            Dirty |= parser.MergeFromQIF(file);
+            if (!string.IsNullOrEmpty(parser.Log))
+            {
+                ErrorMessage(parser.Log, "Merge results");
+            }
         }
 
         // Commit changes to household data set

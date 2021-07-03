@@ -192,6 +192,7 @@ namespace XamlUI
                 FilterIndex = 1,
                 InitialDirectory = dir,
                 FileName = logic.File,
+                Title = logic.Title,
                 Multiselect = false
             };
 

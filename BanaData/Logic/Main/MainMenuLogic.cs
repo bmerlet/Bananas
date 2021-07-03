@@ -21,11 +21,13 @@ namespace BanaData.Logic.Main
 
         #region Constructor
 
-        public MainMenuLogic(MainWindowLogic main)
+        public MainMenuLogic(MainWindowLogic _mainWindow)
         {
-            this.mainWindow = main;
+            mainWindow = _mainWindow;
 
             Open = new CommandBase(OnOpen);
+            Import = new CommandBase(OnImport);
+            Merge = new CommandBase(OnMerge);
             Save = new CommandBase(OnSave);
             Exit = new CommandBase(OnExit);
 
@@ -55,10 +57,40 @@ namespace BanaData.Logic.Main
         private void OnOpen()
         {
             string ZZZfile = @"C:\Users\bmerlet\Documents\Lab\Projects\C#\Bananas\sgbjm.qif";
-            OpenFileLogic logic = new OpenFileLogic(ZZZfile, "Banana files (*.xban)|*.xban|Quicken Interchange Format files (*.QIF)|*.QIF|Any file (*.*)|*.*");
+            OpenFileLogic logic = new OpenFileLogic(ZZZfile, "Banana files (*.xban)|*.xban|Quicken Interchange Format files (*.QIF)|*.QIF|Any file (*.*)|*.*", "Open file");
             if (mainWindow.GuiServices.ShowDialog(logic))
             {
                 mainWindow.OpenFile(logic.File);
+            }
+        }
+
+        //
+        // Import
+        //
+        public CommandBase Import { get; }
+
+        private void OnImport()
+        {
+            string ZZZfile = @"C:\Users\bmerlet\Documents\Lab\Projects\C#\Bananas\sgbjm.qif";
+            OpenFileLogic logic = new OpenFileLogic(ZZZfile, "Quicken Interchange Format files (*.QIF)|*.QIF|Any file (*.*)|*.*", "Import file");
+            if (mainWindow.GuiServices.ShowDialog(logic))
+            {
+                mainWindow.ImportQIF(logic.File);
+            }
+        }
+
+        //
+        // Merge
+        //
+        public CommandBase Merge { get; }
+
+        private void OnMerge()
+        {
+            string ZZZfile = @"C:\Users\bmerlet\Documents\Lab\Projects\C#\Bananas\sgbjm.qif";
+            OpenFileLogic logic = new OpenFileLogic(ZZZfile, "Quicken Interchange Format files (*.QIF)|*.QIF|Any file (*.*)|*.*", "Merge file");
+            if (mainWindow.GuiServices.ShowDialog(logic))
+            {
+                mainWindow.MergeQIF(logic.File);
             }
         }
 

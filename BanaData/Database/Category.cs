@@ -88,6 +88,40 @@ namespace BanaData.Database
                 return catRow;
             }
 
+            public bool HasSame(CategoriesRow catRow, string description, bool income, string taxInfo)
+            {
+                if (catRow.IsDescriptionNull())
+                {
+                    if (!string.IsNullOrWhiteSpace(description))
+                    {
+                        return false;
+                    }
+                }
+                else if (catRow.Description != description)
+                {
+                    return false;
+                }
+
+                if (catRow.IsIncome != income)
+                {
+                    return false;
+                }
+
+                if (catRow.IsTaxInfoNull())
+                {
+                    if (!string.IsNullOrWhiteSpace(taxInfo))
+                    {
+                        return false;
+                    }
+                }
+                else if (catRow.TaxInfo != taxInfo)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
             private static CategoriesRow UpdateCategory(CategoriesRow catRow, string name, string description, CategoriesRow parent, bool income, string taxInfo)
             {
                 catRow.Name = name;

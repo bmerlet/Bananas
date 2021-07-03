@@ -23,6 +23,8 @@ namespace BanaData.Serializations
         #region Private members
 
         private readonly Household household;
+        private bool merging;
+        private readonly List<string> accountNames = new List<string>();
 
         #endregion
 
@@ -36,17 +38,42 @@ namespace BanaData.Serializations
 
         public string Log { get; private set; } = "";
 
+        private class Tracker
+        {
+            public Tracker(string item) => Item = item;
+            public readonly string Item;
+            public int Added;
+            public int Updated;
+            public int Unchanged;
+
+            public override string ToString()
+            {
+                return $"{Item}: {Added} added, {Updated} updated, {Unchanged} unchanged.";
+            }
+
+            public bool HasChange => Added != 0 || Updated != 0;
+        }
+
+        private Tracker accountTracker;
+        private Tracker categoryTracker;
+
         #endregion
 
         #region QIF main parser
 
-        public void ConvertFromQIF(string fileName)
+        public void ImportFromQIF(string fileName)
         {
+            // Init
             Log = "";
+            Household.AccountsRow accountRow = null;
+            accountNames.Clear();
+            merging = false;
+
+            // Zap the database
             household.Clear();
             household.AcceptChanges();
-            Household.AccountsRow accountRow = null;
 
+            // Parse the file
             using (var sr = new StreamReader(fileName))
             {
                 while (!sr.EndOfStream)
@@ -67,6 +94,41 @@ namespace BanaData.Serializations
             PairTransfers();
 
             household.AcceptChanges();
+        }
+
+        public bool MergeFromQIF(string fileName)
+        {
+            // Init
+            Log = "";
+            Household.AccountsRow accountRow = null;
+            accountNames.Clear();
+            merging = true;
+            accountTracker = new Tracker("Accounts");
+            categoryTracker = new Tracker("Categories");
+
+            // Parse the file
+            using (var sr = new StreamReader(fileName))
+            {
+                while (!sr.EndOfStream)
+                {
+                    accountRow = ParseOneSection(sr, accountRow);
+                }
+            }
+
+            // Log what we got
+            Log += accountTracker.ToString() + eol;
+            Log += categoryTracker.ToString() + eol;
+            //Log += $"Imported {household.Securities.Rows.Count:N0} securities" + eol;
+            //Log += $"Imported {household.Transactions.Rows.Count:N0} transactions" + eol;
+            //Log += $"Imported {household.MemorizedPayees.Rows.Count:N0} memorized payees" + eol;
+            Log += eol;
+
+            // Find other sides of transfers
+            // ZZZZZZZZZZZ PairTransfers();
+
+            household.AcceptChanges();
+
+            return accountTracker.HasChange | categoryTracker.HasChange;
         }
 
         private Household.AccountsRow ParseOneSection(StreamReader sr, Household.AccountsRow accountRow)
@@ -214,8 +276,38 @@ namespace BanaData.Serializations
                 parentRow = household.Categories.GetByParentAndName(parentRow, components[c]);
             }
 
-            // Create category and add it to the database
-            household.Categories.Add(name, description, parentRow, income, taxInfo);
+            // Add or merge category into the database
+            if (merging)
+            {
+                MergeCategory(name, description, parentRow, income, taxInfo);
+            }
+            else
+            {
+                household.Categories.Add(name, description, parentRow, income, taxInfo);
+            }
+
+        }
+
+        private void MergeCategory(string name, string description, Household.CategoriesRow parentRow, bool income, string taxInfo)
+        {
+            var existingCategoryRow = household.Categories.GetByParentAndName(parentRow, name);
+            if (existingCategoryRow == null)
+            {
+                // New category
+                household.Categories.Add(name, description, parentRow, income, taxInfo);
+                categoryTracker.Added += 1;
+            }
+            else if (household.Categories.HasSame(existingCategoryRow, description, income, taxInfo))
+            {
+                // Exactly the same
+                categoryTracker.Unchanged += 1;
+            }
+            else
+            {
+                // Updated category
+                household.Categories.Update(existingCategoryRow, name, description, parentRow, income, taxInfo);
+                categoryTracker.Updated += 1;
+            }
         }
 
         #endregion
@@ -311,25 +403,71 @@ namespace BanaData.Serializations
                 throw new InvalidDataException("QIF parser: Account has no type");
             }
 
-            // Create account if it does not exist, and make it the current account
+            Household.AccountsRow accountRow;
+
+            // Skip if we already saw this name (account name are present at least twicw in QIF files)
+            if (accountNames.Contains(name))
+            {
+                accountRow = household.Accounts.GetByName(name);
+            }
+            else
+            {
+                accountNames.Add(name);
+
+                if (merging)
+                {
+                    // Merge account
+                    accountRow = MergeAccount(name, description, type, creditLimit, kind);
+                }
+                else
+                {
+                    // Create account
+                    accountRow = CreateAccount(name, description, type, creditLimit, kind);
+                }
+            }
+
+            // Make this account the current account
+            return accountRow;
+        }
+
+        private Household.AccountsRow MergeAccount(string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind)
+        {
             var accountRow = household.Accounts.GetByName(name);
             if (accountRow == null)
             {
-                // By convention ,accounts with a name starting with _CLOSED are hidden
-                // (QIF does not have a flag for hidden accounts)
-                bool hidden = name.StartsWith("_CLOSED");
-
-                // By convention, investment accounts with " IRA" in them are traditional IRA
-                // (QIF does not have a flag for traditional IRAs)
-                if (type == EAccountType.Investment && kind == EInvestmentKind.Brokerage && name.Contains(" IRA"))
-                {
-                    kind = EInvestmentKind.TraditionalIRA;
-                }
-
-                household.Accounts.Add(name, description, type, creditLimit, kind, hidden);
+                // New account
+                accountRow = CreateAccount(name, description, type, creditLimit, kind);
+                accountTracker.Added += 1;
+            }
+            else if (household.Accounts.HasSame(accountRow, description, type, creditLimit, kind))
+            {
+                // Exactly the same
+                accountTracker.Unchanged += 1;
+            }
+            else
+            {
+                // Updated account
+                household.Accounts.Update(accountRow.ID, name, description, type, creditLimit, kind, accountRow.Hidden);
+                accountTracker.Updated += 1;
             }
 
             return accountRow;
+        }
+
+        private Household.AccountsRow CreateAccount(string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind)
+        {
+            // By convention ,accounts with a name starting with _CLOSED are hidden
+            // (QIF does not have a flag for hidden accounts)
+            bool hidden = name.StartsWith("_CLOSED");
+
+            // By convention, investment accounts with " IRA" in them are traditional IRA
+            // (QIF does not have a flag for traditional IRAs)
+            if (type == EAccountType.Investment && kind == EInvestmentKind.Brokerage && name.Contains(" IRA"))
+            {
+                kind = EInvestmentKind.TraditionalIRA;
+            }
+
+            return household.Accounts.Add(name, description, type, creditLimit, kind, hidden);
         }
 
         #endregion
@@ -390,8 +528,16 @@ namespace BanaData.Serializations
                 throw new InvalidDataException("QIF parser: Security has no type");
             }
 
-            // Create security and add it to the list
-            household.Securities.Add(name, symbol, type);
+            if (merging)
+            {
+                // Merge security
+                // ZZZZZZZZZZ
+            }
+            else
+            {
+                // Create security and add it to the list
+                household.Securities.Add(name, symbol, type);
+            }
 
         }
 
@@ -431,7 +577,7 @@ namespace BanaData.Serializations
             ETransactionMedium medium = ETransactionMedium.None;
             uint checkNumber = 0;
 
-            List<LineItemHolder> lineItemHodlers = new List<LineItemHolder>();
+            List<LineItemHolder> lineItemHolders = new List<LineItemHolder>();
             var lineItemHolder = new LineItemHolder();
             bool parsingSplitLineItem = false;
 
@@ -495,7 +641,7 @@ namespace BanaData.Serializations
                         // Indicates beginning of a new split line item - commit previous one if any
                         if (parsingSplitLineItem)
                         {
-                            lineItemHodlers.Add(lineItemHolder);
+                            lineItemHolders.Add(lineItemHolder);
                             lineItemHolder = new LineItemHolder();
                         }
                         parsingSplitLineItem = true;
@@ -517,6 +663,30 @@ namespace BanaData.Serializations
                 throw new InvalidDataException("QIF parser: Mysterious amount not the same as regular amount - " + amountToCheck + " - " + otherMysteriousAmount);
             }
 
+            // Flush last line item
+            lineItemHolders.Add(lineItemHolder);
+
+            if (merging)
+            {
+                // ZZZZZZZZZZZZ
+            }
+            else
+            {
+                // Create transaction
+                CreateBankingTransaction(accountRow, date, payee, memo, status, medium, checkNumber, lineItemHolders);
+            }
+        }
+
+        private Household.TransactionsRow CreateBankingTransaction(
+            Household.AccountsRow accountRow, 
+            DateTime date,
+            string payee, 
+            string memo,
+            ETransactionStatus status,
+            ETransactionMedium medium,
+            uint checkNumber,
+            IEnumerable<LineItemHolder> lineItemHolders)
+        {
             // Create main transaction
             var transRow = household.Transactions.Add(accountRow, date, payee, memo, status);
 
@@ -527,16 +697,17 @@ namespace BanaData.Serializations
             }
 
             // Add the line item(s)
-            lineItemHodlers.Add(lineItemHolder);
-            foreach (var lih in lineItemHodlers)
+            foreach (var lih in lineItemHolders)
             {
                 household.LineItems.Add(
-                    transRow, 
+                    transRow,
                     lih.CategoryID,
-                    lih.AccountID, 
-                    lih.Memo, 
+                    lih.AccountID,
+                    lih.Memo,
                     lih.Amount);
             }
+
+            return transRow;
         }
 
         private void ParseInvestmentTransactions(StreamReader sr, Household.AccountsRow account)
@@ -663,9 +834,36 @@ namespace BanaData.Serializations
                 amount = -amount;
             }
 
-            var transRow = household.Transactions.Add(accountRow, date, altMemo, mainMemo, status);
+            if (merging)
+            {
+                // ZZZZZZZZZZZZZZZZZZZZZZZZ
+            }
+            else
+            {
+                CreateInvestmentTransaction(accountRow, date, altMemo, mainMemo, status, categoryID, categoryAccountID, amount, type, securityRow, securityPrice, securityQuantity, commission);
+            }
+        }
+
+        private Household.TransactionsRow CreateInvestmentTransaction(
+            Household.AccountsRow accountRow,
+            DateTime date,
+            string payee,
+            string memo,
+            ETransactionStatus status,
+            int categoryID,
+            int categoryAccountID,
+            decimal amount,
+            EInvestmentTransactionType type,
+            Household.SecuritiesRow securityRow,
+            decimal securityPrice,
+            decimal securityQuantity,
+            decimal commission)
+        {
+            var transRow = household.Transactions.Add(accountRow, date, payee, memo, status);
             household.LineItems.Add(transRow, categoryID, categoryAccountID, null, amount);
             household.InvestmentTransactions.Add(transRow, type, securityRow, securityPrice, securityQuantity, commission);
+
+            return transRow;
         }
 
         #endregion
@@ -694,7 +892,7 @@ namespace BanaData.Serializations
             ETransactionStatus status = ETransactionStatus.Pending;
             //EMemorizedTransactionType type = EMemorizedTransactionType.None;
 
-            List<LineItemHolder> lineItemHodlers = new List<LineItemHolder>();
+            List<LineItemHolder> lineItemHolders = new List<LineItemHolder>();
             var lineItemHolder = new LineItemHolder();
             bool parsingSplitLineItem = false;
 
@@ -756,7 +954,7 @@ namespace BanaData.Serializations
                         // Indicates beginning of a new split line item - commit previous one if any
                         if (parsingSplitLineItem)
                         {
-                            lineItemHodlers.Add(lineItemHolder);
+                            lineItemHolders.Add(lineItemHolder);
                             lineItemHolder = new LineItemHolder();
                         }
                         parsingSplitLineItem = true;
@@ -772,18 +970,27 @@ namespace BanaData.Serializations
                 }
             }
 
+            // Flush last line item
+            lineItemHolders.Add(lineItemHolder);
+
             // Check we have all info
             if (amountToCheck != otherMysteriousAmount)
             {
                 throw new InvalidDataException("QIF parser: Mysterious amount not the same as regular amount - " + amountToCheck + " - " + otherMysteriousAmount);
             }
 
-            // Create memorized payee
+            if (merging)
+            {
+                // ZZZZZZZZZZZZZZZZ
+            }
+            else
+            {
+                CreateMemorizedPayee(payee, status, memo, lineItemHolders);
+            }
             var memorizedPayees = household.MemorizedPayees.Add(payee, status, memo);
 
             // Add the line item(s)
-            lineItemHodlers.Add(lineItemHolder);
-            foreach (var lih in lineItemHodlers)
+            foreach (var lih in lineItemHolders)
             {
                 household.MemorizedLineItems.Add(memorizedPayees,
                     lih.CategoryID,
@@ -791,6 +998,25 @@ namespace BanaData.Serializations
                     lih.Memo,
                     lih.Amount);
             }
+        }
+
+
+        private Household.MemorizedPayeesRow CreateMemorizedPayee(string payee, ETransactionStatus status, string memo, IEnumerable<LineItemHolder> lineItemHolders)
+        {
+            // Create memorized payee
+            var memorizedPayeeRow = household.MemorizedPayees.Add(payee, status, memo);
+
+            // Add the line item(s)
+            foreach (var lih in lineItemHolders)
+            {
+                household.MemorizedLineItems.Add(memorizedPayeeRow,
+                    lih.CategoryID,
+                    lih.AccountID,
+                    lih.Memo,
+                    lih.Amount);
+            }
+
+            return memorizedPayeeRow;
         }
 
         #endregion
@@ -871,7 +1097,14 @@ namespace BanaData.Serializations
                 var date = ParseDate(subComps[1]);
                 if (date.CompareTo(DateTime.Now) <= 0)
                 {
-                    household.SecurityPrices.Add(securityRow, date, price);
+                    if (merging)
+                    {
+                        // ZZZZZZZZZZZZZZZZZZ
+                    }
+                    else
+                    {
+                        household.SecurityPrices.Add(securityRow, date, price);
+                    }
                 }
             }
         }

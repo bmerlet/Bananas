@@ -268,6 +268,49 @@ namespace BanaData.Database
                 return accRow;
             }
 
+            public bool HasSame(AccountsRow accountRow, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind)
+            {
+                if (accountRow.IsDescriptionNull()) 
+                {
+                    if (!string.IsNullOrWhiteSpace(description))
+                    {
+                        return false;
+                    }
+                }
+                else if (accountRow.Description != description)
+                {
+                    return false;
+                }
+
+                if (accountRow.Type != type)
+                {
+                    return false;
+                }
+
+                if (accountRow.IsCreditLimitNull())
+                {
+                    if (creditLimit != 0)
+                    {
+                        return false;
+                    }
+                }
+                else if (accountRow.CreditLimit != creditLimit)
+                {
+                    return false;
+                }
+
+                if (type == EAccountType.Investment)
+                {
+                    if (accountRow.Kind != kind &&
+                        !(accountRow.Kind == EInvestmentKind.TraditionalIRA && kind == EInvestmentKind.Brokerage))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
             private static void UpdateAccount(AccountsRow accRow, string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind, bool hidden)
             {
                 accRow.Name = name;
