@@ -13,6 +13,9 @@ using BanaData.Logic.Main;
 
 namespace BanaData.Serializations
 {
+    /// <summary>
+    /// Parse a QIF file, creating a Household database or merging it in. 
+    /// </summary>
     class QIFParser
     {
         #region Constants
@@ -846,7 +849,7 @@ namespace BanaData.Serializations
                 // Compare banking transaction if applicable
                 if (accountRow.Type == EAccountType.Bank)
                 {
-                    var bankingTransactionRow = household.BankingTransactions.GetByTransaction(transRow);
+                    var bankingTransactionRow = transRow.GetBankingTransaction();
                     if (!bankingTransactionRow.HasSame(medium, checkNumber))
                     {
                         // Not the same line medimu/check number, but the rest matched...
@@ -956,8 +959,8 @@ namespace BanaData.Serializations
             DateTime date = DateTime.MinValue;
             decimal amount = 0;
             decimal otherMysteriousAmount = 0;
-            string mainMemo = null;
-            string altMemo = null;
+            string memo = null;
+            string payee = null;
             int categoryAccountID = -1;
             int categoryID = -1;
             ETransactionStatus status = ETransactionStatus.Pending;
@@ -1023,11 +1026,11 @@ namespace BanaData.Serializations
                         
                     //case 'E':
                     case 'M':
-                        mainMemo = arg;
+                        memo = arg;
                         break;
 
                     case 'P':
-                        altMemo = arg;
+                        payee = arg;
                         break;
 
                     case 'C':
@@ -1050,7 +1053,7 @@ namespace BanaData.Serializations
             // Check we have all info
             if (date == DateTime.MinValue)
             {
-                throw new InvalidDataException("QIF parser: Investment transaction has no date - " + altMemo);
+                throw new InvalidDataException("QIF parser: Investment transaction has no date - " + payee);
             }
             if (amount != otherMysteriousAmount)
             {
@@ -1064,11 +1067,11 @@ namespace BanaData.Serializations
 
             if (merging)
             {
-                MergeInvestmentTransaction(accountRow, date, altMemo, mainMemo, status, categoryID, categoryAccountID, amount, type, securityRow, securityPrice, securityQuantity, commission);
+                MergeInvestmentTransaction(accountRow, date, payee, memo, status, categoryID, categoryAccountID, amount, type, securityRow, securityPrice, securityQuantity, commission);
             }
             else
             {
-                CreateInvestmentTransaction(accountRow, date, altMemo, mainMemo, status, categoryID, categoryAccountID, amount, type, securityRow, securityPrice, securityQuantity, commission);
+                CreateInvestmentTransaction(accountRow, date, payee, memo, status, categoryID, categoryAccountID, amount, type, securityRow, securityPrice, securityQuantity, commission);
             }
         }
 
@@ -1104,7 +1107,7 @@ namespace BanaData.Serializations
                 }
 
                 // Compare investment transaction
-                var investmentTransactionRow = household.InvestmentTransactions.GetByTransaction(transRow);
+                var investmentTransactionRow = transRow.GetInvestmentTransaction();
                 if (!investmentTransactionRow.HasSame(type, securityRow, securityPrice, securityQuantity, commission))
                 {
                     continue;
@@ -1870,7 +1873,7 @@ namespace BanaData.Serializations
                     var accountRow2 = household.Accounts.FindByID(transactionRow2.AccountID);
 
                     if (accountRow1.Type == EAccountType.Investment &&
-                        household.InvestmentTransactions.GetByTransaction(transactionRow1) is Household.InvestmentTransactionsRow investmentTransactionRow1 &&
+                        transactionRow1.GetInvestmentTransaction() is Household.InvestmentTransactionsRow investmentTransactionRow1 &&
                         investmentTransactionRow1.Type != EInvestmentTransactionType.TransferCash &&
                         investmentTransactionRow1.Type != EInvestmentTransactionType.TransferCashIn &&
                         investmentTransactionRow1.Type != EInvestmentTransactionType.TransferCashOut)
@@ -1880,7 +1883,7 @@ namespace BanaData.Serializations
                         lineItemToKeep = lineItemRow1;
                     }
                     else if (accountRow2.Type == EAccountType.Investment &&
-                        household.InvestmentTransactions.GetByTransaction(transactionRow2) is Household.InvestmentTransactionsRow investmentTransactionRow2 &&
+                        transactionRow2.GetInvestmentTransaction() is Household.InvestmentTransactionsRow investmentTransactionRow2 &&
                         investmentTransactionRow2.Type != EInvestmentTransactionType.TransferCash &&
                         investmentTransactionRow2.Type != EInvestmentTransactionType.TransferCashIn &&
                         investmentTransactionRow2.Type != EInvestmentTransactionType.TransferCashOut)
@@ -1919,11 +1922,11 @@ namespace BanaData.Serializations
                 var accountOfTransactionToDeleteRow = household.Accounts.FindByID(transactionToDelete.AccountID);
                 if (accountOfTransactionToDeleteRow.Type == EAccountType.Investment)
                 {
-                    household.InvestmentTransactions.GetByTransaction(transactionToDelete).Delete();
+                    transactionToDelete.GetInvestmentTransaction().Delete();
                 }
                 else if (accountOfTransactionToDeleteRow.Type == EAccountType.Bank)
                 {
-                    household.BankingTransactions.GetByTransaction(transactionToDelete).Delete();
+                    transactionToDelete.GetBankingTransaction().Delete();
                 }
                 transactionToDelete.Delete();
             }

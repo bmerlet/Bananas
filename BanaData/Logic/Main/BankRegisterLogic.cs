@@ -51,14 +51,8 @@ namespace BanaData.Logic.Main
         // Routine to create a transaction from the DB
         protected override AbstractTransactionLogic CreateTransactionFromDB(Household.AccountsRow accountRow, Household.TransactionsRow transRow, List<LineItem> lineItems) 
         {
-            var household = mainWindowLogic.Household;
-
             // Get banking details
-            Household.BankingTransactionsRow transBankRow = null;
-            if (accountRow.Type == EAccountType.Bank)
-            {
-                transBankRow = household.BankingTransactions.GetByTransaction(transRow);
-            }
+            Household.BankingTransactionsRow transBankRow = (accountRow.Type == EAccountType.Bank) ? transRow.GetBankingTransaction() : null;
 
             var transactionData = new BankingTransactionLogic.BankTransactionData(
                 transRow.Date,

@@ -339,7 +339,7 @@ namespace BanaData.Logic.Dialogs
                     foreach (Household.TransactionsRow transactionRow in accountRow.GetTransactions().Where(tr => tr.Date.Year == selectedYear))
                     {
                         // Get the investment transaction
-                        var investmentTransactionRow = household.InvestmentTransactions.GetByTransaction(transactionRow);
+                        var investmentTransactionRow = transactionRow.GetInvestmentTransaction();
 
                         // Capture dividends
                         var type = investmentTransactionRow.Type;

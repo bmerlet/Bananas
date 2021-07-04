@@ -63,10 +63,8 @@ namespace BanaData.Logic.Main
         // Routine to create a transaction from the DB
         protected override AbstractTransactionLogic CreateTransactionFromDB(Household.AccountsRow accountRow, Household.TransactionsRow transRow, List<LineItem> lineItems)
         {
-            var household = mainWindowLogic.Household;
-
             // Get investment transaction info
-            var investmentTransRow = household.InvestmentTransactions.GetByTransaction(transRow);
+            var investmentTransRow = transRow.GetInvestmentTransaction();
 
             // Create data
             var transactionData = new InvestmentTransactionLogic.InvestmentTransactionData(

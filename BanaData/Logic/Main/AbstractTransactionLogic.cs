@@ -363,11 +363,11 @@ namespace BanaData.Logic.Main
             // Delete banking or investment transaction
             if (accountRow.Type == EAccountType.Bank)
             {
-                household.BankingTransactions.GetByTransaction(transactionRow).Delete();
+                transactionRow.GetBankingTransaction().Delete();
             }
             else if (accountRow.Type == EAccountType.Investment)
             {
-                household.InvestmentTransactions.GetByTransaction(transactionRow).Delete();
+                transactionRow.GetInvestmentTransaction().Delete();
             }
 
             // Finally delete the transaction

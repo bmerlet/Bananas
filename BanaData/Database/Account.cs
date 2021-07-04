@@ -79,7 +79,7 @@ namespace BanaData.Database
                     {
                         if (Type == EAccountType.Investment)
                         {
-                            var investmentTransaction = Type == EAccountType.Investment ? ((Household)Table.DataSet).InvestmentTransactions.GetByTransaction(transaction) : null;
+                            var investmentTransaction = Type == EAccountType.Investment ? transaction.GetInvestmentTransaction() : null;
                             if (investmentTransaction.IsCashIn || investmentTransaction.IsCashOut)
                             {
                                 balance += transaction.GetAmount();
@@ -155,7 +155,7 @@ namespace BanaData.Database
                     var transRow = household.Transactions.FindByID(lineItemRow.TransactionID);
                     if (transRow.AccountID != ID)
                     {
-                        portfolio.ApplyTransfer(household, lineItemRow);
+                        portfolio.ApplyTransfer(lineItemRow);
                     }
                 }
 
@@ -223,14 +223,7 @@ namespace BanaData.Database
                     return false;
                 }
 
-                if (IsCreditLimitNull())
-                {
-                    if (creditLimit != 0)
-                    {
-                        return false;
-                    }
-                }
-                else if (CreditLimit != creditLimit)
+                if (CreditLimit != creditLimit)
                 {
                     return false;
                 }
@@ -329,14 +322,7 @@ namespace BanaData.Database
                 }
 
                 // Credit-card specific
-                if (type == EAccountType.CreditCard)
-                {
-                    accRow.CreditLimit = creditLimit;
-                }
-                else
-                {
-                    accRow.SetCreditLimitNull();
-                }
+                accRow.CreditLimit = creditLimit;
 
                 // Investment specific
                 if (type == EAccountType.Investment)

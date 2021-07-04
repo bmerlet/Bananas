@@ -29,7 +29,7 @@ namespace BanaData.Database
         public void ApplyTransaction(Household household, Household.TransactionsRow transaction)
         {
             // Get investment transaction
-            var investmentTransaction = household.InvestmentTransactions.GetByTransaction(transaction);
+            var investmentTransaction = transaction.GetInvestmentTransaction();
 
             // Get security if any
             Household.SecuritiesRow security = null;
@@ -56,9 +56,7 @@ namespace BanaData.Database
             }
         }
 
-#pragma warning disable IDE0060 // Remove unused parameter
-        public void ApplyTransfer(Household household, Household.LineItemsRow lineItem)
-#pragma warning restore IDE0060 // Remove unused parameter
+        public void ApplyTransfer(Household.LineItemsRow lineItem)
         {
             cashBalance -= lineItem.Amount;
         }
@@ -156,7 +154,7 @@ namespace BanaData.Database
 
             // Get transaction info
             var transactionRow = household.Transactions.FindByID(transactionID);
-            var investmentTransactionRow = household.InvestmentTransactions.GetByTransaction(transactionRow);
+            var investmentTransactionRow = transactionRow.GetInvestmentTransaction();
             var securityRow = household.Securities.FindByID(investmentTransactionRow.SecurityID);
             var accountRow = household.Accounts.FindByID(transactionRow.AccountID);
 

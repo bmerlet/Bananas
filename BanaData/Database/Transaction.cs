@@ -35,6 +35,16 @@ namespace BanaData.Database
                 return amount;
             }
 
+            public BankingTransactionsRow GetBankingTransaction()
+            {
+                return GetChildRows(this.Table.ChildRelations["FK_Transactions_BankTransactions"]).Single() as BankingTransactionsRow;
+            }
+
+            public InvestmentTransactionsRow GetInvestmentTransaction()
+            {
+                return GetChildRows(this.Table.ChildRelations["FK_Transactions_InvestmentTransactions"]).Single() as InvestmentTransactionsRow;
+            }
+
             public bool HasSame(DateTime date, string payee, string memo, ETransactionStatus status)
             {
                 if (Date != date || Status != status)

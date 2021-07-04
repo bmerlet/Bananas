@@ -114,10 +114,10 @@ namespace BanaData.Database
 
         partial class InvestmentTransactionsDataTable
         {
-            public InvestmentTransactionsRow GetByTransaction(TransactionsRow transaction)
-            {
-                return this.Single(it => it.TransactionID == transaction.ID);
-            }
+            //public InvestmentTransactionsRow GetByTransaction(TransactionsRow transaction)
+            //{
+            //    return this.Single(it => it.TransactionID == transaction.ID);
+            //}
 
             public InvestmentTransactionsRow Add(
                 Household.TransactionsRow transactionRow,
@@ -144,7 +144,7 @@ namespace BanaData.Database
                 decimal securityQuantity,
                 decimal commission)
             {
-                InvestmentTransactionsRow invTransRow = GetByTransaction(transactionRow);
+                InvestmentTransactionsRow invTransRow = transactionRow.GetInvestmentTransaction();
 
                 return UpdateInvestmentTransaction(invTransRow, transactionRow, type, security, securityPrice, securityQuantity, commission);
             }

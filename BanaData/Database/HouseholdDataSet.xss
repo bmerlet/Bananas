@@ -7,16 +7,16 @@
 <DiagramLayout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ex:showrelationlabel="False" ViewPortX="-10" ViewPortY="-47" xmlns:ex="urn:schemas-microsoft-com:xml-msdatasource-layout-extended" xmlns="urn:schemas-microsoft-com:xml-msdatasource-layout">
   <Shapes>
     <Shape ID="DesignTable:Accounts" ZOrder="24" X="115" Y="20" Height="181" Width="150" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="24" SplitterPosition="177" />
-    <Shape ID="DesignTable:Categories" ZOrder="10" X="335" Y="483" Height="143" Width="153" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="139" />
+    <Shape ID="DesignTable:Categories" ZOrder="11" X="335" Y="483" Height="143" Width="153" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="139" />
     <Shape ID="DesignTable:Securities" ZOrder="23" X="843" Y="24" Height="105" Width="150" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="101" />
     <Shape ID="DesignTable:SecurityPrices" ZOrder="22" X="1023" Y="64" Height="105" Width="150" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="101" />
     <Shape ID="DesignTable:Transactions" ZOrder="17" X="362" Y="20" Height="143" Width="150" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="139" />
-    <Shape ID="DesignTable:LineItems" ZOrder="9" X="559" Y="246" Height="162" Width="150" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="158" />
-    <Shape ID="DesignTable:BankingTransactions" ZOrder="7" X="287" Y="211" Height="105" Width="168" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="101" />
-    <Shape ID="DesignTable:InvestmentTransactions" ZOrder="1" X="592" Y="22" Height="162" Width="204" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="158" />
-    <Shape ID="DesignTable:MemorizedLineItems" ZOrder="14" X="699" Y="443" Height="162" Width="188" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="158" />
-    <Shape ID="DesignTable:MemorizedPayees" ZOrder="13" X="909" Y="438" Height="105" Width="171" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="101" />
-    <Shape ID="DesignTable:ReconcileInfo" ZOrder="8" X="50" Y="353" Height="162" Width="150" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="158" />
+    <Shape ID="DesignTable:LineItems" ZOrder="10" X="559" Y="246" Height="162" Width="150" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="158" />
+    <Shape ID="DesignTable:BankingTransactions" ZOrder="8" X="287" Y="211" Height="105" Width="168" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="101" />
+    <Shape ID="DesignTable:InvestmentTransactions" ZOrder="2" X="592" Y="22" Height="162" Width="204" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="158" />
+    <Shape ID="DesignTable:MemorizedLineItems" ZOrder="15" X="699" Y="443" Height="162" Width="188" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="158" />
+    <Shape ID="DesignTable:MemorizedPayees" ZOrder="14" X="909" Y="438" Height="105" Width="171" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="101" />
+    <Shape ID="DesignTable:ReconcileInfo" ZOrder="9" X="50" Y="353" Height="162" Width="150" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="158" />
   </Shapes>
   <Connectors>
     <Connector ID="DesignRelation:FK_Securities_SecurityPrices" ZOrder="21" LineWidth="11">
@@ -71,7 +71,7 @@
         </Point>
       </RoutePoints>
     </Connector>
-    <Connector ID="DesignRelation:FK_Securities_InvestmentTransactions" ZOrder="2" LineWidth="11">
+    <Connector ID="DesignRelation:FK_Securities_InvestmentTransactions" ZOrder="3" LineWidth="11">
       <RoutePoints>
         <Point>
           <X>843</X>
@@ -83,7 +83,7 @@
         </Point>
       </RoutePoints>
     </Connector>
-    <Connector ID="DesignRelation:FK_MemorizedPayees_MemorizedLineItems" ZOrder="12" LineWidth="11">
+    <Connector ID="DesignRelation:FK_MemorizedPayees_MemorizedLineItems" ZOrder="13" LineWidth="11">
       <RoutePoints>
         <Point>
           <X>909</X>
@@ -95,7 +95,7 @@
         </Point>
       </RoutePoints>
     </Connector>
-    <Connector ID="DesignRelation:FK_Accounts_MemorizedLineItems" ZOrder="11" LineWidth="11">
+    <Connector ID="DesignRelation:FK_Accounts_MemorizedLineItems" ZOrder="12" LineWidth="11">
       <RoutePoints>
         <Point>
           <X>240</X>
@@ -111,7 +111,7 @@
         </Point>
       </RoutePoints>
     </Connector>
-    <Connector ID="DesignRelation:FK_Categories_MemorizedLineItems" ZOrder="4" LineWidth="11">
+    <Connector ID="DesignRelation:FK_Categories_MemorizedLineItems" ZOrder="5" LineWidth="11">
       <RoutePoints>
         <Point>
           <X>488</X>
@@ -123,7 +123,7 @@
         </Point>
       </RoutePoints>
     </Connector>
-    <Connector ID="DesignRelation:FK_Accounts_ReconcileInfo" ZOrder="6" LineWidth="11">
+    <Connector ID="DesignRelation:FK_Accounts_ReconcileInfo" ZOrder="7" LineWidth="11">
       <RoutePoints>
         <Point>
           <X>157</X>
@@ -135,7 +135,7 @@
         </Point>
       </RoutePoints>
     </Connector>
-    <Connector ID="DesignRelation:FK_Categories_ReconcileInfo" ZOrder="3" LineWidth="11">
+    <Connector ID="DesignRelation:FK_Categories_ReconcileInfo" ZOrder="4" LineWidth="11">
       <RoutePoints>
         <Point>
           <X>335</X>
@@ -163,7 +163,7 @@
         </Point>
       </RoutePoints>
     </Connector>
-    <Connector ID="DesignRelation:Categories_LineItems" ZOrder="5" LineWidth="11">
+    <Connector ID="DesignRelation:Categories_LineItems" ZOrder="6" LineWidth="11">
       <RoutePoints>
         <Point>
           <X>460</X>
@@ -179,7 +179,7 @@
         </Point>
       </RoutePoints>
     </Connector>
-    <Connector ID="DesignRelation:Transactions_InvestmentTransactions" ZOrder="15" LineWidth="11">
+    <Connector ID="DesignRelation:FK_Transactions_InvestmentTransactions" ZOrder="1" LineWidth="11">
       <RoutePoints>
         <Point>
           <X>512</X>

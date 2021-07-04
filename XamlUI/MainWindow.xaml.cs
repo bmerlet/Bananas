@@ -193,6 +193,7 @@ namespace XamlUI
                 InitialDirectory = dir,
                 FileName = logic.File,
                 Title = logic.Title,
+                CheckFileExists = logic.CheckFileExists,
                 Multiselect = false
             };
 

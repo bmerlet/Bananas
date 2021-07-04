@@ -64,7 +64,6 @@ namespace BanaData.Logic.Main
         // Strings for medium
         private const string MEDIUM_NEXTCHECKNUM = "Next Check Num";
         static private readonly string MEDIUM_ATM = EnumDescriptionAttribute.GetDescription(ETransactionMedium.ATM);
-        static private readonly string MEDIUM_CASH = EnumDescriptionAttribute.GetDescription(ETransactionMedium.Cash);
         static private readonly string MEDIUM_DEPOSIT = EnumDescriptionAttribute.GetDescription(ETransactionMedium.Deposit);
         static private readonly string MEDIUM_DIVIDEND = EnumDescriptionAttribute.GetDescription(ETransactionMedium.Dividend);
         static private readonly string MEDIUM_EFT = EnumDescriptionAttribute.GetDescription(ETransactionMedium.EFT);
@@ -72,7 +71,7 @@ namespace BanaData.Logic.Main
 
         public string[] MediumSource { get; } =
         {
-            MEDIUM_NEXTCHECKNUM, MEDIUM_ATM, MEDIUM_CASH, MEDIUM_DEPOSIT, MEDIUM_DIVIDEND, MEDIUM_EFT, MEDIUM_TRANSFER
+            MEDIUM_NEXTCHECKNUM, MEDIUM_ATM, MEDIUM_DEPOSIT, MEDIUM_DIVIDEND, MEDIUM_EFT, MEDIUM_TRANSFER
         };
 
         // Derived from medium being a deposit or not

@@ -54,6 +54,8 @@ namespace BanaData.Database {
         
         private global::System.Data.DataRelation relationFK_Transactions_BankTransactions;
         
+        private global::System.Data.DataRelation relationFK_Transactions_InvestmentTransactions;
+        
         private global::System.Data.DataRelation relationFK_Securities_InvestmentTransactions;
         
         private global::System.Data.DataRelation relationFK_Categories_MemorizedLineItems;
@@ -69,8 +71,6 @@ namespace BanaData.Database {
         private global::System.Data.DataRelation relationAccounts_LineItems;
         
         private global::System.Data.DataRelation relationCategories_LineItems;
-        
-        private global::System.Data.DataRelation relationTransactions_InvestmentTransactions;
         
         private global::System.Data.SchemaSerializationMode _schemaSerializationMode = global::System.Data.SchemaSerializationMode.IncludeSchema;
         
@@ -464,6 +464,7 @@ namespace BanaData.Database {
             this.relationFK_Accounts_Transactions = this.Relations["FK_Accounts_Transactions"];
             this.relationFK_Transactions_LineItems = this.Relations["FK_Transactions_LineItems"];
             this.relationFK_Transactions_BankTransactions = this.Relations["FK_Transactions_BankTransactions"];
+            this.relationFK_Transactions_InvestmentTransactions = this.Relations["FK_Transactions_InvestmentTransactions"];
             this.relationFK_Securities_InvestmentTransactions = this.Relations["FK_Securities_InvestmentTransactions"];
             this.relationFK_Categories_MemorizedLineItems = this.Relations["FK_Categories_MemorizedLineItems"];
             this.relationFK_Accounts_MemorizedLineItems = this.Relations["FK_Accounts_MemorizedLineItems"];
@@ -472,7 +473,6 @@ namespace BanaData.Database {
             this.relationFK_Accounts_ReconcileInfo = this.Relations["FK_Accounts_ReconcileInfo"];
             this.relationAccounts_LineItems = this.Relations["Accounts_LineItems"];
             this.relationCategories_LineItems = this.Relations["Categories_LineItems"];
-            this.relationTransactions_InvestmentTransactions = this.Relations["Transactions_InvestmentTransactions"];
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -534,6 +534,13 @@ namespace BanaData.Database {
             fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
             fkc.DeleteRule = global::System.Data.Rule.Cascade;
             fkc.UpdateRule = global::System.Data.Rule.Cascade;
+            fkc = new global::System.Data.ForeignKeyConstraint("FK_Transactions_InvestmentTransactions", new global::System.Data.DataColumn[] {
+                        this.tableTransactions.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableInvestmentTransactions.TransactionIDColumn});
+            this.tableInvestmentTransactions.Constraints.Add(fkc);
+            fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.Cascade;
+            fkc.DeleteRule = global::System.Data.Rule.Cascade;
+            fkc.UpdateRule = global::System.Data.Rule.Cascade;
             fkc = new global::System.Data.ForeignKeyConstraint("FK_Securities_InvestmentTransactions", new global::System.Data.DataColumn[] {
                         this.tableSecurities.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableInvestmentTransactions.SecurityIDColumn});
@@ -592,6 +599,10 @@ namespace BanaData.Database {
                         this.tableTransactions.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableBankingTransactions.TransactionIDColumn}, false);
             this.Relations.Add(this.relationFK_Transactions_BankTransactions);
+            this.relationFK_Transactions_InvestmentTransactions = new global::System.Data.DataRelation("FK_Transactions_InvestmentTransactions", new global::System.Data.DataColumn[] {
+                        this.tableTransactions.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableInvestmentTransactions.TransactionIDColumn}, false);
+            this.Relations.Add(this.relationFK_Transactions_InvestmentTransactions);
             this.relationFK_Securities_InvestmentTransactions = new global::System.Data.DataRelation("FK_Securities_InvestmentTransactions", new global::System.Data.DataColumn[] {
                         this.tableSecurities.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableInvestmentTransactions.SecurityIDColumn}, false);
@@ -624,10 +635,6 @@ namespace BanaData.Database {
                         this.tableCategories.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableLineItems.CategoryIDColumn}, false);
             this.Relations.Add(this.relationCategories_LineItems);
-            this.relationTransactions_InvestmentTransactions = new global::System.Data.DataRelation("Transactions_InvestmentTransactions", new global::System.Data.DataColumn[] {
-                        this.tableTransactions.IDColumn}, new global::System.Data.DataColumn[] {
-                        this.tableInvestmentTransactions.TransactionIDColumn}, false);
-            this.Relations.Add(this.relationTransactions_InvestmentTransactions);
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1021,6 +1028,7 @@ namespace BanaData.Database {
                 this.columnName.AllowDBNull = false;
                 this.columnName.Unique = true;
                 this.columnIType.AllowDBNull = false;
+                this.columnCreditLimit.AllowDBNull = false;
                 this.columnHidden.AllowDBNull = false;
                 this.columnHidden.DefaultValue = ((bool)(false));
             }
@@ -3242,7 +3250,7 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public InvestmentTransactionsRow AddInvestmentTransactionsRow(TransactionsRow parentTransactionsRowByTransactions_InvestmentTransactions, int IType, SecuritiesRow parentSecuritiesRowByFK_Securities_InvestmentTransactions, decimal SecurityPrice, decimal SecurityQuantity, decimal Commission) {
+            public InvestmentTransactionsRow AddInvestmentTransactionsRow(TransactionsRow parentTransactionsRowByFK_Transactions_InvestmentTransactions, int IType, SecuritiesRow parentSecuritiesRowByFK_Securities_InvestmentTransactions, decimal SecurityPrice, decimal SecurityQuantity, decimal Commission) {
                 InvestmentTransactionsRow rowInvestmentTransactionsRow = ((InvestmentTransactionsRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
@@ -3252,8 +3260,8 @@ namespace BanaData.Database {
                         SecurityPrice,
                         SecurityQuantity,
                         Commission};
-                if ((parentTransactionsRowByTransactions_InvestmentTransactions != null)) {
-                    columnValuesArray[1] = parentTransactionsRowByTransactions_InvestmentTransactions[0];
+                if ((parentTransactionsRowByFK_Transactions_InvestmentTransactions != null)) {
+                    columnValuesArray[1] = parentTransactionsRowByFK_Transactions_InvestmentTransactions[0];
                 }
                 if ((parentSecuritiesRowByFK_Securities_InvestmentTransactions != null)) {
                     columnValuesArray[3] = parentSecuritiesRowByFK_Securities_InvestmentTransactions[0];
@@ -4521,12 +4529,7 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public decimal CreditLimit {
                 get {
-                    try {
-                        return ((decimal)(this[this.tableAccounts.CreditLimitColumn]));
-                    }
-                    catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'CreditLimit\' in table \'Accounts\' is DBNull.", e);
-                    }
+                    return ((decimal)(this[this.tableAccounts.CreditLimitColumn]));
                 }
                 set {
                     this[this.tableAccounts.CreditLimitColumn] = value;
@@ -4586,18 +4589,6 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public void SetDescriptionNull() {
                 this[this.tableAccounts.DescriptionColumn] = global::System.Convert.DBNull;
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public bool IsCreditLimitNull() {
-                return this.IsNull(this.tableAccounts.CreditLimitColumn);
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public void SetCreditLimitNull() {
-                this[this.tableAccounts.CreditLimitColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -5129,6 +5120,17 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public InvestmentTransactionsRow[] GetInvestmentTransactionsRows() {
+                if ((this.Table.ChildRelations["FK_Transactions_InvestmentTransactions"] == null)) {
+                    return new InvestmentTransactionsRow[0];
+                }
+                else {
+                    return ((InvestmentTransactionsRow[])(base.GetChildRows(this.Table.ChildRelations["FK_Transactions_InvestmentTransactions"])));
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public BankingTransactionsRow[] GetBankingTransactionsRows() {
                 if ((this.Table.ChildRelations["FK_Transactions_BankTransactions"] == null)) {
                     return new BankingTransactionsRow[0];
@@ -5146,17 +5148,6 @@ namespace BanaData.Database {
                 }
                 else {
                     return ((LineItemsRow[])(base.GetChildRows(this.Table.ChildRelations["FK_Transactions_LineItems"])));
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public InvestmentTransactionsRow[] GetInvestmentTransactionsRows() {
-                if ((this.Table.ChildRelations["Transactions_InvestmentTransactions"] == null)) {
-                    return new InvestmentTransactionsRow[0];
-                }
-                else {
-                    return ((InvestmentTransactionsRow[])(base.GetChildRows(this.Table.ChildRelations["Transactions_InvestmentTransactions"])));
                 }
             }
         }
@@ -5551,23 +5542,23 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public TransactionsRow TransactionsRow {
+                get {
+                    return ((TransactionsRow)(this.GetParentRow(this.Table.ParentRelations["FK_Transactions_InvestmentTransactions"])));
+                }
+                set {
+                    this.SetParentRow(value, this.Table.ParentRelations["FK_Transactions_InvestmentTransactions"]);
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public SecuritiesRow SecuritiesRow {
                 get {
                     return ((SecuritiesRow)(this.GetParentRow(this.Table.ParentRelations["FK_Securities_InvestmentTransactions"])));
                 }
                 set {
                     this.SetParentRow(value, this.Table.ParentRelations["FK_Securities_InvestmentTransactions"]);
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public TransactionsRow TransactionsRow {
-                get {
-                    return ((TransactionsRow)(this.GetParentRow(this.Table.ParentRelations["Transactions_InvestmentTransactions"])));
-                }
-                set {
-                    this.SetParentRow(value, this.Table.ParentRelations["Transactions_InvestmentTransactions"]);
                 }
             }
             

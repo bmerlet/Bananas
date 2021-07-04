@@ -97,9 +97,6 @@ namespace BanaData.Database
         [EnumDescription("Div")]
         Dividend,
 
-        [EnumDescription("Cash")]
-        Cash,
-
         [EnumDescription("")]
         None
     };

@@ -48,12 +48,6 @@ namespace BanaData.Database
 
         partial class MemorizedLineItemsDataTable
         {
-            public MemorizedLineItemsRow[] GetByMemorizedPayee(Household.MemorizedPayeesRow memorizedPayeesRow)
-            {
-                var memorizedPayeesToMemorizedLineItem = ParentRelations["FK_MemorizedPayees_MemorizedLineItems"];
-                return memorizedPayeesRow.GetChildRows(memorizedPayeesToMemorizedLineItem).Cast<Household.MemorizedLineItemsRow>().ToArray();
-            }
-
             public MemorizedLineItemsRow Add(MemorizedPayeesRow memorizedPayeesRow, bool transfer, DataRow AccountOrCategory, string memo, decimal amount)
             {
                 var memorizedLineItemRow = NewMemorizedLineItemsRow();

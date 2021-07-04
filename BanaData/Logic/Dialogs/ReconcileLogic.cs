@@ -265,7 +265,7 @@ namespace BanaData.Logic.Dialogs
                     string medium = "";
                     if (IsBank)
                     {
-                        var bankTrans = household.BankingTransactions.GetByTransaction(tr);
+                        var bankTrans = tr.GetBankingTransaction();
                         if (bankTrans.Medium == ETransactionMedium.Check && !bankTrans.IsCheckNumberNull())
                         {
                             medium = bankTrans.CheckNumber.ToString();

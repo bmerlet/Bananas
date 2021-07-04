@@ -27,10 +27,9 @@ namespace BanaData.Logic.Items
         public static AccountItem CreateFromDB(Household.AccountsRow accountsRow)
         {
             var desc = accountsRow.IsDescriptionNull() ? "" : accountsRow.Description;
-            decimal creditLimit = accountsRow.IsCreditLimitNull() ? 0 : accountsRow.CreditLimit;
             EInvestmentKind kind = accountsRow.IsIKindNull() ? EInvestmentKind.Invalid : accountsRow.Kind;
 
-            return new AccountItem(accountsRow.ID, accountsRow.Name, desc, accountsRow.Type, creditLimit, kind, accountsRow.Hidden);
+            return new AccountItem(accountsRow.ID, accountsRow.Name, desc, accountsRow.Type, accountsRow.CreditLimit, kind, accountsRow.Hidden);
         }
 
         public readonly int ID;

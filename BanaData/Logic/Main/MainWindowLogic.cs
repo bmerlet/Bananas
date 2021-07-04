@@ -238,6 +238,13 @@ namespace BanaData.Logic.Main
             }
         }
 
+        public void ExportQIF(string file)
+        {
+            var exporter = new QIFWriter(this);
+            exporter.ExportToQIF(file);
+            ErrorMessage("Export completed", "Export results");
+        }
+
         // Commit changes to household data set
         public void CommitChanges()
         {
@@ -392,7 +399,9 @@ namespace BanaData.Logic.Main
             }
             catch (Exception e)
             {
+                //DataRow[] rowErrors = Household.Accounts.GetErrors();
                 ErrorMessage($"Error reading file {System.IO.Path.GetFileName(file)}: {e.Message}");
+
             }
 
             UserSettings.LastFileOpened = file;
@@ -419,7 +428,7 @@ namespace BanaData.Logic.Main
             foreach (var mpr in Household.MemorizedPayees)
             {
                 // Get memorized line item(s)
-                var dbLineItems = household.MemorizedLineItems.GetByMemorizedPayee(mpr);
+                var dbLineItems = mpr.GetMemorizedLineItemsRows();
                 var lineItems = new List<LineItem>(dbLineItems.Length);
                 foreach (var dbli in dbLineItems)
                 {

@@ -28,6 +28,7 @@ namespace BanaData.Logic.Main
             Open = new CommandBase(OnOpen);
             Import = new CommandBase(OnImport);
             Merge = new CommandBase(OnMerge);
+            Export = new CommandBase(OnExport);
             Save = new CommandBase(OnSave);
             Exit = new CommandBase(OnExit);
 
@@ -56,7 +57,7 @@ namespace BanaData.Logic.Main
 
         private void OnOpen()
         {
-            OpenFileLogic logic = new OpenFileLogic(mainWindow.UserSettings.LastFileOpened, "Banana files (*.xban)|*.xban|Any file (*.*)|*.*", "Open file");
+            OpenFileLogic logic = new OpenFileLogic(mainWindow.UserSettings.LastFileOpened, "Banana files (*.xban)|*.xban|Any file (*.*)|*.*", "Open file", true);
             if (mainWindow.GuiServices.ShowDialog(logic))
             {
                 mainWindow.OpenFile(logic.File);
@@ -71,7 +72,7 @@ namespace BanaData.Logic.Main
         private void OnImport()
         {
             string ZZZfile = @"C:\Users\bmerlet\Documents\Lab\Projects\C#\Bananas\sgbjm.qif";
-            OpenFileLogic logic = new OpenFileLogic(ZZZfile, "Quicken Interchange Format files (*.QIF)|*.QIF|Any file (*.*)|*.*", "Import file");
+            OpenFileLogic logic = new OpenFileLogic(ZZZfile, "Quicken Interchange Format files (*.QIF)|*.QIF|Any file (*.*)|*.*", "Import file", true);
             if (mainWindow.GuiServices.ShowDialog(logic))
             {
                 mainWindow.ImportQIF(logic.File);
@@ -86,10 +87,25 @@ namespace BanaData.Logic.Main
         private void OnMerge()
         {
             string ZZZfile = @"C:\Users\bmerlet\Documents\Lab\Projects\C#\Bananas\sgbjm.qif";
-            OpenFileLogic logic = new OpenFileLogic(ZZZfile, "Quicken Interchange Format files (*.QIF)|*.QIF|Any file (*.*)|*.*", "Merge file");
+            OpenFileLogic logic = new OpenFileLogic(ZZZfile, "Quicken Interchange Format files (*.QIF)|*.QIF|Any file (*.*)|*.*", "Merge file", true);
             if (mainWindow.GuiServices.ShowDialog(logic))
             {
                 mainWindow.MergeQIF(logic.File);
+            }
+        }
+
+        //
+        // Export
+        //
+        public CommandBase Export { get; }
+
+        private void OnExport()
+        {
+            string ZZZfile = @"C:\Users\bmerlet\Documents\Lab\Projects\C#\Bananas\out.qif";
+            OpenFileLogic logic = new OpenFileLogic(ZZZfile, "Quicken Interchange Format files (*.QIF)|*.QIF|Any file (*.*)|*.*", "Export file", false);
+            if (mainWindow.GuiServices.ShowDialog(logic))
+            {
+                mainWindow.ExportQIF(logic.File);
             }
         }
 
