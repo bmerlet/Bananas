@@ -123,7 +123,7 @@ namespace BanaData.Serializations
             securityTracker = new Tracker("Securities");
             securityPriceTracker = new Tracker("Security prices");
             bankTransactionTracker = new Tracker("Banking transactions");
-            investmentTransactionTracker = new Tracker("Investment transactions");
+            investmentTransactionTracker = new Tracker("Investment trans.");
             memorizedPayeeTransactionTracker = new Tracker("Memorized payees");
             // ZZZ Memorized payees
 
@@ -141,11 +141,21 @@ namespace BanaData.Serializations
             Log += eol;
 
             // Find other sides of transfers for added transactions
-            // ZZZZZZZZZZZ PairTransfers();
+            if (bankTransactionTracker.Added > 0 || investmentTransactionTracker.Added > 0)
+            {
+                PairTransfers();
+            }
 
             household.AcceptChanges();
 
-            return accountTracker.HasChange | categoryTracker.HasChange | securityTracker.HasChange;
+            return 
+                accountTracker.HasChange | 
+                categoryTracker.HasChange | 
+                securityTracker.HasChange |
+                securityPriceTracker.HasChange |
+                bankTransactionTracker.HasChange |
+                investmentTransactionTracker.HasChange |
+                memorizedPayeeTransactionTracker.HasChange;
         }
 
         #endregion
@@ -540,7 +550,7 @@ namespace BanaData.Serializations
                                 accountTracker.AddedIDs.Remove(addedRow.ID);
                                 addedRow.Delete();
                                 accountRow.Name = name;
-                                accountTracker.FoundIDs.Add(accountRow.ID);
+                                accountTracker.UpdatedIDs.Add(accountRow.ID);
 
                                 again = true;
                                 rename = true;
@@ -1758,11 +1768,27 @@ namespace BanaData.Serializations
                         continue;
                     }
 
+                    // if merging, only consider added transactions
+                    if (merging &&
+                        !bankTransactionTracker.AddedIDs.Contains(sourceTransactionRow.ID) &&
+                        !investmentTransactionTracker.AddedIDs.Contains(sourceTransactionRow.ID))
+                    {
+                        continue;
+                    }
+
                     Tuple<int, int> tuple = null;
 
                     // Look for transactions on the same date in the target account
                     foreach (Household.TransactionsRow targetTransactionRow in household.Transactions.Rows)
                     {
+                        // if merging, only consider added transactions
+                        if (merging &&
+                            !bankTransactionTracker.AddedIDs.Contains(targetTransactionRow.ID) &&
+                            !investmentTransactionTracker.AddedIDs.Contains(targetTransactionRow.ID))
+                        {
+                            continue;
+                        }
+
                         var diffDate = sourceTransactionRow.Date.Subtract(targetTransactionRow.Date);
 
                         if (Math.Abs(diffDate.Days) <= 2 &&

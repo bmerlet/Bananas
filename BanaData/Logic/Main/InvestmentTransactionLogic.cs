@@ -388,15 +388,12 @@ namespace BanaData.Logic.Main
 
                 case EInvestmentTransactionType.TransferCash:
                 case EInvestmentTransactionType.TransferCashIn:
-                    desc = $"Transfered ${AmountString} in";
+                case EInvestmentTransactionType.TransferMiscellaneousIncomeIn:
+                    desc = $"Transfered {Amount:C2} in";
                     break;
 
                 case EInvestmentTransactionType.TransferCashOut:
-                    desc = $"Transfered ${AmountString} out";
-                    break;
-
-                case EInvestmentTransactionType.TransferMiscellaneousIncomeIn:
-                    desc = $"Transfer ${AmountString}";
+                    desc = $"Transfered {-Amount:C2} out";
                     break;
 
                 case EInvestmentTransactionType.SharesIn:
@@ -404,7 +401,7 @@ namespace BanaData.Logic.Main
                     break;
 
                 case EInvestmentTransactionType.SharesOut:
-                    desc = $"Lost {SecurityQuantity} {SecuritySymbol} @ ${SecurityPrice}";
+                    desc = $"Removed {SecurityQuantity} {SecuritySymbol}";
                     break;
 
                 case EInvestmentTransactionType.Buy:
@@ -418,25 +415,34 @@ namespace BanaData.Logic.Main
                     break;
 
                 case EInvestmentTransactionType.Dividends:
+                    desc = $"Received {Amount:C2} in dividends from {SecuritySymbol}";
+                    break;
+
                 case EInvestmentTransactionType.TransferDividends:
-                    desc = $"Received ${AmountString} in dividends from {SecuritySymbol}";
+                    desc = $"Received {-Amount:C2} in dividends from {SecuritySymbol}";
                     break;
 
                 case EInvestmentTransactionType.ReinvestDividends:
                 case EInvestmentTransactionType.ReinvestLongTermCapitalGains:
                 case EInvestmentTransactionType.ReinvestMediumTermCapitalGains:
                 case EInvestmentTransactionType.ReinvestShortTermCapitalGains:
-                    desc = $"Reinvested ${AmountString} as {SecurityQuantity} shares of {SecuritySymbol}";
+                    desc = $"Reinvested {Amount:C2} as {SecurityQuantity} shares of {SecuritySymbol}";
                     break;
 
                 case EInvestmentTransactionType.ShortTermCapitalGains:
+                    desc = $"Received {Amount:C2} in ST CG from {SecuritySymbol}";
+                    break;
+
                 case EInvestmentTransactionType.TransferShortTermCapitalGains:
-                    desc = $"Received ${AmountString} in ST CG from {SecuritySymbol}";
+                    desc = $"Received {-Amount:C2} in ST CG from {SecuritySymbol}";
                     break;
 
                 case EInvestmentTransactionType.LongTermCapitalGains:
+                    desc = $"Received {Amount:C2} in LT CG from {SecuritySymbol}";
+                    break;
+
                 case EInvestmentTransactionType.TransferLongTermCapitalGains:
-                    desc = $"Received ${AmountString} in LT CG from {SecuritySymbol}";
+                    desc = $"Received {-Amount:C2} in LT CG from {SecuritySymbol}";
                     break;
 
                 case EInvestmentTransactionType.Grant:
