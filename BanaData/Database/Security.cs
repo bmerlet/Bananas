@@ -27,18 +27,22 @@ namespace BanaData.Database
                 DateTime mostRecent = DateTime.MinValue;
 
                 var securityToSecurityPrice = Table.ChildRelations["FK_Securities_SecurityPrices"];
-                foreach (var securityPriceRow in GetChildRows(securityToSecurityPrice))
+                foreach (SecurityPricesRow securityPriceRow in GetChildRows(securityToSecurityPrice))
                 {
-                    var securityPrice = securityPriceRow as SecurityPricesRow;
-
-                    if (securityPrice.Date.CompareTo(mostRecent) > 0)
+                    if (securityPriceRow.Date.CompareTo(mostRecent) > 0)
                     {
-                        mostRecent = securityPrice.Date;
-                        price = securityPrice.Value;
+                        mostRecent = securityPriceRow.Date;
+                        price = securityPriceRow.Value;
                     }
                 }
 
                 return price;
+            }
+
+            public IEnumerable<SecurityPricesRow> GetSecurityPrices()
+            {
+                var securityToSecurityPrice = Table.ChildRelations["FK_Securities_SecurityPrices"];
+                return GetChildRows(securityToSecurityPrice).Cast<SecurityPricesRow>();
             }
 
             // Are there transactions associated with this security
@@ -50,6 +54,24 @@ namespace BanaData.Database
                     return GetChildRows(securityToTransactions).Length > 0;
                 }
             }
+
+            public bool HasSame(string symbol, ESecurityType type)
+            {
+                if (IsSymbolNull())
+                {
+                    if (!string.IsNullOrWhiteSpace(symbol))
+                    {
+                        return false;
+                    }
+                }
+                else if (Symbol != symbol)
+                {
+                    return false;
+                }
+
+                return Type == type;
+            }
+
         }
 
         partial class SecuritiesDataTable
@@ -80,23 +102,6 @@ namespace BanaData.Database
                 var secRow = FindByID(id);
 
                 return UpdateSecurity(secRow, name, symbol, type);
-            }
-
-            public bool HasSame(SecuritiesRow secRow, string symbol, ESecurityType type)
-            {
-                if (secRow.IsSymbolNull())
-                {
-                    if (!string.IsNullOrWhiteSpace(symbol))
-                    {
-                        return false;
-                    }
-                }
-                else if (secRow.Symbol != symbol)
-                {
-                    return false;
-                }
-
-                return secRow.Type == type;
             }
 
             private static SecuritiesRow UpdateSecurity(SecuritiesRow secRow, string name, string symbol, ESecurityType type)

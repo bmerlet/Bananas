@@ -21,6 +21,40 @@ namespace BanaData.Database
                 get { return (ETransactionStatus)ITransferStatus; }
                 set { ITransferStatus = (int)value; }
             }
+
+            public bool HasSame(int categoryID, int categoryAccountID, string memo, decimal amount)
+            {
+                int rowCategoryID = IsCategoryIDNull() ? -1 : CategoryID;
+                if (rowCategoryID != categoryID)
+                {
+                    return false;
+                }
+
+                int rowCategoryAccountID = IsAccountIDNull() ? -1 : AccountID;
+                if (rowCategoryAccountID != categoryAccountID)
+                {
+                    return false;
+                }
+
+                if (IsMemoNull())
+                {
+                    if (!string.IsNullOrWhiteSpace(memo))
+                    {
+                        return false;
+                    }
+                }
+                else if (Memo != memo)
+                {
+                    return false;
+                }
+
+                if (Amount != amount)
+                {
+                    return false;
+                }
+
+                return true;
+            }
         }
 
         partial class LineItemsDataTable
@@ -49,39 +83,6 @@ namespace BanaData.Database
                 return lineItemRow;
             }
 
-            public bool HasSame(LineItemsRow lineItemRow, int categoryID, int categoryAccountID, string memo, decimal amount)
-            {
-                int rowCategoryID = lineItemRow.IsCategoryIDNull() ? -1 : lineItemRow.CategoryID;
-                if (rowCategoryID != categoryID)
-                {
-                    return false;
-                }
-
-                int rowCategoryAccountID = lineItemRow.IsAccountIDNull() ? -1 : lineItemRow.AccountID;
-                if (rowCategoryAccountID != categoryAccountID)
-                {
-                    return false;
-                }
-
-                if (lineItemRow.IsMemoNull())
-                {
-                    if (!string.IsNullOrWhiteSpace(memo))
-                    {
-                        return false;
-                    }
-                }
-                else if (lineItemRow.Memo != memo)
-                {
-                    return false;
-                }
-
-                if (lineItemRow.Amount != amount)
-                {
-                    return false;
-                }
-
-                return true;
-            }
 
             private static LineItemsRow UpdateLineItem(LineItemsRow lineItemRow, TransactionsRow transactionRow, int categoryId, int categoryAccountId, string memo, decimal amount)
             {

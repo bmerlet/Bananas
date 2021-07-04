@@ -20,6 +20,22 @@ namespace BanaData.Database
                 get => (ETransactionMedium)IMedium;
                 set => IMedium = (int)value;
             }
+
+            public bool HasSame(ETransactionMedium medium, uint checkNumber)
+            {
+                if (Medium != medium)
+                {
+                    return false;
+                }
+
+                if (Medium == ETransactionMedium.Check && CheckNumber != checkNumber)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
         }
 
         partial class BankingTransactionsDataTable
@@ -47,22 +63,6 @@ namespace BanaData.Database
                 UpdateBankTransaction(bankTransRow, transactionRow, medium, checkNumber);
 
                 return bankTransRow;
-            }
-
-            public bool HasSame(BankingTransactionsRow bankTransRow, ETransactionMedium medium, uint checkNumber)
-            {
-                if (bankTransRow.Medium != medium)
-                {
-                    return false;
-                }
-
-                if (bankTransRow.Medium == ETransactionMedium.Check &&
-                    bankTransRow.CheckNumber != checkNumber)
-                {
-                    return false;
-                }
-
-                return true;
             }
 
             private static BankingTransactionsRow UpdateBankTransaction(BankingTransactionsRow bankTransRow, TransactionsRow transactionRow, ETransactionMedium medium, uint checkNumber)

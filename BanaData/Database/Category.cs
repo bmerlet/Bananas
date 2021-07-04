@@ -18,11 +18,6 @@ namespace BanaData.Database
 
             public string FullName => GetFullName();
 
-            public void ResetFullName()
-            {
-                fullName = null;
-            }
-
             private string GetFullName()
             {
                 if (fullName == null)
@@ -44,6 +39,41 @@ namespace BanaData.Database
 
                 return fullName;
             }
+
+            public bool HasSame(string description, bool income, string taxInfo)
+            {
+                if (IsDescriptionNull())
+                {
+                    if (!string.IsNullOrWhiteSpace(description))
+                    {
+                        return false;
+                    }
+                }
+                else if (Description != description)
+                {
+                    return false;
+                }
+
+                if (IsIncome != income)
+                {
+                    return false;
+                }
+
+                if (IsTaxInfoNull())
+                {
+                    if (!string.IsNullOrWhiteSpace(taxInfo))
+                    {
+                        return false;
+                    }
+                }
+                else if (TaxInfo != taxInfo)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
         }
 
         // Extensions to the category table
@@ -86,40 +116,6 @@ namespace BanaData.Database
                 UpdateCategory(catRow, name, description, parent, income, taxInfo);
 
                 return catRow;
-            }
-
-            public bool HasSame(CategoriesRow catRow, string description, bool income, string taxInfo)
-            {
-                if (catRow.IsDescriptionNull())
-                {
-                    if (!string.IsNullOrWhiteSpace(description))
-                    {
-                        return false;
-                    }
-                }
-                else if (catRow.Description != description)
-                {
-                    return false;
-                }
-
-                if (catRow.IsIncome != income)
-                {
-                    return false;
-                }
-
-                if (catRow.IsTaxInfoNull())
-                {
-                    if (!string.IsNullOrWhiteSpace(taxInfo))
-                    {
-                        return false;
-                    }
-                }
-                else if (catRow.TaxInfo != taxInfo)
-                {
-                    return false;
-                }
-
-                return true;
             }
 
             private static CategoriesRow UpdateCategory(CategoriesRow catRow, string name, string description, CategoriesRow parent, bool income, string taxInfo)

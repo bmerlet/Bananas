@@ -36,6 +36,7 @@ namespace BanaData.Logic.Dialogs
             mainWindowLogic.MemorizedPayees.ForEach(mpi => memorizedPayeesSource.Add(mpi));
             MemorizedPayeesSource = (CollectionView)CollectionViewSource.GetDefaultView(memorizedPayeesSource);
             MemorizedPayeesSource.SortDescriptions.Add(new SortDescription("Payee", ListSortDirection.Ascending));
+            MemorizedPayeesSource.SortDescriptions.Add(new SortDescription("Category", ListSortDirection.Ascending));
 
             AddCommand = new CommandBase(OnAddMemorizedPayee);
             EditCommand = new CommandBase(OnEditMemorizedPayee);

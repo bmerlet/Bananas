@@ -17,6 +17,27 @@ namespace BanaData.Database
                 set { IStatus = (int)value; }
             }
 
+            public bool HasSame(string payee, ETransactionStatus status, string memo)
+            {
+                if (Payee != payee || Status != status)
+                {
+                    return false;
+                }
+
+                if (IsMemoNull())
+                {
+                    if (!string.IsNullOrWhiteSpace(memo))
+                    {
+                        return false;
+                    }
+                }
+                else if (Memo != memo)
+                {
+                    return false;
+                }
+
+                return true;
+            }
         }
 
         partial class MemorizedPayeesDataTable

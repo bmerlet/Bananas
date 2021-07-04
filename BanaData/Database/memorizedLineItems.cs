@@ -9,6 +9,43 @@ namespace BanaData.Database
 {
     public partial class Household
     {
+        partial class MemorizedLineItemsRow
+        {
+            public bool HasSame(int categoryID, int categoryAccountID, string memo, decimal amount)
+            {
+                int rowCategoryID = IsCategoryIDNull() ? -1 : CategoryID;
+                if (rowCategoryID != categoryID)
+                {
+                    return false;
+                }
+
+                int rowCategoryAccountID = IsAccountIDNull() ? -1 : AccountID;
+                if (rowCategoryAccountID != categoryAccountID)
+                {
+                    return false;
+                }
+
+                if (IsMemoNull())
+                {
+                    if (!string.IsNullOrWhiteSpace(memo))
+                    {
+                        return false;
+                    }
+                }
+                else if (Memo != memo)
+                {
+                    return false;
+                }
+
+                if (Amount != amount)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
         partial class MemorizedLineItemsDataTable
         {
             public MemorizedLineItemsRow[] GetByMemorizedPayee(Household.MemorizedPayeesRow memorizedPayeesRow)

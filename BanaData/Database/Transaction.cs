@@ -27,13 +27,48 @@ namespace BanaData.Database
                 decimal amount = 0;
 
                 var transToLineItem = Table.ChildRelations["FK_Transactions_LineItems"];
-                foreach (var lineItemRow in GetChildRows(transToLineItem))
+                foreach (LineItemsRow lineItemRow in GetChildRows(transToLineItem))
                 {
-                    amount += (lineItemRow as Household.LineItemsRow).Amount;
+                    amount += lineItemRow.Amount;
                 }
 
                 return amount;
             }
+
+            public bool HasSame(DateTime date, string payee, string memo, ETransactionStatus status)
+            {
+                if (Date != date || Status != status)
+                {
+                    return false;
+                }
+
+                if (IsPayeeNull())
+                {
+                    if (!string.IsNullOrWhiteSpace(payee))
+                    {
+                        return false;
+                    }
+                }
+                else if (Payee != payee)
+                {
+                    return false;
+                }
+
+                if (IsMemoNull())
+                {
+                    if (!string.IsNullOrWhiteSpace(memo))
+                    {
+                        return false;
+                    }
+                }
+                else if (Memo != memo)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
         }
 
         partial class TransactionsDataTable
@@ -56,40 +91,6 @@ namespace BanaData.Database
                 UpdateTransaction(transactionRow, accountRow, date, payee, memo, status);
 
                 return transactionRow;
-            }
-
-            public bool HasSame(TransactionsRow transactionRow, DateTime date, string payee, string memo, ETransactionStatus status)
-            {
-                if (transactionRow.Date != date || transactionRow.Status != status)
-                {
-                    return false;
-                }
-
-                if (transactionRow.IsPayeeNull())
-                {
-                    if (!string.IsNullOrWhiteSpace(payee))
-                    {
-                        return false;
-                    }
-                }
-                else if (transactionRow.Payee != payee)
-                {
-                    return false;
-                }
-
-                if (transactionRow.IsMemoNull())
-                {
-                    if (!string.IsNullOrWhiteSpace(memo))
-                    {
-                        return false;
-                    }
-                }
-                else if (transactionRow.Memo != memo)
-                {
-                    return false;
-                }
-
-                return true;
             }
 
             private static TransactionsRow UpdateTransaction(TransactionsRow transactionRow, AccountsRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status)

@@ -83,15 +83,15 @@
         </Point>
       </RoutePoints>
     </Connector>
-    <Connector ID="DesignRelation:FK_Categories_MemorizedLineItems" ZOrder="4" LineWidth="11">
+    <Connector ID="DesignRelation:FK_MemorizedPayees_MemorizedLineItems" ZOrder="12" LineWidth="11">
       <RoutePoints>
         <Point>
-          <X>488</X>
-          <Y>555</Y>
+          <X>909</X>
+          <Y>512</Y>
         </Point>
         <Point>
-          <X>699</X>
-          <Y>555</Y>
+          <X>887</X>
+          <Y>512</Y>
         </Point>
       </RoutePoints>
     </Connector>
@@ -111,27 +111,15 @@
         </Point>
       </RoutePoints>
     </Connector>
-    <Connector ID="DesignRelation:FK_MemorizedPayees_MemorizedLineItems" ZOrder="12" LineWidth="11">
+    <Connector ID="DesignRelation:FK_Categories_MemorizedLineItems" ZOrder="4" LineWidth="11">
       <RoutePoints>
         <Point>
-          <X>909</X>
-          <Y>512</Y>
+          <X>488</X>
+          <Y>555</Y>
         </Point>
         <Point>
-          <X>887</X>
-          <Y>512</Y>
-        </Point>
-      </RoutePoints>
-    </Connector>
-    <Connector ID="DesignRelation:FK_Categories_ReconcileInfo" ZOrder="3" LineWidth="11">
-      <RoutePoints>
-        <Point>
-          <X>335</X>
-          <Y>499</Y>
-        </Point>
-        <Point>
-          <X>200</X>
-          <Y>499</Y>
+          <X>699</X>
+          <Y>555</Y>
         </Point>
       </RoutePoints>
     </Connector>
@@ -144,6 +132,18 @@
         <Point>
           <X>157</X>
           <Y>353</Y>
+        </Point>
+      </RoutePoints>
+    </Connector>
+    <Connector ID="DesignRelation:FK_Categories_ReconcileInfo" ZOrder="3" LineWidth="11">
+      <RoutePoints>
+        <Point>
+          <X>335</X>
+          <Y>499</Y>
+        </Point>
+        <Point>
+          <X>200</X>
+          <Y>499</Y>
         </Point>
       </RoutePoints>
     </Connector>

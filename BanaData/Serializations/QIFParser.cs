@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Data;
 
 using BanaData.Database;
@@ -51,29 +52,32 @@ namespace BanaData.Serializations
             // Counters
             public int Added => AddedIDs.Count;
             public int Deleted => DeletedIDs.Count;
-            public int Updated;
+            public int Updated => UpdatedIDs.Count;
             public int Unchanged => FoundIDs.Count;
 
             // Convenience
             public bool HasChange => Added != 0 || Updated != 0;
 
-            // List of IDs found and added (to reconcile items)
+            // List of IDs found, updated, added or deleted (to reconcile items)
             public readonly List<int> FoundIDs = new List<int>();
+            public readonly List<int> UpdatedIDs = new List<int>();
             public readonly List<int> AddedIDs = new List<int>();
             public readonly List<int> DeletedIDs = new List<int>();
 
             // Pretty output
             public override string ToString()
             {
-                return $"{Item}: {Added} added, {Updated} updated, {Unchanged} unchanged.";
+                return $"{Item}: {Added} added, {Updated} updated, {Deleted} deleted, {Unchanged} unchanged.";
             }
         }
 
         private Tracker accountTracker;
         private Tracker categoryTracker;
         private Tracker securityTracker;
+        private Tracker securityPriceTracker;
         private Tracker bankTransactionTracker;
         private Tracker investmentTransactionTracker;
+        private Tracker memorizedPayeeTransactionTracker;
 
         #endregion
 
@@ -97,6 +101,7 @@ namespace BanaData.Serializations
             Log += $"Imported {household.Accounts.Rows.Count:N0} accounts" + eol;
             Log += $"Imported {household.Categories.Rows.Count:N0} categories" + eol;
             Log += $"Imported {household.Securities.Rows.Count:N0} securities" + eol;
+            Log += $"Imported {household.SecurityPrices.Rows.Count:N0} security prices" + eol;
             Log += $"Imported {household.Transactions.Rows.Count:N0} transactions" + eol;
             Log += $"Imported {household.MemorizedPayees.Rows.Count:N0} memorized payees" + eol;
             Log += eol;
@@ -116,8 +121,11 @@ namespace BanaData.Serializations
             accountTracker = new Tracker("Accounts");
             categoryTracker = new Tracker("Categories");
             securityTracker = new Tracker("Securities");
+            securityPriceTracker = new Tracker("Security prices");
             bankTransactionTracker = new Tracker("Banking transactions");
             investmentTransactionTracker = new Tracker("Investment transactions");
+            memorizedPayeeTransactionTracker = new Tracker("Memorized payees");
+            // ZZZ Memorized payees
 
             // Parse the file
             ParseFile(fileName);
@@ -126,11 +134,13 @@ namespace BanaData.Serializations
             Log += accountTracker.ToString() + eol;
             Log += categoryTracker.ToString() + eol;
             Log += securityTracker.ToString() + eol;
+            Log += securityPriceTracker.ToString() + eol;
             Log += bankTransactionTracker.ToString() + eol;
             Log += investmentTransactionTracker.ToString() + eol;
+            Log += memorizedPayeeTransactionTracker.ToString() + eol;
             Log += eol;
 
-            // Find other sides of transfers
+            // Find other sides of transfers for added transactions
             // ZZZZZZZZZZZ PairTransfers();
 
             household.AcceptChanges();
@@ -321,7 +331,7 @@ namespace BanaData.Serializations
                 var newRow = household.Categories.Add(name, description, parentRow, income, taxInfo);
                 categoryTracker.AddedIDs.Add(newRow.ID);
             }
-            else if (household.Categories.HasSame(existingCategoryRow, description, income, taxInfo))
+            else if (existingCategoryRow.HasSame(description, income, taxInfo))
             {
                 // Exactly the same
                 categoryTracker.FoundIDs.Add(existingCategoryRow.ID);
@@ -330,8 +340,7 @@ namespace BanaData.Serializations
             {
                 // Updated category
                 household.Categories.Update(existingCategoryRow, name, description, parentRow, income, taxInfo);
-                categoryTracker.Updated += 1;
-                categoryTracker.FoundIDs.Add(existingCategoryRow.ID);
+                categoryTracker.UpdatedIDs.Add(existingCategoryRow.ID);
             }
         }
 
@@ -470,7 +479,7 @@ namespace BanaData.Serializations
                 accountRow = CreateAccount(name, description, type, creditLimit, kind);
                 accountTracker.AddedIDs.Add(accountRow.ID);
             }
-            else if (household.Accounts.HasSame(accountRow, description, type, creditLimit, kind))
+            else if (accountRow.HasSame(description, type, creditLimit, kind))
             {
                 // Exactly the same
                 accountTracker.FoundIDs.Add(accountRow.ID);
@@ -479,8 +488,7 @@ namespace BanaData.Serializations
             {
                 // Updated account
                 household.Accounts.Update(accountRow.ID, name, description, type, creditLimit, kind, accountRow.Hidden);
-                accountTracker.Updated += 1;
-                accountTracker.FoundIDs.Add(accountRow.ID);
+                accountTracker.UpdatedIDs.Add(accountRow.ID);
             }
 
             return accountRow;
@@ -629,7 +637,7 @@ namespace BanaData.Serializations
                 var newRow = household.Securities.Add(name, symbol, type);
                 securityTracker.AddedIDs.Add(newRow.ID);
             }
-            else if (household.Securities.HasSame(existingSecurityRow, symbol, type))
+            else if (existingSecurityRow.HasSame(symbol, type))
             {
                 // Exactly the same
                 securityTracker.FoundIDs.Add(existingSecurityRow.ID);
@@ -638,14 +646,13 @@ namespace BanaData.Serializations
             {
                 // Updated security
                 household.Securities.Update(existingSecurityRow.ID, name, symbol, type);
-                securityTracker.Updated += 1;
-                securityTracker.FoundIDs.Add(existingSecurityRow.ID);
+                securityTracker.UpdatedIDs.Add(existingSecurityRow.ID);
             }
         }
 
         #endregion
 
-        # region Parse QIF transactions
+        # region Parse QIF banking transactions
 
         private void ParseBankTransactions(StreamReader sr, Household.AccountsRow account)
         {
@@ -794,7 +801,7 @@ namespace BanaData.Serializations
             // Try to find this exact same transaction
             foreach (var transRow in accountRow.GetTransactions())
             {
-                if (!household.Transactions.HasSame(transRow, date, payee, memo, status))
+                if (!transRow.HasSame(date, payee, memo, status))
                 {
                     continue;
                 }
@@ -812,7 +819,7 @@ namespace BanaData.Serializations
                 bool lineItemsMatch = true;
                 for (int i = 0; i < lineItemRows.Length; i++)
                 {
-                    if (!household.LineItems.HasSame(lineItemRows[i], lineItemHolders[i].CategoryID, lineItemHolders[i].AccountID, lineItemHolders[i].Memo, lineItemHolders[i].Amount))
+                    if (!lineItemRows[i].HasSame(lineItemHolders[i].CategoryID, lineItemHolders[i].AccountID, lineItemHolders[i].Memo, lineItemHolders[i].Amount))
                     {
                         lineItemsMatch = false;
                         break;
@@ -830,7 +837,7 @@ namespace BanaData.Serializations
                 if (accountRow.Type == EAccountType.Bank)
                 {
                     var bankingTransactionRow = household.BankingTransactions.GetByTransaction(transRow);
-                    if (!household.BankingTransactions.HasSame(bankingTransactionRow, medium, checkNumber))
+                    if (!bankingTransactionRow.HasSame(medium, checkNumber))
                     {
                         // Not the same line medimu/check number, but the rest matched...
                         transAlmostTheSame.Add(transRow);
@@ -871,7 +878,7 @@ namespace BanaData.Serializations
                 var transRow = transAlmostTheSame[0];
                 var lineItemRows = household.LineItems.GetByTransaction(transRow);
                 if (lineItemRows.Length == 1 &&
-                    household.LineItems.HasSame(lineItemRows[0], lineItemHolders[0].CategoryID, -1, lineItemHolders[0].Memo, lineItemHolders[0].Amount))
+                    lineItemRows[0].HasSame(lineItemHolders[0].CategoryID, -1, lineItemHolders[0].Memo, lineItemHolders[0].Amount))
                 {
                     // Yeah, that's it
                     bankTransactionTracker.FoundIDs.Add(transRow.ID);
@@ -916,6 +923,10 @@ namespace BanaData.Serializations
 
             return transRow;
         }
+
+        #endregion
+
+        #region Parse QIF investment transactions
 
         private void ParseInvestmentTransactions(StreamReader sr, Household.AccountsRow account)
         {
@@ -1043,12 +1054,93 @@ namespace BanaData.Serializations
 
             if (merging)
             {
-                // ZZZZZZZZZZZZZZZZZZZZZZZZ
+                MergeInvestmentTransaction(accountRow, date, altMemo, mainMemo, status, categoryID, categoryAccountID, amount, type, securityRow, securityPrice, securityQuantity, commission);
             }
             else
             {
                 CreateInvestmentTransaction(accountRow, date, altMemo, mainMemo, status, categoryID, categoryAccountID, amount, type, securityRow, securityPrice, securityQuantity, commission);
             }
+        }
+
+        private void MergeInvestmentTransaction(
+            Household.AccountsRow accountRow,
+            DateTime date,
+            string payee,
+            string memo,
+            ETransactionStatus status,
+            int categoryID,
+            int categoryAccountID,
+            decimal amount,
+            EInvestmentTransactionType type,
+            Household.SecuritiesRow securityRow,
+            decimal securityPrice,
+            decimal securityQuantity,
+            decimal commission)
+        {
+            // Try to find this exact same transaction
+            foreach (var transRow in accountRow.GetTransactions())
+            {
+                if (!transRow.HasSame(date, payee, memo, status))
+                {
+                    continue;
+                }
+
+                // Found same transaction, see if it has the same line items
+                var lineItemRows = household.LineItems.GetByTransaction(transRow);
+                if (lineItemRows.Length != 1)
+                {
+                    // Should never get here
+                    continue;
+                }
+
+                // Compare investment transaction
+                var investmentTransactionRow = household.InvestmentTransactions.GetByTransaction(transRow);
+                if (!investmentTransactionRow.HasSame(type, securityRow, securityPrice, securityQuantity, commission))
+                {
+                    continue;
+                }
+
+                // Compare the line items
+                var liRow = lineItemRows[0];
+                if (!liRow.HasSame(categoryID, categoryAccountID, null, amount))
+                {
+                    // May be an edited one? see pair transfer algorithm
+                    if (categoryAccountID < 0 || !liRow.HasSame(categoryID, -1, null, amount))
+                    {
+                        // Not the same
+                        continue;
+                    }
+                }
+
+                // Miracle! we found the exact same transaction
+                investmentTransactionTracker.FoundIDs.Add(transRow.ID);
+                return;
+            }
+
+            // This may be the end of a transfer that was deleted by the pairing algorithm
+            if (categoryAccountID >= 0)
+            {
+                foreach (Household.LineItemsRow li in household.LineItems.Rows)
+                {
+                    if (!li.IsAccountIDNull() && li.AccountID == accountRow.ID &&
+                        !li.IsITransferStatusNull() &&
+                        li.Amount == -amount)
+                    {
+                        // Verify this transaction took place in the account targetted by our line item
+                        var trans = household.Transactions.FindByID(li.TransactionID);
+                        if (trans.AccountID == categoryAccountID)
+                        {
+                            // Found you
+                            investmentTransactionTracker.FoundIDs.Add(li.ID); // ZZZ ???
+                            return;
+                        }
+                    }
+                }
+            }
+
+            // Create a new transaction, the user can delete the extra ones
+            var newTrans = CreateInvestmentTransaction(accountRow, date, payee, memo, status, categoryID, categoryAccountID, amount, type, securityRow, securityPrice, securityQuantity, commission);
+            investmentTransactionTracker.AddedIDs.Add(newTrans.ID);
         }
 
         private Household.TransactionsRow CreateInvestmentTransaction(
@@ -1188,25 +1280,49 @@ namespace BanaData.Serializations
 
             if (merging)
             {
-                // ZZZZZZZZZZZZZZZZ
+                MergeMemorizedPayee(payee, status, memo, lineItemHolders);
             }
             else
             {
                 CreateMemorizedPayee(payee, status, memo, lineItemHolders);
             }
-            var memorizedPayees = household.MemorizedPayees.Add(payee, status, memo);
-
-            // Add the line item(s)
-            foreach (var lih in lineItemHolders)
-            {
-                household.MemorizedLineItems.Add(memorizedPayees,
-                    lih.CategoryID,
-                    lih.AccountID,
-                    lih.Memo,
-                    lih.Amount);
-            }
         }
 
+        private void MergeMemorizedPayee(string payee, ETransactionStatus status, string memo, List<LineItemHolder> lineItemHolders)
+        {
+            // Try to find the same memorized payee
+            foreach (var mpr in household.MemorizedPayees.Rows.Cast< Household.MemorizedPayeesRow>().Where(m => m.HasSame(payee, status, memo)))
+            {
+                // Compare line items
+                var lineItemRows = mpr.GetMemorizedLineItemsRows();
+                if (lineItemRows.Length != lineItemHolders.Count)
+                {
+                    continue;
+                }
+
+                bool samelineItems = true;
+                for (int i = 0; i < lineItemRows.Length; i++)
+                {
+                    var lih = lineItemHolders[i];
+                    if (!lineItemRows[i].HasSame(lih.CategoryID, lih.AccountID, lih.Memo, lih.Amount))
+                    {
+                        samelineItems = false;
+                        break;
+                    }
+                }
+
+                // We found the same memorized payee - all done
+                if (samelineItems)
+                {
+                    memorizedPayeeTransactionTracker.FoundIDs.Add(mpr.ID);
+                    return;
+                }
+            }
+
+            // If we get here we did not find this memorized payee. Add it.
+            var newRow = CreateMemorizedPayee(payee, status, memo, lineItemHolders);
+            memorizedPayeeTransactionTracker.AddedIDs.Add(newRow.ID);
+        }
 
         private Household.MemorizedPayeesRow CreateMemorizedPayee(string payee, ETransactionStatus status, string memo, IEnumerable<LineItemHolder> lineItemHolders)
         {
@@ -1306,7 +1422,7 @@ namespace BanaData.Serializations
                 {
                     if (merging)
                     {
-                        // ZZZZZZZZZZZZZZZZZZ
+                        MergeSecurityPrice(securityRow, date, price);
                     }
                     else
                     {
@@ -1315,6 +1431,23 @@ namespace BanaData.Serializations
                 }
             }
         }
+
+        private void MergeSecurityPrice(Household.SecuritiesRow securityRow, DateTime date, decimal price)
+        {
+            var existingSecurityPriceRow = securityRow.GetSecurityPrices().FirstOrDefault(spr => spr.Date == date && spr.Value == price);
+            if (existingSecurityPriceRow == null)
+            {
+                // New  security price
+                var newRow = household.SecurityPrices.Add(securityRow, date, price);
+                securityPriceTracker.AddedIDs.Add(newRow.ID);
+            }
+            else
+            {
+                // Exactly the same
+                securityPriceTracker.FoundIDs.Add(existingSecurityPriceRow.ID);
+            }
+        }
+
 
         #endregion
 
