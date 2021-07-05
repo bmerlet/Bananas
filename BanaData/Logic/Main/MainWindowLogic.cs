@@ -242,6 +242,13 @@ namespace BanaData.Logic.Main
             ErrorMessage("Export completed", "Export results");
         }
 
+        public void DifferentialExportQIF(string file)
+        {
+            var exporter = new QIFWriter(this);
+            exporter.DifferentialExportToQIF(file);
+            ErrorMessage("Differential export completed; new checkpoint created", "Export results");
+        }
+
         // Commit changes to household data set
         public void CommitChanges()
         {

@@ -82,11 +82,11 @@ namespace BanaData.Database
 
         partial class TransactionsDataTable
         {
-            public TransactionsRow Add(AccountsRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status)
+            public TransactionsRow Add(AccountsRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status, int checkpointID)
             {
                 var transactionRow = NewTransactionsRow();
 
-                UpdateTransaction(transactionRow, accountRow, date, payee, memo, status);
+                UpdateTransaction(transactionRow, accountRow, date, payee, memo, status, checkpointID);
 
                 Rows.Add(transactionRow);
 
@@ -97,12 +97,12 @@ namespace BanaData.Database
             {
                 var transactionRow = FindByID(transactionID);
 
-                UpdateTransaction(transactionRow, accountRow, date, payee, memo, status);
+                UpdateTransaction(transactionRow, accountRow, date, payee, memo, status, transactionRow.CheckpointID);
 
                 return transactionRow;
             }
 
-            private static TransactionsRow UpdateTransaction(TransactionsRow transactionRow, AccountsRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status)
+            private static TransactionsRow UpdateTransaction(TransactionsRow transactionRow, AccountsRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status, int checkpointID)
             {
                 transactionRow.AccountID = accountRow.ID;
 
@@ -127,6 +127,7 @@ namespace BanaData.Database
                 }
 
                 transactionRow.Status = status;
+                transactionRow.CheckpointID = checkpointID;
 
                 return transactionRow;
             }

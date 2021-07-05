@@ -69,7 +69,7 @@ namespace BanaData.Database
 
             public SecuritiesRow GetBySymbol(string symbol)
             {
-                return this.Single(sec => !sec.IsSymbolNull() && sec.Symbol == symbol);
+                return this.First(sec => !sec.IsSymbolNull() && sec.Symbol == symbol);
             }
 
             public SecuritiesRow Add(string name, string symbol, ESecurityType type)

@@ -755,7 +755,7 @@ namespace BanaData.Logic.Main
             if (TransID == TRANSID_NOT_COMMITTED)
             {
                 // Create new transaction row
-                var transactionRow = household.Transactions.Add(accountRow, data.Date, data.Payee, data.Memo, data.Status);
+                var transactionRow = household.Transactions.Add(accountRow, data.Date, data.Payee, data.Memo, data.Status, household.Checkpoints.GetMostRecentCheckpointID());
                 TransID = transactionRow.ID;
 
                 // Create new investment transaction row

@@ -29,6 +29,7 @@ namespace BanaData.Logic.Main
             Import = new CommandBase(OnImport);
             Merge = new CommandBase(OnMerge);
             Export = new CommandBase(OnExport);
+            DifferentialExport = new CommandBase(OnDifferentialExport);
             Save = new CommandBase(OnSave);
             Exit = new CommandBase(OnExit);
 
@@ -109,6 +110,21 @@ namespace BanaData.Logic.Main
             if (mainWindow.GuiServices.ShowDialog(logic))
             {
                 mainWindow.ExportQIF(logic.File);
+            }
+        }
+
+        //
+        // Differential Export
+        //
+        public CommandBase DifferentialExport { get; }
+
+        private void OnDifferentialExport()
+        {
+            string ZZZfile = @"C:\Users\bmerlet\Documents\Lab\Projects\C#\Bananas\out.qif";
+            var logic = new SaveFileLogic(ZZZfile, "Quicken Interchange Format files (*.QIF)|*.QIF|Any file (*.*)|*.*", "Export to file");
+            if (mainWindow.GuiServices.ShowDialog(logic))
+            {
+                mainWindow.DifferentialExportQIF(logic.File);
             }
         }
 

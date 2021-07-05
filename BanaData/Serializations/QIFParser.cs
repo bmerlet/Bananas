@@ -29,6 +29,7 @@ namespace BanaData.Serializations
 
         private readonly MainWindowLogic mainWindowLogic;
         private readonly Household household;
+        private int checkpointID;
         private bool merging;
         private readonly List<string> accountNames = new List<string>();
 
@@ -97,6 +98,9 @@ namespace BanaData.Serializations
             household.Clear();
             household.AcceptChanges();
 
+            // Create a checkpoint - all transactions are created under this checkpoint
+            household.Checkpoints.AddCheckpointsRow(DateTime.Now);
+
             // Parse the file
             ParseFile(fileName);
 
@@ -113,6 +117,10 @@ namespace BanaData.Serializations
             PairTransfers();
 
             household.AcceptChanges();
+
+            // Create a new checkpoint, all transactions created by the user
+            // will be associated with this new checkpoint
+            household.Checkpoints.AddCheckpointsRow(DateTime.Now);
         }
 
         public bool MergeFromQIF(string fileName)
@@ -168,8 +176,13 @@ namespace BanaData.Serializations
         // Parse a QIF file file
         private void ParseFile(string fileName)
         {
+            // Get current checkpoint
+            checkpointID = household.Checkpoints.GetMostRecentCheckpointID();
+
+            // Read the file
             using (var sr = new StreamReader(fileName))
             {
+                // Parse all sections
                 Household.AccountsRow accountRow = null;
                 while (!sr.EndOfStream)
                 {
@@ -914,7 +927,7 @@ namespace BanaData.Serializations
             IEnumerable<LineItemHolder> lineItemHolders)
         {
             // Create main transaction
-            var transRow = household.Transactions.Add(accountRow, date, payee, memo, status);
+            var transRow = household.Transactions.Add(accountRow, date, payee, memo, status, checkpointID);
 
             // Add bank-specific stuff
             if (accountRow.Type == EAccountType.Bank)
@@ -1194,7 +1207,7 @@ namespace BanaData.Serializations
             decimal securityQuantity,
             decimal commission)
         {
-            var transRow = household.Transactions.Add(accountRow, date, payee, memo, status);
+            var transRow = household.Transactions.Add(accountRow, date, payee, memo, status, checkpointID);
             household.LineItems.Add(transRow, categoryID, categoryAccountID, null, amount);
             household.InvestmentTransactions.Add(transRow, type, securityRow, securityPrice, securityQuantity, commission);
 

@@ -44,6 +44,21 @@ namespace BanaData.Serializations
             }
         }
 
+        // Only write out the transactions associated with the current checkpoint
+        // then create a new checkpoint
+        public void DifferentialExportToQIF(string filename)
+        {
+            int checkpointID = household.Checkpoints.GetMostRecentCheckpointID();
+
+            using (var sw = new StreamWriter(filename, false))
+            {
+                ExportTransactions(sw, checkpointID);
+            }
+
+            // Create a new checkpoint
+            household.Checkpoints.AddCheckpointsRow(DateTime.Now);
+        }
+
         #endregion
 
         #region Write QIF categories
@@ -174,7 +189,7 @@ namespace BanaData.Serializations
 
         #region Write QIF transactions
 
-        private void ExportTransactions(StreamWriter sw)
+        private void ExportTransactions(StreamWriter sw, int checkpointID = -1)
         {
             sw.WriteLine("!Option:AutoSwitch");
 
@@ -189,6 +204,12 @@ namespace BanaData.Serializations
                 // Get all transactions on this account
                 foreach (var transactionRow in accountRow.GetTransactionsRows())
                 {
+                    // If filtering on checkpoint, skip transactions that do not match
+                    if (checkpointID >= 0 && transactionRow.CheckpointID != checkpointID)
+                    {
+                        continue;
+                    }
+
                     ExportDate(sw, transactionRow.Date);
 
                     if (accountRow.Type == EAccountType.Investment)
@@ -207,6 +228,12 @@ namespace BanaData.Serializations
                 foreach(var lineItemRow in household.LineItems.Where(li => !li.IsAccountIDNull() && li.AccountID == accountRow.ID))
                 {
                     var transactionRow = lineItemRow.TransactionsRow;
+
+                    // If filtering on checkpoint, skip transactions that do not match
+                    if (checkpointID >= 0 && transactionRow.CheckpointID != checkpointID)
+                    {
+                        continue;
+                    }
 
                     // Skip transfers to self
                     if (transactionRow.AccountID == accountRow.ID)
