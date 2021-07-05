@@ -40,6 +40,7 @@ namespace BanaData.Serializations
                 ExportSecurities(sw);
                 ExportTransactions(sw);
                 ExportMemorizedPayees(sw);
+                ExportSecurityPrices(sw);
             }
         }
 
@@ -185,6 +186,7 @@ namespace BanaData.Serializations
 
                 sw.WriteLine($"!Type:{accountType}");
 
+                // Get all transactions on this account
                 foreach (var transactionRow in accountRow.GetTransactions())
                 {
                     ExportDate(sw, transactionRow.Date);
@@ -196,6 +198,31 @@ namespace BanaData.Serializations
                     else
                     {
                         ExportBankingTransaction(sw, accountRow, transactionRow);
+                    }
+
+                    sw.WriteLine("^");
+                }
+
+                // Now find all transfers that have this account as destination
+                foreach(var lineItemRow in household.LineItems.Where(li => !li.IsAccountIDNull() && li.AccountID == accountRow.ID))
+                {
+                    var transactionRow = lineItemRow.TransactionsRow;
+
+                    // Skip transfers to self
+                    if (transactionRow.AccountID == accountRow.ID)
+                    {
+                        continue;
+                    }
+
+                    ExportDate(sw, transactionRow.Date);
+
+                    if (accountRow.Type == EAccountType.Investment)
+                    {
+                        ExportInvestmentFillIn(sw, transactionRow, lineItemRow);
+                    }
+                    else
+                    {
+                        ExportBankingFillIn(sw, transactionRow, lineItemRow);
                     }
 
                     sw.WriteLine("^");
@@ -265,6 +292,22 @@ namespace BanaData.Serializations
             }
         }
 
+        private void ExportBankingFillIn(StreamWriter sw, Household.TransactionsRow transactionRow, Household.LineItemsRow lineItemRow)
+        {
+            decimal amount = -lineItemRow.Amount;
+            sw.WriteLine($"U{amount:N2}");
+            sw.WriteLine($"T{amount:N2}");
+            ExportTransactionStatus(sw, lineItemRow.TransferStatus, false);
+
+            if (!transactionRow.IsMemoNull())
+            {
+                sw.WriteLine($"M{transactionRow.Memo}");
+            }
+
+            sw.WriteLine("L" + mainWindowLogic.Categories.Find(c => c.AccountID == transactionRow.AccountID).FullName);
+        }
+
+
         private void ExportInvestmentTransaction(StreamWriter sw, Household.TransactionsRow transactionRow)
         {
             var liRow = transactionRow.GetLineItemsRows()[0];
@@ -274,14 +317,12 @@ namespace BanaData.Serializations
 
             switch(investmentTransactionRow.Type)
             {
-                case EInvestmentTransactionType.Cash:
+                case EInvestmentTransactionType.CashIn:
                     sw.WriteLine("NCash");
                     break;
-                case EInvestmentTransactionType.InterestIncome:
-                    sw.WriteLine("NIntInc");
-                    break;
-                case EInvestmentTransactionType.TransferCash:
-                    sw.WriteLine("NContribX");
+                case EInvestmentTransactionType.CashOut:
+                    sw.WriteLine("NCash");
+                    amount = -amount;
                     break;
                 case EInvestmentTransactionType.TransferCashIn:
                     sw.WriteLine("NXIn");
@@ -289,8 +330,8 @@ namespace BanaData.Serializations
                 case EInvestmentTransactionType.TransferCashOut:
                     sw.WriteLine("NXOut");
                     break;
-                case EInvestmentTransactionType.TransferMiscellaneousIncomeIn:
-                    sw.WriteLine("NMiscIncX");
+                case EInvestmentTransactionType.InterestIncome:
+                    sw.WriteLine("NIntInc");
                     break;
                 case EInvestmentTransactionType.SharesIn:
                     sw.WriteLine("NShrsIn");
@@ -408,6 +449,27 @@ namespace BanaData.Serializations
             }
         }
 
+        private void ExportInvestmentFillIn(StreamWriter sw, Household.TransactionsRow transactionRow, Household.LineItemsRow lineItemRow)
+        {
+            decimal amount = -lineItemRow.Amount;
+
+            sw.WriteLine("N" + (amount > 0 ? "XIn" : "XOut"));
+
+            ExportTransactionStatus(sw, lineItemRow.TransferStatus, false);
+
+            sw.WriteLine($"U{Math.Abs(amount):N2}");
+            sw.WriteLine($"T{Math.Abs(amount):N2}");
+
+            if (!transactionRow.IsMemoNull())
+            {
+                sw.WriteLine($"M{transactionRow.Memo}");
+            }
+
+            sw.WriteLine("L" + mainWindowLogic.Categories.Find(c => c.AccountID == transactionRow.AccountID).FullName);
+
+            sw.WriteLine($"${Math.Abs(amount):N2}");
+        }
+
         private void ExportTransactionStatus(StreamWriter sw, ETransactionStatus status, bool investment)
         {
             switch(status)
@@ -474,6 +536,7 @@ namespace BanaData.Serializations
                         sw.WriteLine($"${liRow.Amount:N2}");
                     }
                 }
+                sw.WriteLine("^");
             }
         }
 
@@ -492,13 +555,39 @@ namespace BanaData.Serializations
 
         #endregion
 
+        #region Export security prices
+
+        private void ExportSecurityPrices(StreamWriter sw)
+        {
+            foreach (Household.SecurityPricesRow spr in household.SecurityPrices.Rows)
+            {
+                sw.WriteLine("!Type:Prices");
+
+                var securityRow = spr.SecuritiesRow;
+                if (!securityRow.IsSymbolNull())
+                {
+                    var dateString = GetDateString(spr.Date);
+                    sw.WriteLine($"\"{securityRow.Symbol}\",{spr.Value:N2},\"{dateString}\"");
+                }
+
+                sw.WriteLine("^");
+            }
+        }
+
+        #endregion
+
         #region Shared utilities
 
         private void ExportDate(StreamWriter sw, DateTime date)
         {
+            sw.WriteLine("D" + GetDateString(date));
+        }
+
+        private string GetDateString(DateTime date)
+        {
             var dayStr = string.Format("{0,2:##}", date.Day);
             var yearStr = string.Format("{0,2:##}", date.Year - 2000);
-            sw.WriteLine($"D{date.Month}/{dayStr}'{yearStr}");
+            return $"{date.Month}/{dayStr}'{yearStr}";
         }
 
         #endregion`

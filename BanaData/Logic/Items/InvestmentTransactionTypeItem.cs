@@ -18,29 +18,24 @@ namespace BanaData.Logic.Items
 
             switch(type)
             {
-                case EInvestmentTransactionType.Cash:
-                    Description = "Cash in"; 
+                case EInvestmentTransactionType.CashIn:
+                    Description = "Add cash";
                     break;
 
-                case EInvestmentTransactionType.InterestIncome:
-                    Description = "Interest income";
-                    break;
-
-                case EInvestmentTransactionType.TransferCash:
-                    Description = "Transfer cash in";
+                case EInvestmentTransactionType.CashOut:
+                    Description = "Remove cash";
                     break;
 
                 case EInvestmentTransactionType.TransferCashIn:
                     Description = "Transfer cash in";
                     break;
 
-
                 case EInvestmentTransactionType.TransferCashOut:
                     Description = "Transfer cash out";
                     break;
 
-                case EInvestmentTransactionType.TransferMiscellaneousIncomeIn:
-                    Description = "Transfer miscellaneous income in";
+                case EInvestmentTransactionType.InterestIncome:
+                    Description = "Interest income";
                     break;
 
                 case EInvestmentTransactionType.SharesIn:
@@ -125,10 +120,6 @@ namespace BanaData.Logic.Items
 
                 case EInvestmentTransactionType.Expire:
                     Description = "Expire";
-                    break;
-
-                case EInvestmentTransactionType.None:
-                    Description = "N/A";
                     break;
             }
         }

@@ -45,7 +45,7 @@ namespace BanaData.Logic.Main
             int _accountID)
             : this(_mainWindowLogic, _accountID, AbstractTransactionLogic.TRANSID_NOT_COMMITTED,
                   new InvestmentTransactionData(DateTime.Today, "", "", ETransactionStatus.Pending, new LineItem[] { new LineItem(_mainWindowLogic, -1, "", -1, -1, "", 0, false) },
-                    EInvestmentTransactionType.None, -1, 0, 0, 0)) { }
+                    EInvestmentTransactionType.Dividends, -1, 0, 0, 0)) { }
 
         #endregion
 
@@ -277,11 +277,11 @@ namespace BanaData.Logic.Main
             }
 
             // No type
-            if (data.Type == EInvestmentTransactionType.None)
-            {
-                mainWindowLogic.ErrorMessage("Please choose a transaction type");
-                return (false, false);
-            }
+            //if (data.Type == EInvestmentTransactionType.None)
+            //{
+            //    mainWindowLogic.ErrorMessage("Please choose a transaction type");
+            //    return (false, false);
+            //}
 
             // No quantity ZZZZZZZZZZZZZZZZ More
 
@@ -378,22 +378,24 @@ namespace BanaData.Logic.Main
 
             switch(data.Type)
             {
-                case EInvestmentTransactionType.Cash:
-                    desc = "Opening balance";
+                case EInvestmentTransactionType.CashIn:
+                    desc = $"Added {Amount:C2}";
                     break;
 
-                case EInvestmentTransactionType.InterestIncome:
-                    desc = $"Received ${AmountString} in interest";
+                case EInvestmentTransactionType.CashOut:
+                    desc = $"Removed {-Amount:C2}";
                     break;
 
-                case EInvestmentTransactionType.TransferCash:
                 case EInvestmentTransactionType.TransferCashIn:
-                case EInvestmentTransactionType.TransferMiscellaneousIncomeIn:
                     desc = $"Transfered {Amount:C2} in";
                     break;
 
                 case EInvestmentTransactionType.TransferCashOut:
                     desc = $"Transfered {-Amount:C2} out";
+                    break;
+
+                case EInvestmentTransactionType.InterestIncome:
+                    desc = $"Received ${AmountString} in interest";
                     break;
 
                 case EInvestmentTransactionType.SharesIn:
@@ -469,7 +471,6 @@ namespace BanaData.Logic.Main
 
             switch (data.Type)
             {
-                case EInvestmentTransactionType.Cash:
                 case EInvestmentTransactionType.InterestIncome:
                     column = ShowSecuritySymbol(false, column);
                     column = ShowSecurityTextBoxes(false, false, column);
@@ -477,10 +478,10 @@ namespace BanaData.Logic.Main
                     ShowTransferBox(false, column);
                     break;
 
-                case EInvestmentTransactionType.TransferCash:
+                case EInvestmentTransactionType.CashIn:
+                case EInvestmentTransactionType.CashOut:
                 case EInvestmentTransactionType.TransferCashIn:
                 case EInvestmentTransactionType.TransferCashOut:
-                case EInvestmentTransactionType.TransferMiscellaneousIncomeIn:
                     column = ShowSecuritySymbol(false, column);
                     column = ShowSecurityTextBoxes(false, false, column);
                     column = ShowAmountBox(true, column);
@@ -543,7 +544,6 @@ namespace BanaData.Logic.Main
                 case EInvestmentTransactionType.Vest:
                 case EInvestmentTransactionType.Exercise:
                 case EInvestmentTransactionType.Expire:
-                case EInvestmentTransactionType.None:
                     column = ShowAmountBox(false, column);
                     column = ShowSecuritySymbol(false, column);
                     column = ShowSecurityTextBoxes(false, false, column);
@@ -675,7 +675,6 @@ namespace BanaData.Logic.Main
             //
             switch (data.Type)
             {
-                case EInvestmentTransactionType.Cash:
                 case EInvestmentTransactionType.InterestIncome:
                     data.SecurityID = -1;
                     data.SecurityPrice = 0;
@@ -684,10 +683,10 @@ namespace BanaData.Logic.Main
                     data.LineItems[0].Category = "";
                     break;
 
-                case EInvestmentTransactionType.TransferCash:
+                case EInvestmentTransactionType.CashIn:
+                case EInvestmentTransactionType.CashOut:
                 case EInvestmentTransactionType.TransferCashIn:
                 case EInvestmentTransactionType.TransferCashOut:
-                case EInvestmentTransactionType.TransferMiscellaneousIncomeIn:
                     data.SecurityID = -1;
                     data.SecurityPrice = 0;
                     data.SecurityQuantity = 0;
@@ -739,7 +738,6 @@ namespace BanaData.Logic.Main
                 case EInvestmentTransactionType.Vest:
                 case EInvestmentTransactionType.Exercise:
                 case EInvestmentTransactionType.Expire:
-                case EInvestmentTransactionType.None:
                     data.SecurityID = -1;
                     data.SecurityPrice = 0;
                     data.SecurityQuantity = 0;

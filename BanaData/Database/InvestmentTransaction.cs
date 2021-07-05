@@ -30,28 +30,25 @@ namespace BanaData.Database
 
             // Transactions that add to the cash balance
             static public bool CashIn(EInvestmentTransactionType type) =>
-                type == EInvestmentTransactionType.Cash ||
                 type == EInvestmentTransactionType.InterestIncome ||
                 type == EInvestmentTransactionType.Dividends ||
                 type == EInvestmentTransactionType.ShortTermCapitalGains ||
                 type == EInvestmentTransactionType.LongTermCapitalGains ||
-                type == EInvestmentTransactionType.TransferCash ||
+                type == EInvestmentTransactionType.CashIn ||
                 type == EInvestmentTransactionType.TransferCashIn ||
-                type == EInvestmentTransactionType.TransferMiscellaneousIncomeIn ||
                 type == EInvestmentTransactionType.ReturnOnCapital ||
                 type == EInvestmentTransactionType.Sell;
 
             // Transactions that remove from the cash balance
             static public bool CashOut(EInvestmentTransactionType type) =>
+                type == EInvestmentTransactionType.CashOut ||
                 type == EInvestmentTransactionType.TransferCashOut ||
                 type == EInvestmentTransactionType.Buy;
 
             // Transactions that transfer cash into the account 
             static public bool TransferIn(EInvestmentTransactionType type) =>
-                type == EInvestmentTransactionType.TransferCash ||
                 type == EInvestmentTransactionType.TransferCashIn ||
-                type == EInvestmentTransactionType.BuyFromTransferredCash ||
-                type == EInvestmentTransactionType.TransferMiscellaneousIncomeIn;
+                type == EInvestmentTransactionType.BuyFromTransferredCash;
 
             // Transactions that transfer cash out of the the account 
             static public bool TransferOut(EInvestmentTransactionType type) =>

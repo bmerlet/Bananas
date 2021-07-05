@@ -75,10 +75,7 @@ namespace BanaData.Logic.Main
             // Create list of investment transaction type
             foreach(EInvestmentTransactionType itt in Enum.GetValues(typeof(EInvestmentTransactionType)))
             {
-                if (itt != EInvestmentTransactionType.None)
-                {
-                    investmentTransactionTypes.Add(new InvestmentTransactionTypeItem(itt));
-                }
+                investmentTransactionTypes.Add(new InvestmentTransactionTypeItem(itt));
             }
             InvestmentTransactionTypesView = (CollectionView)CollectionViewSource.GetDefaultView(investmentTransactionTypes);
             InvestmentTransactionTypesView.SortDescriptions.Add(new SortDescription("TypeString", ListSortDirection.Ascending));

@@ -964,7 +964,8 @@ namespace BanaData.Serializations
             int categoryAccountID = -1;
             int categoryID = -1;
             ETransactionStatus status = ETransactionStatus.Pending;
-            EInvestmentTransactionType type = EInvestmentTransactionType.None;
+            EExtendedInvestmentTransactionType extendedType = EExtendedInvestmentTransactionType.None;
+            EInvestmentTransactionType type;
             Household.SecuritiesRow securityRow = null;
             decimal securityPrice = 0;
             decimal securityQuantity = 0;
@@ -1042,7 +1043,7 @@ namespace BanaData.Serializations
                         break;
 
                     case 'N':
-                        type = ParseInvestmentTransactionType(arg);
+                        extendedType = ParseInvestmentTransactionType(arg);
                         break;
 
                     default:
@@ -1058,6 +1059,30 @@ namespace BanaData.Serializations
             if (amount != otherMysteriousAmount)
             {
                 throw new InvalidDataException("QIF parser: Mysterious amount not the same as regular amount - " + amount + " - " + otherMysteriousAmount);
+            }
+            if (extendedType == EExtendedInvestmentTransactionType.None)
+            {
+                throw new InvalidDataException("QIF parser: Investment transaction has no type - " + payee);
+            }
+
+            // Get rid of old transfer types and move them to CashIn/CashOut and XIn/XOut
+            if (extendedType == EExtendedInvestmentTransactionType.Cash || 
+                extendedType == EExtendedInvestmentTransactionType.TransferCash ||
+                extendedType == EExtendedInvestmentTransactionType.TransferMiscellaneousIncomeIn)
+            {
+                if (amount >= 0)
+                {
+                    type = categoryAccountID >=0 ? EInvestmentTransactionType.TransferCashIn : EInvestmentTransactionType.CashIn;
+                }
+                else
+                {
+                    type = categoryAccountID >= 0 ? EInvestmentTransactionType.TransferCashOut : EInvestmentTransactionType.CashOut;
+                    amount = -amount;
+                }
+            }
+            else
+            {
+                type = (EInvestmentTransactionType)extendedType;
             }
 
             if (Household.InvestmentTransactionsRow.CashOut(type) || Household.InvestmentTransactionsRow.TransferOut(type))
@@ -1578,92 +1603,124 @@ namespace BanaData.Serializations
         //    return type;
         //}
 
-        private static EInvestmentTransactionType ParseInvestmentTransactionType(string typeStr)
+        private enum EExtendedInvestmentTransactionType
         {
-            EInvestmentTransactionType type;
+            InterestIncome = EInvestmentTransactionType.InterestIncome,
+            TransferCashIn = EInvestmentTransactionType.TransferCashIn,
+            TransferCashOut = EInvestmentTransactionType.TransferCashOut,
+            SharesIn = EInvestmentTransactionType.SharesIn,
+            SharesOut = EInvestmentTransactionType.SharesOut,
+            Buy = EInvestmentTransactionType.Buy,
+            BuyFromTransferredCash = EInvestmentTransactionType.BuyFromTransferredCash,
+            Sell = EInvestmentTransactionType.Sell,
+            SellAndTransferCash = EInvestmentTransactionType.SellAndTransferCash,
+            Dividends = EInvestmentTransactionType.Dividends,
+            TransferDividends = EInvestmentTransactionType.TransferDividends,
+            ReinvestDividends = EInvestmentTransactionType.ReinvestDividends,
+            ShortTermCapitalGains = EInvestmentTransactionType.ShortTermCapitalGains,
+            TransferShortTermCapitalGains = EInvestmentTransactionType.TransferShortTermCapitalGains,
+            ReinvestShortTermCapitalGains = EInvestmentTransactionType.ReinvestShortTermCapitalGains,
+            ReinvestMediumTermCapitalGains = EInvestmentTransactionType.ReinvestMediumTermCapitalGains,
+            LongTermCapitalGains = EInvestmentTransactionType.LongTermCapitalGains,
+            TransferLongTermCapitalGains = EInvestmentTransactionType.TransferLongTermCapitalGains,
+            ReinvestLongTermCapitalGains = EInvestmentTransactionType.ReinvestLongTermCapitalGains,
+            ReturnOnCapital = EInvestmentTransactionType.ReturnOnCapital,
+            Grant = EInvestmentTransactionType.Grant,
+            Vest = EInvestmentTransactionType.Vest,
+            Exercise = EInvestmentTransactionType.Exercise,
+            Expire = EInvestmentTransactionType.Expire,
+            Cash,
+            TransferCash,
+            TransferMiscellaneousIncomeIn,
+            None
+        }
+
+        private static EExtendedInvestmentTransactionType ParseInvestmentTransactionType(string typeStr)
+        {
+            EExtendedInvestmentTransactionType type;
 
             switch (typeStr)
             {
                 case "Cash":
-                    type = EInvestmentTransactionType.Cash;
+                    type = EExtendedInvestmentTransactionType.Cash;
                     break;
                 case "IntInc":
-                    type = EInvestmentTransactionType.InterestIncome;
+                    type = EExtendedInvestmentTransactionType.InterestIncome;
                     break;
                 case "ContribX":
-                    type = EInvestmentTransactionType.TransferCash;
+                    type = EExtendedInvestmentTransactionType.TransferCash;
                     break;
                 case "XIn":
-                    type = EInvestmentTransactionType.TransferCashIn;
+                    type = EExtendedInvestmentTransactionType.TransferCashIn;
                     break;
                 case "XOut":
-                    type = EInvestmentTransactionType.TransferCashOut;
+                    type = EExtendedInvestmentTransactionType.TransferCashOut;
                     break;
                 case "MiscIncX":
-                    type = EInvestmentTransactionType.TransferMiscellaneousIncomeIn;
+                    type = EExtendedInvestmentTransactionType.TransferMiscellaneousIncomeIn;
                     break;
                 case "ShrsIn":
-                    type = EInvestmentTransactionType.SharesIn;
+                    type = EExtendedInvestmentTransactionType.SharesIn;
                     break;
                 case "ShrsOut":
-                    type = EInvestmentTransactionType.SharesOut;
+                    type = EExtendedInvestmentTransactionType.SharesOut;
                     break;
                 case "Buy":
-                    type = EInvestmentTransactionType.Buy;
+                    type = EExtendedInvestmentTransactionType.Buy;
                     break;
                 case "BuyX":
-                    type = EInvestmentTransactionType.BuyFromTransferredCash;
+                    type = EExtendedInvestmentTransactionType.BuyFromTransferredCash;
                     break;
                 case "Sell":
-                    type = EInvestmentTransactionType.Sell;
+                    type = EExtendedInvestmentTransactionType.Sell;
                     break;
                 case "SellX":
-                    type = EInvestmentTransactionType.SellAndTransferCash;
+                    type = EExtendedInvestmentTransactionType.SellAndTransferCash;
                     break;
                 case "Div":
-                    type = EInvestmentTransactionType.Dividends;
+                    type = EExtendedInvestmentTransactionType.Dividends;
                     break;
                 case "DivX":
-                    type = EInvestmentTransactionType.TransferDividends;
+                    type = EExtendedInvestmentTransactionType.TransferDividends;
                     break;
                 case "ReinvDiv":
-                    type = EInvestmentTransactionType.ReinvestDividends;
+                    type = EExtendedInvestmentTransactionType.ReinvestDividends;
                     break;
                 case "CGShort":
-                    type = EInvestmentTransactionType.ShortTermCapitalGains;
+                    type = EExtendedInvestmentTransactionType.ShortTermCapitalGains;
                     break;
                 case "CGShortX":
-                    type = EInvestmentTransactionType.TransferShortTermCapitalGains;
+                    type = EExtendedInvestmentTransactionType.TransferShortTermCapitalGains;
                     break;
                 case "ReinvSh":
-                    type = EInvestmentTransactionType.ReinvestShortTermCapitalGains;
+                    type = EExtendedInvestmentTransactionType.ReinvestShortTermCapitalGains;
                     break;
                 case "ReinvMd":
-                    type = EInvestmentTransactionType.ReinvestMediumTermCapitalGains;
+                    type = EExtendedInvestmentTransactionType.ReinvestMediumTermCapitalGains;
                     break;
                 case "CGLong":
-                    type = EInvestmentTransactionType.LongTermCapitalGains;
+                    type = EExtendedInvestmentTransactionType.LongTermCapitalGains;
                     break;
                 case "CGLongX":
-                    type = EInvestmentTransactionType.TransferLongTermCapitalGains;
+                    type = EExtendedInvestmentTransactionType.TransferLongTermCapitalGains;
                     break;
                 case "ReinvLg":
-                    type = EInvestmentTransactionType.ReinvestLongTermCapitalGains;
+                    type = EExtendedInvestmentTransactionType.ReinvestLongTermCapitalGains;
                     break;
                 case "RtrnCap":
-                    type = EInvestmentTransactionType.ReturnOnCapital;
+                    type = EExtendedInvestmentTransactionType.ReturnOnCapital;
                     break;
                 case "Grant":
-                    type = EInvestmentTransactionType.Grant;
+                    type = EExtendedInvestmentTransactionType.Grant;
                     break;
                 case "Vest":
-                    type = EInvestmentTransactionType.Vest;
+                    type = EExtendedInvestmentTransactionType.Vest;
                     break;
                 case "Exercise":
-                    type = EInvestmentTransactionType.Exercise;
+                    type = EExtendedInvestmentTransactionType.Exercise;
                     break;
                 case "Expire":
-                    type = EInvestmentTransactionType.Expire;
+                    type = EExtendedInvestmentTransactionType.Expire;
                     break;
                 default:
                     throw new InvalidDataException("Unknown investment transaction type: " + typeStr);
@@ -1874,7 +1931,6 @@ namespace BanaData.Serializations
 
                     if (accountRow1.Type == EAccountType.Investment &&
                         transactionRow1.GetInvestmentTransaction() is Household.InvestmentTransactionsRow investmentTransactionRow1 &&
-                        investmentTransactionRow1.Type != EInvestmentTransactionType.TransferCash &&
                         investmentTransactionRow1.Type != EInvestmentTransactionType.TransferCashIn &&
                         investmentTransactionRow1.Type != EInvestmentTransactionType.TransferCashOut)
                     {
@@ -1884,7 +1940,6 @@ namespace BanaData.Serializations
                     }
                     else if (accountRow2.Type == EAccountType.Investment &&
                         transactionRow2.GetInvestmentTransaction() is Household.InvestmentTransactionsRow investmentTransactionRow2 &&
-                        investmentTransactionRow2.Type != EInvestmentTransactionType.TransferCash &&
                         investmentTransactionRow2.Type != EInvestmentTransactionType.TransferCashIn &&
                         investmentTransactionRow2.Type != EInvestmentTransactionType.TransferCashOut)
                     {

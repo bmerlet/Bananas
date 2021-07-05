@@ -107,14 +107,11 @@ namespace BanaData.Database
     // Investment transaction type
     public enum EInvestmentTransactionType
     {
-        [EnumDescription("Cash")]
-        Cash,
+        [EnumDescription("CashIn")]
+        CashIn,
 
-        [EnumDescription("Int")]
-        InterestIncome,
-
-        [EnumDescription("XCash")]
-        TransferCash,
+        [EnumDescription("CashOut")]
+        CashOut,
 
         [EnumDescription("XIn")]
         TransferCashIn,
@@ -122,8 +119,8 @@ namespace BanaData.Database
         [EnumDescription("XOut")]
         TransferCashOut,
 
-        [EnumDescription("MiscIn")]
-        TransferMiscellaneousIncomeIn,
+        [EnumDescription("Int")]
+        InterestIncome,
 
         [EnumDescription("SharesIn")]
         SharesIn,
@@ -186,10 +183,7 @@ namespace BanaData.Database
         Exercise,
 
         [EnumDescription("Expire")]
-        Expire,
-
-        [EnumDescription("")]
-        None
+        Expire
     }
 
     // Composite transaction state foir the UI
