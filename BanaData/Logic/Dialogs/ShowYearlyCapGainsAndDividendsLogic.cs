@@ -304,10 +304,10 @@ namespace BanaData.Logic.Dialogs
                     var accountName = accountRow.Name;
 
                     // Go through all the transactions for that year
-                    foreach (Household.TransactionsRow transactionRow in accountRow.GetTransactions().Where(tr => tr.Date.Year == selectedYear))
+                    foreach (var transactionRow in accountRow.GetTransactionsRows().Where(tr => tr.Date.Year == selectedYear))
                     {
                         // Go through all the line items
-                        foreach(var li in household.LineItems.GetByTransaction(transactionRow))
+                        foreach(var li in transactionRow.GetLineItemsRows())
                         {
                             if (!li.IsCategoryIDNull() && interestCategories.Contains(li.CategoryID))
                             {
@@ -336,7 +336,7 @@ namespace BanaData.Logic.Dialogs
                     }
 
                     // Go through all the transactions for that year
-                    foreach (Household.TransactionsRow transactionRow in accountRow.GetTransactions().Where(tr => tr.Date.Year == selectedYear))
+                    foreach (var transactionRow in accountRow.GetTransactionsRows().Where(tr => tr.Date.Year == selectedYear))
                     {
                         // Get the investment transaction
                         var investmentTransactionRow = transactionRow.GetInvestmentTransaction();
@@ -348,7 +348,7 @@ namespace BanaData.Logic.Dialogs
                              type == EInvestmentTransactionType.ReinvestDividends ||
                              type == EInvestmentTransactionType.TransferDividends))
                         {
-                            string symbol = household.Securities.FindByID(investmentTransactionRow.SecurityID).Symbol;
+                            string symbol = investmentTransactionRow.SecuritiesRow.Symbol;
                             string description = EnumDescriptionAttribute.GetDescription(type);
                             decimal amount = transactionRow.GetAmount() * (type == EInvestmentTransactionType.TransferDividends ? -1 : 1);
                             tempTransList.Add(new TransactionItem(transactionRow.Date, accountName, symbol, description, amount, 0, 0, 0));
@@ -362,7 +362,7 @@ namespace BanaData.Logic.Dialogs
                              type == EInvestmentTransactionType.ReinvestShortTermCapitalGains ||
                              type == EInvestmentTransactionType.TransferShortTermCapitalGains))
                         {
-                            string symbol = household.Securities.FindByID(investmentTransactionRow.SecurityID).Symbol;
+                            string symbol = investmentTransactionRow.SecuritiesRow.Symbol;
                             string description = EnumDescriptionAttribute.GetDescription(type);
                             decimal amount = transactionRow.GetAmount() * (type == EInvestmentTransactionType.TransferShortTermCapitalGains ? -1 : 1);
                             tempTransList.Add(new TransactionItem(transactionRow.Date, accountName, symbol, description, 0, amount, 0, 0));
@@ -376,7 +376,7 @@ namespace BanaData.Logic.Dialogs
                              type == EInvestmentTransactionType.ReinvestLongTermCapitalGains ||
                              type == EInvestmentTransactionType.TransferLongTermCapitalGains))
                         {
-                            string symbol = household.Securities.FindByID(investmentTransactionRow.SecurityID).Symbol;
+                            string symbol = investmentTransactionRow.SecuritiesRow.Symbol;
                             string description = EnumDescriptionAttribute.GetDescription(type);
                             decimal amount = transactionRow.GetAmount() * (type == EInvestmentTransactionType.TransferLongTermCapitalGains ? -1 : 1);
                             tempTransList.Add(new TransactionItem(transactionRow.Date, accountName, symbol, description, 0, 0, amount, 0));
@@ -389,8 +389,8 @@ namespace BanaData.Logic.Dialogs
                             (type == EInvestmentTransactionType.Sell ||
                              type == EInvestmentTransactionType.SellAndTransferCash))
                         {
-                            string symbol = household.Securities.FindByID(investmentTransactionRow.SecurityID).Symbol;
-                            var sale = Portfolio.ComputeSaleCapitalGains(household, transactionRow.ID);
+                            string symbol = investmentTransactionRow.SecuritiesRow.Symbol;
+                            var sale = Portfolio.ComputeSaleCapitalGains(household, transactionRow.ID, false);
 
                             tempTransList.Add(new TransactionItem(transactionRow.Date, accountName, symbol, sale.Description, 0, sale.ShortTermGain, sale.LongTermGain, 0));
 

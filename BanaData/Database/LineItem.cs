@@ -59,12 +59,6 @@ namespace BanaData.Database
 
         partial class LineItemsDataTable
         {
-            public LineItemsRow[] GetByTransaction(Household.TransactionsRow transactionRow)
-            {
-                var transToLineItem = ParentRelations["FK_Transactions_LineItems"];
-                return transactionRow.GetChildRows(transToLineItem).Cast<Household.LineItemsRow>().ToArray();
-            }
-
             public LineItemsRow Add(TransactionsRow transactionRow, int categoryId, int categoryAccountId, string memo, decimal amount)
             {
                 var lineItemRow = NewLineItemsRow();

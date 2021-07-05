@@ -94,9 +94,8 @@ namespace BanaData.Logic.Main
             Household.AccountsRow accountRow,
             Household.LineItemsRow otherLineItemRow)
         {
-            var household = mainWindowLogic.Household;
-            var otherTransRow = household.Transactions.FindByID(otherLineItemRow.TransactionID);
-            var otherAccountRow = household.Accounts.FindByID(otherTransRow.AccountID);
+            var otherTransRow = otherLineItemRow.TransactionsRow;
+            var otherAccountRow = otherTransRow.AccountsRow;
 
             var lineItem = new LineItem(
                 mainWindowLogic,

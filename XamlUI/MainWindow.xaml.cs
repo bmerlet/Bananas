@@ -91,6 +91,10 @@ namespace XamlUI
             {
                 return ShowOpenFileDialog(openFileLogic);
             }
+            if (logic is SaveFileLogic saveFileLogic)
+            {
+                return ShowSaveFileDialog(saveFileLogic);
+            }
             if (logic is ErrorLogic errorLogic)
             {
                 MessageBox.Show(errorLogic.Error, errorLogic.Title);
@@ -193,8 +197,31 @@ namespace XamlUI
                 InitialDirectory = dir,
                 FileName = logic.File,
                 Title = logic.Title,
-                CheckFileExists = logic.CheckFileExists,
                 Multiselect = false
+            };
+
+            bool result = ofd.ShowDialog() == true;
+            logic.File = result ? ofd.FileName : null;
+
+            return result;
+        }
+
+        // Show save file dialog
+        private bool ShowSaveFileDialog(SaveFileLogic logic)
+        {
+            string dir = logic.InitialDirectory;
+            if (!System.IO.Directory.Exists(dir))
+            {
+                dir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            }
+
+            var ofd = new SaveFileDialog()
+            {
+                Filter = logic.Filter,
+                FilterIndex = 1,
+                InitialDirectory = dir,
+                FileName = logic.File,
+                Title = logic.Title
             };
 
             bool result = ofd.ShowDialog() == true;

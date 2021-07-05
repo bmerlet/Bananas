@@ -187,7 +187,7 @@ namespace BanaData.Serializations
                 sw.WriteLine($"!Type:{accountType}");
 
                 // Get all transactions on this account
-                foreach (var transactionRow in accountRow.GetTransactions())
+                foreach (var transactionRow in accountRow.GetTransactionsRows())
                 {
                     ExportDate(sw, transactionRow.Date);
 

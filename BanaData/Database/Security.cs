@@ -26,8 +26,7 @@ namespace BanaData.Database
                 decimal price = 0;
                 DateTime mostRecent = DateTime.MinValue;
 
-                var securityToSecurityPrice = Table.ChildRelations["FK_Securities_SecurityPrices"];
-                foreach (SecurityPricesRow securityPriceRow in GetChildRows(securityToSecurityPrice))
+                foreach (SecurityPricesRow securityPriceRow in GetSecurityPricesRows())
                 {
                     if (securityPriceRow.Date.CompareTo(mostRecent) > 0)
                     {
@@ -39,21 +38,8 @@ namespace BanaData.Database
                 return price;
             }
 
-            public IEnumerable<SecurityPricesRow> GetSecurityPrices()
-            {
-                var securityToSecurityPrice = Table.ChildRelations["FK_Securities_SecurityPrices"];
-                return GetChildRows(securityToSecurityPrice).Cast<SecurityPricesRow>();
-            }
-
             // Are there transactions associated with this security
-            public bool HasTransactions
-            {
-                get
-                {
-                    var securityToTransactions = Table.ChildRelations["FK_Securities_InvestmentTransactions"];
-                    return GetChildRows(securityToTransactions).Length > 0;
-                }
-            }
+            public bool HasTransactions => GetInvestmentTransactionsRows().Length > 0;
 
             public bool HasSame(string symbol, ESecurityType type)
             {
@@ -83,7 +69,7 @@ namespace BanaData.Database
 
             public SecuritiesRow GetBySymbol(string symbol)
             {
-                return this.First(sec => !sec.IsSymbolNull() && sec.Symbol == symbol);
+                return this.Single(sec => !sec.IsSymbolNull() && sec.Symbol == symbol);
             }
 
             public SecuritiesRow Add(string name, string symbol, ESecurityType type)

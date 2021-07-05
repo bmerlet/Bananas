@@ -110,7 +110,7 @@ namespace BanaData.Logic.Main
             {
                 if (!lineItemRow.IsAccountIDNull() && lineItemRow.AccountID == accountID)
                 {
-                    var transferTransactionRow = household.Transactions.FindByID(lineItemRow.TransactionID);
+                    var transferTransactionRow = lineItemRow.TransactionsRow;
                     if (transferTransactionRow.AccountID != accountID)
                     {
                         var trans = CreateMirrorTransaction(account, lineItemRow);
@@ -333,8 +333,7 @@ namespace BanaData.Logic.Main
         // Get line item(s) from a transaction
         private List<LineItem> GetLineItems(Household.TransactionsRow transRow)
         {
-            var household = mainWindowLogic.Household;
-            var dbLineItems = household.LineItems.GetByTransaction(transRow);
+            var dbLineItems = transRow.GetLineItemsRows();
 
             var lineItems = new List<LineItem>();
             foreach (var dbli in dbLineItems)
@@ -344,14 +343,12 @@ namespace BanaData.Logic.Main
                 string category = "";
                 if (!dbli.IsAccountIDNull())
                 {
-                    var destAccount = household.Accounts.FindByID(dbli.AccountID);
-                    category = "[" + destAccount.Name + "]";
+                    category = "[" + dbli.AccountsRow.Name + "]";
                     catAccntID = dbli.AccountID;
                 }
                 else if (!dbli.IsCategoryIDNull())
                 {
-                    var destCategory = household.Categories.FindByID(dbli.CategoryID);
-                    category = destCategory.FullName;
+                    category = dbli.CategoriesRow.FullName;
                     catID = dbli.CategoryID;
                 }
                 string memo = dbli.IsMemoNull() ? "" : dbli.Memo;

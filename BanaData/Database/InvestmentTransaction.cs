@@ -111,11 +111,6 @@ namespace BanaData.Database
 
         partial class InvestmentTransactionsDataTable
         {
-            //public InvestmentTransactionsRow GetByTransaction(TransactionsRow transaction)
-            //{
-            //    return this.Single(it => it.TransactionID == transaction.ID);
-            //}
-
             public InvestmentTransactionsRow Add(
                 Household.TransactionsRow transactionRow,
                 EInvestmentTransactionType type,

@@ -812,7 +812,7 @@ namespace BanaData.Serializations
             var transAlmostTheSame = new List<Household.TransactionsRow>();
 
             // Try to find this exact same transaction
-            foreach (var transRow in accountRow.GetTransactions())
+            foreach (var transRow in accountRow.GetTransactionsRows())
             {
                 if (!transRow.HasSame(date, payee, memo, status))
                 {
@@ -820,7 +820,7 @@ namespace BanaData.Serializations
                 }
 
                 // Found same transaction, see if it has the same line items
-                var lineItemRows = household.LineItems.GetByTransaction(transRow);
+                var lineItemRows = transRow.GetLineItemsRows();
                 if (lineItemRows.Length != lineItemHolders.Count)
                 {
                     // Not the same number of line items, but the rest matched...
@@ -873,8 +873,7 @@ namespace BanaData.Serializations
                         li.Amount == -lineItemHolders[0].Amount)
                     {
                         // Verify this transaction took place in the account targetted by our line item
-                        var trans = household.Transactions.FindByID(li.TransactionID);
-                        if (trans.AccountID == lineItemHolders[0].AccountID)
+                        if (li.TransactionsRow.AccountID == lineItemHolders[0].AccountID)
                         {
                             // Found you
                             bankTransactionTracker.FoundIDs.Add(li.ID); // ZZZ ???
@@ -889,7 +888,7 @@ namespace BanaData.Serializations
             if (transAlmostTheSame.Count == 1 && lineItemHolders.Count == 1)
             {
                 var transRow = transAlmostTheSame[0];
-                var lineItemRows = household.LineItems.GetByTransaction(transRow);
+                var lineItemRows = transRow.GetLineItemsRows();
                 if (lineItemRows.Length == 1 &&
                     lineItemRows[0].HasSame(lineItemHolders[0].CategoryID, -1, lineItemHolders[0].Memo, lineItemHolders[0].Amount))
                 {
@@ -1116,7 +1115,7 @@ namespace BanaData.Serializations
             decimal commission)
         {
             // Try to find this exact same transaction
-            foreach (var transRow in accountRow.GetTransactions())
+            foreach (var transRow in accountRow.GetTransactionsRows())
             {
                 if (!transRow.HasSame(date, payee, memo, status))
                 {
@@ -1124,7 +1123,7 @@ namespace BanaData.Serializations
                 }
 
                 // Found same transaction, see if it has the same line items
-                var lineItemRows = household.LineItems.GetByTransaction(transRow);
+                var lineItemRows = transRow.GetLineItemsRows();
                 if (lineItemRows.Length != 1)
                 {
                     // Should never get here
@@ -1165,8 +1164,7 @@ namespace BanaData.Serializations
                         li.Amount == -amount)
                     {
                         // Verify this transaction took place in the account targetted by our line item
-                        var trans = household.Transactions.FindByID(li.TransactionID);
-                        if (trans.AccountID == categoryAccountID)
+                        if (li.TransactionsRow.AccountID == categoryAccountID)
                         {
                             // Found you
                             investmentTransactionTracker.FoundIDs.Add(li.ID); // ZZZ ???
@@ -1472,7 +1470,7 @@ namespace BanaData.Serializations
 
         private void MergeSecurityPrice(Household.SecuritiesRow securityRow, DateTime date, decimal price)
         {
-            var existingSecurityPriceRow = securityRow.GetSecurityPrices().FirstOrDefault(spr => spr.Date == date && spr.Value == price);
+            var existingSecurityPriceRow = securityRow.GetSecurityPricesRows().FirstOrDefault(spr => spr.Date == date && spr.Value == price);
             if (existingSecurityPriceRow == null)
             {
                 // New  security price
@@ -1819,7 +1817,7 @@ namespace BanaData.Serializations
                         continue;
                     }
 
-                    var sourceTransactionRow = household.Transactions.FindByID(sourceLineItemRow.TransactionID);
+                    var sourceTransactionRow = sourceLineItemRow.TransactionsRow;
                     int targetAccountID = sourceLineItemRow.AccountID;
 
                     // Skip transfers to self
@@ -1899,12 +1897,12 @@ namespace BanaData.Serializations
             foreach (var pair in pairs)
             {
                 var lineItemRow1 = household.LineItems.FindByID(pair.Item1);
-                var transactionRow1 = household.Transactions.FindByID(lineItemRow1.TransactionID);
-                var lineItemsRow1 = household.LineItems.GetByTransaction(transactionRow1);
+                var transactionRow1 = lineItemRow1.TransactionsRow;
+                var lineItemsRow1 =  transactionRow1.GetLineItemsRows();
 
                 var lineItemRow2 = household.LineItems.FindByID(pair.Item2);
-                var transactionRow2 = household.Transactions.FindByID(lineItemRow2.TransactionID);
-                var lineItemsRow2 = household.LineItems.GetByTransaction(transactionRow2);
+                var transactionRow2 = lineItemRow2.TransactionsRow;
+                var lineItemsRow2 = transactionRow2.GetLineItemsRows();
 
                 Household.TransactionsRow transactionToDelete = null;
                 Household.LineItemsRow lineItemToDelete = null;
@@ -1926,8 +1924,8 @@ namespace BanaData.Serializations
                 else
                 {
                     // If one of the transactions is an investment transaction involving securities, delete the other
-                    var accountRow1 = household.Accounts.FindByID(transactionRow1.AccountID);
-                    var accountRow2 = household.Accounts.FindByID(transactionRow2.AccountID);
+                    var accountRow1 = transactionRow1.AccountsRow;
+                    var accountRow2 = transactionRow2.AccountsRow;
 
                     if (accountRow1.Type == EAccountType.Investment &&
                         transactionRow1.GetInvestmentTransaction() is Household.InvestmentTransactionsRow investmentTransactionRow1 &&
@@ -1974,12 +1972,11 @@ namespace BanaData.Serializations
                 lineItemToDelete.Delete();
 
                 // Delete transaction
-                var accountOfTransactionToDeleteRow = household.Accounts.FindByID(transactionToDelete.AccountID);
-                if (accountOfTransactionToDeleteRow.Type == EAccountType.Investment)
+                if (transactionToDelete.AccountsRow.Type == EAccountType.Investment)
                 {
                     transactionToDelete.GetInvestmentTransaction().Delete();
                 }
-                else if (accountOfTransactionToDeleteRow.Type == EAccountType.Bank)
+                else if (transactionToDelete.AccountsRow.Type == EAccountType.Bank)
                 {
                     transactionToDelete.GetBankingTransaction().Delete();
                 }

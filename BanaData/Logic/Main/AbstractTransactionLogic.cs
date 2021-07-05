@@ -354,7 +354,7 @@ namespace BanaData.Logic.Main
             var transactionRow = household.Transactions.FindByID(transID);
 
             // Delete all line items
-            var lineItems = household.LineItems.GetByTransaction(transactionRow);
+            var lineItems = transactionRow.GetLineItemsRows();
             foreach (var lineItem in lineItems)
             {
                 lineItem.Delete();
@@ -383,7 +383,7 @@ namespace BanaData.Logic.Main
             if (TransID == TRANSID_TRANSFER_FILLIN)
             {
                 var liRow = household.LineItems.FindByID(data.LineItems[0].ID);
-                var transRow = household.Transactions.FindByID(liRow.TransactionID);
+                var transRow = liRow.TransactionsRow;
                 mainWindowLogic.GotoTransaction(transRow.AccountID, transRow.ID, data.LineItems[0].ID);
             }
             else

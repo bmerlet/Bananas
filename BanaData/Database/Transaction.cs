@@ -26,8 +26,7 @@ namespace BanaData.Database
             {
                 decimal amount = 0;
 
-                var transToLineItem = Table.ChildRelations["FK_Transactions_LineItems"];
-                foreach (LineItemsRow lineItemRow in GetChildRows(transToLineItem))
+                foreach (LineItemsRow lineItemRow in GetLineItemsRows())
                 {
                     amount += lineItemRow.Amount;
                 }
@@ -37,12 +36,12 @@ namespace BanaData.Database
 
             public BankingTransactionsRow GetBankingTransaction()
             {
-                return GetChildRows(this.Table.ChildRelations["FK_Transactions_BankTransactions"]).Single() as BankingTransactionsRow;
+                return GetBankingTransactionsRows().Single();
             }
 
             public InvestmentTransactionsRow GetInvestmentTransaction()
             {
-                return GetChildRows(this.Table.ChildRelations["FK_Transactions_InvestmentTransactions"]).Single() as InvestmentTransactionsRow;
+                return GetInvestmentTransactionsRows().Single();
             }
 
             public bool HasSame(DateTime date, string payee, string memo, ETransactionStatus status)

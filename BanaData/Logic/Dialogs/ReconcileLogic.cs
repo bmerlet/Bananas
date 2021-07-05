@@ -252,7 +252,7 @@ namespace BanaData.Logic.Dialogs
                 foreach (Household.TransactionsRow tr in accountRow.GetUnreconciledTransactions())
                 {
                     // Compute amount
-                    var lineItems = household.LineItems.GetByTransaction(tr);
+                    var lineItems = tr.GetLineItemsRows();
                     decimal amount = lineItems.Sum(li => li.Amount);
 
                     // We want only deposit or payments
@@ -303,7 +303,7 @@ namespace BanaData.Logic.Dialogs
                     var transaction = new TransactionToReconcile(
                         li.ID,
                         li.TransferStatus == ETransactionStatus.Cleared,
-                        household.Transactions.FindByID(li.TransactionID).Date,
+                        li.TransactionsRow.Date,
                         "",
                         "",
                         deposit ? amount : -amount,

@@ -26,7 +26,7 @@ namespace BanaData.Database
 
         public IEnumerable<Lot> Lots => lots;
 
-        public void ApplyTransaction(Household household, Household.TransactionsRow transaction)
+        public void ApplyTransaction(Household.TransactionsRow transaction)
         {
             // Get investment transaction
             var investmentTransaction = transaction.GetInvestmentTransaction();
@@ -35,7 +35,7 @@ namespace BanaData.Database
             Household.SecuritiesRow security = null;
             if (!investmentTransaction.IsSecurityIDNull())
             {
-                security = household.Securities.FindByID(investmentTransaction.SecurityID);
+                security = investmentTransaction.SecuritiesRow;
             }
 
             // Don't! The commission is taken into account in the transaction's amount
@@ -144,7 +144,7 @@ namespace BanaData.Database
             return lots.Select(l => l.Security.ID).Distinct();
         }
 
-        static public ComputeSaleCapitalGainsResult ComputeSaleCapitalGains(Household household, int transactionID)
+        static public ComputeSaleCapitalGainsResult ComputeSaleCapitalGains(Household household, int transactionID, bool reportUsedLots)
         {
             // init  results
             decimal longTermGain = 0;
@@ -155,8 +155,8 @@ namespace BanaData.Database
             // Get transaction info
             var transactionRow = household.Transactions.FindByID(transactionID);
             var investmentTransactionRow = transactionRow.GetInvestmentTransaction();
-            var securityRow = household.Securities.FindByID(investmentTransactionRow.SecurityID);
-            var accountRow = household.Accounts.FindByID(transactionRow.AccountID);
+            var securityRow = investmentTransactionRow.SecuritiesRow;
+            var accountRow = transactionRow.AccountsRow;
 
             decimal quantity = investmentTransactionRow.SecurityQuantity;
             decimal price = investmentTransactionRow.SecurityPrice;
@@ -180,15 +180,21 @@ namespace BanaData.Database
                 decimal quantityUsed = Math.Min(lot.Quantity, quantity);
                 decimal gain = (price - lot.SecurityPrice) * quantityUsed;
 
-                var usedLot = new UsedLot(lot.Date, lot.Quantity, quantityUsed, lot.SecurityPrice, gain);
+                var usedLot = reportUsedLots ? new UsedLot(lot.Date, lot.Quantity, quantityUsed, lot.SecurityPrice, gain) : null;
                 if (transactionRow.Date.Subtract(lot.Date).TotalDays > 365) // ZZZ
                 {
-                    longTermLots.Add(usedLot);
+                    if (reportUsedLots)
+                    {
+                        longTermLots.Add(usedLot);
+                    }
                     longTermGain += gain;
                 }
                 else
                 {
-                    shortTermLots.Add(usedLot);
+                    if (reportUsedLots)
+                    {
+                        shortTermLots.Add(usedLot);
+                    }
                     shortTermGain += gain;
                 }
 

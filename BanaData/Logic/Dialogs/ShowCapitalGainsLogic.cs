@@ -25,7 +25,7 @@ namespace BanaData.Logic.Dialogs
         {
             var household = mainWindowLogic.Household;
 
-            var sale = Portfolio.ComputeSaleCapitalGains(household, transactionID);
+            var sale = Portfolio.ComputeSaleCapitalGains(household, transactionID, true);
 
             Description = sale.Description;
             LongTermLots = sale.LongTermLots;
