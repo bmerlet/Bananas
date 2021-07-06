@@ -241,7 +241,7 @@ namespace XamlUI.UserControls
 
             if (selector != null)
             {
-                selector.PreviewMouseUp += OnSelectorPreviewMouseUp;
+                selector.PreviewMouseDown += OnSelectorPreviewMouseDown;
             }
         }
 
@@ -384,7 +384,11 @@ namespace XamlUI.UserControls
         private void PublishSelection()
         {
             var item = selector.SelectedItem;
-            if (item != null)
+            if (item == null)
+            {
+                Text = editor.Text;
+            }
+            else
             {
                 if (string.IsNullOrEmpty(DisplayMember))
                 {
@@ -449,7 +453,7 @@ namespace XamlUI.UserControls
         //
         // Mouse up on the selector: Publish selection and close up
         //
-        private void OnSelectorPreviewMouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void OnSelectorPreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             // Loop through the item containers
             if (selector.ItemContainerGenerator.Status == System.Windows.Controls.Primitives.GeneratorStatus.ContainersGenerated)
@@ -462,6 +466,7 @@ namespace XamlUI.UserControls
                         container.IsSelected = true;
                         PublishSelection();
                         IsPopupOpen = false;
+                        e.Handled = true;
                         break;
                     }
                 }
