@@ -374,9 +374,14 @@ namespace BanaData.Logic.Main
 
         private string GetDescription()
         {
+            if (TransID == TRANSID_NOT_COMMITTED)
+            {
+                return "";
+            }
+
             string desc = "";
 
-            switch(data.Type)
+            switch (data.Type)
             {
                 case EInvestmentTransactionType.CashIn:
                     desc = $"Added {Amount:C2}";
@@ -536,7 +541,7 @@ namespace BanaData.Logic.Main
                 case EInvestmentTransactionType.ReinvestShortTermCapitalGains:
                     column = ShowAmountBox(true, column);
                     column = ShowSecuritySymbol(true, column);
-                    column = ShowSecurityTextBoxes(true, false, column);
+                    column = ShowSecurityTextBoxes(true, true, column);
                     ShowTransferBox(false, column);
                     break;
 

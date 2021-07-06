@@ -765,7 +765,7 @@ namespace BanaData.Serializations
                         break;
                     
                     case 'L':
-                        (lineItemHolder.AccountID, lineItemHolder.CategoryID) = ParseTransactionTarget(household, accountRow, l.Substring(1));
+                        (lineItemHolder.AccountID, lineItemHolder.CategoryID, _) = ParseTransactionTarget(household, accountRow, l.Substring(1));
                         break;
                     
                     case 'N':
@@ -780,7 +780,7 @@ namespace BanaData.Serializations
                             lineItemHolder = new LineItemHolder();
                         }
                         parsingSplitLineItem = true;
-                        (lineItemHolder.AccountID, lineItemHolder.CategoryID) = ParseTransactionTarget(household, accountRow, l.Substring(1));
+                        (lineItemHolder.AccountID, lineItemHolder.CategoryID, _) = ParseTransactionTarget(household, accountRow, l.Substring(1));
                         break;
 
                     default:
@@ -982,6 +982,7 @@ namespace BanaData.Serializations
             decimal securityPrice = 0;
             decimal securityQuantity = 0;
             decimal commission = 0;
+            bool commissionOnDividend = false;
 
             while (true)
             {
@@ -1051,7 +1052,7 @@ namespace BanaData.Serializations
                         break;
 
                     case 'L':
-                        (categoryAccountID, categoryID) = ParseTransactionTarget(household, accountRow, l.Substring(1));
+                        (categoryAccountID, categoryID, commissionOnDividend) = ParseTransactionTarget(household, accountRow, l.Substring(1));
                         break;
 
                     case 'N':
@@ -1075,6 +1076,17 @@ namespace BanaData.Serializations
             if (extendedType == EExtendedInvestmentTransactionType.None)
             {
                 throw new InvalidDataException("QIF parser: Investment transaction has no type - " + payee);
+            }
+
+            // For the fee on reinvestment, find the corresponding reinvestment transaction and modify its commission
+            if (commissionOnDividend)
+            {
+                var reinvDivTrans = accountRow.GetTransactionsRows()
+                    .Where(t => t.Date == date && t.GetInvestmentTransaction().Type == EInvestmentTransactionType.ReinvestDividends)
+                    .Single();
+                reinvDivTrans.GetInvestmentTransaction().Commission = amount;
+                reinvDivTrans.GetLineItemsRows()[0].Amount += amount;
+                return;
             }
 
             // Get rid of old transfer types and move them to CashIn/CashOut and XIn/XOut
@@ -1290,7 +1302,7 @@ namespace BanaData.Serializations
 
                     // Category
                     case 'L':
-                        (lineItemHolder.AccountID, lineItemHolder.CategoryID) = ParseTransactionTarget(household, account, l.Substring(1));
+                        (lineItemHolder.AccountID, lineItemHolder.CategoryID, _) = ParseTransactionTarget(household, account, l.Substring(1));
                         break;
 
                     // Payment/deposit
@@ -1306,7 +1318,7 @@ namespace BanaData.Serializations
                             lineItemHolder = new LineItemHolder();
                         }
                         parsingSplitLineItem = true;
-                        (lineItemHolder.AccountID, lineItemHolder.CategoryID) = ParseTransactionTarget(household, account, l.Substring(1));
+                        (lineItemHolder.AccountID, lineItemHolder.CategoryID, _) = ParseTransactionTarget(household, account, l.Substring(1));
                         break;
 
                     case 'A':
@@ -1740,10 +1752,11 @@ namespace BanaData.Serializations
             return type;
         }
 
-        private static (int accountID, int categoryID) ParseTransactionTarget(Household household, Household.AccountsRow currentAccount, string target)
+        private static (int accountID, int categoryID, bool commissionOnDividend) ParseTransactionTarget(Household household, Household.AccountsRow currentAccount, string target)
         {
             int accountID = -1;
             int categoryID = -1;
+            bool commissionOnDividend = false;
 
             if (target == "")
             {
@@ -1781,8 +1794,9 @@ namespace BanaData.Serializations
                 {
                     if (target == "_DivInc|[" + currentAccount.Name + "]")
                     {
-                        // Transfer to self
-                        accountID = currentAccount.ID;
+                        // Amount received as dividend but payed as a fee to reinvest
+                        // This is in effect a commission on ReinvDiv
+                        commissionOnDividend = true;
                     }
                 }
                 else
@@ -1790,13 +1804,13 @@ namespace BanaData.Serializations
                     categoryID = categoryRow.ID;
                 }
 
-                if (categoryID < 0 && accountID < 0)
+                if (categoryID < 0 && accountID < 0 && !commissionOnDividend)
                 {
                     throw new InvalidDataException("Unknown category: " + target);
                 }
             }
 
-            return (accountID, categoryID);
+            return (accountID, categoryID, commissionOnDividend);
         }
 
         private static void SkipToNextType(TextReader sr)

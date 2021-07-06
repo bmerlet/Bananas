@@ -217,7 +217,7 @@
                     <!-- Transfer destination column-->
                     <GridViewColumn Width="{Binding Widths.WidthOfCategoryColumn, Mode=TwoWay}">
                         <GridViewColumn.Header>
-                            <GridViewColumnHeader Content="Transfer" Tag="Category" Click="OnColumnHeaderClicked"/>
+                            <GridViewColumnHeader Content="Transfer or category" Tag="Category" Click="OnColumnHeaderClicked"/>
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
@@ -287,6 +287,7 @@
             <!-- Status -->
             <ComboBox
                 Grid.Column="0"
+                ToolTip="Transaction status"
                 Width="{Binding Widths.WidthOfStatusColumn}"
                 ItemsSource="{Binding EditedTransaction.StatusSource}"
                 SelectedItem="{Binding EditedTransaction.Status, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
@@ -294,6 +295,7 @@
             <!-- Date-->
             <local:DateBox 
                 Grid.Column="1"
+                ToolTip="Transaction date"
                 KeyboardNavigation.TabIndex="0"
                 Width="{Binding Widths.WidthOfDateColumn}"
                 Date="{Binding EditedTransaction.Date, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -302,6 +304,7 @@
             <!-- Type -->
             <local:AutoCompleteTextBox 
                 KeyboardNavigation.TabIndex="1"
+                ToolTip="Transaction type"
                 Grid.Column="2"
                 Width="{Binding Widths.WidthOfTypeColumn}"
                 Style="{StaticResource InvestmentTransactionTypeStyle}"
@@ -312,12 +315,14 @@
             <local:WatermarkTextBox 
                 KeyboardNavigation.TabIndex="2"
                 Grid.Column="3"
+                ToolTip="Transaction memo"
                 Width="{Binding Widths.WidthOfMemoColumn}"
                 Text="{Binding EditedTransaction.Memo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 Watermark="Memo"/>
 
             <!-- Security symbol -->
             <local:AutoCompleteTextBox
+                ToolTip="Security symbol"
                 Grid.Column="{Binding EditedTransaction.SecuritySymbolColumnNumber}"
                 KeyboardNavigation.TabIndex="{Binding EditedTransaction.SecuritySymbolTabIndex}"
                 Width="{Binding Widths.WidthOfSecuritySymbolColumn}"
@@ -328,6 +333,7 @@
 
             <!-- Security quantity -->
             <local:AmountBox
+                ToolTip="Security quantity"
                 Grid.Column="{Binding EditedTransaction.SecurityQuantityColumnNumber}"
                 KeyboardNavigation.TabIndex="{Binding EditedTransaction.SecurityQuantityTabIndex}"
                 Width="{Binding Widths.WidthOfSecurityQuantityColumn}"
@@ -338,6 +344,7 @@
 
             <!-- Security price -->
             <local:AmountBox
+                ToolTip="Security price per share"
                 Grid.Column="{Binding EditedTransaction.SecurityPriceColumnNumber}"
                 KeyboardNavigation.TabIndex="{Binding EditedTransaction.SecurityPriceTabIndex}"
                 Width="{Binding Widths.WidthOfSecurityPriceColumn}"
@@ -348,6 +355,7 @@
 
             <!-- Commission -->
             <local:AmountBox
+                ToolTip="Transaction commission"
                 Grid.Column="{Binding EditedTransaction.CommissionColumnNumber}"
                 KeyboardNavigation.TabIndex="{Binding EditedTransaction.CommissionTabIndex}"
                 Width="{Binding Widths.WidthOfCommissionColumn}"
@@ -357,6 +365,7 @@
 
             <!-- Dollar amount -->
             <local:AmountBox
+                ToolTip="Dollar amount"
                 Grid.Column="{Binding EditedTransaction.AmountColumnNumber}"
                 KeyboardNavigation.TabIndex="{Binding EditedTransaction.AmountTabIndex}"
                 Width="{Binding Widths.WidthOfAmountColumn}"
@@ -366,6 +375,7 @@
 
             <!-- Category (tx dest) -->
             <local:AutoCompleteTextBox 
+                ToolTip="Transaction category or transfer"
                 Grid.Column="{Binding EditedTransaction.CategoryColumnNumber}"
                 KeyboardNavigation.TabIndex="{Binding EditedTransaction.CategoryTabIndex}"
                 Width="{Binding Widths.WidthOfCategoryColumn}"

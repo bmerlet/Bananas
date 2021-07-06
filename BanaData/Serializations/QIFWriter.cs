@@ -342,7 +342,16 @@ namespace BanaData.Serializations
 
             var investmentTransactionRow = transactionRow.GetInvestmentTransaction();
 
-            switch(investmentTransactionRow.Type)
+            if (investmentTransactionRow.Type == EInvestmentTransactionType.ReinvestDividends &&
+                investmentTransactionRow.Commission != 0)
+            {
+                // Sepcial case of ReinvDiv with fees - not handled gracefully by quicken.
+                // See below at commission processing
+                amount -= investmentTransactionRow.Commission;
+            }
+
+
+            switch (investmentTransactionRow.Type)
             {
                 case EInvestmentTransactionType.CashIn:
                     sw.WriteLine("NCash");
@@ -447,11 +456,6 @@ namespace BanaData.Serializations
 
             ExportTransactionStatus(sw, transactionRow.Status, true);
 
-            if (!transactionRow.IsMemoNull())
-            {
-                sw.WriteLine($"M{transactionRow.Memo}");
-            }
-
             if (amount != 0)
             {
                 sw.WriteLine($"U{amount:N2}");
@@ -472,7 +476,24 @@ namespace BanaData.Serializations
 
             if (investmentTransactionRow.Commission != 0)
             {
-                sw.WriteLine($"O{investmentTransactionRow.Commission:N2}");
+                if (investmentTransactionRow.Type == EInvestmentTransactionType.ReinvestDividends)
+                {
+                    // Special handling for fees on ReinvDiv (not supported gracefully by quicken)
+                    // Create a separate transaction for the fee
+                    sw.WriteLine("^");
+                    ExportDate(sw, transactionRow.Date);
+                    sw.WriteLine("NMiscIncX");
+                    sw.WriteLine($"Y{investmentTransactionRow.SecuritiesRow.Name}");
+                    ExportTransactionStatus(sw, transactionRow.Status, true);
+                    sw.WriteLine($"U{investmentTransactionRow.Commission:N2}");
+                    sw.WriteLine($"T{investmentTransactionRow.Commission:N2}");
+                    sw.WriteLine($"M{investmentTransactionRow.Commission:N2} as a fee");
+                    sw.WriteLine($"L_DivInc|[{transactionRow.AccountsRow.Name}]");
+                }
+                else
+                {
+                    sw.WriteLine($"O{investmentTransactionRow.Commission:N2}");
+                }
             }
         }
 
