@@ -157,6 +157,10 @@ namespace XamlUI
             {
                 dialog = new Reconcile(reconcileLogic);
             }
+            else if (logic is ShowHoldingsLogic showHoldingsLogic)
+            {
+                dialog = new ShowHoldings(showHoldingsLogic);
+            }
             else if (logic is ShowCapitalGainsLogic showCapitalGainsLogic)
             {
                 dialog = new ShowCapitalGains(showCapitalGainsLogic);

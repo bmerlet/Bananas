@@ -10,6 +10,7 @@ using Toolbox.UILogic;
 using BanaData.Database;
 using BanaData.Logic.Items;
 using BanaData.Collections;
+using BanaData.Logic.Dialogs;
 
 namespace BanaData.Logic.Main
 {
@@ -164,7 +165,8 @@ namespace BanaData.Logic.Main
         // Show holdings
         private void OnShowHoldingsCommand()
         {
-            mainWindowLogic.ErrorMessage("Not yet implemented");
+            var logic = new ShowHoldingsLogic(mainWindowLogic, accountID);
+            mainWindowLogic.GuiServices.ShowDialog(logic);
         }
 
         #endregion

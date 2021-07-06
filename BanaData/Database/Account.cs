@@ -152,7 +152,7 @@ namespace BanaData.Database
                 var portfolio = new Portfolio();
                 foreach (TransactionsRow transRow in GetTransactionsRows())
                 {
-                    if (date.HasValue && transRow.Date.CompareTo(date.Value) >= 0)
+                    if (date.HasValue && transRow.Date.CompareTo(date.Value) > 0)
                     {
                         continue;
                     }

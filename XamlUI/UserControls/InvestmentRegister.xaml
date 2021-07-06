@@ -168,7 +168,7 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock 
-                                    Text="{Binding Path=CommissionString, Converter={StaticResource amountToStringConverter}}"
+                                    Text="{Binding Path=Commission, Converter={StaticResource amountToStringConverter}}"
                                     Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"
                                     HorizontalAlignment="Right"/>
                             </DataTemplate>

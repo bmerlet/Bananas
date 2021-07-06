@@ -21,13 +21,18 @@ namespace BanaData.Database
                 set { IType = (int)value; }
             }
 
-            public decimal GetMostRecentPrice()
+            public decimal GetMostRecentPrice(DateTime? limit = null)
             {
                 decimal price = 0;
                 DateTime mostRecent = DateTime.MinValue;
 
                 foreach (SecurityPricesRow securityPriceRow in GetSecurityPricesRows())
                 {
+                    if (limit.HasValue && securityPriceRow.Date.CompareTo(limit.Value) > 0)
+                    {
+                        continue;
+                    }
+
                     if (securityPriceRow.Date.CompareTo(mostRecent) > 0)
                     {
                         mostRecent = securityPriceRow.Date;
