@@ -19,7 +19,7 @@
 
                 <!-- First level -->
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{Binding Symbol}" Width="100"/>
+                    <TextBlock Text="{Binding Symbol}" ToolTip="{Binding Security}" Width="100"/>
                     <TextBlock TextAlignment="Right" Text="{Binding Quantity, StringFormat=N4}" Width="80"/>
                     <TextBlock TextAlignment="Right" Text="{Binding Price, StringFormat=C2}" Width="80"/>
                     <TextBlock TextAlignment="Right" Text="{Binding Value, StringFormat=C2}" Width="100"/>

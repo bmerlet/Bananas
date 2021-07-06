@@ -84,7 +84,7 @@ namespace BanaData.Logic.Dialogs
                     TotalValue += price * lots.Sum(l => l.Quantity);
 
                     // Build list of lots
-                    securityItems.Add(new SecurityItem(symbol, lots, price));
+                    securityItems.Add(new SecurityItem(securityRow.Name, symbol, lots, price));
                 }
 
                 OnPropertyChanged(() => TotalValue);
@@ -98,8 +98,9 @@ namespace BanaData.Logic.Dialogs
         // One security
         public class SecurityItem
         {
-            public SecurityItem(string symbol, List<Lot> lots, decimal price)
+            public SecurityItem(string security, string symbol, List<Lot> lots, decimal price)
             {
+                Security = security;
                 Symbol = symbol;
                 Quantity = lots.Sum(l => l.Quantity);
                 Price = price;
@@ -113,6 +114,7 @@ namespace BanaData.Logic.Dialogs
                 LotItemSource.SortDescriptions.Add(new SortDescription("Date", ListSortDirection.Ascending));
             }
 
+            public string Security { get; }
             public string Symbol { get; }
             public decimal Quantity { get; }
             public decimal Price { get; }
