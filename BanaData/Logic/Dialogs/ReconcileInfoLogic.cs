@@ -57,8 +57,7 @@ namespace BanaData.Logic.Dialogs
             InterestCategory = "Interest Inc";
 
             // Find if there is a reconcile info available for this account
-            var accountsToReconcileInfo = household.ReconcileInfo.ParentRelations["FK_Accounts_ReconcileInfo"];
-            var reconcileInfos = accountRow.GetChildRows(accountsToReconcileInfo).Cast<Household.ReconcileInfoRow>().ToArray();
+            var reconcileInfos = accountRow.GetReconcileInfoRows();
             if (reconcileInfos.Length > 1)
             {
                 throw new ArgumentOutOfRangeException($"Multiple ReconcileInfo rows for account {accountRow.Name}");

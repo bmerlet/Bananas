@@ -84,7 +84,7 @@ namespace BanaData.Database
                     var transRow = lineItemRow.TransactionsRow;
                     if (transRow.AccountID != ID)
                     {
-                        if (!filter || lineItemRow.TransactionsRow.Status == statusToFilterOn)
+                        if (!filter || lineItemRow.TransferStatus == statusToFilterOn)
                         {
                             balance -= lineItemRow.Amount;
                         }
