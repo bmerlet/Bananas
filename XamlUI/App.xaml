@@ -16,6 +16,7 @@
         <t:AmountToStringConverter x:Key="amountToStringConverter"/>
         <t:AmountToStringNoNegativeConverter x:Key="amountToStringNoNegativeConverter"/>
         <t:AmountToColorConverter x:Key="amountToColorConverter"/>
+        <t:ReconcileAmountMultiConverter x:Key="reconcileAmountMultiConverter"/>
 
 
         <!-- Default for amount box -->

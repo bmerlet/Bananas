@@ -11,6 +11,7 @@ using Toolbox.UILogic;
 using Toolbox.UILogic.Dialogs;
 using BanaData.Logic.Main;
 using BanaData.Database;
+using BanaData.Logic.Items;
 
 namespace BanaData.Logic.Dialogs
 {
@@ -38,8 +39,7 @@ namespace BanaData.Logic.Dialogs
             PriorStatementBalance = accountRow.GetReconciledBalance();
 
             // Get reconcile info
-            var accountsToReconcileInfo = household.ReconcileInfo.ParentRelations["FK_Accounts_ReconcileInfo"];
-            var reconcileInfo = accountRow.GetChildRows(accountsToReconcileInfo).Cast<Household.ReconcileInfoRow>().First();
+            var reconcileInfo = accountRow.GetReconcileInfoRows().Single();
             StatementBalance = reconcileInfo.StatementBalance;
             interestAmount = reconcileInfo.IsInterestAmountNull() ? 0 : reconcileInfo.InterestAmount;
 
@@ -282,6 +282,7 @@ namespace BanaData.Logic.Dialogs
                         tr.Date,
                         medium,
                         tr.IsPayeeNull() ? "" : tr.Payee,
+                        "Payee",
                         deposit ? amount : -amount,
                         false);
 
@@ -306,6 +307,7 @@ namespace BanaData.Logic.Dialogs
                         li.TransactionsRow.Date,
                         "",
                         "",
+                        "Payee",
                         deposit ? amount : -amount,
                         true);
 
@@ -369,48 +371,5 @@ namespace BanaData.Logic.Dialogs
 
         #endregion
 
-        #region Transaction class 
-
-        //
-        // One transaction to reconcile
-        //
-        public class TransactionToReconcile : LogicBase
-        {
-            // Constructor
-            public TransactionToReconcile(int id, bool _isCleared, DateTime date, string medium, string payee, decimal amount, bool isTransferFillIn) =>
-                (ID, isCleared, Date, Medium, Payee, Amount, IsTransferFillIn) =
-                (id, _isCleared, date, medium, payee, amount, isTransferFillIn);
-
-            // Identifier - transaction ID
-            public readonly int ID;
-            public bool IsTransferFillIn;
-
-            // Event
-            public event EventHandler TransactionCleared;
-
-            // Only modifiable UI property: If the item is checked
-            private bool isCleared;
-            public bool? IsCleared
-            {
-                get => isCleared;
-                set
-                {
-                    if (isCleared != value)
-                    {
-                        isCleared = value == true;
-                        OnPropertyChanged(() => IsCleared);
-                        TransactionCleared?.Invoke(this, EventArgs.Empty);
-                    }
-                }
-            }
-
-            // Read-only UI properties
-            public DateTime Date { get; }
-            public string Medium { get; }
-            public string Payee { get; }
-            public decimal Amount { get; }
-        }
-
-        #endregion
     }
 }

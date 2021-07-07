@@ -215,16 +215,20 @@ namespace BanaData.Logic.Main
             if (mainWindow.GuiServices.ShowDialog(infoLogic))
             {
                 // Show reconcile dialog
-                var reconcileLogic = new ReconcileLogic(mainWindow, accountID);
+                LogicBase reconcileLogic =
+                    mainWindow.Household.Accounts.FindByID(accountID).Type == EAccountType.Investment ?
+                    new ReconcileInvestmentsLogic(mainWindow, accountID) as LogicBase:
+                    new ReconcileLogic(mainWindow, accountID) as LogicBase;
+
                 if (mainWindow.GuiServices.ShowDialog(reconcileLogic))
                 {
                     // Update the cleared status in the register
                     mainWindow.BankRegister.UpdateAllTransactionStatus();
 
                     // Update the register if an interest transaction was created
-                    if (reconcileLogic.InterestTransactionID >= 0)
+                    if (reconcileLogic is ReconcileLogic bankReconcileLogic && bankReconcileLogic.InterestTransactionID >= 0)
                     {
-                        mainWindow.BankRegister.AddTransaction(reconcileLogic.InterestTransactionID);
+                        mainWindow.BankRegister.AddTransaction(bankReconcileLogic.InterestTransactionID);
                     }
                 }
             }

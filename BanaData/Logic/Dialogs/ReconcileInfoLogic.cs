@@ -159,7 +159,7 @@ namespace BanaData.Logic.Dialogs
         // Securities info (for investment accounts)
         //
         public bool IsSecurityInfoVisible { get; }
-        private ObservableCollection<SecurityInfoItem> securityInfos { get; } = new ObservableCollection<SecurityInfoItem>();
+        private readonly ObservableCollection<SecurityInfoItem> securityInfos = new ObservableCollection<SecurityInfoItem>();
         public CollectionView SecurityInfoSource { get; }
 
         #endregion

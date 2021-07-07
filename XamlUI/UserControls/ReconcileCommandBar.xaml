@@ -1,0 +1,28 @@
+﻿<UserControl x:Class="XamlUI.UserControls.ReconcileCommandBar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:XamlUI.UserControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="100" d:DesignWidth="500">
+    
+    <!-- Panel containing OK/Cancel and a few reconcile-specific buttons -->
+    <WrapPanel
+            HorizontalAlignment="Right" VerticalAlignment="Bottom"
+            Orientation="Horizontal" Margin="0,8" >
+        <WrapPanel.Resources>
+            <Style TargetType="Button">
+                <Setter Property="HorizontalAlignment" Value="Left"/>
+                <Setter Property ="VerticalAlignment" Value="Center"/>
+                <Setter Property="Width" Value="75" />
+                <Setter Property="Margin" Value="0,0,10,0" />
+            </Style>
+        </WrapPanel.Resources>
+        <Button Content="Mark all" Command="{Binding MarkAll}"/>
+        <Button Content="Unmark all" Command="{Binding UnmarkAll}" Margin="0,0,50,0"/>
+        <Button Content="Done" Command="{Binding CommitCommand}"/>
+        <Button Content="Finish Later" Command="{Binding FinishLaterCommand}" IsDefault="True"/>
+        <Button Content="Cancel" IsCancel="True"/>
+    </WrapPanel>
+</UserControl>

@@ -94,6 +94,9 @@
     <Compile Include="Dialogs\ReconcileInfo.xaml.cs">
       <DependentUpon>ReconcileInfo.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\ReconcileInvestments.xaml.cs">
+      <DependentUpon>ReconcileInvestments.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\ShowCapitalGains.xaml.cs">
       <DependentUpon>ShowCapitalGains.xaml</DependentUpon>
     </Compile>
@@ -110,6 +113,7 @@
     <Compile Include="Tools\FocusAttachedProperty.cs" />
     <Compile Include="Tools\FontWeightConverter.cs" />
     <Compile Include="Tools\GridLengthConverter.cs" />
+    <Compile Include="Tools\ReconcileAmountMultiConverter.cs" />
     <Compile Include="Tools\SortAdorner.cs" />
     <Compile Include="Tools\TransactionStateToBrushConverter.cs" />
     <Compile Include="Tools\VisibilityBoolConverter.cs" />
@@ -134,6 +138,9 @@
     <Compile Include="UserControls\ListviewWithOverlay.cs" />
     <Compile Include="UserControls\OKCancel.xaml.cs">
       <DependentUpon>OKCancel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\ReconcileCommandBar.xaml.cs">
+      <DependentUpon>ReconcileCommandBar.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\ReconcileGrid.xaml.cs">
       <DependentUpon>ReconcileGrid.xaml</DependentUpon>
@@ -190,6 +197,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Dialogs\ReconcileInvestments.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\ShowCapitalGains.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -239,6 +250,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserControls\OKCancel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\ReconcileCommandBar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -70,6 +70,7 @@
     <Compile Include="Database\SecurityPrice.cs" />
     <Compile Include="Database\Transaction.cs" />
     <Compile Include="Logic\Dialogs\AccountPickerLogic.cs" />
+    <Compile Include="Logic\Dialogs\ReconcileInvestmentsLogic.cs" />
     <Compile Include="Logic\Dialogs\ShowHoldingsLogic.cs" />
     <Compile Include="Logic\Dialogs\EditAccountLogic.cs" />
     <Compile Include="Logic\Dialogs\EditAccountsLogic.cs" />
@@ -92,6 +93,7 @@
     <Compile Include="Logic\Items\LineItem.cs" />
     <Compile Include="Logic\Items\MemorizedPayeeItem.cs" />
     <Compile Include="Logic\Items\SecurityItem.cs" />
+    <Compile Include="Logic\Items\TransactionToReconcile.cs" />
     <Compile Include="Logic\Main\AbstractRegisterLogic.cs" />
     <Compile Include="Logic\Main\AbstractTransactionLogic.cs" />
     <Compile Include="Logic\Main\AccountGroupLogic.cs" />

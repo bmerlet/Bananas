@@ -63,9 +63,9 @@
                     </GridViewColumn>
 
                     <!-- Payee column -->
-                    <GridViewColumn DisplayMemberBinding="{Binding Payee}" Width="150">
+                    <GridViewColumn DisplayMemberBinding="{Binding Description}" Width="150">
                         <GridViewColumn.Header>
-                            <GridViewColumnHeader Content="Payee"/>
+                            <GridViewColumnHeader Content="{Binding DescriptionColumnName}"/>
                         </GridViewColumn.Header>
                     </GridViewColumn>
 

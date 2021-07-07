@@ -1,0 +1,100 @@
+﻿<Window x:Class="XamlUI.Dialogs.ReconcileInvestments"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:XamlUI.Dialogs"
+        xmlns:w="clr-namespace:XamlUI.UserControls"
+        mc:Ignorable="d"
+        Title="Reconcile"
+        Icon="/XamlUI;component/Images/Bananas.ico"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        SizeToContent="WidthAndHeight">
+    <DockPanel>
+
+        <!-- OK/Cancel panel -->
+        <w:ReconcileCommandBar DockPanel.Dock="Bottom"/>
+        
+        <!-- The listview tracking the cleared amounts and shares -->
+        <ListView 
+            DockPanel.Dock="Bottom"
+            ItemsSource="{Binding TrackersSource}">
+
+            <!-- Make the list view items use all the horizontal space -->
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListView.ItemContainerStyle>
+
+            <ListView.View>
+                <GridView>
+                    <GridView.Columns>
+                        <GridViewColumn Header="Security" Width="200" DisplayMemberBinding="{Binding Symbol}"/>
+                        <GridViewColumn Header="Prior statement" Width="100">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock TextAlignment="Right">
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource reconcileAmountMultiConverter}">
+                                                <Binding Path="PriorStatementBalance"/>
+                                                <Binding Path="FormatString"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Cleared" Width="100">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock TextAlignment="Right">
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource reconcileAmountMultiConverter}">
+                                                <Binding Path="ClearedBalance"/>
+                                                <Binding Path="FormatString"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Statement amount" Width="100">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock TextAlignment="Right">
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource reconcileAmountMultiConverter}">
+                                                <Binding Path="StatementBalance"/>
+                                                <Binding Path="FormatString"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Difference" Width="100">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock TextAlignment="Right">
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource reconcileAmountMultiConverter}">
+                                                <Binding Path="BalanceToClear"/>
+                                                <Binding Path="FormatString"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView.Columns>                    
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <!-- The list of transactions to reconcile -->
+        <w:ReconcileGrid DataContext="{Binding Transactions}" Height="300"/>
+
+    </DockPanel>
+</Window>

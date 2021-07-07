@@ -96,7 +96,7 @@
                                 <ColumnDefinition Width="100"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="{Binding Symbol}" Margin="5"/>
-                            <w:AmountBox Amount="{Binding Quantity, Mode=TwoWay, StringFormat=N4}" Grid.Column="1"/>
+                            <w:AmountBox Amount="{Binding Quantity, Mode=TwoWay}" Precision="4" Grid.Column="1"/>
                         </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

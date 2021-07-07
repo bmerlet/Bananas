@@ -10,25 +10,18 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-using BanaData.Logic.Dialogs;
-
-namespace XamlUI.Dialogs
+namespace XamlUI.UserControls
 {
     /// <summary>
-    /// Interaction logic for Reconcile.xaml
+    /// Interaction logic for ReconcileCommandBar.xaml
     /// </summary>
-    public partial class Reconcile : Window
+    public partial class ReconcileCommandBar : UserControl
     {
-        public Reconcile(ReconcileLogic logic)
+        public ReconcileCommandBar()
         {
-            // Use the view model as data context
-            this.DataContext = logic;
-
-            // Tell the view model how to close this dialog
-            logic.CloseView = result => DialogResult = result;
-            
             InitializeComponent();
         }
     }

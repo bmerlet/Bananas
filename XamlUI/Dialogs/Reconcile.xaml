@@ -18,24 +18,7 @@
         </DockPanel.Resources>
         
         <!-- OK/Cancel panel -->
-        <WrapPanel
-            DockPanel.Dock="Bottom" 
-            HorizontalAlignment="Right" VerticalAlignment="Bottom"
-            Orientation="Horizontal" Margin="0,8" >
-            <WrapPanel.Resources>
-                <Style TargetType="Button">
-                    <Setter Property="HorizontalAlignment" Value="Left"/>
-                    <Setter Property ="VerticalAlignment" Value="Center"/>
-                    <Setter Property="Width" Value="75" />
-                    <Setter Property="Margin" Value="0,0,10,0" />
-                </Style>
-            </WrapPanel.Resources>
-            <Button Content="Mark all" Command="{Binding MarkAll}"/>
-            <Button Content="Unmark all" Command="{Binding UnmarkAll}" Margin="0,0,50,0"/>
-            <Button Content="Done" Command="{Binding CommitCommand}"/>
-            <Button Content="Finish Later" Command="{Binding FinishLaterCommand}" IsDefault="True"/>
-            <Button Content="Cancel" IsCancel="True"/>
-        </WrapPanel>
+        <w:ReconcileCommandBar DockPanel.Dock="Bottom"/>
         
         <!-- Main panel: left column for payments, right column for deposits and controls -->
         <Grid Height="600">
@@ -54,7 +37,7 @@
             <w:ReconcileGrid DataContext="{Binding Deposits}" Grid.Column="1" VerticalAlignment="Stretch"/>
 
             <!-- Balances -->
-            <Border BorderThickness="1" BorderBrush="Gray" Margin="5,5,5,27" Grid.Column="1" Grid.Row="1">
+            <Border BorderThickness="1" BorderBrush="LightGray" Margin="5,5,5,27" Grid.Column="1" Grid.Row="1">
                 <Grid >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
