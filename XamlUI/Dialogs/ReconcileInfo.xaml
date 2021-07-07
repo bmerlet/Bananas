@@ -23,6 +23,7 @@
     <DockPanel>
         <!-- OK/Cancel panel -->
         <w:OKCancel DockPanel.Dock="Bottom"/>
+        
         <!-- Interest panel -->
         <Grid
             DockPanel.Dock="Bottom"
@@ -58,6 +59,50 @@
                         KeyboardNavigation.TabIndex="4"/>
 
         </Grid>
+
+        <!-- Securities panel -->
+        <Grid
+            DockPanel.Dock="Bottom"
+            Visibility="{Binding IsSecurityInfoVisible, Converter={StaticResource visibilityBoolConverter}, FallbackValue=Visible}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="5" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Row 0: Empty spacer -->
+
+            <!-- Row 1: Explanation -->
+            <TextBlock Grid.Row="1" Text="Number of shares in statement:"/>
+
+            <!-- Row 2: Listbox -->
+            <ItemsControl
+                Grid.Row="2"
+                Margin="0"
+                ItemsSource="{Binding SecurityInfoSource}">
+                <ItemsControl.ItemContainerStyle>
+                    <Style TargetType="ContentPresenter">
+                        <Setter Property="Margin" Value="0"/>
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="100"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding Symbol}" Margin="5"/>
+                            <w:AmountBox Amount="{Binding Quantity, Mode=TwoWay, StringFormat=N4}" Grid.Column="1"/>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+
         <!-- Main panel -->
         <Grid>
             <Grid.RowDefinitions>

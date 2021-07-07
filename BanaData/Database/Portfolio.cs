@@ -144,6 +144,11 @@ namespace BanaData.Database
             return lots.Select(l => l.Security.ID).Distinct();
         }
 
+        public IEnumerable<Household.SecuritiesRow> GetSecuritiesRows()
+        {
+            return lots.Select(l => l.Security).Distinct();
+        }
+
         static public ComputeSaleCapitalGainsResult ComputeSaleCapitalGains(Household household, int transactionID, bool reportUsedLots)
         {
             // init  results

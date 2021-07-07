@@ -5,22 +5,6 @@ namespace BanaData.Database
 {
     public partial class Household
     {
-        partial class AccountsDataTable
-        {
-        }
-
-        partial class TransactionsDataTable
-        {
-        }
-
-        partial class SecuritiesDataTable
-        {
-        }
-
-        partial class SecurityPricesDataTable
-        {
-        }
-
         partial class CheckpointsDataTable
         {
             public int GetMostRecentCheckpointID()
