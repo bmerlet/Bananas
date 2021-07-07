@@ -54,7 +54,7 @@
             <w:ReconcileGrid DataContext="{Binding Deposits}" Grid.Column="1" VerticalAlignment="Stretch"/>
 
             <!-- Balances -->
-            <Border BorderThickness="1" BorderBrush="Gray" Margin="5" Grid.Column="1" Grid.Row="1">
+            <Border BorderThickness="1" BorderBrush="Gray" Margin="5,5,5,27" Grid.Column="1" Grid.Row="1">
                 <Grid >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
