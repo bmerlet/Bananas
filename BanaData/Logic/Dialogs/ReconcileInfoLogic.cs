@@ -168,6 +168,11 @@ namespace BanaData.Logic.Dialogs
 
         public void GuessSecurities(DateTime start, DateTime end)
         {
+            if (accountRow.Type != EAccountType.Investment)
+            {
+                return;
+            }
+
             securityInfos.Clear();
 
             // Get the protfolio at the statement date

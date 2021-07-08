@@ -13,9 +13,9 @@ namespace BanaData.Logic.Items
     public class TransactionToReconcile : LogicBase
     {
         // Constructor
-        public TransactionToReconcile(int id, bool _isCleared, DateTime date, string medium, string description, string descriptionColumnName, decimal amount, bool isTransferFillIn) =>
-            (ID, isCleared, Date, Medium, Description, DescriptionColumnName, Amount, IsTransferFillIn) =
-            (id, _isCleared, date, medium, description, descriptionColumnName, amount, isTransferFillIn);
+        public TransactionToReconcile(int id, bool _isCleared, DateTime date, string medium, string description, string symbol, decimal amount, bool isTransferFillIn) =>
+            (ID, isCleared, Date, Medium, Description, Symbol, Amount, IsTransferFillIn) =
+            (id, _isCleared, date, medium, description, symbol, amount, isTransferFillIn);
 
         // Identifier - transaction ID
         public readonly int ID;
@@ -40,11 +40,23 @@ namespace BanaData.Logic.Items
             }
         }
 
+        //
         // Read-only UI properties
+        //
+
+        // Date
         public DateTime Date { get; }
+
+        // Medium (for bank accounts only)
         public string Medium { get; }
+
+        // Description (payee for banks, generated description for investments)
         public string Description { get; }
-        public string DescriptionColumnName { get; }
+
+        // Security quantity (for investments)
+        public string Symbol { get; }
+
+        // dollar amount
         public decimal Amount { get; }
     }
 

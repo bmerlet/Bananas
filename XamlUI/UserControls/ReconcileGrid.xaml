@@ -9,19 +9,23 @@
              d:DesignHeight="450" d:DesignWidth="400">
     <DockPanel>
         
+        <!-- Title at the top -->
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-            <TextBlock Text="{Binding Title}"/>
+            <TextBlock Text="{Binding Title, FallbackValue=Title}"/>
         </StackPanel>
+
+        <!-- # transactions selected and total cash at the bottom -->
         <Grid DockPanel.Dock="Bottom">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Text="{Binding NumberOfCheckedItems}"/>
-            <TextBlock Text="{Binding TotalCleared, StringFormat=N}" HorizontalAlignment="Right" Grid.Column="2"/>
+            <TextBlock Text="{Binding NumberOfCheckedItems, FallbackValue=NumberOfItemsChecked}"/>
+            <TextBlock Text="{Binding TotalCleared, StringFormat=C2, FallbackValue=0}" HorizontalAlignment="Right" Grid.Column="2"/>
         </Grid>
 
+        <!-- transactions -->
         <ListView
             SelectionMode="Single"
             ItemsSource="{Binding Transactions}">
@@ -56,16 +60,23 @@
                     </GridViewColumn>
 
                     <!-- Medium column -->
-                    <GridViewColumn DisplayMemberBinding="{Binding Medium}" Width="{Binding MediumColumnWidth}">
+                    <GridViewColumn DisplayMemberBinding="{Binding Medium}" Width="{Binding MediumColumnWidth, Mode=OneWay, FallbackValue=80}">
                         <GridViewColumn.Header>
-                            <GridViewColumnHeader Content="Type"/>
+                            <GridViewColumnHeader Content="Type" Visibility="{Binding IsMediumVisible, Converter={StaticResource visibilityBoolConverter}}"/>
                         </GridViewColumn.Header>
                     </GridViewColumn>
 
-                    <!-- Payee column -->
-                    <GridViewColumn DisplayMemberBinding="{Binding Description}" Width="150">
+                    <!-- Description column -->
+                    <GridViewColumn DisplayMemberBinding="{Binding Description}" Width="{Binding DescriptionColumnWidth, Mode=OneWay, FallbackValue=150}">
                         <GridViewColumn.Header>
                             <GridViewColumnHeader Content="{Binding DescriptionColumnName}"/>
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
+
+                    <!-- Security symbol column -->
+                    <GridViewColumn DisplayMemberBinding="{Binding Symbol}" Width="{Binding SymbolColumnWidth, Mode=OneWay, FallbackValue=80}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Symbol" Visibility="{Binding IsSymbolVisible, Converter={StaticResource visibilityBoolConverter}}"/>
                         </GridViewColumn.Header>
                     </GridViewColumn>
 

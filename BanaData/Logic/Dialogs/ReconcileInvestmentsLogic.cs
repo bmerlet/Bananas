@@ -31,9 +31,6 @@ namespace BanaData.Logic.Dialogs
 
             Title = "Reconcile: " + accountRow.Name;
 
-            // Get DB
-            var household = mainWindowLogic.Household;
-
             // Get account info
             decimal priorStatementCashBalance = accountRow.GetReconciledBalance();
 
@@ -41,10 +38,10 @@ namespace BanaData.Logic.Dialogs
             var reconcileInfo = accountRow.GetReconcileInfoRows().Single();
             decimal statementCashBalance = reconcileInfo.StatementBalance;
 
-            // Add tracker for cash balance
+            // Create tracker for cash balance
             trackers.Add(new SecurityTracker("Cash", priorStatementCashBalance, 0, statementCashBalance, 0, "C2"));
 
-            // Add tracker for securities
+            // Add trackers for securities
             var priorStatementPortfolio = accountRow.GetPortfolio(accountRow.IsLastStatementDateNull() ? reconcileInfo.StatementDate : accountRow.LastStatementDate);
             foreach(var securityReconcileInfo in reconcileInfo.GetSecurityReconcileInfoRows())
             {
@@ -56,8 +53,8 @@ namespace BanaData.Logic.Dialogs
             TrackersSource.SortDescriptions.Add(new SortDescription("Date", ListSortDirection.Ascending));
 
 
-            // Build properties
-            Transactions = new TransactionsToReconcile(mainWindowLogic, accountRow);
+            // Build transaction list
+            Transactions = new ReconcileGridLogic(accountRow, "Transactions:", BuildTransactionList());
             Transactions.ClearedBalanceChanged += OnClearedBalanceChanged;
 
             MarkAll = new CommandBase(OnMarkAll);
@@ -65,6 +62,60 @@ namespace BanaData.Logic.Dialogs
             FinishLaterCommand = new CommandBase(OnFinishLaterCommand);
 
             UpdateBalances();
+        }
+
+        private IEnumerable<TransactionToReconcile> BuildTransactionList()
+        {
+            // Find all candidates
+            var transactions = new List<TransactionToReconcile>();
+            // Process regular transactions
+            foreach (Household.TransactionsRow tr in accountRow.GetUnreconciledTransactions())
+            {
+                var investmentTransactionRow = tr.GetInvestmentTransaction();
+
+                // Compute dollar amount
+                decimal amount = tr.GetAmount();
+                if (investmentTransactionRow.IsCashOut)
+                {
+                    amount = -amount;
+                }
+                else if (investmentTransactionRow.IsTransferIn || investmentTransactionRow.IsTransferOut)
+                {
+                    // transfers are cash-neutral
+                    amount = 0;
+                }
+
+                var transaction = new TransactionToReconcile(
+                    tr.ID,
+                    tr.Status == ETransactionStatus.Cleared,
+                    tr.Date,
+                    null,
+                    tr.IsPayeeNull() ? "" : tr.Payee, // ZZZZZZZZZZZ
+                    investmentTransactionRow.IsSecurityIDNull() ? null : investmentTransactionRow.SecuritiesRow.Symbol,
+                    amount,
+                    false);
+
+                transactions.Add(transaction);
+            }
+
+            // Process transfer fill-ins
+            foreach (Household.LineItemsRow li in accountRow.GetUnreconciledTransfers())
+            {
+                decimal amount = -li.Amount;
+
+                var transaction = new TransactionToReconcile(
+                    li.ID,
+                    li.TransferStatus == ETransactionStatus.Cleared,
+                    li.TransactionsRow.Date,
+                    null,
+                    "",
+                    null,
+                    amount,
+                    true);
+
+                transactions.Add(transaction);
+            }
+            return transactions;
         }
 
         #endregion
@@ -75,7 +126,7 @@ namespace BanaData.Logic.Dialogs
         public string Title { get; }
 
         // The transactions panel
-        public TransactionsToReconcile Transactions { get; }
+        public ReconcileGridLogic Transactions { get; }
 
         // The securities to reconcile
         private readonly ObservableCollection<SecurityTracker> trackers = new ObservableCollection<SecurityTracker>();
@@ -216,123 +267,6 @@ namespace BanaData.Logic.Dialogs
 
         #endregion
 
-        #region Transaction list class
-
-        public class TransactionsToReconcile : LogicBase
-        {
-            public TransactionsToReconcile(MainWindowLogic mainWindowLogic, Household.AccountsRow accountRow)
-            {
-                // Find all candidates
-                var household = mainWindowLogic.Household;
-
-                // Process regular transactions
-                foreach (Household.TransactionsRow tr in accountRow.GetUnreconciledTransactions())
-                {
-                    var investmentTransactionRow = tr.GetInvestmentTransaction();
-
-                    // Compute dollar amount
-                    decimal amount = tr.GetAmount();
-                    if (investmentTransactionRow.IsCashOut)
-                    {
-                        amount = -amount;
-                    }
-                    else if (investmentTransactionRow.IsTransferIn || investmentTransactionRow.IsTransferOut)
-                    {
-                        // transfers are cash-neutral
-                        amount = 0;
-                    }
-
-                    var transaction = new TransactionToReconcile(
-                        tr.ID,
-                        tr.Status == ETransactionStatus.Cleared,
-                        tr.Date,
-                        null,
-                        tr.IsPayeeNull() ? "" : tr.Payee, // ZZZZZZZZZZZ
-                        "Description",
-                        amount,
-                        false);
-
-                    transaction.TransactionCleared += OnTransactionCleared;
-                    transactions.Add(transaction);
-                }
-
-                // Process transfer fill-ins
-                foreach (Household.LineItemsRow li in accountRow.GetUnreconciledTransfers())
-                {
-                    decimal amount = -li.Amount;
-
-                    var transaction = new TransactionToReconcile(
-                        li.ID,
-                        li.TransferStatus == ETransactionStatus.Cleared,
-                        li.TransactionsRow.Date,
-                        "",
-                        "",
-                        "Description",
-                        amount,
-                        true);
-
-                    transaction.TransactionCleared += OnTransactionCleared;
-                    transactions.Add(transaction);
-                }
-
-                // Give the transactions to the UI
-                Transactions = (CollectionView)CollectionViewSource.GetDefaultView(transactions);
-                Transactions.SortDescriptions.Add(new SortDescription("Date", ListSortDirection.Ascending));
-
-                // Compute initial total
-                UpdateClearedTotal();
-            }
-
-            //
-            // Events
-            //
-            public event EventHandler ClearedBalanceChanged;
-
-            //
-            // UI Properties
-            //
-
-            // Title
-            public string Title { get; } = "Transactions";
-
-            // Transactions
-            private readonly ObservableCollection<TransactionToReconcile> transactions = new ObservableCollection<TransactionToReconcile>();
-            public CollectionView Transactions { get; }
-
-            // Total cleared
-            public decimal TotalCleared { get; private set; }
-            public string NumberOfCheckedItems { get; private set; }
-
-            // If this is a bank
-            public bool IsBank => false;
-            public double MediumColumnWidth => 0;
-
-            public string DescriptionColumnName => "Description";
-
-            //
-            // Actions
-            //
-
-            // Activated when the cleared status change for a transaction
-            private void OnTransactionCleared(object sender, EventArgs e)
-            {
-                UpdateClearedTotal();
-            }
-
-            private void UpdateClearedTotal()
-            {
-                TotalCleared = transactions.Sum(tr => tr.IsCleared == true ? tr.Amount : 0);
-                OnPropertyChanged(() => TotalCleared);
-
-                NumberOfCheckedItems = "Cleared transactions: " + transactions.Count(tr => tr.IsCleared == true);
-                OnPropertyChanged(() => NumberOfCheckedItems);
-
-                ClearedBalanceChanged?.Invoke(this, EventArgs.Empty);
-            }
-        }
-
-        #endregion
-
         #region Tracker class 
         
         // Tracker for one security or cash
@@ -372,6 +306,5 @@ namespace BanaData.Logic.Dialogs
         }
 
         #endregion
-
     }
 }

@@ -20,22 +20,18 @@ namespace BanaData.Logic.Dialogs
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
-        private readonly int accountID;
+        private readonly Household.AccountsRow accountRow;
         private readonly decimal interestAmount;
 
         #endregion
 
         #region Constructor
 
-        public ReconcileLogic(MainWindowLogic _mainWindowLogic, int _accountID)
+        public ReconcileLogic(MainWindowLogic _mainWindowLogic, int accountID)
         {
-            (mainWindowLogic, accountID) = (_mainWindowLogic, _accountID);
-
-            // Get DB
-            var household = mainWindowLogic.Household;
+            (mainWindowLogic, accountRow) = (_mainWindowLogic, _mainWindowLogic.Household.Accounts.FindByID(accountID));
 
             // Get account info
-            var accountRow = household.Accounts.FindByID(accountID);
             PriorStatementBalance = accountRow.GetReconciledBalance();
 
             // Get reconcile info
@@ -46,10 +42,10 @@ namespace BanaData.Logic.Dialogs
             Title = "Reconcile: " + accountRow.Name;
 
             // Build properties
-            Payments = new TransactionsToReconcile(mainWindowLogic, accountID, false);
+            Payments = new ReconcileGridLogic(accountRow, "Payments:", BuildTransactionList(false));
             Payments.ClearedBalanceChanged += OnClearedBalanceChanged;
 
-            Deposits = new TransactionsToReconcile(mainWindowLogic, accountID, true);
+            Deposits = new ReconcileGridLogic(accountRow, "Deposits:", BuildTransactionList(true));
             Deposits.ClearedBalanceChanged += OnClearedBalanceChanged;
 
             MarkAll = new CommandBase(OnMarkAll);
@@ -57,6 +53,80 @@ namespace BanaData.Logic.Dialogs
             FinishLaterCommand = new CommandBase(OnFinishLaterCommand);
 
             UpdateBalances();
+        }
+
+        private IEnumerable<TransactionToReconcile> BuildTransactionList(bool deposit)
+        {
+            // Find all candidates
+            var transactions = new List<TransactionToReconcile>();
+            var household = mainWindowLogic.Household;
+
+            // Process regular transactions
+            foreach (Household.TransactionsRow tr in accountRow.GetUnreconciledTransactions())
+            {
+                // Compute amount
+                var lineItems = tr.GetLineItemsRows();
+                decimal amount = lineItems.Sum(li => li.Amount);
+
+                // We want only deposit or payments
+                if (amount >= 0 ^ deposit)
+                {
+                    continue;
+                }
+
+                // Compute medium
+                string medium = null;
+                if (accountRow.Type == EAccountType.Bank)
+                {
+                    var bankTrans = tr.GetBankingTransaction();
+                    if (bankTrans.Medium == ETransactionMedium.Check && !bankTrans.IsCheckNumberNull())
+                    {
+                        medium = bankTrans.CheckNumber.ToString();
+                    }
+                    else
+                    {
+                        medium = Toolbox.Attributes.EnumDescriptionAttribute.GetDescription(bankTrans.Medium);
+                    }
+                }
+
+                var transaction = new TransactionToReconcile(
+                    tr.ID,
+                    tr.Status == ETransactionStatus.Cleared,
+                    tr.Date,
+                    medium,
+                    tr.IsPayeeNull() ? "" : tr.Payee,
+                    null,
+                    deposit ? amount : -amount,
+                    false);
+
+                transactions.Add(transaction);
+            }
+
+            // Process transfer fill-ins
+            foreach (Household.LineItemsRow li in accountRow.GetUnreconciledTransfers())
+            {
+                decimal amount = -li.Amount;
+
+                // We want only deposit or payments
+                if (amount >= 0 ^ deposit)
+                {
+                    continue;
+                }
+
+                var transaction = new TransactionToReconcile(
+                    li.ID,
+                    li.TransferStatus == ETransactionStatus.Cleared,
+                    li.TransactionsRow.Date,
+                    "",
+                    "",
+                    null,
+                    deposit ? amount : -amount,
+                    true);
+
+                transactions.Add(transaction);
+            }
+
+            return transactions;
         }
 
         #endregion
@@ -67,10 +137,10 @@ namespace BanaData.Logic.Dialogs
         public string Title { get; }
 
         // The deposit panel
-        public TransactionsToReconcile Deposits { get; }
+        public ReconcileGridLogic Deposits { get; }
 
         // The payments panel
-        public TransactionsToReconcile Payments { get; }
+        public ReconcileGridLogic Payments { get; }
 
         // Prior balance
         public decimal PriorStatementBalance { get; }
@@ -126,7 +196,7 @@ namespace BanaData.Logic.Dialogs
 
         private void OnMarkOrUnmarkAll(bool mark)
         {
-            foreach (var trList in new TransactionsToReconcile[] { Payments, Deposits })
+            foreach (var trList in new ReconcileGridLogic[] { Payments, Deposits })
             {
                 foreach (TransactionToReconcile tr in trList.Transactions)
                 {
@@ -161,15 +231,11 @@ namespace BanaData.Logic.Dialogs
                 return null;
             }
 
-            var household = mainWindowLogic.Household;
-
             // Update the status of relevant transactions in the DB
             UpdateAllMarkedTransactionsTo(ETransactionStatus.Reconciled);
 
             // Get account and reconcile info rows
-            var accountRow = household.Accounts.FindByID(accountID);
-            var accountsToReconcileInfo = household.ReconcileInfo.ParentRelations["FK_Accounts_ReconcileInfo"];
-            var reconcileInfoRow = accountRow.GetChildRows(accountsToReconcileInfo).Cast<Household.ReconcileInfoRow>().First();
+            var reconcileInfoRow = accountRow.GetReconcileInfoRows().Single();
 
             // Update the last statement date in the account
             accountRow.LastStatementDate = reconcileInfoRow.StatementDate;
@@ -194,7 +260,7 @@ namespace BanaData.Logic.Dialogs
         {
             var household = mainWindowLogic.Household;
 
-            foreach (var trList in new TransactionsToReconcile[] { Payments, Deposits })
+            foreach (var trList in new ReconcileGridLogic[] { Payments, Deposits })
             {
                 foreach (TransactionToReconcile tr in trList.Transactions)
                 {
@@ -230,146 +296,5 @@ namespace BanaData.Logic.Dialogs
         }
 
         #endregion
-
-        #region Transaction list class
-
-        //
-        // One transaction list
-        //
-        public class TransactionsToReconcile : LogicBase
-        {
-            public TransactionsToReconcile(MainWindowLogic mainWindowLogic, int accountID, bool deposit)
-            {
-                // Title
-                Title = deposit ? "Deposits:" : "Payments:";
-
-                // Find all candidates
-                var household = mainWindowLogic.Household;
-                var accountRow = household.Accounts.FindByID(accountID);
-                IsBank = accountRow.Type == EAccountType.Bank;
-
-                // Process regular transactions
-                foreach (Household.TransactionsRow tr in accountRow.GetUnreconciledTransactions())
-                {
-                    // Compute amount
-                    var lineItems = tr.GetLineItemsRows();
-                    decimal amount = lineItems.Sum(li => li.Amount);
-
-                    // We want only deposit or payments
-                    if (amount >= 0 ^ deposit)
-                    {
-                        continue;
-                    }
-
-                    // Compute medium
-                    string medium = "";
-                    if (IsBank)
-                    {
-                        var bankTrans = tr.GetBankingTransaction();
-                        if (bankTrans.Medium == ETransactionMedium.Check && !bankTrans.IsCheckNumberNull())
-                        {
-                            medium = bankTrans.CheckNumber.ToString();
-                        }
-                        else
-                        {
-                            medium = Toolbox.Attributes.EnumDescriptionAttribute.GetDescription(bankTrans.Medium);
-                        }
-                    }
-
-                    var transaction = new TransactionToReconcile(
-                        tr.ID,
-                        tr.Status == ETransactionStatus.Cleared,
-                        tr.Date,
-                        medium,
-                        tr.IsPayeeNull() ? "" : tr.Payee,
-                        "Payee",
-                        deposit ? amount : -amount,
-                        false);
-
-                    transaction.TransactionCleared += OnTransactionCleared;
-                    transactions.Add(transaction);
-                }
-
-                // Process transfer fill-ins
-                foreach(Household.LineItemsRow li in accountRow.GetUnreconciledTransfers())
-                {
-                    decimal amount = -li.Amount;
-
-                    // We want only deposit or payments
-                    if (amount >= 0 ^ deposit)
-                    {
-                        continue;
-                    }
-
-                    var transaction = new TransactionToReconcile(
-                        li.ID,
-                        li.TransferStatus == ETransactionStatus.Cleared,
-                        li.TransactionsRow.Date,
-                        "",
-                        "",
-                        "Payee",
-                        deposit ? amount : -amount,
-                        true);
-
-                    transaction.TransactionCleared += OnTransactionCleared;
-                    transactions.Add(transaction);
-                }
-
-                // Give the transactions to the UI
-                Transactions = (CollectionView)CollectionViewSource.GetDefaultView(transactions);
-                Transactions.SortDescriptions.Add(new SortDescription("Date", ListSortDirection.Ascending));
-
-                // Compute initial total
-                UpdateClearedTotal();
-            }
-
-            //
-            // Events
-            //
-            public event EventHandler ClearedBalanceChanged;
-
-            //
-            // UI Properties
-            //
-
-            // Title
-            public string Title { get; }
-
-            // Transactions
-            private readonly ObservableCollection<TransactionToReconcile> transactions = new ObservableCollection<TransactionToReconcile>();
-            public CollectionView Transactions { get; }
-
-            // Total cleared
-            public decimal TotalCleared { get; private set; }
-            public string NumberOfCheckedItems { get; private set; }
-
-            // If this is a bank
-            public bool IsBank { get; }
-            public double MediumColumnWidth => IsBank ? 80 : 0;
-
-            //
-            // Actions
-            //
-
-            // Activated when the cleared status change for a transaction
-            private void OnTransactionCleared(object sender, EventArgs e)
-            {
-                UpdateClearedTotal();
-            }
-
-            private void UpdateClearedTotal()
-            {
-                TotalCleared = transactions.Sum(tr => tr.IsCleared == true ? tr.Amount : 0);
-                OnPropertyChanged(() => TotalCleared);
-
-                NumberOfCheckedItems = "Cleared transactions: " + transactions.Count(tr => tr.IsCleared == true);
-                OnPropertyChanged(() => NumberOfCheckedItems);
-
-                ClearedBalanceChanged?.Invoke(this, EventArgs.Empty);
-            }
-        }
-
-        #endregion
-
     }
 }

@@ -70,6 +70,7 @@
     <Compile Include="Database\SecurityPrice.cs" />
     <Compile Include="Database\Transaction.cs" />
     <Compile Include="Logic\Dialogs\AccountPickerLogic.cs" />
+    <Compile Include="Logic\Dialogs\ReconcileGridLogic.cs" />
     <Compile Include="Logic\Dialogs\ReconcileInvestmentsLogic.cs" />
     <Compile Include="Logic\Dialogs\ShowHoldingsLogic.cs" />
     <Compile Include="Logic\Dialogs\EditAccountLogic.cs" />

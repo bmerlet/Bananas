@@ -31,7 +31,7 @@
             <ListView.View>
                 <GridView>
                     <GridView.Columns>
-                        <GridViewColumn Header="Security" Width="200" DisplayMemberBinding="{Binding Symbol}"/>
+                        <GridViewColumn Header="Security" Width="100" DisplayMemberBinding="{Binding Symbol}"/>
                         <GridViewColumn Header="Prior statement" Width="100">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
@@ -60,7 +60,7 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Statement amount" Width="100">
+                        <GridViewColumn Header="Statement" Width="100">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock TextAlignment="Right">
