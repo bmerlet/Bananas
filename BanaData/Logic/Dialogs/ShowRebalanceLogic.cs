@@ -45,7 +45,7 @@ namespace BanaData.Logic.Dialogs
             SecuritiesSource = (CollectionView)CollectionViewSource.GetDefaultView(securityItems);
             SecuritiesSource.SortDescriptions.Add(new SortDescription("Symbol", ListSortDirection.Ascending));
 
-            UpdateQuote = new CommandBase(OnUpdateQuote);
+            UpdateQuotes = new CommandBase(OnUpdateQuotes);
 
             Recompute();
         }
@@ -59,16 +59,22 @@ namespace BanaData.Logic.Dialogs
         public CollectionView SecuritiesSource { get; }
 
         // Command to update quotes
-        public CommandBase UpdateQuote { get; }
+        public CommandBase UpdateQuotes { get; }
 
         // Error string
-        public string Error { get; }
+        public string Error { get; private set; }
+
+        // Total target %
+        public decimal TotalTarget { get; private set; }
+
+        // Total value
+        public decimal TotalValue { get; private set; }
 
         #endregion
 
         #region Actions
 
-        private void OnUpdateQuote()
+        private void OnUpdateQuotes()
         {
             // ZZZZ
         }
@@ -80,12 +86,58 @@ namespace BanaData.Logic.Dialogs
 
         private void Recompute()
         {
-            // ZZZZ
+            // Recompute values
+            foreach(var si in securityItems)
+            {
+                si.Valuation = si.SecurityQuantity * si.SecurityPrice;
+            }
+
+            TotalValue = securityItems.Sum(si => si.SecurityQuantity * si.SecurityPrice);
+            OnPropertyChanged(() => TotalValue);
+
+            // Recompute actual percentages
+            foreach (var si in securityItems)
+            {
+                si.Actual = si.Valuation / TotalValue;
+            }
+
+            // Recompute total target percentage
+            TotalTarget = securityItems.Sum(si => si.Target);
+            OnPropertyChanged(() => TotalTarget);
+            if (TotalTarget != 1)
+            {
+                Error = "The total target percentage must be 100%";
+            }
+            else
+            {
+                Error = "";
+
+                // Compute action
+                foreach (var si in securityItems)
+                {
+                    decimal diff = (si.Actual - si.Target) * TotalValue;
+                    decimal numShares = diff / si.SecurityPrice;
+
+                    if (si.Actual > si.Target)
+                    {
+                        si.Action = $"Too high by {diff:C2}; Sell {numShares:N1} shares of {si.Symbol}";
+                    }
+                    else
+                    {
+                        decimal toSell = diff / si.SecurityPrice;
+                        si.Action = $"Too low by {-diff:C2}; Buy {-numShares:N1} shares of {si.Symbol}";
+                    };
+                }
+
+            }
+
+            OnPropertyChanged(() => Error);
         }
 
         protected override bool? Commit()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            return false;
         }
 
         #endregion

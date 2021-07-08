@@ -18,10 +18,13 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="30"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <TextBlock Text="{Binding AccountName}" Style="{StaticResource FormTextBlock}"/>
             <Button Content="Holdings..." Command="{Binding ShowHoldingsCommand}" Grid.Column="2" Style="{StaticResource FormButton}" Width="120"/>
+            <Button Content="Rebalance..." Command="{Binding ShowRebalanceCommand}" Grid.Column="4" Style="{StaticResource FormButton}" Width="120"/>
         </Grid>
 
         <!-- The listview -->

@@ -24,9 +24,22 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Button Content="Update quotes" Style="{StaticResource FormButton}" Command="{Binding UpdateQuotes}"/>
-            <TextBlock Text="{Binding Error}" Style="{StaticResource FormTextBlock}"/>
+            <TextBlock Text="{Binding Error}" Style="{StaticResource FormTextBlock}" Foreground="Red" Grid.Column="2"/>
         </Grid>
         
+        <!-- Totals on the bottom -->
+        <Grid Margin="2,0" DockPanel.Dock="Bottom">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="90"/>
+                <ColumnDefinition Width="90"/>
+                <ColumnDefinition Width="90"/>
+                <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="100"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="{Binding TotalTarget, StringFormat={}{0:P1}, FallbackValue=100}" TextAlignment="Center" Grid.Column="1"/>
+            <TextBlock Text="{Binding TotalValue, StringFormat=C2, FallbackValue=10.0000.00}" TextAlignment="Right" Grid.Column="4"/>
+        </Grid>
+
         <!-- Main listview -->
         <ListView
             ItemsSource="{Binding SecuritiesSource}">
