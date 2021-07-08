@@ -209,26 +209,35 @@ namespace BanaData.Logic.Main
         {
             // Retreive account info
             int accountID = mainWindow.DisplayedAccountID;
+            bool isInvestment = mainWindow.Household.Accounts.FindByID(accountID).Type == EAccountType.Investment;
 
             // Create logic and show reconcile info dialog
             var infoLogic = new ReconcileInfoLogic(mainWindow, accountID);
             if (mainWindow.GuiServices.ShowDialog(infoLogic))
             {
                 // Show reconcile dialog
-                LogicBase reconcileLogic =
-                    mainWindow.Household.Accounts.FindByID(accountID).Type == EAccountType.Investment ?
-                    new ReconcileInvestmentsLogic(mainWindow, accountID) as LogicBase:
-                    new ReconcileLogic(mainWindow, accountID) as LogicBase;
-
-                if (mainWindow.GuiServices.ShowDialog(reconcileLogic))
+                if (isInvestment)
                 {
-                    // Update the cleared status in the register
-                    mainWindow.BankRegister.UpdateAllTransactionStatus();
-
-                    // Update the register if an interest transaction was created
-                    if (reconcileLogic is ReconcileLogic bankReconcileLogic && bankReconcileLogic.InterestTransactionID >= 0)
+                    var logic = new ReconcileInvestmentsLogic(mainWindow, accountID);
+                    if (mainWindow.GuiServices.ShowDialog(logic))
                     {
-                        mainWindow.BankRegister.AddTransaction(bankReconcileLogic.InterestTransactionID);
+                        mainWindow.InvestmentRegister.UpdateAllTransactionStatus();
+                    }
+                }
+                else
+                {
+                    var logic = new ReconcileLogic(mainWindow, accountID);
+
+                    if (mainWindow.GuiServices.ShowDialog(logic))
+                    {
+                        // Update the cleared status in the register
+                        mainWindow.BankRegister.UpdateAllTransactionStatus();
+
+                        // Update the register if an interest transaction was created
+                        if (logic.InterestTransactionID >= 0)
+                        {
+                            mainWindow.BankRegister.AddTransaction(logic.InterestTransactionID);
+                        }
                     }
                 }
             }

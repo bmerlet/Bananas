@@ -176,7 +176,7 @@ namespace BanaData.Database
             }
 
             // Figure out the portfolio for this account at the transaction date
-            var portfolio = accountRow.GetPortfolio(transactionRow.Date);
+            var portfolio = accountRow.GetPortfolio(transactionRow.Date, transactionRow);
 
             // Get the used lots
             var usedLots = portfolio.GetLotsUsedForSale(securityRow, investmentTransactionRow.SecurityQuantity);

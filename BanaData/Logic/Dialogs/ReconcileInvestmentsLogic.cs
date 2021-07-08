@@ -90,7 +90,7 @@ namespace BanaData.Logic.Dialogs
                     tr.Status == ETransactionStatus.Cleared,
                     tr.Date,
                     null,
-                    tr.IsPayeeNull() ? "" : tr.Payee, // ZZZZZZZZZZZ
+                    investmentTransactionRow.GetDescription(),
                     investmentTransactionRow.IsSecurityIDNull() ? null : investmentTransactionRow.SecuritiesRow.Symbol,
                     amount,
                     false);

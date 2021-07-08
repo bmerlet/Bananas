@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Toolbox.Attributes;
 
 namespace BanaData.Database
 {
@@ -73,6 +74,104 @@ namespace BanaData.Database
                 type == EInvestmentTransactionType.SharesOut ||
                 type == EInvestmentTransactionType.SellAndTransferCash ||
                 type == EInvestmentTransactionType.Sell;
+
+            // Build a description of a transaction
+            public string GetDescription()
+            {
+                return GetDescription(
+                    Type,
+                    TransactionsRow.GetAmount(),
+                    IsSecurityIDNull() ? "" : SecuritiesRow.Symbol,
+                    IsSecurityQuantityNull() ? 0 : SecurityQuantity,
+                    IsSecurityPriceNull() ? 0 : SecurityPrice);
+            }
+
+            public static string GetDescription(
+                EInvestmentTransactionType type, decimal amount, string symbol, decimal quantity, decimal price)
+            {
+                string desc = "";
+
+                switch (type)
+                {
+                    case EInvestmentTransactionType.CashIn:
+                        desc = $"Added {amount:C2}";
+                        break;
+
+                    case EInvestmentTransactionType.CashOut:
+                        desc = $"Removed {-amount:C2}";
+                        break;
+
+                    case EInvestmentTransactionType.TransferCashIn:
+                        desc = $"Transfered {amount:C2} in";
+                        break;
+
+                    case EInvestmentTransactionType.TransferCashOut:
+                        desc = $"Transfered {-amount:C2} out";
+                        break;
+
+                    case EInvestmentTransactionType.InterestIncome:
+                        desc = $"Received ${amount:C2} in interest";
+                        break;
+
+                    case EInvestmentTransactionType.SharesIn:
+                        desc = $"Received {quantity} {symbol} @ ${price}";
+                        break;
+
+                    case EInvestmentTransactionType.SharesOut:
+                        desc = $"Removed {quantity} {symbol}";
+                        break;
+
+                    case EInvestmentTransactionType.Buy:
+                    case EInvestmentTransactionType.BuyFromTransferredCash:
+                        desc = $"Bought {quantity} {symbol} @ ${price}";
+                        break;
+
+                    case EInvestmentTransactionType.Sell:
+                    case EInvestmentTransactionType.SellAndTransferCash:
+                        desc = $"Sold {quantity} {symbol} @ ${price}";
+                        break;
+
+                    case EInvestmentTransactionType.Dividends:
+                        desc = $"Received {amount:C2} in dividends from {symbol}";
+                        break;
+
+                    case EInvestmentTransactionType.TransferDividends:
+                        desc = $"Received {-amount:C2} in dividends from {symbol}";
+                        break;
+
+                    case EInvestmentTransactionType.ReinvestDividends:
+                    case EInvestmentTransactionType.ReinvestLongTermCapitalGains:
+                    case EInvestmentTransactionType.ReinvestMediumTermCapitalGains:
+                    case EInvestmentTransactionType.ReinvestShortTermCapitalGains:
+                        desc = $"Reinvested {amount:C2} as {quantity} shares of {symbol}";
+                        break;
+
+                    case EInvestmentTransactionType.ShortTermCapitalGains:
+                        desc = $"Received {amount:C2} in ST CG from {symbol}";
+                        break;
+
+                    case EInvestmentTransactionType.TransferShortTermCapitalGains:
+                        desc = $"Received {-amount:C2} in ST CG from {symbol}";
+                        break;
+
+                    case EInvestmentTransactionType.LongTermCapitalGains:
+                        desc = $"Received {amount:C2} in LT CG from {symbol}";
+                        break;
+
+                    case EInvestmentTransactionType.TransferLongTermCapitalGains:
+                        desc = $"Received {-amount:C2} in LT CG from {symbol}";
+                        break;
+
+                    case EInvestmentTransactionType.Grant:
+                    case EInvestmentTransactionType.Vest:
+                    case EInvestmentTransactionType.Exercise:
+                    case EInvestmentTransactionType.Expire:
+                        desc = $"{EnumDescriptionAttribute.GetDescription(type)}: Not supported";
+                        break;
+                }
+
+                return desc;
+            }
 
             public bool HasSame(
                 EInvestmentTransactionType type,

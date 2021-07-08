@@ -146,12 +146,17 @@ namespace BanaData.Database
             }
 
             // Get the portfolio at a specific date
-            public Portfolio GetPortfolio(DateTime? date)
+            public Portfolio GetPortfolio(DateTime? date, Household.TransactionsRow excludedTransaction = null)
             {
                 // Compute the portfolio at the specified date
                 var portfolio = new Portfolio();
                 foreach (TransactionsRow transRow in GetTransactionsRows())
                 {
+                    if (transRow == excludedTransaction)
+                    {
+                        continue;
+                    }
+
                     if (date.HasValue && transRow.Date.CompareTo(date.Value) > 0)
                     {
                         continue;

@@ -1081,11 +1081,14 @@ namespace BanaData.Serializations
             // For the fee on reinvestment, find the corresponding reinvestment transaction and modify its commission
             if (commissionOnDividend)
             {
-                var reinvDivTrans = accountRow.GetTransactionsRows()
-                    .Where(t => t.Date == date && t.GetInvestmentTransaction().Type == EInvestmentTransactionType.ReinvestDividends)
-                    .Single();
-                reinvDivTrans.GetInvestmentTransaction().Commission = amount;
-                reinvDivTrans.GetLineItemsRows()[0].Amount += amount;
+                if (!merging) // ZZZZ
+                {
+                    var reinvDivTrans = accountRow.GetTransactionsRows()
+                        .Where(t => t.Date == date && t.GetInvestmentTransaction().Type == EInvestmentTransactionType.ReinvestDividends)
+                        .Single();
+                    reinvDivTrans.GetInvestmentTransaction().Commission = amount;
+                    reinvDivTrans.GetLineItemsRows()[0].Amount += amount;
+                }
                 return;
             }
 

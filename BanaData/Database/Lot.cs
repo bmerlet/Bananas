@@ -32,6 +32,11 @@ namespace BanaData.Database
             return price * Quantity;
         }
 
+        public override string ToString()
+        {
+            return $"{Quantity:N4} {Security.Symbol} at {SecurityPrice:C4} on {Date:MM/dd/yyyy}";
+        }
+
         public override bool Equals(object obj)
         {
             return

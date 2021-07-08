@@ -9,6 +9,9 @@ using BanaData.Database;
 
 namespace BanaData.Logic.Items
 {
+    /// <summary>
+    /// Class to show investment transaction type in an autocomplete textbox 
+    /// </summary>
     public class InvestmentTransactionTypeItem
     {
         public InvestmentTransactionTypeItem(EInvestmentTransactionType type)
