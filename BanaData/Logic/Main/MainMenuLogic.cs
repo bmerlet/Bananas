@@ -43,6 +43,8 @@ namespace BanaData.Logic.Main
             UpdateStockPrices = new CommandBase(OnUpdateStockPrices);
 
             ShowYearlyCapGainsAndDividends = new CommandBase(OnShowYearlyCapGainsAndDividends);
+            ShowRebalance = new CommandBase(OnShowRebalance);
+            ShowRebalance.SetCanExecute(false);
 
             Test = new CommandBase(OnTest);
         }
@@ -312,6 +314,16 @@ namespace BanaData.Logic.Main
         private void OnShowYearlyCapGainsAndDividends()
         {
             mainWindow.GuiServices.ShowDialog(new ShowYearlyCapGainsAndDividendsLogic(mainWindow));
+        }
+
+        //
+        // Show rebalance dashboard
+        //
+        public CommandBase ShowRebalance { get; }
+
+        private void OnShowRebalance()
+        {
+            mainWindow.GuiServices.ShowDialog(new ShowRebalanceLogic(mainWindow, mainWindow.DisplayedAccountID));
         }
 
         #endregion

@@ -103,6 +103,9 @@
     <Compile Include="Dialogs\ShowHoldings.xaml.cs">
       <DependentUpon>ShowHoldings.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\ShowRebalance.xaml.cs">
+      <DependentUpon>ShowRebalance.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\ShowYearlyCapGainsAndDividends.xaml.cs">
       <DependentUpon>ShowYearlyCapGainsAndDividends.xaml</DependentUpon>
     </Compile>
@@ -206,6 +209,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\ShowHoldings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\ShowRebalance.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

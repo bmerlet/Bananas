@@ -86,6 +86,7 @@
     <Compile Include="Logic\Dialogs\ReconcileInfoLogic.cs" />
     <Compile Include="Logic\Dialogs\ReconcileLogic.cs" />
     <Compile Include="Logic\Dialogs\ShowCapitalGainsLogic.cs" />
+    <Compile Include="Logic\Dialogs\ShowRebalanceLogic.cs" />
     <Compile Include="Logic\Dialogs\ShowYearlyCapGainsAndDividendsLogic.cs" />
     <Compile Include="Logic\IGuiServices.cs" />
     <Compile Include="Logic\Items\AccountItem.cs" />

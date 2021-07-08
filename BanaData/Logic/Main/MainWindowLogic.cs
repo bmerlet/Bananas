@@ -323,6 +323,7 @@ namespace BanaData.Logic.Main
             BankRegister.SetAccount(accountID, transactionID, lineItemID);
             DisplayedAccountID = accountID;
             MainMenuLogic.Reconcile.SetCanExecute(accountID >= 0);
+            MainMenuLogic.ShowRebalance.SetCanExecute(false);
             IsInvestmentRegisterVisible = false;
             IsBankRegisterVisible = true;
             OnPropertyChanged(() => IsInvestmentRegisterVisible);
@@ -337,6 +338,7 @@ namespace BanaData.Logic.Main
             InvestmentRegister.SetAccount(accountID, transactionID, lineItemID);
             DisplayedAccountID = accountID;
             MainMenuLogic.Reconcile.SetCanExecute(accountID >= 0);
+            MainMenuLogic.ShowRebalance.SetCanExecute(accountID >= 0);
             IsInvestmentRegisterVisible = true;
             IsBankRegisterVisible = false;
             OnPropertyChanged(() => IsInvestmentRegisterVisible);
