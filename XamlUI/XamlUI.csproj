@@ -116,6 +116,7 @@
     <Compile Include="Tools\FocusAttachedProperty.cs" />
     <Compile Include="Tools\FontWeightConverter.cs" />
     <Compile Include="Tools\GridLengthConverter.cs" />
+    <Compile Include="Tools\PercentTostringConverter.cs" />
     <Compile Include="Tools\ReconcileAmountMultiConverter.cs" />
     <Compile Include="Tools\SortAdorner.cs" />
     <Compile Include="Tools\TransactionStateToBrushConverter.cs" />

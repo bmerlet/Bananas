@@ -30,14 +30,14 @@
         <!-- Totals on the bottom -->
         <Grid Margin="2,0" DockPanel.Dock="Bottom">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="90"/>
-                <ColumnDefinition Width="90"/>
-                <ColumnDefinition Width="90"/>
-                <ColumnDefinition Width="80"/>
-                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="{Binding WidthOfSecurityColumn}"/>
+                <ColumnDefinition Width="{Binding WidthOfTargetColumn}"/>
+                <ColumnDefinition Width="{Binding WidthOfQuantityColumn}"/>
+                <ColumnDefinition Width="{Binding WidthOfPriceColumn}"/>
+                <ColumnDefinition Width="{Binding WidthOValueColumn}"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Text="{Binding TotalTarget, StringFormat={}{0:P1}, FallbackValue=100}" TextAlignment="Center" Grid.Column="1"/>
-            <TextBlock Text="{Binding TotalValue, StringFormat=C2, FallbackValue=10.0000.00}" TextAlignment="Right" Grid.Column="4"/>
+            <TextBlock Text="{Binding TotalTarget, StringFormat={}{0:P1}, FallbackValue=100}" TextAlignment="Center" Grid.Column="1" Margin="8,4,4,4"/>
+            <TextBlock Text="{Binding TotalValue, StringFormat=C2, FallbackValue=10.0000.00}" TextAlignment="Right" Grid.Column="4" Margin="4"/>
         </Grid>
 
         <!-- Main listview -->
@@ -52,29 +52,29 @@
 
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Security" Width="90" DisplayMemberBinding="{Binding Symbol}"/>
-                    <GridViewColumn Header="Target %" Width="90">
+                    <GridViewColumn Header="Security" Width="{Binding WidthOfSecurityColumn, Mode=TwoWay}" DisplayMemberBinding="{Binding Symbol}"/>
+                    <GridViewColumn Header="Target %" Width="{Binding WidthOfTargetColumn, Mode=TwoWay}">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBox Text="{Binding Target, StringFormat={}{0:P1}}" TextAlignment="Center"/>
+                                <TextBox Text="{Binding Target, Converter={StaticResource percentTostringConverter}, ConverterParameter=1, Mode=TwoWay}" TextAlignment="Center"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Quantity" Width="90">
+                    <GridViewColumn Header="Quantity" Width="{Binding WidthOfQuantityColumn, Mode=TwoWay}">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding SecurityQuantity, StringFormat=N4}" TextAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Price" Width="80">
+                    <GridViewColumn Header="Price" Width="{Binding WidthOfPriceColumn, Mode=TwoWay}">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding SecurityPrice, StringFormat=C2}" TextAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Value" Width="100">
+                    <GridViewColumn Header="Value" Width="{Binding WidthOValueColumn, Mode=TwoWay}">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Valuation, StringFormat=C2}" TextAlignment="Right"/>
@@ -88,7 +88,9 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
+                    <GridViewColumn Header="Status" Width="150" DisplayMemberBinding="{Binding Status}"/>
                     <GridViewColumn Header="Action" Width="200" DisplayMemberBinding="{Binding Action}"/>
+                    <GridViewColumn Header="Tax consequences" Width="150" DisplayMemberBinding="{Binding Consequences}"/>
                 </GridView>
             </ListView.View>
 

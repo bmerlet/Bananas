@@ -47,6 +47,7 @@ namespace BanaData.Logic.Dialogs
 
             UpdateQuotes = new CommandBase(OnUpdateQuotes);
 
+            SetupPercentages();
             Recompute();
         }
 
@@ -70,6 +71,42 @@ namespace BanaData.Logic.Dialogs
         // Total value
         public decimal TotalValue { get; private set; }
 
+        // Widths
+        private double widthOfSecurityColumn = 90;
+        public double WidthOfSecurityColumn
+        {
+            get => widthOfSecurityColumn;
+            set { widthOfSecurityColumn = value; OnPropertyChanged(() => WidthOfSecurityColumn); }
+        }
+
+        private double widthOfTargetColumn = 60;
+        public double WidthOfTargetColumn
+        {
+            get => widthOfTargetColumn;
+            set { widthOfTargetColumn = value; OnPropertyChanged(() => WidthOfTargetColumn); }
+        }
+
+        private double widthOfQuantityColumn = 90;
+        public double WidthOfQuantityColumn
+        {
+            get => widthOfQuantityColumn;
+            set { widthOfQuantityColumn = value; OnPropertyChanged(() => WidthOfQuantityColumn); }
+        }
+
+        private double widthOfPriceColumn = 60;
+        public double WidthOfPriceColumn
+        {
+            get => widthOfPriceColumn;
+            set { widthOfPriceColumn = value; OnPropertyChanged(() => WidthOfPriceColumn); }
+        }
+
+        private double widthOValueColumn = 100;
+        public double WidthOValueColumn
+        {
+            get => widthOValueColumn;
+            set { widthOValueColumn = value; OnPropertyChanged(() => WidthOValueColumn); }
+        }
+
         #endregion
 
         #region Actions
@@ -77,6 +114,20 @@ namespace BanaData.Logic.Dialogs
         private void OnUpdateQuotes()
         {
             // ZZZZ
+        }
+
+        private void SetupPercentages()
+        {
+            // ZZZ Look up in DB
+
+            // Default: do quick and dirty computation based on current values
+            TotalValue = securityItems.Sum(si => si.SecurityQuantity * si.SecurityPrice);
+            foreach (var si in securityItems)
+            {
+                si.Target = Math.Round(si.SecurityQuantity * si.SecurityPrice / TotalValue, 3);
+            }
+            TotalTarget = securityItems.Sum(si => si.Target);
+            securityItems.Last().Target = 1 + securityItems.Last().Target - TotalTarget;
         }
 
         private void OnSecurityItemTargetChanged(object sender, EventArgs e)
@@ -120,12 +171,13 @@ namespace BanaData.Logic.Dialogs
 
                     if (si.Actual > si.Target)
                     {
-                        si.Action = $"Too high by {diff:C2}; Sell {numShares:N1} shares of {si.Symbol}";
+                        si.Status = $"Too high by {diff:C2}";
+                        si.Action = $"Sell {numShares:N1} shares of {si.Symbol}";
                     }
                     else
                     {
-                        decimal toSell = diff / si.SecurityPrice;
-                        si.Action = $"Too low by {-diff:C2}; Buy {-numShares:N1} shares of {si.Symbol}";
+                        si.Status = $"Too low by {-diff:C2}";
+                        si.Action = $"Buy {-numShares:N1} shares of {si.Symbol}";
                     };
                 }
 
@@ -191,6 +243,14 @@ namespace BanaData.Logic.Dialogs
                 set { actual = value; OnPropertyChanged(() => Actual); }
             }
 
+            // Result: too high/too low
+            private string status;
+            public string Status
+            {
+                get => status;
+                set { status = value; OnPropertyChanged(() => Status); }
+            }
+
             // Action to take
             private string action;
             public string Action
@@ -199,7 +259,13 @@ namespace BanaData.Logic.Dialogs
                 set { action = value; OnPropertyChanged(() => Action); }
             }
 
-            // ZZZZ should have STCG and LTCG resulting from the action
+            // Tax consequence
+            private string consequences;
+            public string Consequences
+            {
+                get => consequences;
+                set { consequences = value; OnPropertyChanged(() => Consequences); }
+            }
         }
 
         #endregion
