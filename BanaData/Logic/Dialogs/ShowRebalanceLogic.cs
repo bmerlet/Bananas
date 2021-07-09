@@ -125,16 +125,31 @@ namespace BanaData.Logic.Dialogs
 
         private void SetupPercentages()
         {
-            // ZZZ Look up in DB
-
-            // Default: do quick and dirty computation based on current values
-            TotalValue = securityItems.Sum(si => si.SecurityQuantity * si.SecurityPrice);
-            foreach (var si in securityItems)
+            // Look up in DB
+            bool found = false;
+            foreach(var targetRow in accountRow.GetRebalanceTargetRows())
             {
-                si.Target = Math.Round(si.SecurityQuantity * si.SecurityPrice / TotalValue, 3);
+                foreach (var si in securityItems)
+                {
+                    if (si.SecurityRow == targetRow.SecurityRow)
+                    {
+                        si.Target = targetRow.Target;
+                        found = true;
+                    }
+                }
             }
-            TotalTarget = securityItems.Sum(si => si.Target);
-            securityItems.Last().Target = 1 + securityItems.Last().Target - TotalTarget;
+
+            // Not in DB: do quick and dirty computation based on current values
+            if (!found)
+            {
+                TotalValue = securityItems.Sum(si => si.SecurityQuantity * si.SecurityPrice);
+                foreach (var si in securityItems)
+                {
+                    si.Target = Math.Round(si.SecurityQuantity * si.SecurityPrice / TotalValue, 3);
+                }
+                TotalTarget = securityItems.Sum(si => si.Target);
+                securityItems.Last().Target = 1 + securityItems.Last().Target - TotalTarget;
+            }
         }
 
         private void OnSecurityItemTargetChanged(object sender, EventArgs e)
@@ -202,8 +217,46 @@ namespace BanaData.Logic.Dialogs
 
         protected override bool? Commit()
         {
-            //throw new NotImplementedException();
-            return false;
+            // Commit the current targets to DB
+            bool change = false;
+
+            foreach (var si in securityItems)
+            {
+                bool found = false;
+
+                foreach (var targetRow in accountRow.GetRebalanceTargetRows())
+                {
+                    if (si.SecurityRow == targetRow.SecurityRow)
+                    {
+                        if (targetRow.Target != si.Target)
+                        {
+                            // Update DB entry
+                            targetRow.Target = si.Target;
+                            change = true;
+                        }
+                        found = true;
+                    }
+                }
+
+                if (!found)
+                {
+                    // Create new entry in DB
+                    var newTarget = mainWindowLogic.Household.RebalanceTarget.NewRebalanceTargetRow();
+                    newTarget.AccountID = accountRow.ID;
+                    newTarget.SecurityID = si.SecurityRow.ID;
+                    newTarget.Target = si.Target;
+                    mainWindowLogic.Household.RebalanceTarget.AddRebalanceTargetRow(newTarget);
+
+                    change = true;
+                }
+            }
+
+            if (change)
+            {
+                mainWindowLogic.CommitChanges();
+            }
+
+            return change;
         }
 
         #endregion
