@@ -44,7 +44,7 @@ namespace BanaData.Database
             }
 
             // Are there transactions associated with this security
-            public bool HasTransactions => GetInvestmentTransactionsRows().Length > 0;
+            public bool HasTransactions => GetInvestmentTransactionRows().Length > 0;
 
             public bool HasSame(string symbol, ESecurityType type)
             {

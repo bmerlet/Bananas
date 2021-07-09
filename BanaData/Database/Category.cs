@@ -12,7 +12,7 @@ namespace BanaData.Database
 {
     public partial class Household
     {
-        partial class CategoriesRow
+        partial class CategoryRow
         {
             private string fullName = null;
 
@@ -30,7 +30,7 @@ namespace BanaData.Database
                     else
                     {
                         // Get parent
-                        var parentRow = (Table as CategoriesDataTable).Single(c => c.ID == ParentID);
+                        var parentRow = (Table as CategoryDataTable).Single(c => c.ID == ParentID);
 
                         // Recurse
                         fullName = parentRow.FullName + ":" + Name;
@@ -77,14 +77,14 @@ namespace BanaData.Database
         }
 
         // Extensions to the category table
-        partial class CategoriesDataTable
+        partial class CategoryDataTable
         {
-            public CategoriesRow GetByFullName(string name)
+            public CategoryRow GetByFullName(string name)
             {
                 return this.FirstOrDefault(cat => cat.FullName == name);
             }
 
-            public CategoriesRow GetByParentAndName(CategoriesRow parentRow, string name)
+            public CategoryRow GetByParentAndName(CategoryRow parentRow, string name)
             {
                 var lquery =
                     from cat in this
@@ -100,9 +100,9 @@ namespace BanaData.Database
             }
 
             // Adding a category
-            public CategoriesRow Add(string name, string description, CategoriesRow parent, bool income, string taxInfo)
+            public CategoryRow Add(string name, string description, CategoryRow parent, bool income, string taxInfo)
             {
-                var catRow = NewCategoriesRow();
+                var catRow = NewCategoryRow();
 
                 UpdateCategory(catRow, name, description, parent, income, taxInfo);
 
@@ -111,14 +111,14 @@ namespace BanaData.Database
                 return catRow;
             }
 
-            public CategoriesRow Update(CategoriesRow catRow, string name, string description, CategoriesRow parent, bool income, string taxInfo)
+            public CategoryRow Update(CategoryRow catRow, string name, string description, CategoryRow parent, bool income, string taxInfo)
             {
                 UpdateCategory(catRow, name, description, parent, income, taxInfo);
 
                 return catRow;
             }
 
-            private static CategoriesRow UpdateCategory(CategoriesRow catRow, string name, string description, CategoriesRow parent, bool income, string taxInfo)
+            private static CategoryRow UpdateCategory(CategoryRow catRow, string name, string description, CategoryRow parent, bool income, string taxInfo)
             {
                 catRow.Name = name;
 

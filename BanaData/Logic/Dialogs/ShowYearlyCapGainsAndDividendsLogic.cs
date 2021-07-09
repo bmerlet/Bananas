@@ -52,7 +52,7 @@ namespace BanaData.Logic.Dialogs
             }
 
             // Find the categories that hold interest income
-            foreach(Household.CategoriesRow categoryRow in mainWindowLogic.Household.Categories.Rows)
+            foreach(Household.CategoryRow categoryRow in mainWindowLogic.Household.Category.Rows)
             {
                 if (!categoryRow.IsTaxInfoNull() && CategoryItem.TaxInfoDictionary[categoryRow.TaxInfo].Contains("Interest income"))
                 {
@@ -304,10 +304,10 @@ namespace BanaData.Logic.Dialogs
                     var accountName = accountRow.Name;
 
                     // Go through all the transactions for that year
-                    foreach (var transactionRow in accountRow.GetTransactionsRows().Where(tr => tr.Date.Year == selectedYear))
+                    foreach (var transactionRow in accountRow.GetTransactionRows().Where(tr => tr.Date.Year == selectedYear))
                     {
                         // Go through all the line items
-                        foreach(var li in transactionRow.GetLineItemsRows())
+                        foreach(var li in transactionRow.GetLineItemRows())
                         {
                             if (!li.IsCategoryIDNull() && interestCategories.Contains(li.CategoryID))
                             {
@@ -336,7 +336,7 @@ namespace BanaData.Logic.Dialogs
                     }
 
                     // Go through all the transactions for that year
-                    foreach (var transactionRow in accountRow.GetTransactionsRows().Where(tr => tr.Date.Year == selectedYear))
+                    foreach (var transactionRow in accountRow.GetTransactionRows().Where(tr => tr.Date.Year == selectedYear))
                     {
                         // Get the investment transaction
                         var investmentTransactionRow = transactionRow.GetInvestmentTransaction();

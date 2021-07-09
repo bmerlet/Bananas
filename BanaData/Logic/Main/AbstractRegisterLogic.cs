@@ -98,7 +98,7 @@ namespace BanaData.Logic.Main
 
             var accTransRel = household.Relations["FK_Accounts_Transactions"];
 
-            foreach (Household.TransactionsRow transRow in account.GetChildRows(accTransRel))
+            foreach (Household.TransactionRow transRow in account.GetChildRows(accTransRel))
             {
                 var lineItems = GetLineItems(transRow);
                 var trans = CreateTransactionFromDB(account, transRow, lineItems);
@@ -106,7 +106,7 @@ namespace BanaData.Logic.Main
             }
 
             // Now find all transfers to this account ID from a difffernet account and create placeholder transactions
-            foreach (Household.LineItemsRow lineItemRow in household.LineItems.Rows)
+            foreach (Household.LineItemRow lineItemRow in household.LineItem.Rows)
             {
                 if (!lineItemRow.IsAccountIDNull() && lineItemRow.AccountID == accountID)
                 {
@@ -170,7 +170,7 @@ namespace BanaData.Logic.Main
         {
             var household = mainWindowLogic.Household;
             var account = household.Account.FindByID(accountID);
-            var transRow = household.Transactions.FindByID(transactionID);
+            var transRow = household.Transaction.FindByID(transactionID);
             var lineItems = GetLineItems(transRow);
 
             var trans = CreateTransactionFromDB(account, transRow, lineItems);
@@ -331,9 +331,9 @@ namespace BanaData.Logic.Main
         #region Private utilities
 
         // Get line item(s) from a transaction
-        private List<LineItem> GetLineItems(Household.TransactionsRow transRow)
+        private List<LineItem> GetLineItems(Household.TransactionRow transRow)
         {
-            var dbLineItems = transRow.GetLineItemsRows();
+            var dbLineItems = transRow.GetLineItemRows();
 
             var lineItems = new List<LineItem>();
             foreach (var dbli in dbLineItems)
@@ -436,13 +436,13 @@ namespace BanaData.Logic.Main
         // Create a transaction from DB info
         protected abstract AbstractTransactionLogic CreateTransactionFromDB(
             Household.AccountRow account,
-            Household.TransactionsRow transRow,
+            Household.TransactionRow transRow,
             List<LineItem> lineItems);
 
         // Create a mirror pseudo-transaction for transfers
         protected abstract AbstractTransactionLogic CreateMirrorTransaction(
             Household.AccountRow account,
-            Household.LineItemsRow lineItem);
+            Household.LineItemRow lineItem);
 
         // Creaste an empty transaction
         protected abstract AbstractTransactionLogic CreateEmptyTransaction();

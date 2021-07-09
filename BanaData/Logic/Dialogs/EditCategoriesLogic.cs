@@ -34,7 +34,7 @@ namespace BanaData.Logic.Dialogs
                 bool inUse = false;
 
                 // Find if this category is in use
-                inUse = household.LineItems.FirstOrDefault(li => !li.IsCategoryIDNull() && li.CategoryID == cat.ID) != null;
+                inUse = household.LineItem.FirstOrDefault(li => !li.IsCategoryIDNull() && li.CategoryID == cat.ID) != null;
                 inUse |= household.MemorizedLineItem.FirstOrDefault(li => !li.IsCategoryIDNull() && li.CategoryID == cat.ID) != null;
 
                 categoriesSource.Add(new EditCategoryItem(cat, inUse));
@@ -224,8 +224,8 @@ namespace BanaData.Logic.Dialogs
         {
             var household = mainWindowLogic.Household;
 
-            var parentRow = category.Parent ==  null ? null : household.Categories.FindByID(category.Parent.ID);
-            var catRow = household.Categories.Add(category.Name, category.Description, parentRow, category.IsIncome, category.TaxInfo);
+            var parentRow = category.Parent ==  null ? null : household.Category.FindByID(category.Parent.ID);
+            var catRow = household.Category.Add(category.Name, category.Description, parentRow, category.IsIncome, category.TaxInfo);
 
             mainWindowLogic.CommitChanges();
 
@@ -236,9 +236,9 @@ namespace BanaData.Logic.Dialogs
         {
             var household = mainWindowLogic.Household;
 
-            var catRow = household.Categories.FindByID(category.ID);
-            var parentRow = category.Parent == null ? null : household.Categories.FindByID(category.Parent.ID);
-            household.Categories.Update(catRow, category.Name, category.Description, parentRow, category.IsIncome, category.TaxInfo);
+            var catRow = household.Category.FindByID(category.ID);
+            var parentRow = category.Parent == null ? null : household.Category.FindByID(category.Parent.ID);
+            household.Category.Update(catRow, category.Name, category.Description, parentRow, category.IsIncome, category.TaxInfo);
 
             mainWindowLogic.CommitChanges();
         }
@@ -247,7 +247,7 @@ namespace BanaData.Logic.Dialogs
         {
             var household = mainWindowLogic.Household;
 
-            var row = household.Categories.FindByID(category.ID);
+            var row = household.Category.FindByID(category.ID);
             row.Delete();
 
             mainWindowLogic.CommitChanges();

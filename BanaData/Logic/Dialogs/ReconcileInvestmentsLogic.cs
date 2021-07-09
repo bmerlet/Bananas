@@ -69,7 +69,7 @@ namespace BanaData.Logic.Dialogs
             // Find all candidates
             var transactions = new List<TransactionToReconcile>();
             // Process regular transactions
-            foreach (Household.TransactionsRow tr in accountRow.GetUnreconciledTransactions())
+            foreach (Household.TransactionRow tr in accountRow.GetUnreconciledTransactions())
             {
                 var investmentTransactionRow = tr.GetInvestmentTransaction();
 
@@ -99,7 +99,7 @@ namespace BanaData.Logic.Dialogs
             }
 
             // Process transfer fill-ins
-            foreach (Household.LineItemsRow li in accountRow.GetUnreconciledTransfers())
+            foreach (Household.LineItemRow li in accountRow.GetUnreconciledTransfers())
             {
                 decimal amount = -li.Amount;
 
@@ -164,7 +164,7 @@ namespace BanaData.Logic.Dialogs
                     {
                         if (trans.IsCleared == true && !trans.IsTransferFillIn)
                         {
-                            var tr = mainWindowLogic.Household.Transactions.FindByID(trans.ID);
+                            var tr = mainWindowLogic.Household.Transaction.FindByID(trans.ID);
                             var itr = tr.GetInvestmentTransaction();
                             if (!itr.IsSecurityIDNull() && itr.SecuritiesRow.Symbol == tracker.Symbol)
                             {
@@ -254,12 +254,12 @@ namespace BanaData.Logic.Dialogs
             {
                 if (tr.IsTransferFillIn)
                 {
-                    var liRow = household.LineItems.FindByID(tr.ID);
+                    var liRow = household.LineItem.FindByID(tr.ID);
                     liRow.TransferStatus = tr.IsCleared == true ? newStatus : ETransactionStatus.Pending;
                 }
                 else
                 {
-                    var transRow = household.Transactions.FindByID(tr.ID);
+                    var transRow = household.Transaction.FindByID(tr.ID);
                     transRow.Status = tr.IsCleared == true ? newStatus : ETransactionStatus.Pending;
                 }
             }

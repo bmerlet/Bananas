@@ -327,7 +327,7 @@ namespace BanaData.Logic.Main
 
             if (TransID == TRANSID_TRANSFER_FILLIN)
             {
-                var liRow = household.LineItems.FindByID(data.LineItems[0].ID);
+                var liRow = household.LineItem.FindByID(data.LineItems[0].ID);
                 if (data.Status != liRow.TransferStatus)
                 {
                     data.Status = liRow.TransferStatus;
@@ -336,7 +336,7 @@ namespace BanaData.Logic.Main
             }
             else if (TransID != TRANSID_NOT_COMMITTED)
             {
-                var trRow = household.Transactions.FindByID(TransID);
+                var trRow = household.Transaction.FindByID(TransID);
 
                 if (data.Status != trRow.Status)
                 {
@@ -351,10 +351,10 @@ namespace BanaData.Logic.Main
             // Delete from dataset
             var household = mainWindowLogic.Household;
             var accountRow = household.Account.FindByID(accountID);
-            var transactionRow = household.Transactions.FindByID(transID);
+            var transactionRow = household.Transaction.FindByID(transID);
 
             // Delete all line items
-            var lineItems = transactionRow.GetLineItemsRows();
+            var lineItems = transactionRow.GetLineItemRows();
             foreach (var lineItem in lineItems)
             {
                 lineItem.Delete();
@@ -382,7 +382,7 @@ namespace BanaData.Logic.Main
 
             if (TransID == TRANSID_TRANSFER_FILLIN)
             {
-                var liRow = household.LineItems.FindByID(data.LineItems[0].ID);
+                var liRow = household.LineItem.FindByID(data.LineItems[0].ID);
                 var transRow = liRow.TransactionsRow;
                 mainWindowLogic.GotoTransaction(transRow.AccountID, transRow.ID, data.LineItems[0].ID);
             }

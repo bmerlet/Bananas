@@ -39,7 +39,7 @@ namespace BanaData.Database
             }
 
             // Are there transactions associated with this account?
-            public bool HasTransactions => GetTransactionsRows().Length > 0;
+            public bool HasTransactions => GetTransactionRows().Length > 0;
 
             // Get the balance of an account
             public decimal GetBalance()
@@ -59,7 +59,7 @@ namespace BanaData.Database
                 decimal balance = 0;
 
                 // Find balance from all transactions
-                foreach (var transaction in GetTransactionsRows())
+                foreach (var transaction in GetTransactionRows())
                 {
                     if (!filter || transaction.Status == statusToFilterOn)
                     {
@@ -79,7 +79,7 @@ namespace BanaData.Database
                 }
 
                 // Add tansfers to/from that account
-                foreach (var lineItemRow in GetLineItemsRows())
+                foreach (var lineItemRow in GetLineItemRows())
                 {
                     var transRow = lineItemRow.TransactionsRow;
                     if (transRow.AccountID != ID)
@@ -95,15 +95,15 @@ namespace BanaData.Database
             }
 
             // Get the unreconciled transactions of a banking account
-            public IEnumerable<TransactionsRow> GetUnreconciledTransactions()
+            public IEnumerable<TransactionRow> GetUnreconciledTransactions()
             {
-                return GetTransactionsRows().Where(tr => tr.Status != ETransactionStatus.Reconciled);
+                return GetTransactionRows().Where(tr => tr.Status != ETransactionStatus.Reconciled);
             }
 
             // Get the unreconciled transfer to a banking account
-            public IEnumerable<LineItemsRow> GetUnreconciledTransfers()
+            public IEnumerable<LineItemRow> GetUnreconciledTransfers()
             {
-                return GetLineItemsRows()
+                return GetLineItemRows()
                     .Where(li => li.TransactionsRow.AccountID != ID)
                     .Where(li => li.TransferStatus != ETransactionStatus.Reconciled);
             }
@@ -113,13 +113,13 @@ namespace BanaData.Database
             {
                 // Compute the portfolio
                 var portfolio = new Portfolio();
-                foreach (var transRow in GetTransactionsRows())
+                foreach (var transRow in GetTransactionRows())
                 {
                     portfolio.ApplyTransaction(transRow);
                 }
 
                 // Add tansfers to/from that account
-                foreach (var lineItemRow in GetLineItemsRows())
+                foreach (var lineItemRow in GetLineItemRows())
                 {
                     if (lineItemRow.TransactionsRow.AccountID != ID)
                     {
@@ -136,7 +136,7 @@ namespace BanaData.Database
             {
                 // Compute the portfolio
                 var portfolio = new Portfolio();
-                foreach (var transRow in GetTransactionsRows())
+                foreach (var transRow in GetTransactionRows())
                 {
                     portfolio.ApplyTransaction(transRow);
                 }
@@ -146,11 +146,11 @@ namespace BanaData.Database
             }
 
             // Get the portfolio at a specific date
-            public Portfolio GetPortfolio(DateTime? date, Household.TransactionsRow excludedTransaction = null)
+            public Portfolio GetPortfolio(DateTime? date, Household.TransactionRow excludedTransaction = null)
             {
                 // Compute the portfolio at the specified date
                 var portfolio = new Portfolio();
-                foreach (TransactionsRow transRow in GetTransactionsRows())
+                foreach (TransactionRow transRow in GetTransactionRows())
                 {
                     if (transRow == excludedTransaction)
                     {

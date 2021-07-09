@@ -51,13 +51,13 @@ namespace BanaData.Logic.Main
 
         #region Logic Properties
 
-        public bool IsCashIn => Household.InvestmentTransactionsRow.CashIn(data.Type);
+        public bool IsCashIn => Household.InvestmentTransactionRow.CashIn(data.Type);
 
-        public bool IsCashOut => Household.InvestmentTransactionsRow.CashOut(data.Type);
+        public bool IsCashOut => Household.InvestmentTransactionRow.CashOut(data.Type);
 
-        public bool IsSecurityIn => Household.InvestmentTransactionsRow.SecurityIn(data.Type);
+        public bool IsSecurityIn => Household.InvestmentTransactionRow.SecurityIn(data.Type);
 
-        public bool IsSecurityOut => Household.InvestmentTransactionsRow.SecurityOut(data.Type);
+        public bool IsSecurityOut => Household.InvestmentTransactionRow.SecurityOut(data.Type);
 
         public override decimal AmountForCashBalance => (IsCashIn || IsCashOut) ? data.Amount : 0;
 
@@ -379,7 +379,7 @@ namespace BanaData.Logic.Main
                 return "";
             }
 
-            return Household.InvestmentTransactionsRow.GetDescription(data.Type, Amount, SecuritySymbol, SecurityQuantity, SecurityPrice);
+            return Household.InvestmentTransactionRow.GetDescription(data.Type, Amount, SecuritySymbol, SecurityQuantity, SecurityPrice);
         }
 
         private void SetType(EInvestmentTransactionType value, bool force)
@@ -679,36 +679,36 @@ namespace BanaData.Logic.Main
             if (TransID == TRANSID_NOT_COMMITTED)
             {
                 // Create new transaction row
-                var transactionRow = household.Transactions.Add(accountRow, data.Date, data.Payee, data.Memo, data.Status, household.Checkpoint.GetMostRecentCheckpointID());
+                var transactionRow = household.Transaction.Add(accountRow, data.Date, data.Payee, data.Memo, data.Status, household.Checkpoint.GetMostRecentCheckpointID());
                 TransID = transactionRow.ID;
 
                 // Create new investment transaction row
-                household.InvestmentTransactions.Add(transactionRow, data.Type, securityRow, data.SecurityPrice, data.SecurityQuantity, data.Commission);
+                household.InvestmentTransaction.Add(transactionRow, data.Type, securityRow, data.SecurityPrice, data.SecurityQuantity, data.Commission);
 
                 // Create the line item
                 var li = data.LineItems[0];
-                var liRow = household.LineItems.Add(transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount);
+                var liRow = household.LineItem.Add(transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount);
                 li.ID = liRow.ID;
             }
             else if (TransID == TRANSID_TRANSFER_FILLIN)
             {
                 // Modification of status for transfer pseudo-transaction
                 // The status for the transactionless end of the transfer is kept in the transfer line item row 
-                var liRow = household.LineItems.FindByID(data.LineItems[0].ID);
+                var liRow = household.LineItem.FindByID(data.LineItems[0].ID);
                 liRow.TransferStatus = data.Status;
             }
             else
             {
                 // Update transaction row
-                var transactionRow = household.Transactions.Update(TransID, accountRow, data.Date, data.Memo, data.Payee, data.Status);
+                var transactionRow = household.Transaction.Update(TransID, accountRow, data.Date, data.Memo, data.Payee, data.Status);
 
                 // Update investment transaction
-                household.InvestmentTransactions.Update(transactionRow, data.Type, securityRow, data.SecurityPrice, data.SecurityQuantity, data.Commission);
+                household.InvestmentTransaction.Update(transactionRow, data.Type, securityRow, data.SecurityPrice, data.SecurityQuantity, data.Commission);
 
                 // Update the line item
                 var li = data.LineItems[0];
-                var liRow = household.LineItems.FindByID(li.ID);
-                household.LineItems.Update(liRow, transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount);
+                var liRow = household.LineItem.FindByID(li.ID);
+                household.LineItem.Update(liRow, transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount);
             }
 
             mainWindowLogic.CommitChanges();

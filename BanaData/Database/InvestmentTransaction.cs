@@ -13,7 +13,7 @@ namespace BanaData.Database
 {
     public partial class Household
     {
-        partial class InvestmentTransactionsRow
+        partial class InvestmentTransactionRow
         {
             // Bridges to local enum types
             public EInvestmentTransactionType Type
@@ -208,17 +208,17 @@ namespace BanaData.Database
             }
         }
 
-        partial class InvestmentTransactionsDataTable
+        partial class InvestmentTransactionDataTable
         {
-            public InvestmentTransactionsRow Add(
-                TransactionsRow transactionRow,
+            public InvestmentTransactionRow Add(
+                TransactionRow transactionRow,
                 EInvestmentTransactionType type,
                 SecurityRow security,
                 decimal securityPrice,
                 decimal securityQuantity,
                 decimal commission)
             {
-                var invTransRow = NewInvestmentTransactionsRow();
+                var invTransRow = NewInvestmentTransactionRow();
 
                 UpdateInvestmentTransaction(invTransRow, transactionRow, type, security, securityPrice, securityQuantity, commission);
 
@@ -227,22 +227,22 @@ namespace BanaData.Database
                 return invTransRow;
             }
 
-            public InvestmentTransactionsRow Update(
-                TransactionsRow transactionRow,
+            public InvestmentTransactionRow Update(
+                TransactionRow transactionRow,
                 EInvestmentTransactionType type,
                 SecurityRow security,
                 decimal securityPrice,
                 decimal securityQuantity,
                 decimal commission)
             {
-                InvestmentTransactionsRow invTransRow = transactionRow.GetInvestmentTransaction();
+                InvestmentTransactionRow invTransRow = transactionRow.GetInvestmentTransaction();
 
                 return UpdateInvestmentTransaction(invTransRow, transactionRow, type, security, securityPrice, securityQuantity, commission);
             }
 
-            private static InvestmentTransactionsRow UpdateInvestmentTransaction(
-                InvestmentTransactionsRow invTransRow,
-                TransactionsRow transactionRow,
+            private static InvestmentTransactionRow UpdateInvestmentTransaction(
+                InvestmentTransactionRow invTransRow,
+                TransactionRow transactionRow,
                 EInvestmentTransactionType type,
                 SecurityRow securityRow,
                 decimal securityPrice,

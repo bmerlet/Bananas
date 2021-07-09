@@ -221,7 +221,7 @@ namespace BanaData.Logic.Main
             if (TransID == TRANSID_NOT_COMMITTED)
             {
                 // Create new transaction row
-                var transactionRow = household.Transactions.Add(accountRow, data.Date, data.Payee, data.Memo, data.Status, household.Checkpoint.GetMostRecentCheckpointID());
+                var transactionRow = household.Transaction.Add(accountRow, data.Date, data.Payee, data.Memo, data.Status, household.Checkpoint.GetMostRecentCheckpointID());
                 TransID = transactionRow.ID;
 
                 // Create new banking transaction row if needed
@@ -234,7 +234,7 @@ namespace BanaData.Logic.Main
                 // Create all line items
                 foreach(var li in data.LineItems)
                 {
-                    var liRow = household.LineItems.Add(transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount);
+                    var liRow = household.LineItem.Add(transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount);
                     li.ID = liRow.ID;
                 }
             }
@@ -242,13 +242,13 @@ namespace BanaData.Logic.Main
             {
                 // Modification of status for transfer pseudo-transaction
                 // The status for the transactionless end of the transfer is kept in the transfer line item row 
-                var liRow = household.LineItems.FindByID(data.LineItems[0].ID);
+                var liRow = household.LineItem.FindByID(data.LineItems[0].ID);
                 liRow.TransferStatus = data.Status;
             }
             else
             {
                 // Update transaction row
-                var transactionRow = household.Transactions.Update(TransID, accountRow, data.Date, data.Payee, data.Memo, data.Status);
+                var transactionRow = household.Transaction.Update(TransID, accountRow, data.Date, data.Payee, data.Memo, data.Status);
 
                 // Update banking transaction if needed
                 if (bankRegisterLogic.IsBank)
@@ -265,7 +265,7 @@ namespace BanaData.Logic.Main
                 {
                     if (li.ID >= 0 && data.LineItems.FirstOrDefault(l => l.ID == li.ID) == null)
                     {
-                        household.LineItems.FindByID(li.ID).Delete();
+                        household.LineItem.FindByID(li.ID).Delete();
                     }
                 }
                 // Second update or create the other ones
@@ -273,12 +273,12 @@ namespace BanaData.Logic.Main
                 {
                     if (li.ID >= 0)
                     {
-                        var liRow = household.LineItems.FindByID(li.ID);
-                        household.LineItems.Update(liRow, transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount);
+                        var liRow = household.LineItem.FindByID(li.ID);
+                        household.LineItem.Update(liRow, transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount);
                     }
                     else
                     {
-                        var liRow = household.LineItems.Add(transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount);
+                        var liRow = household.LineItem.Add(transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount);
                         li.ID = liRow.ID;
                     }
                 }

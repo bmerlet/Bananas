@@ -445,7 +445,7 @@ namespace BanaData.Logic.Main
                     int categoryAccountID = -1;
                     if (!dbli.IsCategoryIDNull())
                     {
-                        var destCategory = household.Categories.FindByID(dbli.CategoryID);
+                        var destCategory = household.Category.FindByID(dbli.CategoryID);
                         category = destCategory.FullName;
                         categoryID = destCategory.ID;
                     }
@@ -473,7 +473,7 @@ namespace BanaData.Logic.Main
             Categories.Clear();
 
             // Add all top-level categories
-            foreach (var category in Household.Categories)
+            foreach (var category in Household.Category)
             {
                 if (category.IsParentIDNull())
                 {
@@ -489,7 +489,7 @@ namespace BanaData.Logic.Main
             {
                 categoryNotFound = false;
 
-                foreach (var category in Household.Categories)
+                foreach (var category in Household.Category)
                 {
                     // If category has a parent
                     if (!category.IsParentIDNull())

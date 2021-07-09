@@ -26,7 +26,7 @@ namespace BanaData.Database
 
         public IEnumerable<Lot> Lots => lots;
 
-        public void ApplyTransaction(Household.TransactionsRow transaction)
+        public void ApplyTransaction(Household.TransactionRow transaction)
         {
             // Get investment transaction
             var investmentTransaction = transaction.GetInvestmentTransaction();
@@ -56,7 +56,7 @@ namespace BanaData.Database
             }
         }
 
-        public void ApplyTransfer(Household.LineItemsRow lineItem)
+        public void ApplyTransfer(Household.LineItemRow lineItem)
         {
             cashBalance -= lineItem.Amount;
         }
@@ -153,7 +153,7 @@ namespace BanaData.Database
         static public ComputeSaleCapitalGainsResult ComputeSaleCapitalGains(Household household, int transactionID, bool reportUsedLots)
         {
             // Get transaction info
-            var transactionRow = household.Transactions.FindByID(transactionID);
+            var transactionRow = household.Transaction.FindByID(transactionID);
             var investmentTransactionRow = transactionRow.GetInvestmentTransaction();
             var securityRow = investmentTransactionRow.SecuritiesRow;
             var accountRow = transactionRow.AccountsRow;
@@ -186,7 +186,7 @@ namespace BanaData.Database
         private static ComputeSaleCapitalGainsResult ComputeSaleCapitalGains(
             Household.AccountRow accountRow, 
             DateTime date,
-            Household.TransactionsRow transactionToExclude,
+            Household.TransactionRow transactionToExclude,
             Household.SecurityRow securityRow,
             decimal securityQuantity,
             decimal securityPrice,

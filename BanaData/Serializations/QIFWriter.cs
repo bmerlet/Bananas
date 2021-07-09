@@ -66,7 +66,7 @@ namespace BanaData.Serializations
         private void ExportCategories(StreamWriter sw)
         {
             sw.WriteLine("!Type:Cat");
-            foreach(Household.CategoriesRow categoryRow in household.Categories.Rows)
+            foreach(Household.CategoryRow categoryRow in household.Category.Rows)
             {
                 sw.WriteLine($"N{mainWindowLogic.Categories.Find(c => c.ID == categoryRow.ID).FullName}");
                 if (!categoryRow.IsDescriptionNull())
@@ -202,7 +202,7 @@ namespace BanaData.Serializations
                 sw.WriteLine($"!Type:{accountType}");
 
                 // Get all transactions on this account
-                foreach (var transactionRow in accountRow.GetTransactionsRows())
+                foreach (var transactionRow in accountRow.GetTransactionRows())
                 {
                     // If filtering on checkpoint, skip transactions that do not match
                     if (checkpointID >= 0 && transactionRow.CheckpointID != checkpointID)
@@ -225,7 +225,7 @@ namespace BanaData.Serializations
                 }
 
                 // Now find all transfers that have this account as destination
-                foreach(var lineItemRow in household.LineItems.Where(li => !li.IsAccountIDNull() && li.AccountID == accountRow.ID))
+                foreach(var lineItemRow in household.LineItem.Where(li => !li.IsAccountIDNull() && li.AccountID == accountRow.ID))
                 {
                     var transactionRow = lineItemRow.TransactionsRow;
 
@@ -257,9 +257,9 @@ namespace BanaData.Serializations
             }
         }
 
-        private void ExportBankingTransaction(StreamWriter sw, Household.AccountRow accountRow, Household.TransactionsRow transactionRow)
+        private void ExportBankingTransaction(StreamWriter sw, Household.AccountRow accountRow, Household.TransactionRow transactionRow)
         {
-            var liRows = transactionRow.GetLineItemsRows();
+            var liRows = transactionRow.GetLineItemRows();
             decimal amount = liRows.Sum(li => li.Amount);
 
             sw.WriteLine($"U{amount:N2}");
@@ -319,7 +319,7 @@ namespace BanaData.Serializations
             }
         }
 
-        private void ExportBankingFillIn(StreamWriter sw, Household.TransactionsRow transactionRow, Household.LineItemsRow lineItemRow)
+        private void ExportBankingFillIn(StreamWriter sw, Household.TransactionRow transactionRow, Household.LineItemRow lineItemRow)
         {
             decimal amount = -lineItemRow.Amount;
             sw.WriteLine($"U{amount:N2}");
@@ -335,9 +335,9 @@ namespace BanaData.Serializations
         }
 
 
-        private void ExportInvestmentTransaction(StreamWriter sw, Household.TransactionsRow transactionRow)
+        private void ExportInvestmentTransaction(StreamWriter sw, Household.TransactionRow transactionRow)
         {
-            var liRow = transactionRow.GetLineItemsRows()[0];
+            var liRow = transactionRow.GetLineItemRows()[0];
             decimal amount = Math.Abs(liRow.Amount);
 
             var investmentTransactionRow = transactionRow.GetInvestmentTransaction();
@@ -497,7 +497,7 @@ namespace BanaData.Serializations
             }
         }
 
-        private void ExportInvestmentFillIn(StreamWriter sw, Household.TransactionsRow transactionRow, Household.LineItemsRow lineItemRow)
+        private void ExportInvestmentFillIn(StreamWriter sw, Household.TransactionRow transactionRow, Household.LineItemRow lineItemRow)
         {
             decimal amount = -lineItemRow.Amount;
 
@@ -534,7 +534,7 @@ namespace BanaData.Serializations
             }
         }
 
-        private void ExportCategory(StreamWriter sw, Household.LineItemsRow lineItemRow, bool forSplit)
+        private void ExportCategory(StreamWriter sw, Household.LineItemRow lineItemRow, bool forSplit)
         {
             string letter = forSplit ? "S" : "L";
             if (!lineItemRow.IsCategoryIDNull())

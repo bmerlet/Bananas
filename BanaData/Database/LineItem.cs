@@ -13,7 +13,7 @@ namespace BanaData.Database
 {
     public partial class Household
     {
-        partial class LineItemsRow
+        partial class LineItemRow
         {
             // Bridges to local enum types
             public ETransactionStatus TransferStatus
@@ -57,11 +57,11 @@ namespace BanaData.Database
             }
         }
 
-        partial class LineItemsDataTable
+        partial class LineItemDataTable
         {
-            public LineItemsRow Add(TransactionsRow transactionRow, int categoryId, int categoryAccountId, string memo, decimal amount)
+            public LineItemRow Add(TransactionRow transactionRow, int categoryId, int categoryAccountId, string memo, decimal amount)
             {
-                var lineItemRow = NewLineItemsRow();
+                var lineItemRow = NewLineItemRow();
 
                 UpdateLineItem(lineItemRow, transactionRow, categoryId, categoryAccountId, memo, amount);
 
@@ -70,7 +70,7 @@ namespace BanaData.Database
                 return lineItemRow;
             }
 
-            public LineItemsRow Update(LineItemsRow lineItemRow, TransactionsRow transactionRow, int categoryId, int categoryAccountId, string memo, decimal amount)
+            public LineItemRow Update(LineItemRow lineItemRow, TransactionRow transactionRow, int categoryId, int categoryAccountId, string memo, decimal amount)
             {
                 UpdateLineItem(lineItemRow, transactionRow, categoryId, categoryAccountId, memo, amount);
 
@@ -78,7 +78,7 @@ namespace BanaData.Database
             }
 
 
-            private static LineItemsRow UpdateLineItem(LineItemsRow lineItemRow, TransactionsRow transactionRow, int categoryId, int categoryAccountId, string memo, decimal amount)
+            private static LineItemRow UpdateLineItem(LineItemRow lineItemRow, TransactionRow transactionRow, int categoryId, int categoryAccountId, string memo, decimal amount)
             {
                 lineItemRow.TransactionID = transactionRow.ID;
 

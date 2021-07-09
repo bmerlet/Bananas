@@ -93,7 +93,7 @@ namespace BanaData.Logic.Dialogs
 
             var parent = GetParent();
 
-            foreach (Household.CategoriesRow cat in mainWindowLogic.Household.Categories.Rows)
+            foreach (Household.CategoryRow cat in mainWindowLogic.Household.Category.Rows)
             {
                 if (cat.ID != oldCategoryItem.ID && cat.Name == Name &&
                     ((parent == null && cat.IsParentIDNull()) || (parent != null && !cat.IsParentIDNull() && parent.ID == cat.ParentID)))

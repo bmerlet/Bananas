@@ -62,10 +62,10 @@ namespace BanaData.Logic.Dialogs
             var household = mainWindowLogic.Household;
 
             // Process regular transactions
-            foreach (Household.TransactionsRow tr in accountRow.GetUnreconciledTransactions())
+            foreach (Household.TransactionRow tr in accountRow.GetUnreconciledTransactions())
             {
                 // Compute amount
-                var lineItems = tr.GetLineItemsRows();
+                var lineItems = tr.GetLineItemRows();
                 decimal amount = lineItems.Sum(li => li.Amount);
 
                 // We want only deposit or payments
@@ -103,7 +103,7 @@ namespace BanaData.Logic.Dialogs
             }
 
             // Process transfer fill-ins
-            foreach (Household.LineItemsRow li in accountRow.GetUnreconciledTransfers())
+            foreach (Household.LineItemRow li in accountRow.GetUnreconciledTransfers())
             {
                 decimal amount = -li.Amount;
 
@@ -266,12 +266,12 @@ namespace BanaData.Logic.Dialogs
                 {
                     if (tr.IsTransferFillIn)
                     {
-                        var liRow = household.LineItems.FindByID(tr.ID);
+                        var liRow = household.LineItem.FindByID(tr.ID);
                         liRow.TransferStatus = tr.IsCleared == true ? newStatus : ETransactionStatus.Pending;
                     }
                     else
                     {
-                        var transRow = household.Transactions.FindByID(tr.ID);
+                        var transRow = household.Transaction.FindByID(tr.ID);
                         transRow.Status = tr.IsCleared == true ? newStatus : ETransactionStatus.Pending;
                     }
                 }
@@ -283,13 +283,13 @@ namespace BanaData.Logic.Dialogs
             var household = mainWindowLogic.Household;
 
             // Create new transaction row
-            var transactionRow = household.Transactions.Add(accountRow, reconcileInfoRow.InterestDate, "Interest Earned", null, ETransactionStatus.Reconciled, household.Checkpoint.GetMostRecentCheckpointID());
+            var transactionRow = household.Transaction.Add(accountRow, reconcileInfoRow.InterestDate, "Interest Earned", null, ETransactionStatus.Reconciled, household.Checkpoint.GetMostRecentCheckpointID());
 
             // Create new banking transaction row
             household.BankingTransaction.Add(transactionRow,ETransactionMedium.None, 0);
 
             // Create the line items
-            household.LineItems.Add(transactionRow, reconcileInfoRow.InterestCategoryID, -1, "", interestAmount);
+            household.LineItem.Add(transactionRow, reconcileInfoRow.InterestCategoryID, -1, "", interestAmount);
 
             // Post newly created transaction ID
             InterestTransactionID = transactionRow.ID;

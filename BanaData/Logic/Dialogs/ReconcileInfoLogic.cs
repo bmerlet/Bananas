@@ -90,7 +90,7 @@ namespace BanaData.Logic.Dialogs
                 {
                     InterestAmount = reconcileInfoRow.InterestAmount;
                     InterestDate = reconcileInfoRow.InterestDate;
-                    InterestCategory = household.Categories.FindByID(reconcileInfoRow.InterestCategoryID).FullName;
+                    InterestCategory = household.Category.FindByID(reconcileInfoRow.InterestCategoryID).FullName;
                 }
 
                 // Copy security info if available

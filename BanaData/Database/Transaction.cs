@@ -12,7 +12,7 @@ namespace BanaData.Database
 {
     public partial class Household
     {
-        partial class TransactionsRow
+        partial class TransactionRow
         {
             // Bridges to local enum types
             public ETransactionStatus Status
@@ -26,7 +26,7 @@ namespace BanaData.Database
             {
                 decimal amount = 0;
 
-                foreach (LineItemsRow lineItemRow in GetLineItemsRows())
+                foreach (LineItemRow lineItemRow in GetLineItemRows())
                 {
                     amount += lineItemRow.Amount;
                 }
@@ -39,9 +39,9 @@ namespace BanaData.Database
                 return GetBankingTransactionRows().Single();
             }
 
-            public InvestmentTransactionsRow GetInvestmentTransaction()
+            public InvestmentTransactionRow GetInvestmentTransaction()
             {
-                return GetInvestmentTransactionsRows().Single();
+                return GetInvestmentTransactionRows().Single();
             }
 
             public bool HasSame(DateTime date, string payee, string memo, ETransactionStatus status)
@@ -80,11 +80,11 @@ namespace BanaData.Database
 
         }
 
-        partial class TransactionsDataTable
+        partial class TransactionDataTable
         {
-            public TransactionsRow Add(AccountRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status, int checkpointID)
+            public TransactionRow Add(AccountRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status, int checkpointID)
             {
-                var transactionRow = NewTransactionsRow();
+                var transactionRow = NewTransactionRow();
 
                 UpdateTransaction(transactionRow, accountRow, date, payee, memo, status, checkpointID);
 
@@ -93,7 +93,7 @@ namespace BanaData.Database
                 return transactionRow;
             }
 
-            public TransactionsRow Update(int transactionID, AccountRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status)
+            public TransactionRow Update(int transactionID, AccountRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status)
             {
                 var transactionRow = FindByID(transactionID);
 
@@ -102,7 +102,7 @@ namespace BanaData.Database
                 return transactionRow;
             }
 
-            private static TransactionsRow UpdateTransaction(TransactionsRow transactionRow, AccountRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status, int checkpointID)
+            private static TransactionRow UpdateTransaction(TransactionRow transactionRow, AccountRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status, int checkpointID)
             {
                 transactionRow.AccountID = accountRow.ID;
 

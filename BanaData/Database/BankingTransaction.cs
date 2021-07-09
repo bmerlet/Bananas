@@ -40,7 +40,7 @@ namespace BanaData.Database
 
         partial class BankingTransactionDataTable
         {
-            public BankingTransactionRow Add(TransactionsRow transactionRow, ETransactionMedium medium, uint checkNumber)
+            public BankingTransactionRow Add(TransactionRow transactionRow, ETransactionMedium medium, uint checkNumber)
             {
                 var bankTransRow = NewBankingTransactionRow();
 
@@ -51,7 +51,7 @@ namespace BanaData.Database
                 return bankTransRow;
             }
 
-            public BankingTransactionRow Update(TransactionsRow transactionRow, ETransactionMedium medium, uint checkNumber)
+            public BankingTransactionRow Update(TransactionRow transactionRow, ETransactionMedium medium, uint checkNumber)
             {
                 var bankTransRow = transactionRow.GetBankingTransaction();
 
@@ -60,7 +60,7 @@ namespace BanaData.Database
                 return bankTransRow;
             }
 
-            private static BankingTransactionRow UpdateBankTransaction(BankingTransactionRow bankTransRow, TransactionsRow transactionRow, ETransactionMedium medium, uint checkNumber)
+            private static BankingTransactionRow UpdateBankTransaction(BankingTransactionRow bankTransRow, TransactionRow transactionRow, ETransactionMedium medium, uint checkNumber)
             {
                 bankTransRow.TransactionID = transactionRow.ID;
                 bankTransRow.Medium = medium;
