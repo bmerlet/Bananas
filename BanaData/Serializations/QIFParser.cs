@@ -87,12 +87,14 @@ namespace BanaData.Serializations
 
         #region Entry points
 
-        public void ImportFromQIF(string fileName)
+        public void ImportFromQIF(string fileName, bool preserveInfoNotPresentInQIF)
         {
             // Init
             Log = "";
             accountNames.Clear();
             merging = false;
+
+            var supplementalInfo = preserveInfoNotPresentInQIF ? GetSupplemtalInfo() : null;
 
             // Zap the database
             household.Clear();
@@ -115,6 +117,11 @@ namespace BanaData.Serializations
 
             // Find other sides of transfers
             PairTransfers();
+
+            if (supplementalInfo != null)
+            {
+                ApplySupplementalInfo(supplementalInfo);
+            }
 
             household.AcceptChanges();
 
@@ -2011,6 +2018,188 @@ namespace BanaData.Serializations
                     transactionToDelete.GetBankingTransaction().Delete();
                 }
                 transactionToDelete.Delete();
+            }
+        }
+
+        #endregion
+
+        #region Save and restore non-QIF info
+
+        private SupplementalInfo GetSupplemtalInfo()
+        {
+            var supplementalInfo = new SupplementalInfo();
+
+            // Accounts: Hidden flag in accounts, IRA kind in accounts, last statement date
+            foreach(Household.AccountRow accountRow in household.Account.Rows)
+            {
+                supplementalInfo.Accounts.Add(
+                    new SupplementalInfo.Account(
+                        accountRow.Name,
+                        accountRow.Hidden,
+                        accountRow.Type == EAccountType.Investment && accountRow.Kind == EInvestmentKind.TraditionalIRA,
+                        accountRow.IsLastStatementDateNull() ? null : accountRow.LastStatementDate as DateTime?));
+            }
+
+            // ReconcileInfo table and SecurityReconcileInfo table
+            foreach (Household.ReconcileInfoRow reconcileInfoRow in household.ReconcileInfo)
+            {
+                var reconcileInfo = new SupplementalInfo.ReconcileInfo(
+                    reconcileInfoRow.AccountsRow.Name,
+                    reconcileInfoRow.StatementDate,
+                    reconcileInfoRow.StatementBalance,
+                    reconcileInfoRow.IsInterestAmountNull() ? 0 : reconcileInfoRow.InterestAmount,
+                    reconcileInfoRow.IsInterestDateNull() ? null : reconcileInfoRow.InterestDate as DateTime?,
+                    reconcileInfoRow.IsInterestCategoryIDNull() ? null : reconcileInfoRow.CategoriesRow.FullName);
+
+                foreach (var securityReconcileInfoRow in reconcileInfoRow.GetSecurityReconcileInfoRows())
+                {
+                    reconcileInfo.SecurityReconcileInfos.Add(
+                        new SupplementalInfo.ReconcileInfo.SecurityReconcileInfo(
+                            securityReconcileInfoRow.SecuritiesRow.Name, securityReconcileInfoRow.SecurityQuantity));
+                }
+
+                supplementalInfo.ReconcileInfos.Add(reconcileInfo);
+            }
+
+            // RebalanceTarget table
+            foreach (Household.RebalanceTargetRow rebalanceTargetRow in household.RebalanceTarget)
+            {
+                supplementalInfo.RebalanceTargets.Add(
+                    new SupplementalInfo.RebalanceTarget(
+                        rebalanceTargetRow.AccountRow.Name, rebalanceTargetRow.SecurityRow.Name, rebalanceTargetRow.Target));
+            }
+
+            return supplementalInfo;
+        }
+
+        private void ApplySupplementalInfo(SupplementalInfo supplementalInfo)
+        {
+            // Accounts: Hidden flag in accounts, IRA kind in accounts, last statement date
+            foreach (Household.AccountRow accountRow in household.Account.Rows)
+            {
+                var sai = supplementalInfo.Accounts.FirstOrDefault(a => a.Name == accountRow.Name);
+                if (sai != null)
+                {
+                    accountRow.Hidden = sai.Hidden;
+                    if (sai.IsIRA && !accountRow.IsIKindNull())
+                    {
+                        accountRow.Kind = EInvestmentKind.TraditionalIRA;
+                    }
+                    if (sai.LastStatementDate.HasValue)
+                    {
+                        accountRow.LastStatementDate = sai.LastStatementDate.Value;
+                    }
+                }
+            }
+
+            // ReconcileInfo table and SecurityReconcileInfo table
+            foreach (var reconcileInfo in supplementalInfo.ReconcileInfos)
+            {
+                var accountRow = household.Account.GetByName(reconcileInfo.AccountName);
+                if (accountRow != null)
+                {
+                    var reconcileInfoRow = household.ReconcileInfo.NewReconcileInfoRow();
+                    
+                    reconcileInfoRow.AccountID = accountRow.ID;
+                    reconcileInfoRow.StatementDate = reconcileInfo.StatementDate;
+                    reconcileInfoRow.StatementBalance = reconcileInfo.StatementBalance;
+
+                    if (reconcileInfo.InterestDate != null)
+                    {
+                        reconcileInfoRow.InterestAmount = reconcileInfo.InterestAmount;
+                        reconcileInfoRow.InterestDate = reconcileInfo.InterestDate.Value;
+                        var categoryRow = household.Category.GetByFullName(reconcileInfo.InterestCategory);
+                        if (categoryRow != null)
+                        {
+                            reconcileInfoRow.InterestCategoryID = categoryRow.ID;
+                        }
+                    }
+
+                    household.ReconcileInfo.AddReconcileInfoRow(reconcileInfoRow);
+
+                    foreach(var securityReconcileInfo in reconcileInfo.SecurityReconcileInfos)
+                    {
+                        var securityRow = household.Security.GetByName(securityReconcileInfo.Name);
+                        if (securityRow != null)
+                        {
+                            var securityReconcileInfoRow = household.SecurityReconcileInfo.NewSecurityReconcileInfoRow();
+                            securityReconcileInfoRow.ReconcileInfoID = reconcileInfoRow.ID;
+                            securityReconcileInfoRow.SecurityID = securityRow.ID;
+                            securityReconcileInfoRow.SecurityQuantity = securityReconcileInfo.Quantity;
+                            household.SecurityReconcileInfo.AddSecurityReconcileInfoRow(securityReconcileInfoRow);
+                        }
+                    }
+                }
+            }
+
+            // RebalanceTarget table
+            foreach (var rebalanceTarget in supplementalInfo.RebalanceTargets)
+            {
+                var accountRow = household.Account.GetByName(rebalanceTarget.AccountName);
+                if (accountRow != null)
+                {
+                    var securityRow = household.Security.GetByName(rebalanceTarget.SecurityName);
+                    if (securityRow != null)
+                    {
+                        var rebalanceTargetRow = household.RebalanceTarget.NewRebalanceTargetRow();
+                        rebalanceTargetRow.AccountID = accountRow.ID;
+                        rebalanceTargetRow.SecurityID = securityRow.ID;
+                        rebalanceTargetRow.Target = rebalanceTarget.Target;
+                        household.RebalanceTarget.AddRebalanceTargetRow(rebalanceTargetRow);
+                    }
+                }
+            }
+
+        }
+
+        private class SupplementalInfo
+        {
+            // Account info
+            public readonly List<Account> Accounts = new List<Account>();
+            public class Account
+            {
+                public Account(string name, bool hidden, bool isIRA, DateTime? lastStatementDate) =>
+                    (Name, Hidden, IsIRA, LastStatementDate) = (name, hidden, isIRA, lastStatementDate);
+
+                public readonly string Name;
+                public readonly bool Hidden;
+                public readonly bool IsIRA;
+                public readonly DateTime? LastStatementDate;
+            }
+
+            // Reconcile info table
+            public readonly List<ReconcileInfo> ReconcileInfos = new List<ReconcileInfo>();
+            public class ReconcileInfo
+            {
+                public ReconcileInfo(string accountName, DateTime statementDate, decimal statementBalance, decimal interestAmount, DateTime? interestDate, string interestCategory) =>
+                    (AccountName, StatementDate, StatementBalance, InterestAmount, InterestDate, InterestCategory) =
+                        (accountName, statementDate, statementBalance, interestAmount, interestDate, interestCategory);
+                public readonly string AccountName;
+                public readonly DateTime StatementDate;
+                public readonly decimal StatementBalance;
+                public readonly decimal InterestAmount;
+                public readonly DateTime? InterestDate;
+                public readonly string InterestCategory;
+                public readonly List<SecurityReconcileInfo> SecurityReconcileInfos = new List<SecurityReconcileInfo>();
+
+                public class SecurityReconcileInfo
+                {
+                    public SecurityReconcileInfo(string name, decimal quantity) => (Name, Quantity) = (name, quantity);
+                    public readonly string Name;
+                    public readonly decimal Quantity;
+                }
+            }
+
+            // Rebalance targets
+            public readonly List<RebalanceTarget> RebalanceTargets = new List<RebalanceTarget>();
+            public class RebalanceTarget
+            {
+                public RebalanceTarget(string accountName, string securityName, decimal target) => 
+                    (AccountName, SecurityName, Target) = (accountName, securityName, target);
+
+                public readonly string AccountName;
+                public readonly string SecurityName;
+                public readonly decimal Target;
             }
         }
 

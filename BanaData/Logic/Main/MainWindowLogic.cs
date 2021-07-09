@@ -205,7 +205,7 @@ namespace BanaData.Logic.Main
         public void ImportQIF(string file)
         {
             var parser = new QIFParser(this);
-            parser.ImportFromQIF(file);
+            parser.ImportFromQIF(file, true);
             if (!string.IsNullOrEmpty(parser.Log))
             {
                 ErrorMessage(parser.Log, "Import results");

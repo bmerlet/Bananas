@@ -69,14 +69,7 @@ namespace BanaData.Database
         {
             public SecurityRow GetByName(string name)
             {
-                try
-                {
-                    return this.Single(s => s.Name == name);
-                }
-                catch (InvalidOperationException)
-                {
-                    return null;
-                }
+                return this.SingleOrDefault(s => s.Name == name);
             }
 
             public SecurityRow GetBySymbol(string symbol)
