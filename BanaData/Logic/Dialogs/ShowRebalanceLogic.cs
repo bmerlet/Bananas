@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using BanaData.Database;
 using BanaData.Logic.Main;
+using BanaData.Web;
 using Toolbox.UILogic;
 using Toolbox.UILogic.Dialogs;
 
@@ -37,7 +38,7 @@ namespace BanaData.Logic.Dialogs
             {
                 decimal securityQuantity = portfolio.Lots.Where(l => l.Security == securityRow).Sum(l => l.Quantity);
                 decimal securityPrice = securityRow.GetMostRecentPrice();
-                var securityItem = new SecurityItem(securityRow.Symbol, securityQuantity, securityPrice);
+                var securityItem = new SecurityItem(securityRow, securityRow.Symbol, securityQuantity, securityPrice);
                 securityItems.Add(securityItem);
                 securityItem.TargetChanged += OnSecurityItemTargetChanged;
             }
@@ -113,7 +114,13 @@ namespace BanaData.Logic.Dialogs
 
         private void OnUpdateQuotes()
         {
-            // ZZZZ
+            var quote = new Quote();
+            foreach(var si in securityItems)
+            {
+                si.SecurityPrice = quote.GetQuote(si.Symbol);
+            }
+
+            Recompute();
         }
 
         private void SetupPercentages()
@@ -173,11 +180,18 @@ namespace BanaData.Logic.Dialogs
                     {
                         si.Status = $"Too high by {diff:C2}";
                         si.Action = $"Sell {numShares:N1} shares of {si.Symbol}";
+
+                        var cg = Portfolio.ComputeSaleHypotheticalCapitalGains(accountRow, si.SecurityRow, numShares, si.SecurityPrice);
+                        si.Consequences =
+                            (cg.ShortTermGain != 0 ? $"STCG: {cg.ShortTermGain:C2}" : "") +
+                            (cg.ShortTermGain != 0 && cg.LongTermGain != 0 ? ", " : "") +
+                            (cg.LongTermGain != 0 ? $"LTCG: {cg.LongTermGain:C2}" : "");
                     }
                     else
                     {
                         si.Status = $"Too low by {-diff:C2}";
                         si.Action = $"Buy {-numShares:N1} shares of {si.Symbol}";
+                        si.Consequences = "";
                     };
                 }
 
@@ -198,10 +212,13 @@ namespace BanaData.Logic.Dialogs
 
         public class SecurityItem : LogicBase
         {
-            public SecurityItem(string symbol, decimal securityQuantity, decimal _securityPrice) =>
-                (Symbol, SecurityQuantity, securityPrice) = (symbol, securityQuantity, _securityPrice);
+            public SecurityItem(Household.SecuritiesRow securityRow, string symbol, decimal securityQuantity, decimal _securityPrice) =>
+                (SecurityRow, Symbol, SecurityQuantity, securityPrice) = (securityRow, symbol, securityQuantity, _securityPrice);
 
 
+            // For logic
+            public readonly Household.SecuritiesRow SecurityRow;
+                
             // Invoked when target changes
             public event EventHandler TargetChanged;
 

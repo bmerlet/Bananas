@@ -329,8 +329,8 @@ namespace BanaData.Logic.Dialogs
                 {
                     var accountName = accountRow.Name;
 
-                    // Perf: Skip non-investment accounts altogether if not computing interest
-                    if (accountRow.Type != EAccountType.Investment && !isShowingInterest)
+                    // Skip non-investment accounts
+                    if (accountRow.Type != EAccountType.Investment)
                     {
                         continue;
                     }

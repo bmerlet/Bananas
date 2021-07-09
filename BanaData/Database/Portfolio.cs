@@ -149,14 +149,9 @@ namespace BanaData.Database
             return lots.Select(l => l.Security).Distinct();
         }
 
+        // Computes cap gains from a transaction in the DB
         static public ComputeSaleCapitalGainsResult ComputeSaleCapitalGains(Household household, int transactionID, bool reportUsedLots)
         {
-            // init  results
-            decimal longTermGain = 0;
-            var longTermLots = new List<UsedLot>();
-            decimal shortTermGain = 0;
-            var shortTermLots = new List<UsedLot>();
-
             // Get transaction info
             var transactionRow = household.Transactions.FindByID(transactionID);
             var investmentTransactionRow = transactionRow.GetInvestmentTransaction();
@@ -175,18 +170,48 @@ namespace BanaData.Database
                 price = transactionRow.GetAmount() / quantity;
             }
 
+            return ComputeSaleCapitalGains(accountRow, transactionRow.Date, transactionRow, securityRow, quantity, price, description, reportUsedLots);
+        }
+
+        // Computes cap gains from a hypothetical transaction (taking place today)
+        static public ComputeSaleCapitalGainsResult ComputeSaleHypotheticalCapitalGains(
+            Household.AccountsRow accountRow,
+            Household.SecuritiesRow securityRow,
+            decimal securityQuantity,
+            decimal securityPrice)
+        {
+            return ComputeSaleCapitalGains(accountRow, DateTime.Today, null, securityRow, securityQuantity, securityPrice, null, false);
+        }
+
+        private static ComputeSaleCapitalGainsResult ComputeSaleCapitalGains(
+            Household.AccountsRow accountRow, 
+            DateTime date,
+            Household.TransactionsRow transactionToExclude,
+            Household.SecuritiesRow securityRow,
+            decimal securityQuantity,
+            decimal securityPrice,
+            string description,
+            bool reportUsedLots)
+        {
+            // init  results
+            decimal longTermGain = 0;
+            var longTermLots = new List<UsedLot>();
+            decimal shortTermGain = 0;
+            var shortTermLots = new List<UsedLot>();
+
+
             // Figure out the portfolio for this account at the transaction date
-            var portfolio = accountRow.GetPortfolio(transactionRow.Date, transactionRow);
+            var portfolio = accountRow.GetPortfolio(date, transactionToExclude);
 
             // Get the used lots
-            var usedLots = portfolio.GetLotsUsedForSale(securityRow, investmentTransactionRow.SecurityQuantity);
+            var usedLots = portfolio.GetLotsUsedForSale(securityRow, securityQuantity);
             foreach (var lot in usedLots)
             {
-                decimal quantityUsed = Math.Min(lot.Quantity, quantity);
-                decimal gain = (price - lot.SecurityPrice) * quantityUsed;
+                decimal quantityUsed = Math.Min(lot.Quantity, securityQuantity);
+                decimal gain = (securityPrice - lot.SecurityPrice) * quantityUsed;
 
                 var usedLot = reportUsedLots ? new UsedLot(lot.Date, lot.Quantity, quantityUsed, lot.SecurityPrice, gain) : null;
-                if (transactionRow.Date.Subtract(lot.Date).TotalDays > 365) // ZZZ
+                if (date.Subtract(lot.Date).TotalDays > 365) // ZZZ
                 {
                     if (reportUsedLots)
                     {
@@ -203,7 +228,7 @@ namespace BanaData.Database
                     shortTermGain += gain;
                 }
 
-                quantity -= quantityUsed;
+                securityQuantity -= quantityUsed;
             }
 
             return new ComputeSaleCapitalGainsResult(description, longTermGain, longTermLots, shortTermGain, shortTermLots);
