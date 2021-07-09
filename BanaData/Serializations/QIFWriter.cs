@@ -48,7 +48,7 @@ namespace BanaData.Serializations
         // then create a new checkpoint
         public void DifferentialExportToQIF(string filename)
         {
-            int checkpointID = household.Checkpoints.GetMostRecentCheckpointID();
+            int checkpointID = household.Checkpoint.GetMostRecentCheckpointID();
 
             using (var sw = new StreamWriter(filename, false))
             {
@@ -56,7 +56,7 @@ namespace BanaData.Serializations
             }
 
             // Create a new checkpoint
-            household.Checkpoints.AddCheckpointsRow(DateTime.Now);
+            household.Checkpoint.AddCheckpointRow(DateTime.Now);
         }
 
         #endregion
@@ -91,14 +91,14 @@ namespace BanaData.Serializations
         {
             sw.WriteLine("!Option:AutoSwitch");
             sw.WriteLine("!Account");
-            foreach (Household.AccountsRow accountRow in household.Accounts.Rows)
+            foreach (Household.AccountRow accountRow in household.Account.Rows)
             {
                 ExportOneAccount(sw, accountRow, GetAccountType(accountRow, false));
             }
             sw.WriteLine("!Clear:AutoSwitch");
         }
 
-        private void ExportOneAccount(StreamWriter sw, Household.AccountsRow accountRow, string accountType)
+        private void ExportOneAccount(StreamWriter sw, Household.AccountRow accountRow, string accountType)
         {
             sw.WriteLine($"N{accountRow.Name}");
             sw.WriteLine($"T{accountType}");
@@ -115,7 +115,7 @@ namespace BanaData.Serializations
             sw.WriteLine("^");
         }
 
-        private string GetAccountType(Household.AccountsRow accountRow, bool forTransactions)
+        private string GetAccountType(Household.AccountRow accountRow, bool forTransactions)
         {
             switch (accountRow.Type)
             {
@@ -158,7 +158,7 @@ namespace BanaData.Serializations
 
         private void ExportSecurities(StreamWriter sw)
         {
-            foreach (Household.SecuritiesRow securityRow in household.Securities.Rows)
+            foreach (Household.SecurityRow securityRow in household.Security.Rows)
             {
                 sw.WriteLine("!Type:Security");
                 sw.WriteLine($"N{securityRow.Name}");
@@ -193,7 +193,7 @@ namespace BanaData.Serializations
         {
             sw.WriteLine("!Option:AutoSwitch");
 
-            foreach (Household.AccountsRow accountRow in household.Accounts.Rows)
+            foreach (Household.AccountRow accountRow in household.Account.Rows)
             {
                 sw.WriteLine("!Account");
                 string accountType = GetAccountType(accountRow, true);
@@ -257,7 +257,7 @@ namespace BanaData.Serializations
             }
         }
 
-        private void ExportBankingTransaction(StreamWriter sw, Household.AccountsRow accountRow, Household.TransactionsRow transactionRow)
+        private void ExportBankingTransaction(StreamWriter sw, Household.AccountRow accountRow, Household.TransactionsRow transactionRow)
         {
             var liRows = transactionRow.GetLineItemsRows();
             decimal amount = liRows.Sum(li => li.Amount);
@@ -555,7 +555,7 @@ namespace BanaData.Serializations
         {
             sw.WriteLine("!Type:Memorized");
 
-            foreach(Household.MemorizedPayeesRow mpr in household.MemorizedPayees.Rows)
+            foreach(Household.MemorizedPayeeRow mpr in household.MemorizedPayee.Rows)
             {
                 var liRows = mpr.GetMemorizedLineItemsRows();
                 decimal amount = liRows.Sum(li => li.Amount);
@@ -588,7 +588,7 @@ namespace BanaData.Serializations
             }
         }
 
-        private void ExportCategoryForMemorizedPayee(StreamWriter sw, Household.MemorizedLineItemsRow lineItemRow, bool forSplit)
+        private void ExportCategoryForMemorizedPayee(StreamWriter sw, Household.MemorizedLineItemRow lineItemRow, bool forSplit)
         {
             string letter = forSplit ? "S" : "L";
             if (!lineItemRow.IsCategoryIDNull())
@@ -607,7 +607,7 @@ namespace BanaData.Serializations
 
         private void ExportSecurityPrices(StreamWriter sw)
         {
-            foreach (Household.SecurityPricesRow spr in household.SecurityPrices.Rows)
+            foreach (Household.SecurityPriceRow spr in household.SecurityPrice.Rows)
             {
                 sw.WriteLine("!Type:Prices");
 

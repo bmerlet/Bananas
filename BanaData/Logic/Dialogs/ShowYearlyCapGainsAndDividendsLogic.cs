@@ -21,7 +21,7 @@ namespace BanaData.Logic.Dialogs
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
-        private readonly List<Household.AccountsRow> shownAccounts = new List<Household.AccountsRow>();
+        private readonly List<Household.AccountRow> shownAccounts = new List<Household.AccountRow>();
         private readonly List<int> interestCategories = new List<int>();
 
         #endregion
@@ -43,7 +43,7 @@ namespace BanaData.Logic.Dialogs
             SelectedYear = years[0];
 
             // Setup accounts - skip IRAs as they are not taxable
-            foreach(Household.AccountsRow accountRow in mainWindowLogic.Household.Accounts.Rows)
+            foreach(Household.AccountRow accountRow in mainWindowLogic.Household.Account.Rows)
             {
                 if (!(accountRow.Type == EAccountType.Investment) || !(accountRow.Kind == EInvestmentKind.TraditionalIRA))
                 {

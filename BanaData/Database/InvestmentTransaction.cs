@@ -175,7 +175,7 @@ namespace BanaData.Database
 
             public bool HasSame(
                 EInvestmentTransactionType type,
-                SecuritiesRow securityRow,
+                SecurityRow securityRow,
                 decimal securityPrice,
                 decimal securityQuantity,
                 decimal commission)
@@ -211,9 +211,9 @@ namespace BanaData.Database
         partial class InvestmentTransactionsDataTable
         {
             public InvestmentTransactionsRow Add(
-                Household.TransactionsRow transactionRow,
+                TransactionsRow transactionRow,
                 EInvestmentTransactionType type,
-                Household.SecuritiesRow security,
+                SecurityRow security,
                 decimal securityPrice,
                 decimal securityQuantity,
                 decimal commission)
@@ -228,9 +228,9 @@ namespace BanaData.Database
             }
 
             public InvestmentTransactionsRow Update(
-                Household.TransactionsRow transactionRow,
+                TransactionsRow transactionRow,
                 EInvestmentTransactionType type,
-                Household.SecuritiesRow security,
+                SecurityRow security,
                 decimal securityPrice,
                 decimal securityQuantity,
                 decimal commission)
@@ -241,10 +241,10 @@ namespace BanaData.Database
             }
 
             private static InvestmentTransactionsRow UpdateInvestmentTransaction(
-                Household.InvestmentTransactionsRow invTransRow,
-                Household.TransactionsRow transactionRow,
+                InvestmentTransactionsRow invTransRow,
+                TransactionsRow transactionRow,
                 EInvestmentTransactionType type,
-                Household.SecuritiesRow securityRow,
+                SecurityRow securityRow,
                 decimal securityPrice,
                 decimal securityQuantity,
                 decimal commission)

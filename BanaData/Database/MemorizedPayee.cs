@@ -8,7 +8,7 @@ namespace BanaData.Database
 {
     public partial class Household
     {
-        partial class MemorizedPayeesRow
+        partial class MemorizedPayeeRow
         {
             // Bridges to local enum types
             public ETransactionStatus Status
@@ -40,11 +40,11 @@ namespace BanaData.Database
             }
         }
 
-        partial class MemorizedPayeesDataTable
+        partial class MemorizedPayeeDataTable
         {
-            public MemorizedPayeesRow Add(string payee, ETransactionStatus status, string memo)
+            public MemorizedPayeeRow Add(string payee, ETransactionStatus status, string memo)
             {
-                var memorizedPayeeRow = NewMemorizedPayeesRow();
+                var memorizedPayeeRow = NewMemorizedPayeeRow();
 
                 UpdateMemorisedPayee(memorizedPayeeRow, payee, status, memo);
 
@@ -53,14 +53,14 @@ namespace BanaData.Database
                 return memorizedPayeeRow;
             }
 
-            public MemorizedPayeesRow Update(MemorizedPayeesRow memorizedPayeeRow, string payee, ETransactionStatus status, string memo)
+            public MemorizedPayeeRow Update(MemorizedPayeeRow memorizedPayeeRow, string payee, ETransactionStatus status, string memo)
             {
                 UpdateMemorisedPayee(memorizedPayeeRow, payee, status, memo);
 
                 return memorizedPayeeRow;
             }
 
-            private static MemorizedPayeesRow UpdateMemorisedPayee(MemorizedPayeesRow memorizedPayeesRow, string payee, ETransactionStatus status, string memo)
+            private static MemorizedPayeeRow UpdateMemorisedPayee(MemorizedPayeeRow memorizedPayeesRow, string payee, ETransactionStatus status, string memo)
             {
                 memorizedPayeesRow.Payee = payee;
                 memorizedPayeesRow.Status = status;

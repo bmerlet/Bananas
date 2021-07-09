@@ -18,7 +18,7 @@ namespace BanaData.Logic.Dialogs
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
-        private readonly Household.AccountsRow accountRow;
+        private readonly Household.AccountRow accountRow;
 
         #endregion
 
@@ -28,7 +28,7 @@ namespace BanaData.Logic.Dialogs
         {
             mainWindowLogic = _mainWindowLogic;
             var household = mainWindowLogic.Household;
-            accountRow = household.Accounts.FindByID(accountID);
+            accountRow = household.Account.FindByID(accountID);
 
             // Init data
             SetDate(DateTime.Today);
@@ -71,7 +71,7 @@ namespace BanaData.Logic.Dialogs
                 // Get a security list
                 foreach (var securityID in portfolio.GetSecurities())
                 {
-                    var securityRow = mainWindowLogic.Household.Securities.FindByID(securityID);
+                    var securityRow = mainWindowLogic.Household.Security.FindByID(securityID);
                     string symbol = securityRow.IsSymbolNull() ? "??" : securityRow.Symbol;
 
                     // Get lots for this securoty

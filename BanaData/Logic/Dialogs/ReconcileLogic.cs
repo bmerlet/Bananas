@@ -20,7 +20,7 @@ namespace BanaData.Logic.Dialogs
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
-        private readonly Household.AccountsRow accountRow;
+        private readonly Household.AccountRow accountRow;
         private readonly decimal interestAmount;
 
         #endregion
@@ -29,7 +29,7 @@ namespace BanaData.Logic.Dialogs
 
         public ReconcileLogic(MainWindowLogic _mainWindowLogic, int accountID)
         {
-            (mainWindowLogic, accountRow) = (_mainWindowLogic, _mainWindowLogic.Household.Accounts.FindByID(accountID));
+            (mainWindowLogic, accountRow) = (_mainWindowLogic, _mainWindowLogic.Household.Account.FindByID(accountID));
 
             // Get account info
             PriorStatementBalance = accountRow.GetReconciledBalance();
@@ -278,15 +278,15 @@ namespace BanaData.Logic.Dialogs
             }
         }
 
-        private void AddInterestTransactionToDB(Household.AccountsRow accountRow, Household.ReconcileInfoRow reconcileInfoRow)
+        private void AddInterestTransactionToDB(Household.AccountRow accountRow, Household.ReconcileInfoRow reconcileInfoRow)
         {
             var household = mainWindowLogic.Household;
 
             // Create new transaction row
-            var transactionRow = household.Transactions.Add(accountRow, reconcileInfoRow.InterestDate, "Interest Earned", null, ETransactionStatus.Reconciled, household.Checkpoints.GetMostRecentCheckpointID());
+            var transactionRow = household.Transactions.Add(accountRow, reconcileInfoRow.InterestDate, "Interest Earned", null, ETransactionStatus.Reconciled, household.Checkpoint.GetMostRecentCheckpointID());
 
             // Create new banking transaction row
-            household.BankingTransactions.Add(transactionRow,ETransactionMedium.None, 0);
+            household.BankingTransaction.Add(transactionRow,ETransactionMedium.None, 0);
 
             // Create the line items
             household.LineItems.Add(transactionRow, reconcileInfoRow.InterestCategoryID, -1, "", interestAmount);

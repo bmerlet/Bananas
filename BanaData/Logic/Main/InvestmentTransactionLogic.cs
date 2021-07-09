@@ -565,7 +565,7 @@ namespace BanaData.Logic.Main
             if (id >= 0)
             {
                 var household = mainWindowLogic.Household;
-                var security = household.Securities.FindByID(id);
+                var security = household.Security.FindByID(id);
                 result = security.IsSymbolNull() ? "" : security.Symbol;
             }
 
@@ -579,7 +579,7 @@ namespace BanaData.Logic.Main
             if (!string.IsNullOrWhiteSpace(value))
             {
                 var household = mainWindowLogic.Household;
-                var securityRow = household.Securities.GetBySymbol(value);
+                var securityRow = household.Security.GetBySymbol(value);
                 if (securityRow != null)
                 {
                     id = securityRow.ID; 
@@ -592,7 +592,7 @@ namespace BanaData.Logic.Main
         private void CommitTransactionToDataSet()
         {
             var household = mainWindowLogic.Household;
-            var accountRow = household.Accounts.FindByID(accountID);
+            var accountRow = household.Account.FindByID(accountID);
 
             //
             // Remove irrelevant input based on type
@@ -674,12 +674,12 @@ namespace BanaData.Logic.Main
             //
             // Save to DB
             //
-            var securityRow = data.SecurityID < 0 ? null : household.Securities.FindByID(data.SecurityID);
+            var securityRow = data.SecurityID < 0 ? null : household.Security.FindByID(data.SecurityID);
 
             if (TransID == TRANSID_NOT_COMMITTED)
             {
                 // Create new transaction row
-                var transactionRow = household.Transactions.Add(accountRow, data.Date, data.Payee, data.Memo, data.Status, household.Checkpoints.GetMostRecentCheckpointID());
+                var transactionRow = household.Transactions.Add(accountRow, data.Date, data.Payee, data.Memo, data.Status, household.Checkpoint.GetMostRecentCheckpointID());
                 TransID = transactionRow.ID;
 
                 // Create new investment transaction row

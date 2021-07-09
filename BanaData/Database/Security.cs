@@ -12,7 +12,7 @@ namespace BanaData.Database
 {
     public partial class Household
     {
-        partial class SecuritiesRow
+        partial class SecurityRow
         {
             // Bridges to local enum types
             public ESecurityType Type
@@ -26,7 +26,7 @@ namespace BanaData.Database
                 decimal price = 0;
                 DateTime mostRecent = DateTime.MinValue;
 
-                foreach (SecurityPricesRow securityPriceRow in GetSecurityPricesRows())
+                foreach (SecurityPriceRow securityPriceRow in GetSecurityPriceRows())
                 {
                     if (limit.HasValue && securityPriceRow.Date.CompareTo(limit.Value) > 0)
                     {
@@ -65,9 +65,9 @@ namespace BanaData.Database
 
         }
 
-        partial class SecuritiesDataTable
+        partial class SecurityDataTable
         {
-            public SecuritiesRow GetByName(string name)
+            public SecurityRow GetByName(string name)
             {
                 try
                 {
@@ -79,14 +79,14 @@ namespace BanaData.Database
                 }
             }
 
-            public SecuritiesRow GetBySymbol(string symbol)
+            public SecurityRow GetBySymbol(string symbol)
             {
                 return this.First(sec => !sec.IsSymbolNull() && sec.Symbol == symbol);
             }
 
-            public SecuritiesRow Add(string name, string symbol, ESecurityType type)
+            public SecurityRow Add(string name, string symbol, ESecurityType type)
             {
-                var secRow = NewSecuritiesRow();
+                var secRow = NewSecurityRow();
 
                 UpdateSecurity(secRow, name, symbol, type);
 
@@ -95,14 +95,14 @@ namespace BanaData.Database
                 return secRow;
             }
 
-            public SecuritiesRow Update(int id, string name, string symbol, ESecurityType type)
+            public SecurityRow Update(int id, string name, string symbol, ESecurityType type)
             {
                 var secRow = FindByID(id);
 
                 return UpdateSecurity(secRow, name, symbol, type);
             }
 
-            private static SecuritiesRow UpdateSecurity(SecuritiesRow secRow, string name, string symbol, ESecurityType type)
+            private static SecurityRow UpdateSecurity(SecurityRow secRow, string name, string symbol, ESecurityType type)
             {
                 secRow.Name = name;
 

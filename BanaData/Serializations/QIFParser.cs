@@ -99,18 +99,18 @@ namespace BanaData.Serializations
             household.AcceptChanges();
 
             // Create a checkpoint - all transactions are created under this checkpoint
-            household.Checkpoints.AddCheckpointsRow(DateTime.Now);
+            household.Checkpoint.AddCheckpointRow(DateTime.Now);
 
             // Parse the file
             ParseFile(fileName);
 
             // Log what we got
-            Log += $"Imported {household.Accounts.Rows.Count:N0} accounts" + eol;
+            Log += $"Imported {household.Account.Rows.Count:N0} accounts" + eol;
             Log += $"Imported {household.Categories.Rows.Count:N0} categories" + eol;
-            Log += $"Imported {household.Securities.Rows.Count:N0} securities" + eol;
-            Log += $"Imported {household.SecurityPrices.Rows.Count:N0} security prices" + eol;
+            Log += $"Imported {household.Security.Rows.Count:N0} securities" + eol;
+            Log += $"Imported {household.SecurityPrice.Rows.Count:N0} security prices" + eol;
             Log += $"Imported {household.Transactions.Rows.Count:N0} transactions" + eol;
-            Log += $"Imported {household.MemorizedPayees.Rows.Count:N0} memorized payees" + eol;
+            Log += $"Imported {household.MemorizedPayee.Rows.Count:N0} memorized payees" + eol;
             Log += eol;
 
             // Find other sides of transfers
@@ -120,7 +120,7 @@ namespace BanaData.Serializations
 
             // Create a new checkpoint, all transactions created by the user
             // will be associated with this new checkpoint
-            household.Checkpoints.AddCheckpointsRow(DateTime.Now);
+            household.Checkpoint.AddCheckpointRow(DateTime.Now);
         }
 
         public bool MergeFromQIF(string fileName)
@@ -177,13 +177,13 @@ namespace BanaData.Serializations
         private void ParseFile(string fileName)
         {
             // Get current checkpoint
-            checkpointID = household.Checkpoints.GetMostRecentCheckpointID();
+            checkpointID = household.Checkpoint.GetMostRecentCheckpointID();
 
             // Read the file
             using (var sr = new StreamReader(fileName))
             {
                 // Parse all sections
-                Household.AccountsRow accountRow = null;
+                Household.AccountRow accountRow = null;
                 while (!sr.EndOfStream)
                 {
                     accountRow = ParseOneSection(sr, accountRow);
@@ -191,7 +191,7 @@ namespace BanaData.Serializations
             }
         }
 
-        private Household.AccountsRow ParseOneSection(StreamReader sr, Household.AccountsRow accountRow)
+        private Household.AccountRow ParseOneSection(StreamReader sr, Household.AccountRow accountRow)
         {
             var sectionStr = sr.ReadLine();
             if (!sectionStr.StartsWith("!"))
@@ -374,9 +374,9 @@ namespace BanaData.Serializations
 
         #region Parse QIF account
 
-        private Household.AccountsRow ParseAccounts(StreamReader sr)
+        private Household.AccountRow ParseAccounts(StreamReader sr)
         {
-            Household.AccountsRow result = null;
+            Household.AccountRow result = null;
             bool firstTime = accountNames.Count == 0;
 
             while (sr.Peek() != '!' && !sr.EndOfStream)
@@ -392,7 +392,7 @@ namespace BanaData.Serializations
             return result;
         }
 
-        private Household.AccountsRow ParseOneAccount(TextReader sr)
+        private Household.AccountRow ParseOneAccount(TextReader sr)
         {
             string name = null;
             string description = null;
@@ -469,12 +469,12 @@ namespace BanaData.Serializations
                 throw new InvalidDataException("QIF parser: Account has no type");
             }
 
-            Household.AccountsRow accountRow;
+            Household.AccountRow accountRow;
 
             // Skip if we already saw this name (account name are present at least twicw in QIF files)
             if (accountNames.Contains(name))
             {
-                accountRow = household.Accounts.GetByName(name);
+                accountRow = household.Account.GetByName(name);
             }
             else
             {
@@ -496,9 +496,9 @@ namespace BanaData.Serializations
             return accountRow;
         }
 
-        private Household.AccountsRow MergeAccount(string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind)
+        private Household.AccountRow MergeAccount(string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind)
         {
-            var accountRow = household.Accounts.GetByName(name);
+            var accountRow = household.Account.GetByName(name);
             if (accountRow == null)
             {
                 // New account
@@ -513,14 +513,14 @@ namespace BanaData.Serializations
             else
             {
                 // Updated account
-                household.Accounts.Update(accountRow.ID, name, description, type, creditLimit, kind, accountRow.Hidden);
+                household.Account.Update(accountRow.ID, name, description, type, creditLimit, kind, accountRow.Hidden);
                 accountTracker.UpdatedIDs.Add(accountRow.ID);
             }
 
             return accountRow;
         }
 
-        private Household.AccountsRow CreateAccount(string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind)
+        private Household.AccountRow CreateAccount(string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind)
         {
             // By convention ,accounts with a name starting with _CLOSED are hidden
             // (QIF does not have a flag for hidden accounts)
@@ -533,12 +533,12 @@ namespace BanaData.Serializations
                 kind = EInvestmentKind.TraditionalIRA;
             }
 
-            return household.Accounts.Add(name, description, type, creditLimit, kind, hidden);
+            return household.Account.Add(name, description, type, creditLimit, kind, hidden);
         }
 
         private void ReconcileMergedAccounts()
         {
-            if (accountTracker.FoundIDs.Count == household.Accounts.Rows.Count)
+            if (accountTracker.FoundIDs.Count == household.Account.Rows.Count)
             {
                 // No problem, existing accounts have not changed
                 return;
@@ -549,7 +549,7 @@ namespace BanaData.Serializations
             while (again && accountTracker.AddedIDs.Count > 0)
             {
                 // Find deleted accounts
-                foreach (Household.AccountsRow accountRow in household.Accounts.Rows)
+                foreach (Household.AccountRow accountRow in household.Account.Rows)
                 {
                     if (!accountTracker.FoundIDs.Contains(accountRow.ID))
                     {
@@ -557,7 +557,7 @@ namespace BanaData.Serializations
 
                         foreach(var addedID in accountTracker.AddedIDs)
                         {
-                            var addedRow = household.Accounts.FindByID(addedID);
+                            var addedRow = household.Account.FindByID(addedID);
                             var question = $"Was the account {accountRow.Name} renamed to {addedRow.Name}?";
                             if (mainWindowLogic.YesNoQuestion(question))
                             {
@@ -649,18 +649,18 @@ namespace BanaData.Serializations
             else
             {
                 // Create security and add it to the list
-                household.Securities.Add(name, symbol, type);
+                household.Security.Add(name, symbol, type);
             }
 
         }
 
         private void MergeSecurity(string name, string symbol, ESecurityType type)
         {
-            var existingSecurityRow = household.Securities.GetByName(name);
+            var existingSecurityRow = household.Security.GetByName(name);
             if (existingSecurityRow == null)
             {
                 // New  security
-                var newRow = household.Securities.Add(name, symbol, type);
+                var newRow = household.Security.Add(name, symbol, type);
                 securityTracker.AddedIDs.Add(newRow.ID);
             }
             else if (existingSecurityRow.HasSame(symbol, type))
@@ -671,7 +671,7 @@ namespace BanaData.Serializations
             else
             {
                 // Updated security
-                household.Securities.Update(existingSecurityRow.ID, name, symbol, type);
+                household.Security.Update(existingSecurityRow.ID, name, symbol, type);
                 securityTracker.UpdatedIDs.Add(existingSecurityRow.ID);
             }
         }
@@ -680,7 +680,7 @@ namespace BanaData.Serializations
 
         # region Parse QIF banking transactions
 
-        private void ParseBankTransactions(StreamReader sr, Household.AccountsRow account)
+        private void ParseBankTransactions(StreamReader sr, Household.AccountRow account)
         {
             if (account == null)
             {
@@ -701,7 +701,7 @@ namespace BanaData.Serializations
             public decimal Amount = 0;
         }
 
-        private void ParseOneBankTransaction(TextReader sr, Household.AccountsRow accountRow)
+        private void ParseOneBankTransaction(TextReader sr, Household.AccountRow accountRow)
         {
             DateTime date = DateTime.MinValue;
             decimal amountToCheck = 0;
@@ -813,7 +813,7 @@ namespace BanaData.Serializations
         }
 
         private void MergeBankingTransaction(
-            Household.AccountsRow accountRow,
+            Household.AccountRow accountRow,
             DateTime date,
             string payee,
             string memo,
@@ -917,7 +917,7 @@ namespace BanaData.Serializations
         }
 
         private Household.TransactionsRow CreateBankingTransaction(
-            Household.AccountsRow accountRow, 
+            Household.AccountRow accountRow, 
             DateTime date,
             string payee, 
             string memo,
@@ -932,7 +932,7 @@ namespace BanaData.Serializations
             // Add bank-specific stuff
             if (accountRow.Type == EAccountType.Bank)
             {
-                household.BankingTransactions.Add(transRow, medium, checkNumber);
+                household.BankingTransaction.Add(transRow, medium, checkNumber);
             }
 
             // Add the line item(s)
@@ -953,7 +953,7 @@ namespace BanaData.Serializations
 
         #region Parse QIF investment transactions
 
-        private void ParseInvestmentTransactions(StreamReader sr, Household.AccountsRow account)
+        private void ParseInvestmentTransactions(StreamReader sr, Household.AccountRow account)
         {
             if (account == null)
             {
@@ -966,7 +966,7 @@ namespace BanaData.Serializations
             }
         }
 
-        private void ParseOneInvestmentTransaction(TextReader sr, Household.AccountsRow accountRow)
+        private void ParseOneInvestmentTransaction(TextReader sr, Household.AccountRow accountRow)
         {
             DateTime date = DateTime.MinValue;
             decimal amount = 0;
@@ -978,7 +978,7 @@ namespace BanaData.Serializations
             ETransactionStatus status = ETransactionStatus.Pending;
             EExtendedInvestmentTransactionType extendedType = EExtendedInvestmentTransactionType.None;
             EInvestmentTransactionType type;
-            Household.SecuritiesRow securityRow = null;
+            Household.SecurityRow securityRow = null;
             decimal securityPrice = 0;
             decimal securityQuantity = 0;
             decimal commission = 0;
@@ -1001,7 +1001,7 @@ namespace BanaData.Serializations
                         break;
 
                     case 'Y':
-                        securityRow = household.Securities.GetByName(arg);
+                        securityRow = household.Security.GetByName(arg);
                         if (securityRow == null)
                         {
                             throw new InvalidDataException("Unknown security for investment transaction - db - " + arg);
@@ -1128,7 +1128,7 @@ namespace BanaData.Serializations
         }
 
         private void MergeInvestmentTransaction(
-            Household.AccountsRow accountRow,
+            Household.AccountRow accountRow,
             DateTime date,
             string payee,
             string memo,
@@ -1137,7 +1137,7 @@ namespace BanaData.Serializations
             int categoryAccountID,
             decimal amount,
             EInvestmentTransactionType type,
-            Household.SecuritiesRow securityRow,
+            Household.SecurityRow securityRow,
             decimal securityPrice,
             decimal securityQuantity,
             decimal commission)
@@ -1208,7 +1208,7 @@ namespace BanaData.Serializations
         }
 
         private Household.TransactionsRow CreateInvestmentTransaction(
-            Household.AccountsRow accountRow,
+            Household.AccountRow accountRow,
             DateTime date,
             string payee,
             string memo,
@@ -1217,7 +1217,7 @@ namespace BanaData.Serializations
             int categoryAccountID,
             decimal amount,
             EInvestmentTransactionType type,
-            Household.SecuritiesRow securityRow,
+            Household.SecurityRow securityRow,
             decimal securityPrice,
             decimal securityQuantity,
             decimal commission)
@@ -1233,7 +1233,7 @@ namespace BanaData.Serializations
 
         #region Parse memorized payee
 
-        private void ParseMemorizedPayees(StreamReader sr, Household.AccountsRow account)
+        private void ParseMemorizedPayees(StreamReader sr, Household.AccountRow account)
         {
             if (account == null)
             {
@@ -1246,7 +1246,7 @@ namespace BanaData.Serializations
             }
         }
 
-        private void ParseOneMemorizedPayee(TextReader sr, Household.AccountsRow account)
+        private void ParseOneMemorizedPayee(TextReader sr, Household.AccountRow account)
         {
             decimal amountToCheck = 0;
             decimal otherMysteriousAmount = 0;
@@ -1355,7 +1355,7 @@ namespace BanaData.Serializations
         private void MergeMemorizedPayee(string payee, ETransactionStatus status, string memo, List<LineItemHolder> lineItemHolders)
         {
             // Try to find the same memorized payee
-            foreach (var mpr in household.MemorizedPayees.Rows.Cast< Household.MemorizedPayeesRow>().Where(m => m.HasSame(payee, status, memo)))
+            foreach (var mpr in household.MemorizedPayee.Rows.Cast< Household.MemorizedPayeeRow>().Where(m => m.HasSame(payee, status, memo)))
             {
                 // Compare line items
                 var lineItemRows = mpr.GetMemorizedLineItemsRows();
@@ -1388,15 +1388,15 @@ namespace BanaData.Serializations
             memorizedPayeeTransactionTracker.AddedIDs.Add(newRow.ID);
         }
 
-        private Household.MemorizedPayeesRow CreateMemorizedPayee(string payee, ETransactionStatus status, string memo, IEnumerable<LineItemHolder> lineItemHolders)
+        private Household.MemorizedPayeeRow CreateMemorizedPayee(string payee, ETransactionStatus status, string memo, IEnumerable<LineItemHolder> lineItemHolders)
         {
             // Create memorized payee
-            var memorizedPayeeRow = household.MemorizedPayees.Add(payee, status, memo);
+            var memorizedPayeeRow = household.MemorizedPayee.Add(payee, status, memo);
 
             // Add the line item(s)
             foreach (var lih in lineItemHolders)
             {
-                household.MemorizedLineItems.Add(memorizedPayeeRow,
+                household.MemorizedLineItem.Add(memorizedPayeeRow,
                     lih.CategoryID,
                     lih.AccountID,
                     lih.Memo,
@@ -1438,7 +1438,7 @@ namespace BanaData.Serializations
                 }
 
                 var subComps = comps[0].Split('"');
-                var securityRow = household.Securities.GetBySymbol(subComps[1]);
+                var securityRow = household.Security.GetBySymbol(subComps[1]);
                 if (securityRow == null)
                 {
                     throw new InvalidDataException("Unknown security symbol (db): " + l);
@@ -1490,19 +1490,19 @@ namespace BanaData.Serializations
                     }
                     else
                     {
-                        household.SecurityPrices.Add(securityRow, date, price);
+                        household.SecurityPrice.Add(securityRow, date, price);
                     }
                 }
             }
         }
 
-        private void MergeSecurityPrice(Household.SecuritiesRow securityRow, DateTime date, decimal price)
+        private void MergeSecurityPrice(Household.SecurityRow securityRow, DateTime date, decimal price)
         {
-            var existingSecurityPriceRow = securityRow.GetSecurityPricesRows().FirstOrDefault(spr => spr.Date == date && spr.Value == price);
+            var existingSecurityPriceRow = securityRow.GetSecurityPriceRows().FirstOrDefault(spr => spr.Date == date && spr.Value == price);
             if (existingSecurityPriceRow == null)
             {
                 // New  security price
-                var newRow = household.SecurityPrices.Add(securityRow, date, price);
+                var newRow = household.SecurityPrice.Add(securityRow, date, price);
                 securityPriceTracker.AddedIDs.Add(newRow.ID);
             }
             else
@@ -1755,7 +1755,7 @@ namespace BanaData.Serializations
             return type;
         }
 
-        private static (int accountID, int categoryID, bool commissionOnDividend) ParseTransactionTarget(Household household, Household.AccountsRow currentAccount, string target)
+        private static (int accountID, int categoryID, bool commissionOnDividend) ParseTransactionTarget(Household household, Household.AccountRow currentAccount, string target)
         {
             int accountID = -1;
             int categoryID = -1;
@@ -1772,7 +1772,7 @@ namespace BanaData.Serializations
                 target = target.Substring(1, ix - 1);
                 if (target != deletedAccountStr)
                 {
-                    var accountRow = household.Accounts.GetByName(target);
+                    var accountRow = household.Account.GetByName(target);
                     if (accountRow == null)
                     {
                         throw new InvalidDataException("Unknown destination account: " + target);
@@ -1905,7 +1905,7 @@ namespace BanaData.Serializations
 
                     if (tuple == null)
                     {
-                        var targetAccountRow = household.Accounts.FindByID(targetAccountID);
+                        var targetAccountRow = household.Account.FindByID(targetAccountID);
                         Log += $"Warning: Could not pair transaction on account {sourceTransactionRow.AccountsRow.Name}" + eol+
                             $"to/from account {targetAccountRow.Name} on {sourceTransactionRow.Date} for ${sourceLineItemRow.Amount};" + eol;
                         Log += "Changing category to <none>." + eol;

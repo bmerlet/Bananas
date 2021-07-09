@@ -353,7 +353,7 @@ namespace BanaData.Logic.Main
             AssetAccountGroup.SelectedAccount = null;
             InvestmentAccountGroup.SelectedAccount = null;
 
-            var accountRow = Household.Accounts.FindByID(accountID);
+            var accountRow = Household.Account.FindByID(accountID);
             if (accountRow.Type == EAccountType.Investment)
             {
                 OnInvestmentAccountClicked(accountID, transactionID, lineItemID);
@@ -433,7 +433,7 @@ namespace BanaData.Logic.Main
 
             MemorizedPayees.Clear();
 
-            foreach (var mpr in Household.MemorizedPayees)
+            foreach (var mpr in Household.MemorizedPayee)
             {
                 // Get memorized line item(s)
                 var dbLineItems = mpr.GetMemorizedLineItemsRows();
@@ -515,7 +515,7 @@ namespace BanaData.Logic.Main
             } while (categoryNotFound);
 
             // Add all possible transfers
-            foreach (var account in Household.Accounts)
+            foreach (var account in Household.Account)
             {
                 Categories.Add(new CategoryItem(account.ID, account.Name));
             }
@@ -525,7 +525,7 @@ namespace BanaData.Logic.Main
 
         private void BuildSecuritiesList()
         {
-            foreach (Household.SecuritiesRow security in Household.Securities.Rows)
+            foreach (Household.SecurityRow security in Household.Security.Rows)
             {
                 var symbol = security.IsSymbolNull() ? "" : security.Symbol;
                 Securities.Add(new SecurityItem(security.ID, security.Name, symbol, security.Type));

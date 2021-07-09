@@ -34,9 +34,9 @@ namespace BanaData.Database
                 return amount;
             }
 
-            public BankingTransactionsRow GetBankingTransaction()
+            public BankingTransactionRow GetBankingTransaction()
             {
-                return GetBankingTransactionsRows().Single();
+                return GetBankingTransactionRows().Single();
             }
 
             public InvestmentTransactionsRow GetInvestmentTransaction()
@@ -82,7 +82,7 @@ namespace BanaData.Database
 
         partial class TransactionsDataTable
         {
-            public TransactionsRow Add(AccountsRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status, int checkpointID)
+            public TransactionsRow Add(AccountRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status, int checkpointID)
             {
                 var transactionRow = NewTransactionsRow();
 
@@ -93,7 +93,7 @@ namespace BanaData.Database
                 return transactionRow;
             }
 
-            public TransactionsRow Update(int transactionID, AccountsRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status)
+            public TransactionsRow Update(int transactionID, AccountRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status)
             {
                 var transactionRow = FindByID(transactionID);
 
@@ -102,7 +102,7 @@ namespace BanaData.Database
                 return transactionRow;
             }
 
-            private static TransactionsRow UpdateTransaction(TransactionsRow transactionRow, AccountsRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status, int checkpointID)
+            private static TransactionsRow UpdateTransaction(TransactionsRow transactionRow, AccountRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status, int checkpointID)
             {
                 transactionRow.AccountID = accountRow.ID;
 

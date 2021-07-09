@@ -9,7 +9,7 @@ namespace BanaData.Database
 {
     public partial class Household
     {
-        partial class MemorizedLineItemsRow
+        partial class MemorizedLineItemRow
         {
             public bool HasSame(int categoryID, int categoryAccountID, string memo, decimal amount)
             {
@@ -46,11 +46,11 @@ namespace BanaData.Database
             }
         }
 
-        partial class MemorizedLineItemsDataTable
+        partial class MemorizedLineItemDataTable
         {
-            public MemorizedLineItemsRow Add(MemorizedPayeesRow memorizedPayeesRow, bool transfer, DataRow AccountOrCategory, string memo, decimal amount)
+            public MemorizedLineItemRow Add(MemorizedPayeeRow memorizedPayeesRow, bool transfer, DataRow AccountOrCategory, string memo, decimal amount)
             {
-                var memorizedLineItemRow = NewMemorizedLineItemsRow();
+                var memorizedLineItemRow = NewMemorizedLineItemRow();
 
                 UpdateMemorizedLineItem(memorizedLineItemRow, memorizedPayeesRow, transfer, AccountOrCategory, memo, amount);
 
@@ -59,9 +59,9 @@ namespace BanaData.Database
                 return memorizedLineItemRow;
             }
 
-            public MemorizedLineItemsRow Add(MemorizedPayeesRow memorizedPayeesRow, int categoryId, int categoryAccountId, string memo, decimal amount)
+            public MemorizedLineItemRow Add(MemorizedPayeeRow memorizedPayeesRow, int categoryId, int categoryAccountId, string memo, decimal amount)
             {
-                var memorizedLineItemRow = NewMemorizedLineItemsRow();
+                var memorizedLineItemRow = NewMemorizedLineItemRow();
 
                 UpdateMemorizedLineItem(memorizedLineItemRow, memorizedPayeesRow, categoryId, categoryAccountId, memo, amount);
 
@@ -70,14 +70,14 @@ namespace BanaData.Database
                 return memorizedLineItemRow;
             }
 
-            public MemorizedLineItemsRow Update(MemorizedLineItemsRow memorizedLineItemRow, MemorizedPayeesRow memorizedPayeesRow, int categoryId, int categoryAccountId, string memo, decimal amount)
+            public MemorizedLineItemRow Update(MemorizedLineItemRow memorizedLineItemRow, MemorizedPayeeRow memorizedPayeesRow, int categoryId, int categoryAccountId, string memo, decimal amount)
             {
                 UpdateMemorizedLineItem(memorizedLineItemRow, memorizedPayeesRow, categoryId, categoryAccountId, memo, amount);
 
                 return memorizedLineItemRow;
             }
 
-            private static MemorizedLineItemsRow UpdateMemorizedLineItem(MemorizedLineItemsRow memorizedLineItemsRow, MemorizedPayeesRow memorizedPayeesRow, bool transfer, DataRow AccountOrCategory, string memo, decimal amount)
+            private static MemorizedLineItemRow UpdateMemorizedLineItem(MemorizedLineItemRow memorizedLineItemsRow, MemorizedPayeeRow memorizedPayeesRow, bool transfer, DataRow AccountOrCategory, string memo, decimal amount)
             {
                 memorizedLineItemsRow.MemorizedPayeeID = memorizedPayeesRow.ID;
 
@@ -112,7 +112,7 @@ namespace BanaData.Database
                 return memorizedLineItemsRow;
             }
 
-            private static MemorizedLineItemsRow UpdateMemorizedLineItem(MemorizedLineItemsRow memorizedLineItemsRow, MemorizedPayeesRow memorizedPayeesRow, int categoryId, int categoryAccountId, string memo, decimal amount)
+            private static MemorizedLineItemRow UpdateMemorizedLineItem(MemorizedLineItemRow memorizedLineItemsRow, MemorizedPayeeRow memorizedPayeesRow, int categoryId, int categoryAccountId, string memo, decimal amount)
             {
                 memorizedLineItemsRow.MemorizedPayeeID = memorizedPayeesRow.ID;
 

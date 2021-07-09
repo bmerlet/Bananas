@@ -101,7 +101,7 @@ namespace BanaData.Logic.Dialogs
                 return null;
             }
 
-            foreach (Household.AccountsRow acct in mainWindowLogic.Household.Accounts.Rows)
+            foreach (Household.AccountRow acct in mainWindowLogic.Household.Account.Rows)
             {
                 if (acct.ID != oldAccountItem.ID && acct.Name == Name)
                 {

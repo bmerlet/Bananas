@@ -5,14 +5,14 @@ namespace BanaData.Database
 {
     public partial class Household
     {
-        partial class CheckpointsDataTable
+        partial class CheckpointDataTable
         {
             public int GetMostRecentCheckpointID()
             {
                 DateTime mostRecent = DateTime.MinValue;
                 int id = -1;
 
-                foreach (CheckpointsRow checkpointRow in Rows)
+                foreach (CheckpointRow checkpointRow in Rows)
                 {
                     if (checkpointRow.Date.CompareTo(mostRecent) > 0)
                     {

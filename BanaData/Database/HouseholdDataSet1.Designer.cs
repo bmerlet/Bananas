@@ -24,29 +24,29 @@ namespace BanaData.Database {
     [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.DataSet")]
     public partial class Household : global::System.Data.DataSet {
         
-        private AccountsDataTable tableAccounts;
+        private AccountDataTable tableAccount;
         
         private CategoriesDataTable tableCategories;
         
-        private SecuritiesDataTable tableSecurities;
+        private SecurityDataTable tableSecurity;
         
-        private SecurityPricesDataTable tableSecurityPrices;
+        private SecurityPriceDataTable tableSecurityPrice;
         
         private TransactionsDataTable tableTransactions;
         
         private LineItemsDataTable tableLineItems;
         
-        private BankingTransactionsDataTable tableBankingTransactions;
+        private BankingTransactionDataTable tableBankingTransaction;
         
         private InvestmentTransactionsDataTable tableInvestmentTransactions;
         
-        private MemorizedLineItemsDataTable tableMemorizedLineItems;
+        private MemorizedLineItemDataTable tableMemorizedLineItem;
         
-        private MemorizedPayeesDataTable tableMemorizedPayees;
+        private MemorizedPayeeDataTable tableMemorizedPayee;
         
         private ReconcileInfoDataTable tableReconcileInfo;
         
-        private CheckpointsDataTable tableCheckpoints;
+        private CheckpointDataTable tableCheckpoint;
         
         private SecurityReconcileInfoDataTable tableSecurityReconcileInfo;
         
@@ -110,17 +110,17 @@ namespace BanaData.Database {
             if ((this.DetermineSchemaSerializationMode(info, context) == global::System.Data.SchemaSerializationMode.IncludeSchema)) {
                 global::System.Data.DataSet ds = new global::System.Data.DataSet();
                 ds.ReadXmlSchema(new global::System.Xml.XmlTextReader(new global::System.IO.StringReader(strSchema)));
-                if ((ds.Tables["Accounts"] != null)) {
-                    base.Tables.Add(new AccountsDataTable(ds.Tables["Accounts"]));
+                if ((ds.Tables["Account"] != null)) {
+                    base.Tables.Add(new AccountDataTable(ds.Tables["Account"]));
                 }
                 if ((ds.Tables["Categories"] != null)) {
                     base.Tables.Add(new CategoriesDataTable(ds.Tables["Categories"]));
                 }
-                if ((ds.Tables["Securities"] != null)) {
-                    base.Tables.Add(new SecuritiesDataTable(ds.Tables["Securities"]));
+                if ((ds.Tables["Security"] != null)) {
+                    base.Tables.Add(new SecurityDataTable(ds.Tables["Security"]));
                 }
-                if ((ds.Tables["SecurityPrices"] != null)) {
-                    base.Tables.Add(new SecurityPricesDataTable(ds.Tables["SecurityPrices"]));
+                if ((ds.Tables["SecurityPrice"] != null)) {
+                    base.Tables.Add(new SecurityPriceDataTable(ds.Tables["SecurityPrice"]));
                 }
                 if ((ds.Tables["Transactions"] != null)) {
                     base.Tables.Add(new TransactionsDataTable(ds.Tables["Transactions"]));
@@ -128,23 +128,23 @@ namespace BanaData.Database {
                 if ((ds.Tables["LineItems"] != null)) {
                     base.Tables.Add(new LineItemsDataTable(ds.Tables["LineItems"]));
                 }
-                if ((ds.Tables["BankingTransactions"] != null)) {
-                    base.Tables.Add(new BankingTransactionsDataTable(ds.Tables["BankingTransactions"]));
+                if ((ds.Tables["BankingTransaction"] != null)) {
+                    base.Tables.Add(new BankingTransactionDataTable(ds.Tables["BankingTransaction"]));
                 }
                 if ((ds.Tables["InvestmentTransactions"] != null)) {
                     base.Tables.Add(new InvestmentTransactionsDataTable(ds.Tables["InvestmentTransactions"]));
                 }
-                if ((ds.Tables["MemorizedLineItems"] != null)) {
-                    base.Tables.Add(new MemorizedLineItemsDataTable(ds.Tables["MemorizedLineItems"]));
+                if ((ds.Tables["MemorizedLineItem"] != null)) {
+                    base.Tables.Add(new MemorizedLineItemDataTable(ds.Tables["MemorizedLineItem"]));
                 }
-                if ((ds.Tables["MemorizedPayees"] != null)) {
-                    base.Tables.Add(new MemorizedPayeesDataTable(ds.Tables["MemorizedPayees"]));
+                if ((ds.Tables["MemorizedPayee"] != null)) {
+                    base.Tables.Add(new MemorizedPayeeDataTable(ds.Tables["MemorizedPayee"]));
                 }
                 if ((ds.Tables["ReconcileInfo"] != null)) {
                     base.Tables.Add(new ReconcileInfoDataTable(ds.Tables["ReconcileInfo"]));
                 }
-                if ((ds.Tables["Checkpoints"] != null)) {
-                    base.Tables.Add(new CheckpointsDataTable(ds.Tables["Checkpoints"]));
+                if ((ds.Tables["Checkpoint"] != null)) {
+                    base.Tables.Add(new CheckpointDataTable(ds.Tables["Checkpoint"]));
                 }
                 if ((ds.Tables["SecurityReconcileInfo"] != null)) {
                     base.Tables.Add(new SecurityReconcileInfoDataTable(ds.Tables["SecurityReconcileInfo"]));
@@ -171,9 +171,9 @@ namespace BanaData.Database {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
         [global::System.ComponentModel.Browsable(false)]
         [global::System.ComponentModel.DesignerSerializationVisibility(global::System.ComponentModel.DesignerSerializationVisibility.Content)]
-        public AccountsDataTable Accounts {
+        public AccountDataTable Account {
             get {
-                return this.tableAccounts;
+                return this.tableAccount;
             }
         }
         
@@ -191,9 +191,9 @@ namespace BanaData.Database {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
         [global::System.ComponentModel.Browsable(false)]
         [global::System.ComponentModel.DesignerSerializationVisibility(global::System.ComponentModel.DesignerSerializationVisibility.Content)]
-        public SecuritiesDataTable Securities {
+        public SecurityDataTable Security {
             get {
-                return this.tableSecurities;
+                return this.tableSecurity;
             }
         }
         
@@ -201,9 +201,9 @@ namespace BanaData.Database {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
         [global::System.ComponentModel.Browsable(false)]
         [global::System.ComponentModel.DesignerSerializationVisibility(global::System.ComponentModel.DesignerSerializationVisibility.Content)]
-        public SecurityPricesDataTable SecurityPrices {
+        public SecurityPriceDataTable SecurityPrice {
             get {
-                return this.tableSecurityPrices;
+                return this.tableSecurityPrice;
             }
         }
         
@@ -231,9 +231,9 @@ namespace BanaData.Database {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
         [global::System.ComponentModel.Browsable(false)]
         [global::System.ComponentModel.DesignerSerializationVisibility(global::System.ComponentModel.DesignerSerializationVisibility.Content)]
-        public BankingTransactionsDataTable BankingTransactions {
+        public BankingTransactionDataTable BankingTransaction {
             get {
-                return this.tableBankingTransactions;
+                return this.tableBankingTransaction;
             }
         }
         
@@ -251,9 +251,9 @@ namespace BanaData.Database {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
         [global::System.ComponentModel.Browsable(false)]
         [global::System.ComponentModel.DesignerSerializationVisibility(global::System.ComponentModel.DesignerSerializationVisibility.Content)]
-        public MemorizedLineItemsDataTable MemorizedLineItems {
+        public MemorizedLineItemDataTable MemorizedLineItem {
             get {
-                return this.tableMemorizedLineItems;
+                return this.tableMemorizedLineItem;
             }
         }
         
@@ -261,9 +261,9 @@ namespace BanaData.Database {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
         [global::System.ComponentModel.Browsable(false)]
         [global::System.ComponentModel.DesignerSerializationVisibility(global::System.ComponentModel.DesignerSerializationVisibility.Content)]
-        public MemorizedPayeesDataTable MemorizedPayees {
+        public MemorizedPayeeDataTable MemorizedPayee {
             get {
-                return this.tableMemorizedPayees;
+                return this.tableMemorizedPayee;
             }
         }
         
@@ -281,9 +281,9 @@ namespace BanaData.Database {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
         [global::System.ComponentModel.Browsable(false)]
         [global::System.ComponentModel.DesignerSerializationVisibility(global::System.ComponentModel.DesignerSerializationVisibility.Content)]
-        public CheckpointsDataTable Checkpoints {
+        public CheckpointDataTable Checkpoint {
             get {
-                return this.tableCheckpoints;
+                return this.tableCheckpoint;
             }
         }
         
@@ -364,17 +364,17 @@ namespace BanaData.Database {
                 this.Reset();
                 global::System.Data.DataSet ds = new global::System.Data.DataSet();
                 ds.ReadXml(reader);
-                if ((ds.Tables["Accounts"] != null)) {
-                    base.Tables.Add(new AccountsDataTable(ds.Tables["Accounts"]));
+                if ((ds.Tables["Account"] != null)) {
+                    base.Tables.Add(new AccountDataTable(ds.Tables["Account"]));
                 }
                 if ((ds.Tables["Categories"] != null)) {
                     base.Tables.Add(new CategoriesDataTable(ds.Tables["Categories"]));
                 }
-                if ((ds.Tables["Securities"] != null)) {
-                    base.Tables.Add(new SecuritiesDataTable(ds.Tables["Securities"]));
+                if ((ds.Tables["Security"] != null)) {
+                    base.Tables.Add(new SecurityDataTable(ds.Tables["Security"]));
                 }
-                if ((ds.Tables["SecurityPrices"] != null)) {
-                    base.Tables.Add(new SecurityPricesDataTable(ds.Tables["SecurityPrices"]));
+                if ((ds.Tables["SecurityPrice"] != null)) {
+                    base.Tables.Add(new SecurityPriceDataTable(ds.Tables["SecurityPrice"]));
                 }
                 if ((ds.Tables["Transactions"] != null)) {
                     base.Tables.Add(new TransactionsDataTable(ds.Tables["Transactions"]));
@@ -382,23 +382,23 @@ namespace BanaData.Database {
                 if ((ds.Tables["LineItems"] != null)) {
                     base.Tables.Add(new LineItemsDataTable(ds.Tables["LineItems"]));
                 }
-                if ((ds.Tables["BankingTransactions"] != null)) {
-                    base.Tables.Add(new BankingTransactionsDataTable(ds.Tables["BankingTransactions"]));
+                if ((ds.Tables["BankingTransaction"] != null)) {
+                    base.Tables.Add(new BankingTransactionDataTable(ds.Tables["BankingTransaction"]));
                 }
                 if ((ds.Tables["InvestmentTransactions"] != null)) {
                     base.Tables.Add(new InvestmentTransactionsDataTable(ds.Tables["InvestmentTransactions"]));
                 }
-                if ((ds.Tables["MemorizedLineItems"] != null)) {
-                    base.Tables.Add(new MemorizedLineItemsDataTable(ds.Tables["MemorizedLineItems"]));
+                if ((ds.Tables["MemorizedLineItem"] != null)) {
+                    base.Tables.Add(new MemorizedLineItemDataTable(ds.Tables["MemorizedLineItem"]));
                 }
-                if ((ds.Tables["MemorizedPayees"] != null)) {
-                    base.Tables.Add(new MemorizedPayeesDataTable(ds.Tables["MemorizedPayees"]));
+                if ((ds.Tables["MemorizedPayee"] != null)) {
+                    base.Tables.Add(new MemorizedPayeeDataTable(ds.Tables["MemorizedPayee"]));
                 }
                 if ((ds.Tables["ReconcileInfo"] != null)) {
                     base.Tables.Add(new ReconcileInfoDataTable(ds.Tables["ReconcileInfo"]));
                 }
-                if ((ds.Tables["Checkpoints"] != null)) {
-                    base.Tables.Add(new CheckpointsDataTable(ds.Tables["Checkpoints"]));
+                if ((ds.Tables["Checkpoint"] != null)) {
+                    base.Tables.Add(new CheckpointDataTable(ds.Tables["Checkpoint"]));
                 }
                 if ((ds.Tables["SecurityReconcileInfo"] != null)) {
                     base.Tables.Add(new SecurityReconcileInfoDataTable(ds.Tables["SecurityReconcileInfo"]));
@@ -436,10 +436,10 @@ namespace BanaData.Database {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
         internal void InitVars(bool initTable) {
-            this.tableAccounts = ((AccountsDataTable)(base.Tables["Accounts"]));
+            this.tableAccount = ((AccountDataTable)(base.Tables["Account"]));
             if ((initTable == true)) {
-                if ((this.tableAccounts != null)) {
-                    this.tableAccounts.InitVars();
+                if ((this.tableAccount != null)) {
+                    this.tableAccount.InitVars();
                 }
             }
             this.tableCategories = ((CategoriesDataTable)(base.Tables["Categories"]));
@@ -448,16 +448,16 @@ namespace BanaData.Database {
                     this.tableCategories.InitVars();
                 }
             }
-            this.tableSecurities = ((SecuritiesDataTable)(base.Tables["Securities"]));
+            this.tableSecurity = ((SecurityDataTable)(base.Tables["Security"]));
             if ((initTable == true)) {
-                if ((this.tableSecurities != null)) {
-                    this.tableSecurities.InitVars();
+                if ((this.tableSecurity != null)) {
+                    this.tableSecurity.InitVars();
                 }
             }
-            this.tableSecurityPrices = ((SecurityPricesDataTable)(base.Tables["SecurityPrices"]));
+            this.tableSecurityPrice = ((SecurityPriceDataTable)(base.Tables["SecurityPrice"]));
             if ((initTable == true)) {
-                if ((this.tableSecurityPrices != null)) {
-                    this.tableSecurityPrices.InitVars();
+                if ((this.tableSecurityPrice != null)) {
+                    this.tableSecurityPrice.InitVars();
                 }
             }
             this.tableTransactions = ((TransactionsDataTable)(base.Tables["Transactions"]));
@@ -472,10 +472,10 @@ namespace BanaData.Database {
                     this.tableLineItems.InitVars();
                 }
             }
-            this.tableBankingTransactions = ((BankingTransactionsDataTable)(base.Tables["BankingTransactions"]));
+            this.tableBankingTransaction = ((BankingTransactionDataTable)(base.Tables["BankingTransaction"]));
             if ((initTable == true)) {
-                if ((this.tableBankingTransactions != null)) {
-                    this.tableBankingTransactions.InitVars();
+                if ((this.tableBankingTransaction != null)) {
+                    this.tableBankingTransaction.InitVars();
                 }
             }
             this.tableInvestmentTransactions = ((InvestmentTransactionsDataTable)(base.Tables["InvestmentTransactions"]));
@@ -484,16 +484,16 @@ namespace BanaData.Database {
                     this.tableInvestmentTransactions.InitVars();
                 }
             }
-            this.tableMemorizedLineItems = ((MemorizedLineItemsDataTable)(base.Tables["MemorizedLineItems"]));
+            this.tableMemorizedLineItem = ((MemorizedLineItemDataTable)(base.Tables["MemorizedLineItem"]));
             if ((initTable == true)) {
-                if ((this.tableMemorizedLineItems != null)) {
-                    this.tableMemorizedLineItems.InitVars();
+                if ((this.tableMemorizedLineItem != null)) {
+                    this.tableMemorizedLineItem.InitVars();
                 }
             }
-            this.tableMemorizedPayees = ((MemorizedPayeesDataTable)(base.Tables["MemorizedPayees"]));
+            this.tableMemorizedPayee = ((MemorizedPayeeDataTable)(base.Tables["MemorizedPayee"]));
             if ((initTable == true)) {
-                if ((this.tableMemorizedPayees != null)) {
-                    this.tableMemorizedPayees.InitVars();
+                if ((this.tableMemorizedPayee != null)) {
+                    this.tableMemorizedPayee.InitVars();
                 }
             }
             this.tableReconcileInfo = ((ReconcileInfoDataTable)(base.Tables["ReconcileInfo"]));
@@ -502,10 +502,10 @@ namespace BanaData.Database {
                     this.tableReconcileInfo.InitVars();
                 }
             }
-            this.tableCheckpoints = ((CheckpointsDataTable)(base.Tables["Checkpoints"]));
+            this.tableCheckpoint = ((CheckpointDataTable)(base.Tables["Checkpoint"]));
             if ((initTable == true)) {
-                if ((this.tableCheckpoints != null)) {
-                    this.tableCheckpoints.InitVars();
+                if ((this.tableCheckpoint != null)) {
+                    this.tableCheckpoint.InitVars();
                 }
             }
             this.tableSecurityReconcileInfo = ((SecurityReconcileInfoDataTable)(base.Tables["SecurityReconcileInfo"]));
@@ -540,42 +540,42 @@ namespace BanaData.Database {
             this.Namespace = "http://prose.org/Household.xsd";
             this.EnforceConstraints = true;
             this.SchemaSerializationMode = global::System.Data.SchemaSerializationMode.IncludeSchema;
-            this.tableAccounts = new AccountsDataTable();
-            base.Tables.Add(this.tableAccounts);
+            this.tableAccount = new AccountDataTable();
+            base.Tables.Add(this.tableAccount);
             this.tableCategories = new CategoriesDataTable();
             base.Tables.Add(this.tableCategories);
-            this.tableSecurities = new SecuritiesDataTable();
-            base.Tables.Add(this.tableSecurities);
-            this.tableSecurityPrices = new SecurityPricesDataTable();
-            base.Tables.Add(this.tableSecurityPrices);
+            this.tableSecurity = new SecurityDataTable();
+            base.Tables.Add(this.tableSecurity);
+            this.tableSecurityPrice = new SecurityPriceDataTable();
+            base.Tables.Add(this.tableSecurityPrice);
             this.tableTransactions = new TransactionsDataTable();
             base.Tables.Add(this.tableTransactions);
             this.tableLineItems = new LineItemsDataTable();
             base.Tables.Add(this.tableLineItems);
-            this.tableBankingTransactions = new BankingTransactionsDataTable();
-            base.Tables.Add(this.tableBankingTransactions);
+            this.tableBankingTransaction = new BankingTransactionDataTable();
+            base.Tables.Add(this.tableBankingTransaction);
             this.tableInvestmentTransactions = new InvestmentTransactionsDataTable();
             base.Tables.Add(this.tableInvestmentTransactions);
-            this.tableMemorizedLineItems = new MemorizedLineItemsDataTable();
-            base.Tables.Add(this.tableMemorizedLineItems);
-            this.tableMemorizedPayees = new MemorizedPayeesDataTable();
-            base.Tables.Add(this.tableMemorizedPayees);
+            this.tableMemorizedLineItem = new MemorizedLineItemDataTable();
+            base.Tables.Add(this.tableMemorizedLineItem);
+            this.tableMemorizedPayee = new MemorizedPayeeDataTable();
+            base.Tables.Add(this.tableMemorizedPayee);
             this.tableReconcileInfo = new ReconcileInfoDataTable();
             base.Tables.Add(this.tableReconcileInfo);
-            this.tableCheckpoints = new CheckpointsDataTable();
-            base.Tables.Add(this.tableCheckpoints);
+            this.tableCheckpoint = new CheckpointDataTable();
+            base.Tables.Add(this.tableCheckpoint);
             this.tableSecurityReconcileInfo = new SecurityReconcileInfoDataTable();
             base.Tables.Add(this.tableSecurityReconcileInfo);
             global::System.Data.ForeignKeyConstraint fkc;
             fkc = new global::System.Data.ForeignKeyConstraint("FK_Securities_SecurityPrices", new global::System.Data.DataColumn[] {
-                        this.tableSecurities.IDColumn}, new global::System.Data.DataColumn[] {
-                        this.tableSecurityPrices.SecurityIDColumn});
-            this.tableSecurityPrices.Constraints.Add(fkc);
+                        this.tableSecurity.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableSecurityPrice.SecurityIDColumn});
+            this.tableSecurityPrice.Constraints.Add(fkc);
             fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
             fkc.DeleteRule = global::System.Data.Rule.Cascade;
             fkc.UpdateRule = global::System.Data.Rule.Cascade;
             fkc = new global::System.Data.ForeignKeyConstraint("FK_Accounts_Transactions", new global::System.Data.DataColumn[] {
-                        this.tableAccounts.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableAccount.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableTransactions.AccountIDColumn});
             this.tableTransactions.Constraints.Add(fkc);
             fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
@@ -590,8 +590,8 @@ namespace BanaData.Database {
             fkc.UpdateRule = global::System.Data.Rule.Cascade;
             fkc = new global::System.Data.ForeignKeyConstraint("FK_Transactions_BankTransactions", new global::System.Data.DataColumn[] {
                         this.tableTransactions.IDColumn}, new global::System.Data.DataColumn[] {
-                        this.tableBankingTransactions.TransactionIDColumn});
-            this.tableBankingTransactions.Constraints.Add(fkc);
+                        this.tableBankingTransaction.TransactionIDColumn});
+            this.tableBankingTransaction.Constraints.Add(fkc);
             fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
             fkc.DeleteRule = global::System.Data.Rule.Cascade;
             fkc.UpdateRule = global::System.Data.Rule.Cascade;
@@ -603,7 +603,7 @@ namespace BanaData.Database {
             fkc.DeleteRule = global::System.Data.Rule.Cascade;
             fkc.UpdateRule = global::System.Data.Rule.Cascade;
             fkc = new global::System.Data.ForeignKeyConstraint("FK_Securities_InvestmentTransactions", new global::System.Data.DataColumn[] {
-                        this.tableSecurities.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableSecurity.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableInvestmentTransactions.SecurityIDColumn});
             this.tableInvestmentTransactions.Constraints.Add(fkc);
             fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
@@ -611,22 +611,22 @@ namespace BanaData.Database {
             fkc.UpdateRule = global::System.Data.Rule.None;
             fkc = new global::System.Data.ForeignKeyConstraint("FK_Categories_MemorizedLineItems", new global::System.Data.DataColumn[] {
                         this.tableCategories.IDColumn}, new global::System.Data.DataColumn[] {
-                        this.tableMemorizedLineItems.CategoryIDColumn});
-            this.tableMemorizedLineItems.Constraints.Add(fkc);
+                        this.tableMemorizedLineItem.CategoryIDColumn});
+            this.tableMemorizedLineItem.Constraints.Add(fkc);
             fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
             fkc.DeleteRule = global::System.Data.Rule.Cascade;
             fkc.UpdateRule = global::System.Data.Rule.Cascade;
             fkc = new global::System.Data.ForeignKeyConstraint("FK_Accounts_MemorizedLineItems", new global::System.Data.DataColumn[] {
-                        this.tableAccounts.IDColumn}, new global::System.Data.DataColumn[] {
-                        this.tableMemorizedLineItems.AccountIDColumn});
-            this.tableMemorizedLineItems.Constraints.Add(fkc);
+                        this.tableAccount.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableMemorizedLineItem.AccountIDColumn});
+            this.tableMemorizedLineItem.Constraints.Add(fkc);
             fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
             fkc.DeleteRule = global::System.Data.Rule.Cascade;
             fkc.UpdateRule = global::System.Data.Rule.Cascade;
             fkc = new global::System.Data.ForeignKeyConstraint("FK_MemorizedPayees_MemorizedLineItems", new global::System.Data.DataColumn[] {
-                        this.tableMemorizedPayees.IDColumn}, new global::System.Data.DataColumn[] {
-                        this.tableMemorizedLineItems.MemorizedPayeeIDColumn});
-            this.tableMemorizedLineItems.Constraints.Add(fkc);
+                        this.tableMemorizedPayee.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableMemorizedLineItem.MemorizedPayeeIDColumn});
+            this.tableMemorizedLineItem.Constraints.Add(fkc);
             fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
             fkc.DeleteRule = global::System.Data.Rule.Cascade;
             fkc.UpdateRule = global::System.Data.Rule.Cascade;
@@ -638,14 +638,14 @@ namespace BanaData.Database {
             fkc.DeleteRule = global::System.Data.Rule.None;
             fkc.UpdateRule = global::System.Data.Rule.None;
             fkc = new global::System.Data.ForeignKeyConstraint("FK_Accounts_ReconcileInfo", new global::System.Data.DataColumn[] {
-                        this.tableAccounts.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableAccount.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableReconcileInfo.AccountIDColumn});
             this.tableReconcileInfo.Constraints.Add(fkc);
             fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
             fkc.DeleteRule = global::System.Data.Rule.Cascade;
             fkc.UpdateRule = global::System.Data.Rule.Cascade;
             fkc = new global::System.Data.ForeignKeyConstraint("FK_Securities_SecurityReconcileInfo", new global::System.Data.DataColumn[] {
-                        this.tableSecurities.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableSecurity.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableSecurityReconcileInfo.SecurityIDColumn});
             this.tableSecurityReconcileInfo.Constraints.Add(fkc);
             fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
@@ -659,11 +659,11 @@ namespace BanaData.Database {
             fkc.DeleteRule = global::System.Data.Rule.Cascade;
             fkc.UpdateRule = global::System.Data.Rule.Cascade;
             this.relationFK_Securities_SecurityPrices = new global::System.Data.DataRelation("FK_Securities_SecurityPrices", new global::System.Data.DataColumn[] {
-                        this.tableSecurities.IDColumn}, new global::System.Data.DataColumn[] {
-                        this.tableSecurityPrices.SecurityIDColumn}, false);
+                        this.tableSecurity.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableSecurityPrice.SecurityIDColumn}, false);
             this.Relations.Add(this.relationFK_Securities_SecurityPrices);
             this.relationFK_Accounts_Transactions = new global::System.Data.DataRelation("FK_Accounts_Transactions", new global::System.Data.DataColumn[] {
-                        this.tableAccounts.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableAccount.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableTransactions.AccountIDColumn}, false);
             this.Relations.Add(this.relationFK_Accounts_Transactions);
             this.relationFK_Transactions_LineItems = new global::System.Data.DataRelation("FK_Transactions_LineItems", new global::System.Data.DataColumn[] {
@@ -672,38 +672,38 @@ namespace BanaData.Database {
             this.Relations.Add(this.relationFK_Transactions_LineItems);
             this.relationFK_Transactions_BankTransactions = new global::System.Data.DataRelation("FK_Transactions_BankTransactions", new global::System.Data.DataColumn[] {
                         this.tableTransactions.IDColumn}, new global::System.Data.DataColumn[] {
-                        this.tableBankingTransactions.TransactionIDColumn}, false);
+                        this.tableBankingTransaction.TransactionIDColumn}, false);
             this.Relations.Add(this.relationFK_Transactions_BankTransactions);
             this.relationFK_Transactions_InvestmentTransactions = new global::System.Data.DataRelation("FK_Transactions_InvestmentTransactions", new global::System.Data.DataColumn[] {
                         this.tableTransactions.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableInvestmentTransactions.TransactionIDColumn}, false);
             this.Relations.Add(this.relationFK_Transactions_InvestmentTransactions);
             this.relationFK_Securities_InvestmentTransactions = new global::System.Data.DataRelation("FK_Securities_InvestmentTransactions", new global::System.Data.DataColumn[] {
-                        this.tableSecurities.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableSecurity.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableInvestmentTransactions.SecurityIDColumn}, false);
             this.Relations.Add(this.relationFK_Securities_InvestmentTransactions);
             this.relationFK_Categories_MemorizedLineItems = new global::System.Data.DataRelation("FK_Categories_MemorizedLineItems", new global::System.Data.DataColumn[] {
                         this.tableCategories.IDColumn}, new global::System.Data.DataColumn[] {
-                        this.tableMemorizedLineItems.CategoryIDColumn}, false);
+                        this.tableMemorizedLineItem.CategoryIDColumn}, false);
             this.Relations.Add(this.relationFK_Categories_MemorizedLineItems);
             this.relationFK_Accounts_MemorizedLineItems = new global::System.Data.DataRelation("FK_Accounts_MemorizedLineItems", new global::System.Data.DataColumn[] {
-                        this.tableAccounts.IDColumn}, new global::System.Data.DataColumn[] {
-                        this.tableMemorizedLineItems.AccountIDColumn}, false);
+                        this.tableAccount.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableMemorizedLineItem.AccountIDColumn}, false);
             this.Relations.Add(this.relationFK_Accounts_MemorizedLineItems);
             this.relationFK_MemorizedPayees_MemorizedLineItems = new global::System.Data.DataRelation("FK_MemorizedPayees_MemorizedLineItems", new global::System.Data.DataColumn[] {
-                        this.tableMemorizedPayees.IDColumn}, new global::System.Data.DataColumn[] {
-                        this.tableMemorizedLineItems.MemorizedPayeeIDColumn}, false);
+                        this.tableMemorizedPayee.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableMemorizedLineItem.MemorizedPayeeIDColumn}, false);
             this.Relations.Add(this.relationFK_MemorizedPayees_MemorizedLineItems);
             this.relationFK_Categories_ReconcileInfo = new global::System.Data.DataRelation("FK_Categories_ReconcileInfo", new global::System.Data.DataColumn[] {
                         this.tableCategories.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableReconcileInfo.InterestCategoryIDColumn}, false);
             this.Relations.Add(this.relationFK_Categories_ReconcileInfo);
             this.relationFK_Accounts_ReconcileInfo = new global::System.Data.DataRelation("FK_Accounts_ReconcileInfo", new global::System.Data.DataColumn[] {
-                        this.tableAccounts.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableAccount.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableReconcileInfo.AccountIDColumn}, false);
             this.Relations.Add(this.relationFK_Accounts_ReconcileInfo);
             this.relationFK_Securities_SecurityReconcileInfo = new global::System.Data.DataRelation("FK_Securities_SecurityReconcileInfo", new global::System.Data.DataColumn[] {
-                        this.tableSecurities.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableSecurity.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableSecurityReconcileInfo.SecurityIDColumn}, false);
             this.Relations.Add(this.relationFK_Securities_SecurityReconcileInfo);
             this.relationFK_ReconcileInfo_SecurityReconcileInfo = new global::System.Data.DataRelation("FK_ReconcileInfo_SecurityReconcileInfo", new global::System.Data.DataColumn[] {
@@ -711,7 +711,7 @@ namespace BanaData.Database {
                         this.tableSecurityReconcileInfo.ReconcileInfoIDColumn}, false);
             this.Relations.Add(this.relationFK_ReconcileInfo_SecurityReconcileInfo);
             this.relationAccounts_LineItems = new global::System.Data.DataRelation("Accounts_LineItems", new global::System.Data.DataColumn[] {
-                        this.tableAccounts.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableAccount.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableLineItems.AccountIDColumn}, false);
             this.Relations.Add(this.relationAccounts_LineItems);
             this.relationCategories_LineItems = new global::System.Data.DataRelation("Categories_LineItems", new global::System.Data.DataColumn[] {
@@ -719,14 +719,14 @@ namespace BanaData.Database {
                         this.tableLineItems.CategoryIDColumn}, false);
             this.Relations.Add(this.relationCategories_LineItems);
             this.relationCheckpoints_Transactions = new global::System.Data.DataRelation("Checkpoints_Transactions", new global::System.Data.DataColumn[] {
-                        this.tableCheckpoints.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableCheckpoint.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableTransactions.CheckpointIDColumn}, false);
             this.Relations.Add(this.relationCheckpoints_Transactions);
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-        private bool ShouldSerializeAccounts() {
+        private bool ShouldSerializeAccount() {
             return false;
         }
         
@@ -738,13 +738,13 @@ namespace BanaData.Database {
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-        private bool ShouldSerializeSecurities() {
+        private bool ShouldSerializeSecurity() {
             return false;
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-        private bool ShouldSerializeSecurityPrices() {
+        private bool ShouldSerializeSecurityPrice() {
             return false;
         }
         
@@ -762,7 +762,7 @@ namespace BanaData.Database {
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-        private bool ShouldSerializeBankingTransactions() {
+        private bool ShouldSerializeBankingTransaction() {
             return false;
         }
         
@@ -774,13 +774,13 @@ namespace BanaData.Database {
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-        private bool ShouldSerializeMemorizedLineItems() {
+        private bool ShouldSerializeMemorizedLineItem() {
             return false;
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-        private bool ShouldSerializeMemorizedPayees() {
+        private bool ShouldSerializeMemorizedPayee() {
             return false;
         }
         
@@ -792,7 +792,7 @@ namespace BanaData.Database {
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-        private bool ShouldSerializeCheckpoints() {
+        private bool ShouldSerializeCheckpoint() {
             return false;
         }
         
@@ -858,16 +858,16 @@ namespace BanaData.Database {
         }
         
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-        public delegate void AccountsRowChangeEventHandler(object sender, AccountsRowChangeEvent e);
+        public delegate void AccountRowChangeEventHandler(object sender, AccountRowChangeEvent e);
         
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
         public delegate void CategoriesRowChangeEventHandler(object sender, CategoriesRowChangeEvent e);
         
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-        public delegate void SecuritiesRowChangeEventHandler(object sender, SecuritiesRowChangeEvent e);
+        public delegate void SecurityRowChangeEventHandler(object sender, SecurityRowChangeEvent e);
         
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-        public delegate void SecurityPricesRowChangeEventHandler(object sender, SecurityPricesRowChangeEvent e);
+        public delegate void SecurityPriceRowChangeEventHandler(object sender, SecurityPriceRowChangeEvent e);
         
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
         public delegate void TransactionsRowChangeEventHandler(object sender, TransactionsRowChangeEvent e);
@@ -876,22 +876,22 @@ namespace BanaData.Database {
         public delegate void LineItemsRowChangeEventHandler(object sender, LineItemsRowChangeEvent e);
         
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-        public delegate void BankingTransactionsRowChangeEventHandler(object sender, BankingTransactionsRowChangeEvent e);
+        public delegate void BankingTransactionRowChangeEventHandler(object sender, BankingTransactionRowChangeEvent e);
         
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
         public delegate void InvestmentTransactionsRowChangeEventHandler(object sender, InvestmentTransactionsRowChangeEvent e);
         
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-        public delegate void MemorizedLineItemsRowChangeEventHandler(object sender, MemorizedLineItemsRowChangeEvent e);
+        public delegate void MemorizedLineItemRowChangeEventHandler(object sender, MemorizedLineItemRowChangeEvent e);
         
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-        public delegate void MemorizedPayeesRowChangeEventHandler(object sender, MemorizedPayeesRowChangeEvent e);
+        public delegate void MemorizedPayeeRowChangeEventHandler(object sender, MemorizedPayeeRowChangeEvent e);
         
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
         public delegate void ReconcileInfoRowChangeEventHandler(object sender, ReconcileInfoRowChangeEvent e);
         
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-        public delegate void CheckpointsRowChangeEventHandler(object sender, CheckpointsRowChangeEvent e);
+        public delegate void CheckpointRowChangeEventHandler(object sender, CheckpointRowChangeEvent e);
         
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
         public delegate void SecurityReconcileInfoRowChangeEventHandler(object sender, SecurityReconcileInfoRowChangeEvent e);
@@ -901,7 +901,7 @@ namespace BanaData.Database {
         ///</summary>
         [global::System.Serializable()]
         [global::System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedTableSchema")]
-        public partial class AccountsDataTable : global::System.Data.TypedTableBase<AccountsRow> {
+        public partial class AccountDataTable : global::System.Data.TypedTableBase<AccountRow> {
             
             private global::System.Data.DataColumn columnID;
             
@@ -921,8 +921,8 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public AccountsDataTable() {
-                this.TableName = "Accounts";
+            public AccountDataTable() {
+                this.TableName = "Account";
                 this.BeginInit();
                 this.InitClass();
                 this.EndInit();
@@ -930,7 +930,7 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            internal AccountsDataTable(global::System.Data.DataTable table) {
+            internal AccountDataTable(global::System.Data.DataTable table) {
                 this.TableName = table.TableName;
                 if ((table.CaseSensitive != table.DataSet.CaseSensitive)) {
                     this.CaseSensitive = table.CaseSensitive;
@@ -947,7 +947,7 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            protected AccountsDataTable(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context) : 
+            protected AccountDataTable(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context) : 
                     base(info, context) {
                 this.InitVars();
             }
@@ -1027,34 +1027,34 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public AccountsRow this[int index] {
+            public AccountRow this[int index] {
                 get {
-                    return ((AccountsRow)(this.Rows[index]));
+                    return ((AccountRow)(this.Rows[index]));
                 }
             }
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event AccountsRowChangeEventHandler AccountsRowChanging;
+            public event AccountRowChangeEventHandler AccountRowChanging;
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event AccountsRowChangeEventHandler AccountsRowChanged;
+            public event AccountRowChangeEventHandler AccountRowChanged;
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event AccountsRowChangeEventHandler AccountsRowDeleting;
+            public event AccountRowChangeEventHandler AccountRowDeleting;
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event AccountsRowChangeEventHandler AccountsRowDeleted;
+            public event AccountRowChangeEventHandler AccountRowDeleted;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public void AddAccountsRow(AccountsRow row) {
+            public void AddAccountRow(AccountRow row) {
                 this.Rows.Add(row);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public AccountsRow AddAccountsRow(string Name, string Description, int IType, decimal CreditLimit, int IKind, bool Hidden, System.DateTime LastStatementDate) {
-                AccountsRow rowAccountsRow = ((AccountsRow)(this.NewRow()));
+            public AccountRow AddAccountRow(string Name, string Description, int IType, decimal CreditLimit, int IKind, bool Hidden, System.DateTime LastStatementDate) {
+                AccountRow rowAccountRow = ((AccountRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
                         Name,
@@ -1064,22 +1064,22 @@ namespace BanaData.Database {
                         IKind,
                         Hidden,
                         LastStatementDate};
-                rowAccountsRow.ItemArray = columnValuesArray;
-                this.Rows.Add(rowAccountsRow);
-                return rowAccountsRow;
+                rowAccountRow.ItemArray = columnValuesArray;
+                this.Rows.Add(rowAccountRow);
+                return rowAccountRow;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public AccountsRow FindByID(int ID) {
-                return ((AccountsRow)(this.Rows.Find(new object[] {
+            public AccountRow FindByID(int ID) {
+                return ((AccountRow)(this.Rows.Find(new object[] {
                             ID})));
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public override global::System.Data.DataTable Clone() {
-                AccountsDataTable cln = ((AccountsDataTable)(base.Clone()));
+                AccountDataTable cln = ((AccountDataTable)(base.Clone()));
                 cln.InitVars();
                 return cln;
             }
@@ -1087,7 +1087,7 @@ namespace BanaData.Database {
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override global::System.Data.DataTable CreateInstance() {
-                return new AccountsDataTable();
+                return new AccountDataTable();
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1140,28 +1140,28 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public AccountsRow NewAccountsRow() {
-                return ((AccountsRow)(this.NewRow()));
+            public AccountRow NewAccountRow() {
+                return ((AccountRow)(this.NewRow()));
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override global::System.Data.DataRow NewRowFromBuilder(global::System.Data.DataRowBuilder builder) {
-                return new AccountsRow(builder);
+                return new AccountRow(builder);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override global::System.Type GetRowType() {
-                return typeof(AccountsRow);
+                return typeof(AccountRow);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowChanged(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowChanged(e);
-                if ((this.AccountsRowChanged != null)) {
-                    this.AccountsRowChanged(this, new AccountsRowChangeEvent(((AccountsRow)(e.Row)), e.Action));
+                if ((this.AccountRowChanged != null)) {
+                    this.AccountRowChanged(this, new AccountRowChangeEvent(((AccountRow)(e.Row)), e.Action));
                 }
             }
             
@@ -1169,8 +1169,8 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowChanging(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowChanging(e);
-                if ((this.AccountsRowChanging != null)) {
-                    this.AccountsRowChanging(this, new AccountsRowChangeEvent(((AccountsRow)(e.Row)), e.Action));
+                if ((this.AccountRowChanging != null)) {
+                    this.AccountRowChanging(this, new AccountRowChangeEvent(((AccountRow)(e.Row)), e.Action));
                 }
             }
             
@@ -1178,8 +1178,8 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowDeleted(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowDeleted(e);
-                if ((this.AccountsRowDeleted != null)) {
-                    this.AccountsRowDeleted(this, new AccountsRowChangeEvent(((AccountsRow)(e.Row)), e.Action));
+                if ((this.AccountRowDeleted != null)) {
+                    this.AccountRowDeleted(this, new AccountRowChangeEvent(((AccountRow)(e.Row)), e.Action));
                 }
             }
             
@@ -1187,14 +1187,14 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowDeleting(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowDeleting(e);
-                if ((this.AccountsRowDeleting != null)) {
-                    this.AccountsRowDeleting(this, new AccountsRowChangeEvent(((AccountsRow)(e.Row)), e.Action));
+                if ((this.AccountRowDeleting != null)) {
+                    this.AccountRowDeleting(this, new AccountRowChangeEvent(((AccountRow)(e.Row)), e.Action));
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public void RemoveAccountsRow(AccountsRow row) {
+            public void RemoveAccountRow(AccountRow row) {
                 this.Rows.Remove(row);
             }
             
@@ -1221,7 +1221,7 @@ namespace BanaData.Database {
                 type.Attributes.Add(attribute1);
                 global::System.Xml.Schema.XmlSchemaAttribute attribute2 = new global::System.Xml.Schema.XmlSchemaAttribute();
                 attribute2.Name = "tableTypeName";
-                attribute2.FixedValue = "AccountsDataTable";
+                attribute2.FixedValue = "AccountDataTable";
                 type.Attributes.Add(attribute2);
                 type.Particle = sequence;
                 global::System.Xml.Schema.XmlSchema dsSchema = ds.GetSchemaSerializable();
@@ -1600,7 +1600,7 @@ namespace BanaData.Database {
         ///</summary>
         [global::System.Serializable()]
         [global::System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedTableSchema")]
-        public partial class SecuritiesDataTable : global::System.Data.TypedTableBase<SecuritiesRow> {
+        public partial class SecurityDataTable : global::System.Data.TypedTableBase<SecurityRow> {
             
             private global::System.Data.DataColumn columnID;
             
@@ -1612,8 +1612,8 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public SecuritiesDataTable() {
-                this.TableName = "Securities";
+            public SecurityDataTable() {
+                this.TableName = "Security";
                 this.BeginInit();
                 this.InitClass();
                 this.EndInit();
@@ -1621,7 +1621,7 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            internal SecuritiesDataTable(global::System.Data.DataTable table) {
+            internal SecurityDataTable(global::System.Data.DataTable table) {
                 this.TableName = table.TableName;
                 if ((table.CaseSensitive != table.DataSet.CaseSensitive)) {
                     this.CaseSensitive = table.CaseSensitive;
@@ -1638,7 +1638,7 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            protected SecuritiesDataTable(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context) : 
+            protected SecurityDataTable(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context) : 
                     base(info, context) {
                 this.InitVars();
             }
@@ -1686,55 +1686,55 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public SecuritiesRow this[int index] {
+            public SecurityRow this[int index] {
                 get {
-                    return ((SecuritiesRow)(this.Rows[index]));
+                    return ((SecurityRow)(this.Rows[index]));
                 }
             }
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event SecuritiesRowChangeEventHandler SecuritiesRowChanging;
+            public event SecurityRowChangeEventHandler SecurityRowChanging;
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event SecuritiesRowChangeEventHandler SecuritiesRowChanged;
+            public event SecurityRowChangeEventHandler SecurityRowChanged;
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event SecuritiesRowChangeEventHandler SecuritiesRowDeleting;
+            public event SecurityRowChangeEventHandler SecurityRowDeleting;
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event SecuritiesRowChangeEventHandler SecuritiesRowDeleted;
+            public event SecurityRowChangeEventHandler SecurityRowDeleted;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public void AddSecuritiesRow(SecuritiesRow row) {
+            public void AddSecurityRow(SecurityRow row) {
                 this.Rows.Add(row);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public SecuritiesRow AddSecuritiesRow(string Name, string Symbol, int IType) {
-                SecuritiesRow rowSecuritiesRow = ((SecuritiesRow)(this.NewRow()));
+            public SecurityRow AddSecurityRow(string Name, string Symbol, int IType) {
+                SecurityRow rowSecurityRow = ((SecurityRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
                         Name,
                         Symbol,
                         IType};
-                rowSecuritiesRow.ItemArray = columnValuesArray;
-                this.Rows.Add(rowSecuritiesRow);
-                return rowSecuritiesRow;
+                rowSecurityRow.ItemArray = columnValuesArray;
+                this.Rows.Add(rowSecurityRow);
+                return rowSecurityRow;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public SecuritiesRow FindByID(int ID) {
-                return ((SecuritiesRow)(this.Rows.Find(new object[] {
+            public SecurityRow FindByID(int ID) {
+                return ((SecurityRow)(this.Rows.Find(new object[] {
                             ID})));
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public override global::System.Data.DataTable Clone() {
-                SecuritiesDataTable cln = ((SecuritiesDataTable)(base.Clone()));
+                SecurityDataTable cln = ((SecurityDataTable)(base.Clone()));
                 cln.InitVars();
                 return cln;
             }
@@ -1742,7 +1742,7 @@ namespace BanaData.Database {
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override global::System.Data.DataTable CreateInstance() {
-                return new SecuritiesDataTable();
+                return new SecurityDataTable();
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1780,28 +1780,28 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public SecuritiesRow NewSecuritiesRow() {
-                return ((SecuritiesRow)(this.NewRow()));
+            public SecurityRow NewSecurityRow() {
+                return ((SecurityRow)(this.NewRow()));
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override global::System.Data.DataRow NewRowFromBuilder(global::System.Data.DataRowBuilder builder) {
-                return new SecuritiesRow(builder);
+                return new SecurityRow(builder);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override global::System.Type GetRowType() {
-                return typeof(SecuritiesRow);
+                return typeof(SecurityRow);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowChanged(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowChanged(e);
-                if ((this.SecuritiesRowChanged != null)) {
-                    this.SecuritiesRowChanged(this, new SecuritiesRowChangeEvent(((SecuritiesRow)(e.Row)), e.Action));
+                if ((this.SecurityRowChanged != null)) {
+                    this.SecurityRowChanged(this, new SecurityRowChangeEvent(((SecurityRow)(e.Row)), e.Action));
                 }
             }
             
@@ -1809,8 +1809,8 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowChanging(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowChanging(e);
-                if ((this.SecuritiesRowChanging != null)) {
-                    this.SecuritiesRowChanging(this, new SecuritiesRowChangeEvent(((SecuritiesRow)(e.Row)), e.Action));
+                if ((this.SecurityRowChanging != null)) {
+                    this.SecurityRowChanging(this, new SecurityRowChangeEvent(((SecurityRow)(e.Row)), e.Action));
                 }
             }
             
@@ -1818,8 +1818,8 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowDeleted(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowDeleted(e);
-                if ((this.SecuritiesRowDeleted != null)) {
-                    this.SecuritiesRowDeleted(this, new SecuritiesRowChangeEvent(((SecuritiesRow)(e.Row)), e.Action));
+                if ((this.SecurityRowDeleted != null)) {
+                    this.SecurityRowDeleted(this, new SecurityRowChangeEvent(((SecurityRow)(e.Row)), e.Action));
                 }
             }
             
@@ -1827,14 +1827,14 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowDeleting(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowDeleting(e);
-                if ((this.SecuritiesRowDeleting != null)) {
-                    this.SecuritiesRowDeleting(this, new SecuritiesRowChangeEvent(((SecuritiesRow)(e.Row)), e.Action));
+                if ((this.SecurityRowDeleting != null)) {
+                    this.SecurityRowDeleting(this, new SecurityRowChangeEvent(((SecurityRow)(e.Row)), e.Action));
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public void RemoveSecuritiesRow(SecuritiesRow row) {
+            public void RemoveSecurityRow(SecurityRow row) {
                 this.Rows.Remove(row);
             }
             
@@ -1861,7 +1861,7 @@ namespace BanaData.Database {
                 type.Attributes.Add(attribute1);
                 global::System.Xml.Schema.XmlSchemaAttribute attribute2 = new global::System.Xml.Schema.XmlSchemaAttribute();
                 attribute2.Name = "tableTypeName";
-                attribute2.FixedValue = "SecuritiesDataTable";
+                attribute2.FixedValue = "SecurityDataTable";
                 type.Attributes.Add(attribute2);
                 type.Particle = sequence;
                 global::System.Xml.Schema.XmlSchema dsSchema = ds.GetSchemaSerializable();
@@ -1907,7 +1907,7 @@ namespace BanaData.Database {
         ///</summary>
         [global::System.Serializable()]
         [global::System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedTableSchema")]
-        public partial class SecurityPricesDataTable : global::System.Data.TypedTableBase<SecurityPricesRow> {
+        public partial class SecurityPriceDataTable : global::System.Data.TypedTableBase<SecurityPriceRow> {
             
             private global::System.Data.DataColumn columnID;
             
@@ -1919,8 +1919,8 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public SecurityPricesDataTable() {
-                this.TableName = "SecurityPrices";
+            public SecurityPriceDataTable() {
+                this.TableName = "SecurityPrice";
                 this.BeginInit();
                 this.InitClass();
                 this.EndInit();
@@ -1928,7 +1928,7 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            internal SecurityPricesDataTable(global::System.Data.DataTable table) {
+            internal SecurityPriceDataTable(global::System.Data.DataTable table) {
                 this.TableName = table.TableName;
                 if ((table.CaseSensitive != table.DataSet.CaseSensitive)) {
                     this.CaseSensitive = table.CaseSensitive;
@@ -1945,7 +1945,7 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            protected SecurityPricesDataTable(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context) : 
+            protected SecurityPriceDataTable(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context) : 
                     base(info, context) {
                 this.InitVars();
             }
@@ -1993,58 +1993,58 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public SecurityPricesRow this[int index] {
+            public SecurityPriceRow this[int index] {
                 get {
-                    return ((SecurityPricesRow)(this.Rows[index]));
+                    return ((SecurityPriceRow)(this.Rows[index]));
                 }
             }
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event SecurityPricesRowChangeEventHandler SecurityPricesRowChanging;
+            public event SecurityPriceRowChangeEventHandler SecurityPriceRowChanging;
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event SecurityPricesRowChangeEventHandler SecurityPricesRowChanged;
+            public event SecurityPriceRowChangeEventHandler SecurityPriceRowChanged;
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event SecurityPricesRowChangeEventHandler SecurityPricesRowDeleting;
+            public event SecurityPriceRowChangeEventHandler SecurityPriceRowDeleting;
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event SecurityPricesRowChangeEventHandler SecurityPricesRowDeleted;
+            public event SecurityPriceRowChangeEventHandler SecurityPriceRowDeleted;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public void AddSecurityPricesRow(SecurityPricesRow row) {
+            public void AddSecurityPriceRow(SecurityPriceRow row) {
                 this.Rows.Add(row);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public SecurityPricesRow AddSecurityPricesRow(SecuritiesRow parentSecuritiesRowByFK_Securities_SecurityPrices, System.DateTime Date, decimal Value) {
-                SecurityPricesRow rowSecurityPricesRow = ((SecurityPricesRow)(this.NewRow()));
+            public SecurityPriceRow AddSecurityPriceRow(SecurityRow parentSecurityRowByFK_Securities_SecurityPrices, System.DateTime Date, decimal Value) {
+                SecurityPriceRow rowSecurityPriceRow = ((SecurityPriceRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
                         null,
                         Date,
                         Value};
-                if ((parentSecuritiesRowByFK_Securities_SecurityPrices != null)) {
-                    columnValuesArray[1] = parentSecuritiesRowByFK_Securities_SecurityPrices[0];
+                if ((parentSecurityRowByFK_Securities_SecurityPrices != null)) {
+                    columnValuesArray[1] = parentSecurityRowByFK_Securities_SecurityPrices[0];
                 }
-                rowSecurityPricesRow.ItemArray = columnValuesArray;
-                this.Rows.Add(rowSecurityPricesRow);
-                return rowSecurityPricesRow;
+                rowSecurityPriceRow.ItemArray = columnValuesArray;
+                this.Rows.Add(rowSecurityPriceRow);
+                return rowSecurityPriceRow;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public SecurityPricesRow FindByID(int ID) {
-                return ((SecurityPricesRow)(this.Rows.Find(new object[] {
+            public SecurityPriceRow FindByID(int ID) {
+                return ((SecurityPriceRow)(this.Rows.Find(new object[] {
                             ID})));
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public override global::System.Data.DataTable Clone() {
-                SecurityPricesDataTable cln = ((SecurityPricesDataTable)(base.Clone()));
+                SecurityPriceDataTable cln = ((SecurityPriceDataTable)(base.Clone()));
                 cln.InitVars();
                 return cln;
             }
@@ -2052,7 +2052,7 @@ namespace BanaData.Database {
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override global::System.Data.DataTable CreateInstance() {
-                return new SecurityPricesDataTable();
+                return new SecurityPriceDataTable();
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -2088,28 +2088,28 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public SecurityPricesRow NewSecurityPricesRow() {
-                return ((SecurityPricesRow)(this.NewRow()));
+            public SecurityPriceRow NewSecurityPriceRow() {
+                return ((SecurityPriceRow)(this.NewRow()));
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override global::System.Data.DataRow NewRowFromBuilder(global::System.Data.DataRowBuilder builder) {
-                return new SecurityPricesRow(builder);
+                return new SecurityPriceRow(builder);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override global::System.Type GetRowType() {
-                return typeof(SecurityPricesRow);
+                return typeof(SecurityPriceRow);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowChanged(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowChanged(e);
-                if ((this.SecurityPricesRowChanged != null)) {
-                    this.SecurityPricesRowChanged(this, new SecurityPricesRowChangeEvent(((SecurityPricesRow)(e.Row)), e.Action));
+                if ((this.SecurityPriceRowChanged != null)) {
+                    this.SecurityPriceRowChanged(this, new SecurityPriceRowChangeEvent(((SecurityPriceRow)(e.Row)), e.Action));
                 }
             }
             
@@ -2117,8 +2117,8 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowChanging(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowChanging(e);
-                if ((this.SecurityPricesRowChanging != null)) {
-                    this.SecurityPricesRowChanging(this, new SecurityPricesRowChangeEvent(((SecurityPricesRow)(e.Row)), e.Action));
+                if ((this.SecurityPriceRowChanging != null)) {
+                    this.SecurityPriceRowChanging(this, new SecurityPriceRowChangeEvent(((SecurityPriceRow)(e.Row)), e.Action));
                 }
             }
             
@@ -2126,8 +2126,8 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowDeleted(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowDeleted(e);
-                if ((this.SecurityPricesRowDeleted != null)) {
-                    this.SecurityPricesRowDeleted(this, new SecurityPricesRowChangeEvent(((SecurityPricesRow)(e.Row)), e.Action));
+                if ((this.SecurityPriceRowDeleted != null)) {
+                    this.SecurityPriceRowDeleted(this, new SecurityPriceRowChangeEvent(((SecurityPriceRow)(e.Row)), e.Action));
                 }
             }
             
@@ -2135,14 +2135,14 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowDeleting(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowDeleting(e);
-                if ((this.SecurityPricesRowDeleting != null)) {
-                    this.SecurityPricesRowDeleting(this, new SecurityPricesRowChangeEvent(((SecurityPricesRow)(e.Row)), e.Action));
+                if ((this.SecurityPriceRowDeleting != null)) {
+                    this.SecurityPriceRowDeleting(this, new SecurityPriceRowChangeEvent(((SecurityPriceRow)(e.Row)), e.Action));
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public void RemoveSecurityPricesRow(SecurityPricesRow row) {
+            public void RemoveSecurityPriceRow(SecurityPriceRow row) {
                 this.Rows.Remove(row);
             }
             
@@ -2169,7 +2169,7 @@ namespace BanaData.Database {
                 type.Attributes.Add(attribute1);
                 global::System.Xml.Schema.XmlSchemaAttribute attribute2 = new global::System.Xml.Schema.XmlSchemaAttribute();
                 attribute2.Name = "tableTypeName";
-                attribute2.FixedValue = "SecurityPricesDataTable";
+                attribute2.FixedValue = "SecurityPriceDataTable";
                 type.Attributes.Add(attribute2);
                 type.Particle = sequence;
                 global::System.Xml.Schema.XmlSchema dsSchema = ds.GetSchemaSerializable();
@@ -2357,7 +2357,7 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public TransactionsRow AddTransactionsRow(AccountsRow parentAccountsRowByFK_Accounts_Transactions, System.DateTime Date, string Payee, int IStatus, string Memo, CheckpointsRow parentCheckpointsRowByCheckpoints_Transactions) {
+            public TransactionsRow AddTransactionsRow(AccountRow parentAccountRowByFK_Accounts_Transactions, System.DateTime Date, string Payee, int IStatus, string Memo, CheckpointRow parentCheckpointRowByCheckpoints_Transactions) {
                 TransactionsRow rowTransactionsRow = ((TransactionsRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
@@ -2367,11 +2367,11 @@ namespace BanaData.Database {
                         IStatus,
                         Memo,
                         null};
-                if ((parentAccountsRowByFK_Accounts_Transactions != null)) {
-                    columnValuesArray[1] = parentAccountsRowByFK_Accounts_Transactions[0];
+                if ((parentAccountRowByFK_Accounts_Transactions != null)) {
+                    columnValuesArray[1] = parentAccountRowByFK_Accounts_Transactions[0];
                 }
-                if ((parentCheckpointsRowByCheckpoints_Transactions != null)) {
-                    columnValuesArray[6] = parentCheckpointsRowByCheckpoints_Transactions[0];
+                if ((parentCheckpointRowByCheckpoints_Transactions != null)) {
+                    columnValuesArray[6] = parentCheckpointRowByCheckpoints_Transactions[0];
                 }
                 rowTransactionsRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowTransactionsRow);
@@ -2711,7 +2711,7 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public LineItemsRow AddLineItemsRow(TransactionsRow parentTransactionsRowByFK_Transactions_LineItems, AccountsRow parentAccountsRowByAccounts_LineItems, CategoriesRow parentCategoriesRowByCategories_LineItems, string Memo, decimal Amount, int ITransferStatus) {
+            public LineItemsRow AddLineItemsRow(TransactionsRow parentTransactionsRowByFK_Transactions_LineItems, AccountRow parentAccountRowByAccounts_LineItems, CategoriesRow parentCategoriesRowByCategories_LineItems, string Memo, decimal Amount, int ITransferStatus) {
                 LineItemsRow rowLineItemsRow = ((LineItemsRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
@@ -2724,8 +2724,8 @@ namespace BanaData.Database {
                 if ((parentTransactionsRowByFK_Transactions_LineItems != null)) {
                     columnValuesArray[1] = parentTransactionsRowByFK_Transactions_LineItems[0];
                 }
-                if ((parentAccountsRowByAccounts_LineItems != null)) {
-                    columnValuesArray[2] = parentAccountsRowByAccounts_LineItems[0];
+                if ((parentAccountRowByAccounts_LineItems != null)) {
+                    columnValuesArray[2] = parentAccountRowByAccounts_LineItems[0];
                 }
                 if ((parentCategoriesRowByCategories_LineItems != null)) {
                     columnValuesArray[3] = parentCategoriesRowByCategories_LineItems[0];
@@ -2924,7 +2924,7 @@ namespace BanaData.Database {
         ///</summary>
         [global::System.Serializable()]
         [global::System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedTableSchema")]
-        public partial class BankingTransactionsDataTable : global::System.Data.TypedTableBase<BankingTransactionsRow> {
+        public partial class BankingTransactionDataTable : global::System.Data.TypedTableBase<BankingTransactionRow> {
             
             private global::System.Data.DataColumn columnID;
             
@@ -2936,8 +2936,8 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public BankingTransactionsDataTable() {
-                this.TableName = "BankingTransactions";
+            public BankingTransactionDataTable() {
+                this.TableName = "BankingTransaction";
                 this.BeginInit();
                 this.InitClass();
                 this.EndInit();
@@ -2945,7 +2945,7 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            internal BankingTransactionsDataTable(global::System.Data.DataTable table) {
+            internal BankingTransactionDataTable(global::System.Data.DataTable table) {
                 this.TableName = table.TableName;
                 if ((table.CaseSensitive != table.DataSet.CaseSensitive)) {
                     this.CaseSensitive = table.CaseSensitive;
@@ -2962,7 +2962,7 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            protected BankingTransactionsDataTable(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context) : 
+            protected BankingTransactionDataTable(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context) : 
                     base(info, context) {
                 this.InitVars();
             }
@@ -3010,34 +3010,34 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public BankingTransactionsRow this[int index] {
+            public BankingTransactionRow this[int index] {
                 get {
-                    return ((BankingTransactionsRow)(this.Rows[index]));
+                    return ((BankingTransactionRow)(this.Rows[index]));
                 }
             }
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event BankingTransactionsRowChangeEventHandler BankingTransactionsRowChanging;
+            public event BankingTransactionRowChangeEventHandler BankingTransactionRowChanging;
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event BankingTransactionsRowChangeEventHandler BankingTransactionsRowChanged;
+            public event BankingTransactionRowChangeEventHandler BankingTransactionRowChanged;
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event BankingTransactionsRowChangeEventHandler BankingTransactionsRowDeleting;
+            public event BankingTransactionRowChangeEventHandler BankingTransactionRowDeleting;
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event BankingTransactionsRowChangeEventHandler BankingTransactionsRowDeleted;
+            public event BankingTransactionRowChangeEventHandler BankingTransactionRowDeleted;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public void AddBankingTransactionsRow(BankingTransactionsRow row) {
+            public void AddBankingTransactionRow(BankingTransactionRow row) {
                 this.Rows.Add(row);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public BankingTransactionsRow AddBankingTransactionsRow(TransactionsRow parentTransactionsRowByFK_Transactions_BankTransactions, int IMedium, decimal CheckNumber) {
-                BankingTransactionsRow rowBankingTransactionsRow = ((BankingTransactionsRow)(this.NewRow()));
+            public BankingTransactionRow AddBankingTransactionRow(TransactionsRow parentTransactionsRowByFK_Transactions_BankTransactions, int IMedium, decimal CheckNumber) {
+                BankingTransactionRow rowBankingTransactionRow = ((BankingTransactionRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
                         null,
@@ -3046,22 +3046,22 @@ namespace BanaData.Database {
                 if ((parentTransactionsRowByFK_Transactions_BankTransactions != null)) {
                     columnValuesArray[1] = parentTransactionsRowByFK_Transactions_BankTransactions[0];
                 }
-                rowBankingTransactionsRow.ItemArray = columnValuesArray;
-                this.Rows.Add(rowBankingTransactionsRow);
-                return rowBankingTransactionsRow;
+                rowBankingTransactionRow.ItemArray = columnValuesArray;
+                this.Rows.Add(rowBankingTransactionRow);
+                return rowBankingTransactionRow;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public BankingTransactionsRow FindByID(int ID) {
-                return ((BankingTransactionsRow)(this.Rows.Find(new object[] {
+            public BankingTransactionRow FindByID(int ID) {
+                return ((BankingTransactionRow)(this.Rows.Find(new object[] {
                             ID})));
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public override global::System.Data.DataTable Clone() {
-                BankingTransactionsDataTable cln = ((BankingTransactionsDataTable)(base.Clone()));
+                BankingTransactionDataTable cln = ((BankingTransactionDataTable)(base.Clone()));
                 cln.InitVars();
                 return cln;
             }
@@ -3069,7 +3069,7 @@ namespace BanaData.Database {
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override global::System.Data.DataTable CreateInstance() {
-                return new BankingTransactionsDataTable();
+                return new BankingTransactionDataTable();
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -3104,28 +3104,28 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public BankingTransactionsRow NewBankingTransactionsRow() {
-                return ((BankingTransactionsRow)(this.NewRow()));
+            public BankingTransactionRow NewBankingTransactionRow() {
+                return ((BankingTransactionRow)(this.NewRow()));
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override global::System.Data.DataRow NewRowFromBuilder(global::System.Data.DataRowBuilder builder) {
-                return new BankingTransactionsRow(builder);
+                return new BankingTransactionRow(builder);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override global::System.Type GetRowType() {
-                return typeof(BankingTransactionsRow);
+                return typeof(BankingTransactionRow);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowChanged(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowChanged(e);
-                if ((this.BankingTransactionsRowChanged != null)) {
-                    this.BankingTransactionsRowChanged(this, new BankingTransactionsRowChangeEvent(((BankingTransactionsRow)(e.Row)), e.Action));
+                if ((this.BankingTransactionRowChanged != null)) {
+                    this.BankingTransactionRowChanged(this, new BankingTransactionRowChangeEvent(((BankingTransactionRow)(e.Row)), e.Action));
                 }
             }
             
@@ -3133,8 +3133,8 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowChanging(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowChanging(e);
-                if ((this.BankingTransactionsRowChanging != null)) {
-                    this.BankingTransactionsRowChanging(this, new BankingTransactionsRowChangeEvent(((BankingTransactionsRow)(e.Row)), e.Action));
+                if ((this.BankingTransactionRowChanging != null)) {
+                    this.BankingTransactionRowChanging(this, new BankingTransactionRowChangeEvent(((BankingTransactionRow)(e.Row)), e.Action));
                 }
             }
             
@@ -3142,8 +3142,8 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowDeleted(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowDeleted(e);
-                if ((this.BankingTransactionsRowDeleted != null)) {
-                    this.BankingTransactionsRowDeleted(this, new BankingTransactionsRowChangeEvent(((BankingTransactionsRow)(e.Row)), e.Action));
+                if ((this.BankingTransactionRowDeleted != null)) {
+                    this.BankingTransactionRowDeleted(this, new BankingTransactionRowChangeEvent(((BankingTransactionRow)(e.Row)), e.Action));
                 }
             }
             
@@ -3151,14 +3151,14 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowDeleting(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowDeleting(e);
-                if ((this.BankingTransactionsRowDeleting != null)) {
-                    this.BankingTransactionsRowDeleting(this, new BankingTransactionsRowChangeEvent(((BankingTransactionsRow)(e.Row)), e.Action));
+                if ((this.BankingTransactionRowDeleting != null)) {
+                    this.BankingTransactionRowDeleting(this, new BankingTransactionRowChangeEvent(((BankingTransactionRow)(e.Row)), e.Action));
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public void RemoveBankingTransactionsRow(BankingTransactionsRow row) {
+            public void RemoveBankingTransactionRow(BankingTransactionRow row) {
                 this.Rows.Remove(row);
             }
             
@@ -3185,7 +3185,7 @@ namespace BanaData.Database {
                 type.Attributes.Add(attribute1);
                 global::System.Xml.Schema.XmlSchemaAttribute attribute2 = new global::System.Xml.Schema.XmlSchemaAttribute();
                 attribute2.Name = "tableTypeName";
-                attribute2.FixedValue = "BankingTransactionsDataTable";
+                attribute2.FixedValue = "BankingTransactionDataTable";
                 type.Attributes.Add(attribute2);
                 type.Particle = sequence;
                 global::System.Xml.Schema.XmlSchema dsSchema = ds.GetSchemaSerializable();
@@ -3373,7 +3373,7 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public InvestmentTransactionsRow AddInvestmentTransactionsRow(TransactionsRow parentTransactionsRowByFK_Transactions_InvestmentTransactions, int IType, SecuritiesRow parentSecuritiesRowByFK_Securities_InvestmentTransactions, decimal SecurityPrice, decimal SecurityQuantity, decimal Commission) {
+            public InvestmentTransactionsRow AddInvestmentTransactionsRow(TransactionsRow parentTransactionsRowByFK_Transactions_InvestmentTransactions, int IType, SecurityRow parentSecurityRowByFK_Securities_InvestmentTransactions, decimal SecurityPrice, decimal SecurityQuantity, decimal Commission) {
                 InvestmentTransactionsRow rowInvestmentTransactionsRow = ((InvestmentTransactionsRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
@@ -3386,8 +3386,8 @@ namespace BanaData.Database {
                 if ((parentTransactionsRowByFK_Transactions_InvestmentTransactions != null)) {
                     columnValuesArray[1] = parentTransactionsRowByFK_Transactions_InvestmentTransactions[0];
                 }
-                if ((parentSecuritiesRowByFK_Securities_InvestmentTransactions != null)) {
-                    columnValuesArray[3] = parentSecuritiesRowByFK_Securities_InvestmentTransactions[0];
+                if ((parentSecurityRowByFK_Securities_InvestmentTransactions != null)) {
+                    columnValuesArray[3] = parentSecurityRowByFK_Securities_InvestmentTransactions[0];
                 }
                 rowInvestmentTransactionsRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowInvestmentTransactionsRow);
@@ -3584,7 +3584,7 @@ namespace BanaData.Database {
         ///</summary>
         [global::System.Serializable()]
         [global::System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedTableSchema")]
-        public partial class MemorizedLineItemsDataTable : global::System.Data.TypedTableBase<MemorizedLineItemsRow> {
+        public partial class MemorizedLineItemDataTable : global::System.Data.TypedTableBase<MemorizedLineItemRow> {
             
             private global::System.Data.DataColumn columnID;
             
@@ -3602,8 +3602,8 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public MemorizedLineItemsDataTable() {
-                this.TableName = "MemorizedLineItems";
+            public MemorizedLineItemDataTable() {
+                this.TableName = "MemorizedLineItem";
                 this.BeginInit();
                 this.InitClass();
                 this.EndInit();
@@ -3611,7 +3611,7 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            internal MemorizedLineItemsDataTable(global::System.Data.DataTable table) {
+            internal MemorizedLineItemDataTable(global::System.Data.DataTable table) {
                 this.TableName = table.TableName;
                 if ((table.CaseSensitive != table.DataSet.CaseSensitive)) {
                     this.CaseSensitive = table.CaseSensitive;
@@ -3628,7 +3628,7 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            protected MemorizedLineItemsDataTable(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context) : 
+            protected MemorizedLineItemDataTable(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context) : 
                     base(info, context) {
                 this.InitVars();
             }
@@ -3700,34 +3700,34 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public MemorizedLineItemsRow this[int index] {
+            public MemorizedLineItemRow this[int index] {
                 get {
-                    return ((MemorizedLineItemsRow)(this.Rows[index]));
+                    return ((MemorizedLineItemRow)(this.Rows[index]));
                 }
             }
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event MemorizedLineItemsRowChangeEventHandler MemorizedLineItemsRowChanging;
+            public event MemorizedLineItemRowChangeEventHandler MemorizedLineItemRowChanging;
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event MemorizedLineItemsRowChangeEventHandler MemorizedLineItemsRowChanged;
+            public event MemorizedLineItemRowChangeEventHandler MemorizedLineItemRowChanged;
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event MemorizedLineItemsRowChangeEventHandler MemorizedLineItemsRowDeleting;
+            public event MemorizedLineItemRowChangeEventHandler MemorizedLineItemRowDeleting;
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event MemorizedLineItemsRowChangeEventHandler MemorizedLineItemsRowDeleted;
+            public event MemorizedLineItemRowChangeEventHandler MemorizedLineItemRowDeleted;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public void AddMemorizedLineItemsRow(MemorizedLineItemsRow row) {
+            public void AddMemorizedLineItemRow(MemorizedLineItemRow row) {
                 this.Rows.Add(row);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public MemorizedLineItemsRow AddMemorizedLineItemsRow(MemorizedPayeesRow parentMemorizedPayeesRowByFK_MemorizedPayees_MemorizedLineItems, bool IsTransfer, AccountsRow parentAccountsRowByFK_Accounts_MemorizedLineItems, CategoriesRow parentCategoriesRowByFK_Categories_MemorizedLineItems, string Memo, decimal Amount) {
-                MemorizedLineItemsRow rowMemorizedLineItemsRow = ((MemorizedLineItemsRow)(this.NewRow()));
+            public MemorizedLineItemRow AddMemorizedLineItemRow(MemorizedPayeeRow parentMemorizedPayeeRowByFK_MemorizedPayees_MemorizedLineItems, bool IsTransfer, AccountRow parentAccountRowByFK_Accounts_MemorizedLineItems, CategoriesRow parentCategoriesRowByFK_Categories_MemorizedLineItems, string Memo, decimal Amount) {
+                MemorizedLineItemRow rowMemorizedLineItemRow = ((MemorizedLineItemRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
                         null,
@@ -3736,31 +3736,31 @@ namespace BanaData.Database {
                         null,
                         Memo,
                         Amount};
-                if ((parentMemorizedPayeesRowByFK_MemorizedPayees_MemorizedLineItems != null)) {
-                    columnValuesArray[1] = parentMemorizedPayeesRowByFK_MemorizedPayees_MemorizedLineItems[0];
+                if ((parentMemorizedPayeeRowByFK_MemorizedPayees_MemorizedLineItems != null)) {
+                    columnValuesArray[1] = parentMemorizedPayeeRowByFK_MemorizedPayees_MemorizedLineItems[0];
                 }
-                if ((parentAccountsRowByFK_Accounts_MemorizedLineItems != null)) {
-                    columnValuesArray[3] = parentAccountsRowByFK_Accounts_MemorizedLineItems[0];
+                if ((parentAccountRowByFK_Accounts_MemorizedLineItems != null)) {
+                    columnValuesArray[3] = parentAccountRowByFK_Accounts_MemorizedLineItems[0];
                 }
                 if ((parentCategoriesRowByFK_Categories_MemorizedLineItems != null)) {
                     columnValuesArray[4] = parentCategoriesRowByFK_Categories_MemorizedLineItems[0];
                 }
-                rowMemorizedLineItemsRow.ItemArray = columnValuesArray;
-                this.Rows.Add(rowMemorizedLineItemsRow);
-                return rowMemorizedLineItemsRow;
+                rowMemorizedLineItemRow.ItemArray = columnValuesArray;
+                this.Rows.Add(rowMemorizedLineItemRow);
+                return rowMemorizedLineItemRow;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public MemorizedLineItemsRow FindByID(int ID) {
-                return ((MemorizedLineItemsRow)(this.Rows.Find(new object[] {
+            public MemorizedLineItemRow FindByID(int ID) {
+                return ((MemorizedLineItemRow)(this.Rows.Find(new object[] {
                             ID})));
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public override global::System.Data.DataTable Clone() {
-                MemorizedLineItemsDataTable cln = ((MemorizedLineItemsDataTable)(base.Clone()));
+                MemorizedLineItemDataTable cln = ((MemorizedLineItemDataTable)(base.Clone()));
                 cln.InitVars();
                 return cln;
             }
@@ -3768,7 +3768,7 @@ namespace BanaData.Database {
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override global::System.Data.DataTable CreateInstance() {
-                return new MemorizedLineItemsDataTable();
+                return new MemorizedLineItemDataTable();
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -3813,28 +3813,28 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public MemorizedLineItemsRow NewMemorizedLineItemsRow() {
-                return ((MemorizedLineItemsRow)(this.NewRow()));
+            public MemorizedLineItemRow NewMemorizedLineItemRow() {
+                return ((MemorizedLineItemRow)(this.NewRow()));
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override global::System.Data.DataRow NewRowFromBuilder(global::System.Data.DataRowBuilder builder) {
-                return new MemorizedLineItemsRow(builder);
+                return new MemorizedLineItemRow(builder);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override global::System.Type GetRowType() {
-                return typeof(MemorizedLineItemsRow);
+                return typeof(MemorizedLineItemRow);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowChanged(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowChanged(e);
-                if ((this.MemorizedLineItemsRowChanged != null)) {
-                    this.MemorizedLineItemsRowChanged(this, new MemorizedLineItemsRowChangeEvent(((MemorizedLineItemsRow)(e.Row)), e.Action));
+                if ((this.MemorizedLineItemRowChanged != null)) {
+                    this.MemorizedLineItemRowChanged(this, new MemorizedLineItemRowChangeEvent(((MemorizedLineItemRow)(e.Row)), e.Action));
                 }
             }
             
@@ -3842,8 +3842,8 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowChanging(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowChanging(e);
-                if ((this.MemorizedLineItemsRowChanging != null)) {
-                    this.MemorizedLineItemsRowChanging(this, new MemorizedLineItemsRowChangeEvent(((MemorizedLineItemsRow)(e.Row)), e.Action));
+                if ((this.MemorizedLineItemRowChanging != null)) {
+                    this.MemorizedLineItemRowChanging(this, new MemorizedLineItemRowChangeEvent(((MemorizedLineItemRow)(e.Row)), e.Action));
                 }
             }
             
@@ -3851,8 +3851,8 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowDeleted(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowDeleted(e);
-                if ((this.MemorizedLineItemsRowDeleted != null)) {
-                    this.MemorizedLineItemsRowDeleted(this, new MemorizedLineItemsRowChangeEvent(((MemorizedLineItemsRow)(e.Row)), e.Action));
+                if ((this.MemorizedLineItemRowDeleted != null)) {
+                    this.MemorizedLineItemRowDeleted(this, new MemorizedLineItemRowChangeEvent(((MemorizedLineItemRow)(e.Row)), e.Action));
                 }
             }
             
@@ -3860,14 +3860,14 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowDeleting(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowDeleting(e);
-                if ((this.MemorizedLineItemsRowDeleting != null)) {
-                    this.MemorizedLineItemsRowDeleting(this, new MemorizedLineItemsRowChangeEvent(((MemorizedLineItemsRow)(e.Row)), e.Action));
+                if ((this.MemorizedLineItemRowDeleting != null)) {
+                    this.MemorizedLineItemRowDeleting(this, new MemorizedLineItemRowChangeEvent(((MemorizedLineItemRow)(e.Row)), e.Action));
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public void RemoveMemorizedLineItemsRow(MemorizedLineItemsRow row) {
+            public void RemoveMemorizedLineItemRow(MemorizedLineItemRow row) {
                 this.Rows.Remove(row);
             }
             
@@ -3894,7 +3894,7 @@ namespace BanaData.Database {
                 type.Attributes.Add(attribute1);
                 global::System.Xml.Schema.XmlSchemaAttribute attribute2 = new global::System.Xml.Schema.XmlSchemaAttribute();
                 attribute2.Name = "tableTypeName";
-                attribute2.FixedValue = "MemorizedLineItemsDataTable";
+                attribute2.FixedValue = "MemorizedLineItemDataTable";
                 type.Attributes.Add(attribute2);
                 type.Particle = sequence;
                 global::System.Xml.Schema.XmlSchema dsSchema = ds.GetSchemaSerializable();
@@ -3940,7 +3940,7 @@ namespace BanaData.Database {
         ///</summary>
         [global::System.Serializable()]
         [global::System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedTableSchema")]
-        public partial class MemorizedPayeesDataTable : global::System.Data.TypedTableBase<MemorizedPayeesRow> {
+        public partial class MemorizedPayeeDataTable : global::System.Data.TypedTableBase<MemorizedPayeeRow> {
             
             private global::System.Data.DataColumn columnID;
             
@@ -3952,8 +3952,8 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public MemorizedPayeesDataTable() {
-                this.TableName = "MemorizedPayees";
+            public MemorizedPayeeDataTable() {
+                this.TableName = "MemorizedPayee";
                 this.BeginInit();
                 this.InitClass();
                 this.EndInit();
@@ -3961,7 +3961,7 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            internal MemorizedPayeesDataTable(global::System.Data.DataTable table) {
+            internal MemorizedPayeeDataTable(global::System.Data.DataTable table) {
                 this.TableName = table.TableName;
                 if ((table.CaseSensitive != table.DataSet.CaseSensitive)) {
                     this.CaseSensitive = table.CaseSensitive;
@@ -3978,7 +3978,7 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            protected MemorizedPayeesDataTable(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context) : 
+            protected MemorizedPayeeDataTable(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context) : 
                     base(info, context) {
                 this.InitVars();
             }
@@ -4026,55 +4026,55 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public MemorizedPayeesRow this[int index] {
+            public MemorizedPayeeRow this[int index] {
                 get {
-                    return ((MemorizedPayeesRow)(this.Rows[index]));
+                    return ((MemorizedPayeeRow)(this.Rows[index]));
                 }
             }
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event MemorizedPayeesRowChangeEventHandler MemorizedPayeesRowChanging;
+            public event MemorizedPayeeRowChangeEventHandler MemorizedPayeeRowChanging;
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event MemorizedPayeesRowChangeEventHandler MemorizedPayeesRowChanged;
+            public event MemorizedPayeeRowChangeEventHandler MemorizedPayeeRowChanged;
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event MemorizedPayeesRowChangeEventHandler MemorizedPayeesRowDeleting;
+            public event MemorizedPayeeRowChangeEventHandler MemorizedPayeeRowDeleting;
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event MemorizedPayeesRowChangeEventHandler MemorizedPayeesRowDeleted;
+            public event MemorizedPayeeRowChangeEventHandler MemorizedPayeeRowDeleted;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public void AddMemorizedPayeesRow(MemorizedPayeesRow row) {
+            public void AddMemorizedPayeeRow(MemorizedPayeeRow row) {
                 this.Rows.Add(row);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public MemorizedPayeesRow AddMemorizedPayeesRow(string Payee, int IStatus, string Memo) {
-                MemorizedPayeesRow rowMemorizedPayeesRow = ((MemorizedPayeesRow)(this.NewRow()));
+            public MemorizedPayeeRow AddMemorizedPayeeRow(string Payee, int IStatus, string Memo) {
+                MemorizedPayeeRow rowMemorizedPayeeRow = ((MemorizedPayeeRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
                         Payee,
                         IStatus,
                         Memo};
-                rowMemorizedPayeesRow.ItemArray = columnValuesArray;
-                this.Rows.Add(rowMemorizedPayeesRow);
-                return rowMemorizedPayeesRow;
+                rowMemorizedPayeeRow.ItemArray = columnValuesArray;
+                this.Rows.Add(rowMemorizedPayeeRow);
+                return rowMemorizedPayeeRow;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public MemorizedPayeesRow FindByID(int ID) {
-                return ((MemorizedPayeesRow)(this.Rows.Find(new object[] {
+            public MemorizedPayeeRow FindByID(int ID) {
+                return ((MemorizedPayeeRow)(this.Rows.Find(new object[] {
                             ID})));
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public override global::System.Data.DataTable Clone() {
-                MemorizedPayeesDataTable cln = ((MemorizedPayeesDataTable)(base.Clone()));
+                MemorizedPayeeDataTable cln = ((MemorizedPayeeDataTable)(base.Clone()));
                 cln.InitVars();
                 return cln;
             }
@@ -4082,7 +4082,7 @@ namespace BanaData.Database {
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override global::System.Data.DataTable CreateInstance() {
-                return new MemorizedPayeesDataTable();
+                return new MemorizedPayeeDataTable();
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -4117,28 +4117,28 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public MemorizedPayeesRow NewMemorizedPayeesRow() {
-                return ((MemorizedPayeesRow)(this.NewRow()));
+            public MemorizedPayeeRow NewMemorizedPayeeRow() {
+                return ((MemorizedPayeeRow)(this.NewRow()));
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override global::System.Data.DataRow NewRowFromBuilder(global::System.Data.DataRowBuilder builder) {
-                return new MemorizedPayeesRow(builder);
+                return new MemorizedPayeeRow(builder);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override global::System.Type GetRowType() {
-                return typeof(MemorizedPayeesRow);
+                return typeof(MemorizedPayeeRow);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowChanged(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowChanged(e);
-                if ((this.MemorizedPayeesRowChanged != null)) {
-                    this.MemorizedPayeesRowChanged(this, new MemorizedPayeesRowChangeEvent(((MemorizedPayeesRow)(e.Row)), e.Action));
+                if ((this.MemorizedPayeeRowChanged != null)) {
+                    this.MemorizedPayeeRowChanged(this, new MemorizedPayeeRowChangeEvent(((MemorizedPayeeRow)(e.Row)), e.Action));
                 }
             }
             
@@ -4146,8 +4146,8 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowChanging(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowChanging(e);
-                if ((this.MemorizedPayeesRowChanging != null)) {
-                    this.MemorizedPayeesRowChanging(this, new MemorizedPayeesRowChangeEvent(((MemorizedPayeesRow)(e.Row)), e.Action));
+                if ((this.MemorizedPayeeRowChanging != null)) {
+                    this.MemorizedPayeeRowChanging(this, new MemorizedPayeeRowChangeEvent(((MemorizedPayeeRow)(e.Row)), e.Action));
                 }
             }
             
@@ -4155,8 +4155,8 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowDeleted(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowDeleted(e);
-                if ((this.MemorizedPayeesRowDeleted != null)) {
-                    this.MemorizedPayeesRowDeleted(this, new MemorizedPayeesRowChangeEvent(((MemorizedPayeesRow)(e.Row)), e.Action));
+                if ((this.MemorizedPayeeRowDeleted != null)) {
+                    this.MemorizedPayeeRowDeleted(this, new MemorizedPayeeRowChangeEvent(((MemorizedPayeeRow)(e.Row)), e.Action));
                 }
             }
             
@@ -4164,14 +4164,14 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowDeleting(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowDeleting(e);
-                if ((this.MemorizedPayeesRowDeleting != null)) {
-                    this.MemorizedPayeesRowDeleting(this, new MemorizedPayeesRowChangeEvent(((MemorizedPayeesRow)(e.Row)), e.Action));
+                if ((this.MemorizedPayeeRowDeleting != null)) {
+                    this.MemorizedPayeeRowDeleting(this, new MemorizedPayeeRowChangeEvent(((MemorizedPayeeRow)(e.Row)), e.Action));
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public void RemoveMemorizedPayeesRow(MemorizedPayeesRow row) {
+            public void RemoveMemorizedPayeeRow(MemorizedPayeeRow row) {
                 this.Rows.Remove(row);
             }
             
@@ -4198,7 +4198,7 @@ namespace BanaData.Database {
                 type.Attributes.Add(attribute1);
                 global::System.Xml.Schema.XmlSchemaAttribute attribute2 = new global::System.Xml.Schema.XmlSchemaAttribute();
                 attribute2.Name = "tableTypeName";
-                attribute2.FixedValue = "MemorizedPayeesDataTable";
+                attribute2.FixedValue = "MemorizedPayeeDataTable";
                 type.Attributes.Add(attribute2);
                 type.Particle = sequence;
                 global::System.Xml.Schema.XmlSchema dsSchema = ds.GetSchemaSerializable();
@@ -4386,7 +4386,7 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public ReconcileInfoRow AddReconcileInfoRow(AccountsRow parentAccountsRowByFK_Accounts_ReconcileInfo, System.DateTime StatementDate, decimal StatementBalance, decimal InterestAmount, System.DateTime InterestDate, CategoriesRow parentCategoriesRowByFK_Categories_ReconcileInfo) {
+            public ReconcileInfoRow AddReconcileInfoRow(AccountRow parentAccountRowByFK_Accounts_ReconcileInfo, System.DateTime StatementDate, decimal StatementBalance, decimal InterestAmount, System.DateTime InterestDate, CategoriesRow parentCategoriesRowByFK_Categories_ReconcileInfo) {
                 ReconcileInfoRow rowReconcileInfoRow = ((ReconcileInfoRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
@@ -4396,8 +4396,8 @@ namespace BanaData.Database {
                         InterestAmount,
                         InterestDate,
                         null};
-                if ((parentAccountsRowByFK_Accounts_ReconcileInfo != null)) {
-                    columnValuesArray[1] = parentAccountsRowByFK_Accounts_ReconcileInfo[0];
+                if ((parentAccountRowByFK_Accounts_ReconcileInfo != null)) {
+                    columnValuesArray[1] = parentAccountRowByFK_Accounts_ReconcileInfo[0];
                 }
                 if ((parentCategoriesRowByFK_Categories_ReconcileInfo != null)) {
                     columnValuesArray[6] = parentCategoriesRowByFK_Categories_ReconcileInfo[0];
@@ -4590,7 +4590,7 @@ namespace BanaData.Database {
         ///</summary>
         [global::System.Serializable()]
         [global::System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedTableSchema")]
-        public partial class CheckpointsDataTable : global::System.Data.TypedTableBase<CheckpointsRow> {
+        public partial class CheckpointDataTable : global::System.Data.TypedTableBase<CheckpointRow> {
             
             private global::System.Data.DataColumn columnID;
             
@@ -4598,8 +4598,8 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public CheckpointsDataTable() {
-                this.TableName = "Checkpoints";
+            public CheckpointDataTable() {
+                this.TableName = "Checkpoint";
                 this.BeginInit();
                 this.InitClass();
                 this.EndInit();
@@ -4607,7 +4607,7 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            internal CheckpointsDataTable(global::System.Data.DataTable table) {
+            internal CheckpointDataTable(global::System.Data.DataTable table) {
                 this.TableName = table.TableName;
                 if ((table.CaseSensitive != table.DataSet.CaseSensitive)) {
                     this.CaseSensitive = table.CaseSensitive;
@@ -4624,7 +4624,7 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            protected CheckpointsDataTable(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context) : 
+            protected CheckpointDataTable(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context) : 
                     base(info, context) {
                 this.InitVars();
             }
@@ -4656,46 +4656,46 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public CheckpointsRow this[int index] {
+            public CheckpointRow this[int index] {
                 get {
-                    return ((CheckpointsRow)(this.Rows[index]));
+                    return ((CheckpointRow)(this.Rows[index]));
                 }
             }
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event CheckpointsRowChangeEventHandler CheckpointsRowChanging;
+            public event CheckpointRowChangeEventHandler CheckpointRowChanging;
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event CheckpointsRowChangeEventHandler CheckpointsRowChanged;
+            public event CheckpointRowChangeEventHandler CheckpointRowChanged;
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event CheckpointsRowChangeEventHandler CheckpointsRowDeleting;
+            public event CheckpointRowChangeEventHandler CheckpointRowDeleting;
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public event CheckpointsRowChangeEventHandler CheckpointsRowDeleted;
+            public event CheckpointRowChangeEventHandler CheckpointRowDeleted;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public void AddCheckpointsRow(CheckpointsRow row) {
+            public void AddCheckpointRow(CheckpointRow row) {
                 this.Rows.Add(row);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public CheckpointsRow AddCheckpointsRow(System.DateTime Date) {
-                CheckpointsRow rowCheckpointsRow = ((CheckpointsRow)(this.NewRow()));
+            public CheckpointRow AddCheckpointRow(System.DateTime Date) {
+                CheckpointRow rowCheckpointRow = ((CheckpointRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
                         Date};
-                rowCheckpointsRow.ItemArray = columnValuesArray;
-                this.Rows.Add(rowCheckpointsRow);
-                return rowCheckpointsRow;
+                rowCheckpointRow.ItemArray = columnValuesArray;
+                this.Rows.Add(rowCheckpointRow);
+                return rowCheckpointRow;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public override global::System.Data.DataTable Clone() {
-                CheckpointsDataTable cln = ((CheckpointsDataTable)(base.Clone()));
+                CheckpointDataTable cln = ((CheckpointDataTable)(base.Clone()));
                 cln.InitVars();
                 return cln;
             }
@@ -4703,7 +4703,7 @@ namespace BanaData.Database {
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override global::System.Data.DataTable CreateInstance() {
-                return new CheckpointsDataTable();
+                return new CheckpointDataTable();
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -4730,28 +4730,28 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public CheckpointsRow NewCheckpointsRow() {
-                return ((CheckpointsRow)(this.NewRow()));
+            public CheckpointRow NewCheckpointRow() {
+                return ((CheckpointRow)(this.NewRow()));
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override global::System.Data.DataRow NewRowFromBuilder(global::System.Data.DataRowBuilder builder) {
-                return new CheckpointsRow(builder);
+                return new CheckpointRow(builder);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override global::System.Type GetRowType() {
-                return typeof(CheckpointsRow);
+                return typeof(CheckpointRow);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowChanged(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowChanged(e);
-                if ((this.CheckpointsRowChanged != null)) {
-                    this.CheckpointsRowChanged(this, new CheckpointsRowChangeEvent(((CheckpointsRow)(e.Row)), e.Action));
+                if ((this.CheckpointRowChanged != null)) {
+                    this.CheckpointRowChanged(this, new CheckpointRowChangeEvent(((CheckpointRow)(e.Row)), e.Action));
                 }
             }
             
@@ -4759,8 +4759,8 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowChanging(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowChanging(e);
-                if ((this.CheckpointsRowChanging != null)) {
-                    this.CheckpointsRowChanging(this, new CheckpointsRowChangeEvent(((CheckpointsRow)(e.Row)), e.Action));
+                if ((this.CheckpointRowChanging != null)) {
+                    this.CheckpointRowChanging(this, new CheckpointRowChangeEvent(((CheckpointRow)(e.Row)), e.Action));
                 }
             }
             
@@ -4768,8 +4768,8 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowDeleted(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowDeleted(e);
-                if ((this.CheckpointsRowDeleted != null)) {
-                    this.CheckpointsRowDeleted(this, new CheckpointsRowChangeEvent(((CheckpointsRow)(e.Row)), e.Action));
+                if ((this.CheckpointRowDeleted != null)) {
+                    this.CheckpointRowDeleted(this, new CheckpointRowChangeEvent(((CheckpointRow)(e.Row)), e.Action));
                 }
             }
             
@@ -4777,14 +4777,14 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             protected override void OnRowDeleting(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowDeleting(e);
-                if ((this.CheckpointsRowDeleting != null)) {
-                    this.CheckpointsRowDeleting(this, new CheckpointsRowChangeEvent(((CheckpointsRow)(e.Row)), e.Action));
+                if ((this.CheckpointRowDeleting != null)) {
+                    this.CheckpointRowDeleting(this, new CheckpointRowChangeEvent(((CheckpointRow)(e.Row)), e.Action));
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public void RemoveCheckpointsRow(CheckpointsRow row) {
+            public void RemoveCheckpointRow(CheckpointRow row) {
                 this.Rows.Remove(row);
             }
             
@@ -4811,7 +4811,7 @@ namespace BanaData.Database {
                 type.Attributes.Add(attribute1);
                 global::System.Xml.Schema.XmlSchemaAttribute attribute2 = new global::System.Xml.Schema.XmlSchemaAttribute();
                 attribute2.Name = "tableTypeName";
-                attribute2.FixedValue = "CheckpointsDataTable";
+                attribute2.FixedValue = "CheckpointDataTable";
                 type.Attributes.Add(attribute2);
                 type.Particle = sequence;
                 global::System.Xml.Schema.XmlSchema dsSchema = ds.GetSchemaSerializable();
@@ -4969,7 +4969,7 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public SecurityReconcileInfoRow AddSecurityReconcileInfoRow(ReconcileInfoRow parentReconcileInfoRowByFK_ReconcileInfo_SecurityReconcileInfo, SecuritiesRow parentSecuritiesRowByFK_Securities_SecurityReconcileInfo, decimal SecurityQuantity) {
+            public SecurityReconcileInfoRow AddSecurityReconcileInfoRow(ReconcileInfoRow parentReconcileInfoRowByFK_ReconcileInfo_SecurityReconcileInfo, SecurityRow parentSecurityRowByFK_Securities_SecurityReconcileInfo, decimal SecurityQuantity) {
                 SecurityReconcileInfoRow rowSecurityReconcileInfoRow = ((SecurityReconcileInfoRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
@@ -4979,8 +4979,8 @@ namespace BanaData.Database {
                 if ((parentReconcileInfoRowByFK_ReconcileInfo_SecurityReconcileInfo != null)) {
                     columnValuesArray[1] = parentReconcileInfoRowByFK_ReconcileInfo_SecurityReconcileInfo[0];
                 }
-                if ((parentSecuritiesRowByFK_Securities_SecurityReconcileInfo != null)) {
-                    columnValuesArray[2] = parentSecuritiesRowByFK_Securities_SecurityReconcileInfo[0];
+                if ((parentSecurityRowByFK_Securities_SecurityReconcileInfo != null)) {
+                    columnValuesArray[2] = parentSecurityRowByFK_Securities_SecurityReconcileInfo[0];
                 }
                 rowSecurityReconcileInfoRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowSecurityReconcileInfoRow);
@@ -5159,25 +5159,25 @@ namespace BanaData.Database {
         /// <summary>
         ///Represents strongly named DataRow class.
         ///</summary>
-        public partial class AccountsRow : global::System.Data.DataRow {
+        public partial class AccountRow : global::System.Data.DataRow {
             
-            private AccountsDataTable tableAccounts;
+            private AccountDataTable tableAccount;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            internal AccountsRow(global::System.Data.DataRowBuilder rb) : 
+            internal AccountRow(global::System.Data.DataRowBuilder rb) : 
                     base(rb) {
-                this.tableAccounts = ((AccountsDataTable)(this.Table));
+                this.tableAccount = ((AccountDataTable)(this.Table));
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public int ID {
                 get {
-                    return ((int)(this[this.tableAccounts.IDColumn]));
+                    return ((int)(this[this.tableAccount.IDColumn]));
                 }
                 set {
-                    this[this.tableAccounts.IDColumn] = value;
+                    this[this.tableAccount.IDColumn] = value;
                 }
             }
             
@@ -5185,10 +5185,10 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public string Name {
                 get {
-                    return ((string)(this[this.tableAccounts.NameColumn]));
+                    return ((string)(this[this.tableAccount.NameColumn]));
                 }
                 set {
-                    this[this.tableAccounts.NameColumn] = value;
+                    this[this.tableAccount.NameColumn] = value;
                 }
             }
             
@@ -5197,14 +5197,14 @@ namespace BanaData.Database {
             public string Description {
                 get {
                     try {
-                        return ((string)(this[this.tableAccounts.DescriptionColumn]));
+                        return ((string)(this[this.tableAccount.DescriptionColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'Description\' in table \'Accounts\' is DBNull.", e);
+                        throw new global::System.Data.StrongTypingException("The value for column \'Description\' in table \'Account\' is DBNull.", e);
                     }
                 }
                 set {
-                    this[this.tableAccounts.DescriptionColumn] = value;
+                    this[this.tableAccount.DescriptionColumn] = value;
                 }
             }
             
@@ -5212,10 +5212,10 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public int IType {
                 get {
-                    return ((int)(this[this.tableAccounts.ITypeColumn]));
+                    return ((int)(this[this.tableAccount.ITypeColumn]));
                 }
                 set {
-                    this[this.tableAccounts.ITypeColumn] = value;
+                    this[this.tableAccount.ITypeColumn] = value;
                 }
             }
             
@@ -5223,10 +5223,10 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public decimal CreditLimit {
                 get {
-                    return ((decimal)(this[this.tableAccounts.CreditLimitColumn]));
+                    return ((decimal)(this[this.tableAccount.CreditLimitColumn]));
                 }
                 set {
-                    this[this.tableAccounts.CreditLimitColumn] = value;
+                    this[this.tableAccount.CreditLimitColumn] = value;
                 }
             }
             
@@ -5235,14 +5235,14 @@ namespace BanaData.Database {
             public int IKind {
                 get {
                     try {
-                        return ((int)(this[this.tableAccounts.IKindColumn]));
+                        return ((int)(this[this.tableAccount.IKindColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'IKind\' in table \'Accounts\' is DBNull.", e);
+                        throw new global::System.Data.StrongTypingException("The value for column \'IKind\' in table \'Account\' is DBNull.", e);
                     }
                 }
                 set {
-                    this[this.tableAccounts.IKindColumn] = value;
+                    this[this.tableAccount.IKindColumn] = value;
                 }
             }
             
@@ -5250,10 +5250,10 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public bool Hidden {
                 get {
-                    return ((bool)(this[this.tableAccounts.HiddenColumn]));
+                    return ((bool)(this[this.tableAccount.HiddenColumn]));
                 }
                 set {
-                    this[this.tableAccounts.HiddenColumn] = value;
+                    this[this.tableAccount.HiddenColumn] = value;
                 }
             }
             
@@ -5262,51 +5262,51 @@ namespace BanaData.Database {
             public System.DateTime LastStatementDate {
                 get {
                     try {
-                        return ((global::System.DateTime)(this[this.tableAccounts.LastStatementDateColumn]));
+                        return ((global::System.DateTime)(this[this.tableAccount.LastStatementDateColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'LastStatementDate\' in table \'Accounts\' is DBNull.", e);
+                        throw new global::System.Data.StrongTypingException("The value for column \'LastStatementDate\' in table \'Account\' is DBNull.", e);
                     }
                 }
                 set {
-                    this[this.tableAccounts.LastStatementDateColumn] = value;
+                    this[this.tableAccount.LastStatementDateColumn] = value;
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public bool IsDescriptionNull() {
-                return this.IsNull(this.tableAccounts.DescriptionColumn);
+                return this.IsNull(this.tableAccount.DescriptionColumn);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public void SetDescriptionNull() {
-                this[this.tableAccounts.DescriptionColumn] = global::System.Convert.DBNull;
+                this[this.tableAccount.DescriptionColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public bool IsIKindNull() {
-                return this.IsNull(this.tableAccounts.IKindColumn);
+                return this.IsNull(this.tableAccount.IKindColumn);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public void SetIKindNull() {
-                this[this.tableAccounts.IKindColumn] = global::System.Convert.DBNull;
+                this[this.tableAccount.IKindColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public bool IsLastStatementDateNull() {
-                return this.IsNull(this.tableAccounts.LastStatementDateColumn);
+                return this.IsNull(this.tableAccount.LastStatementDateColumn);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public void SetLastStatementDateNull() {
-                this[this.tableAccounts.LastStatementDateColumn] = global::System.Convert.DBNull;
+                this[this.tableAccount.LastStatementDateColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -5322,12 +5322,12 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public MemorizedLineItemsRow[] GetMemorizedLineItemsRows() {
+            public MemorizedLineItemRow[] GetMemorizedLineItemRows() {
                 if ((this.Table.ChildRelations["FK_Accounts_MemorizedLineItems"] == null)) {
-                    return new MemorizedLineItemsRow[0];
+                    return new MemorizedLineItemRow[0];
                 }
                 else {
-                    return ((MemorizedLineItemsRow[])(base.GetChildRows(this.Table.ChildRelations["FK_Accounts_MemorizedLineItems"])));
+                    return ((MemorizedLineItemRow[])(base.GetChildRows(this.Table.ChildRelations["FK_Accounts_MemorizedLineItems"])));
                 }
             }
             
@@ -5498,12 +5498,12 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public MemorizedLineItemsRow[] GetMemorizedLineItemsRows() {
+            public MemorizedLineItemRow[] GetMemorizedLineItemRows() {
                 if ((this.Table.ChildRelations["FK_Categories_MemorizedLineItems"] == null)) {
-                    return new MemorizedLineItemsRow[0];
+                    return new MemorizedLineItemRow[0];
                 }
                 else {
-                    return ((MemorizedLineItemsRow[])(base.GetChildRows(this.Table.ChildRelations["FK_Categories_MemorizedLineItems"])));
+                    return ((MemorizedLineItemRow[])(base.GetChildRows(this.Table.ChildRelations["FK_Categories_MemorizedLineItems"])));
                 }
             }
             
@@ -5522,25 +5522,25 @@ namespace BanaData.Database {
         /// <summary>
         ///Represents strongly named DataRow class.
         ///</summary>
-        public partial class SecuritiesRow : global::System.Data.DataRow {
+        public partial class SecurityRow : global::System.Data.DataRow {
             
-            private SecuritiesDataTable tableSecurities;
+            private SecurityDataTable tableSecurity;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            internal SecuritiesRow(global::System.Data.DataRowBuilder rb) : 
+            internal SecurityRow(global::System.Data.DataRowBuilder rb) : 
                     base(rb) {
-                this.tableSecurities = ((SecuritiesDataTable)(this.Table));
+                this.tableSecurity = ((SecurityDataTable)(this.Table));
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public int ID {
                 get {
-                    return ((int)(this[this.tableSecurities.IDColumn]));
+                    return ((int)(this[this.tableSecurity.IDColumn]));
                 }
                 set {
-                    this[this.tableSecurities.IDColumn] = value;
+                    this[this.tableSecurity.IDColumn] = value;
                 }
             }
             
@@ -5548,10 +5548,10 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public string Name {
                 get {
-                    return ((string)(this[this.tableSecurities.NameColumn]));
+                    return ((string)(this[this.tableSecurity.NameColumn]));
                 }
                 set {
-                    this[this.tableSecurities.NameColumn] = value;
+                    this[this.tableSecurity.NameColumn] = value;
                 }
             }
             
@@ -5560,14 +5560,14 @@ namespace BanaData.Database {
             public string Symbol {
                 get {
                     try {
-                        return ((string)(this[this.tableSecurities.SymbolColumn]));
+                        return ((string)(this[this.tableSecurity.SymbolColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'Symbol\' in table \'Securities\' is DBNull.", e);
+                        throw new global::System.Data.StrongTypingException("The value for column \'Symbol\' in table \'Security\' is DBNull.", e);
                     }
                 }
                 set {
-                    this[this.tableSecurities.SymbolColumn] = value;
+                    this[this.tableSecurity.SymbolColumn] = value;
                 }
             }
             
@@ -5575,23 +5575,23 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public int IType {
                 get {
-                    return ((int)(this[this.tableSecurities.ITypeColumn]));
+                    return ((int)(this[this.tableSecurity.ITypeColumn]));
                 }
                 set {
-                    this[this.tableSecurities.ITypeColumn] = value;
+                    this[this.tableSecurity.ITypeColumn] = value;
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public bool IsSymbolNull() {
-                return this.IsNull(this.tableSecurities.SymbolColumn);
+                return this.IsNull(this.tableSecurity.SymbolColumn);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public void SetSymbolNull() {
-                this[this.tableSecurities.SymbolColumn] = global::System.Convert.DBNull;
+                this[this.tableSecurity.SymbolColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -5618,12 +5618,12 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public SecurityPricesRow[] GetSecurityPricesRows() {
+            public SecurityPriceRow[] GetSecurityPriceRows() {
                 if ((this.Table.ChildRelations["FK_Securities_SecurityPrices"] == null)) {
-                    return new SecurityPricesRow[0];
+                    return new SecurityPriceRow[0];
                 }
                 else {
-                    return ((SecurityPricesRow[])(base.GetChildRows(this.Table.ChildRelations["FK_Securities_SecurityPrices"])));
+                    return ((SecurityPriceRow[])(base.GetChildRows(this.Table.ChildRelations["FK_Securities_SecurityPrices"])));
                 }
             }
         }
@@ -5631,25 +5631,25 @@ namespace BanaData.Database {
         /// <summary>
         ///Represents strongly named DataRow class.
         ///</summary>
-        public partial class SecurityPricesRow : global::System.Data.DataRow {
+        public partial class SecurityPriceRow : global::System.Data.DataRow {
             
-            private SecurityPricesDataTable tableSecurityPrices;
+            private SecurityPriceDataTable tableSecurityPrice;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            internal SecurityPricesRow(global::System.Data.DataRowBuilder rb) : 
+            internal SecurityPriceRow(global::System.Data.DataRowBuilder rb) : 
                     base(rb) {
-                this.tableSecurityPrices = ((SecurityPricesDataTable)(this.Table));
+                this.tableSecurityPrice = ((SecurityPriceDataTable)(this.Table));
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public int ID {
                 get {
-                    return ((int)(this[this.tableSecurityPrices.IDColumn]));
+                    return ((int)(this[this.tableSecurityPrice.IDColumn]));
                 }
                 set {
-                    this[this.tableSecurityPrices.IDColumn] = value;
+                    this[this.tableSecurityPrice.IDColumn] = value;
                 }
             }
             
@@ -5657,10 +5657,10 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public int SecurityID {
                 get {
-                    return ((int)(this[this.tableSecurityPrices.SecurityIDColumn]));
+                    return ((int)(this[this.tableSecurityPrice.SecurityIDColumn]));
                 }
                 set {
-                    this[this.tableSecurityPrices.SecurityIDColumn] = value;
+                    this[this.tableSecurityPrice.SecurityIDColumn] = value;
                 }
             }
             
@@ -5668,10 +5668,10 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public System.DateTime Date {
                 get {
-                    return ((global::System.DateTime)(this[this.tableSecurityPrices.DateColumn]));
+                    return ((global::System.DateTime)(this[this.tableSecurityPrice.DateColumn]));
                 }
                 set {
-                    this[this.tableSecurityPrices.DateColumn] = value;
+                    this[this.tableSecurityPrice.DateColumn] = value;
                 }
             }
             
@@ -5679,18 +5679,18 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public decimal Value {
                 get {
-                    return ((decimal)(this[this.tableSecurityPrices.ValueColumn]));
+                    return ((decimal)(this[this.tableSecurityPrice.ValueColumn]));
                 }
                 set {
-                    this[this.tableSecurityPrices.ValueColumn] = value;
+                    this[this.tableSecurityPrice.ValueColumn] = value;
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public SecuritiesRow SecuritiesRow {
+            public SecurityRow SecuritiesRow {
                 get {
-                    return ((SecuritiesRow)(this.GetParentRow(this.Table.ParentRelations["FK_Securities_SecurityPrices"])));
+                    return ((SecurityRow)(this.GetParentRow(this.Table.ParentRelations["FK_Securities_SecurityPrices"])));
                 }
                 set {
                     this.SetParentRow(value, this.Table.ParentRelations["FK_Securities_SecurityPrices"]);
@@ -5801,9 +5801,9 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public AccountsRow AccountsRow {
+            public AccountRow AccountsRow {
                 get {
-                    return ((AccountsRow)(this.GetParentRow(this.Table.ParentRelations["FK_Accounts_Transactions"])));
+                    return ((AccountRow)(this.GetParentRow(this.Table.ParentRelations["FK_Accounts_Transactions"])));
                 }
                 set {
                     this.SetParentRow(value, this.Table.ParentRelations["FK_Accounts_Transactions"]);
@@ -5812,9 +5812,9 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public CheckpointsRow CheckpointsRow {
+            public CheckpointRow CheckpointRow {
                 get {
-                    return ((CheckpointsRow)(this.GetParentRow(this.Table.ParentRelations["Checkpoints_Transactions"])));
+                    return ((CheckpointRow)(this.GetParentRow(this.Table.ParentRelations["Checkpoints_Transactions"])));
                 }
                 set {
                     this.SetParentRow(value, this.Table.ParentRelations["Checkpoints_Transactions"]);
@@ -5858,12 +5858,12 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public BankingTransactionsRow[] GetBankingTransactionsRows() {
+            public BankingTransactionRow[] GetBankingTransactionRows() {
                 if ((this.Table.ChildRelations["FK_Transactions_BankTransactions"] == null)) {
-                    return new BankingTransactionsRow[0];
+                    return new BankingTransactionRow[0];
                 }
                 else {
-                    return ((BankingTransactionsRow[])(base.GetChildRows(this.Table.ChildRelations["FK_Transactions_BankTransactions"])));
+                    return ((BankingTransactionRow[])(base.GetChildRows(this.Table.ChildRelations["FK_Transactions_BankTransactions"])));
                 }
             }
             
@@ -6003,9 +6003,9 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public AccountsRow AccountsRow {
+            public AccountRow AccountsRow {
                 get {
-                    return ((AccountsRow)(this.GetParentRow(this.Table.ParentRelations["Accounts_LineItems"])));
+                    return ((AccountRow)(this.GetParentRow(this.Table.ParentRelations["Accounts_LineItems"])));
                 }
                 set {
                     this.SetParentRow(value, this.Table.ParentRelations["Accounts_LineItems"]);
@@ -6075,25 +6075,25 @@ namespace BanaData.Database {
         /// <summary>
         ///Represents strongly named DataRow class.
         ///</summary>
-        public partial class BankingTransactionsRow : global::System.Data.DataRow {
+        public partial class BankingTransactionRow : global::System.Data.DataRow {
             
-            private BankingTransactionsDataTable tableBankingTransactions;
+            private BankingTransactionDataTable tableBankingTransaction;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            internal BankingTransactionsRow(global::System.Data.DataRowBuilder rb) : 
+            internal BankingTransactionRow(global::System.Data.DataRowBuilder rb) : 
                     base(rb) {
-                this.tableBankingTransactions = ((BankingTransactionsDataTable)(this.Table));
+                this.tableBankingTransaction = ((BankingTransactionDataTable)(this.Table));
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public int ID {
                 get {
-                    return ((int)(this[this.tableBankingTransactions.IDColumn]));
+                    return ((int)(this[this.tableBankingTransaction.IDColumn]));
                 }
                 set {
-                    this[this.tableBankingTransactions.IDColumn] = value;
+                    this[this.tableBankingTransaction.IDColumn] = value;
                 }
             }
             
@@ -6101,10 +6101,10 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public int TransactionID {
                 get {
-                    return ((int)(this[this.tableBankingTransactions.TransactionIDColumn]));
+                    return ((int)(this[this.tableBankingTransaction.TransactionIDColumn]));
                 }
                 set {
-                    this[this.tableBankingTransactions.TransactionIDColumn] = value;
+                    this[this.tableBankingTransaction.TransactionIDColumn] = value;
                 }
             }
             
@@ -6112,10 +6112,10 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public int IMedium {
                 get {
-                    return ((int)(this[this.tableBankingTransactions.IMediumColumn]));
+                    return ((int)(this[this.tableBankingTransaction.IMediumColumn]));
                 }
                 set {
-                    this[this.tableBankingTransactions.IMediumColumn] = value;
+                    this[this.tableBankingTransaction.IMediumColumn] = value;
                 }
             }
             
@@ -6124,14 +6124,14 @@ namespace BanaData.Database {
             public decimal CheckNumber {
                 get {
                     try {
-                        return ((decimal)(this[this.tableBankingTransactions.CheckNumberColumn]));
+                        return ((decimal)(this[this.tableBankingTransaction.CheckNumberColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'CheckNumber\' in table \'BankingTransactions\' is DBNull.", e);
+                        throw new global::System.Data.StrongTypingException("The value for column \'CheckNumber\' in table \'BankingTransaction\' is DBNull.", e);
                     }
                 }
                 set {
-                    this[this.tableBankingTransactions.CheckNumberColumn] = value;
+                    this[this.tableBankingTransaction.CheckNumberColumn] = value;
                 }
             }
             
@@ -6149,13 +6149,13 @@ namespace BanaData.Database {
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public bool IsCheckNumberNull() {
-                return this.IsNull(this.tableBankingTransactions.CheckNumberColumn);
+                return this.IsNull(this.tableBankingTransaction.CheckNumberColumn);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public void SetCheckNumberNull() {
-                this[this.tableBankingTransactions.CheckNumberColumn] = global::System.Convert.DBNull;
+                this[this.tableBankingTransaction.CheckNumberColumn] = global::System.Convert.DBNull;
             }
         }
         
@@ -6280,9 +6280,9 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public SecuritiesRow SecuritiesRow {
+            public SecurityRow SecuritiesRow {
                 get {
-                    return ((SecuritiesRow)(this.GetParentRow(this.Table.ParentRelations["FK_Securities_InvestmentTransactions"])));
+                    return ((SecurityRow)(this.GetParentRow(this.Table.ParentRelations["FK_Securities_InvestmentTransactions"])));
                 }
                 set {
                     this.SetParentRow(value, this.Table.ParentRelations["FK_Securities_InvestmentTransactions"]);
@@ -6329,25 +6329,25 @@ namespace BanaData.Database {
         /// <summary>
         ///Represents strongly named DataRow class.
         ///</summary>
-        public partial class MemorizedLineItemsRow : global::System.Data.DataRow {
+        public partial class MemorizedLineItemRow : global::System.Data.DataRow {
             
-            private MemorizedLineItemsDataTable tableMemorizedLineItems;
+            private MemorizedLineItemDataTable tableMemorizedLineItem;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            internal MemorizedLineItemsRow(global::System.Data.DataRowBuilder rb) : 
+            internal MemorizedLineItemRow(global::System.Data.DataRowBuilder rb) : 
                     base(rb) {
-                this.tableMemorizedLineItems = ((MemorizedLineItemsDataTable)(this.Table));
+                this.tableMemorizedLineItem = ((MemorizedLineItemDataTable)(this.Table));
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public int ID {
                 get {
-                    return ((int)(this[this.tableMemorizedLineItems.IDColumn]));
+                    return ((int)(this[this.tableMemorizedLineItem.IDColumn]));
                 }
                 set {
-                    this[this.tableMemorizedLineItems.IDColumn] = value;
+                    this[this.tableMemorizedLineItem.IDColumn] = value;
                 }
             }
             
@@ -6355,10 +6355,10 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public int MemorizedPayeeID {
                 get {
-                    return ((int)(this[this.tableMemorizedLineItems.MemorizedPayeeIDColumn]));
+                    return ((int)(this[this.tableMemorizedLineItem.MemorizedPayeeIDColumn]));
                 }
                 set {
-                    this[this.tableMemorizedLineItems.MemorizedPayeeIDColumn] = value;
+                    this[this.tableMemorizedLineItem.MemorizedPayeeIDColumn] = value;
                 }
             }
             
@@ -6366,10 +6366,10 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public bool IsTransfer {
                 get {
-                    return ((bool)(this[this.tableMemorizedLineItems.IsTransferColumn]));
+                    return ((bool)(this[this.tableMemorizedLineItem.IsTransferColumn]));
                 }
                 set {
-                    this[this.tableMemorizedLineItems.IsTransferColumn] = value;
+                    this[this.tableMemorizedLineItem.IsTransferColumn] = value;
                 }
             }
             
@@ -6378,14 +6378,14 @@ namespace BanaData.Database {
             public int AccountID {
                 get {
                     try {
-                        return ((int)(this[this.tableMemorizedLineItems.AccountIDColumn]));
+                        return ((int)(this[this.tableMemorizedLineItem.AccountIDColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'AccountID\' in table \'MemorizedLineItems\' is DBNull.", e);
+                        throw new global::System.Data.StrongTypingException("The value for column \'AccountID\' in table \'MemorizedLineItem\' is DBNull.", e);
                     }
                 }
                 set {
-                    this[this.tableMemorizedLineItems.AccountIDColumn] = value;
+                    this[this.tableMemorizedLineItem.AccountIDColumn] = value;
                 }
             }
             
@@ -6394,14 +6394,14 @@ namespace BanaData.Database {
             public int CategoryID {
                 get {
                     try {
-                        return ((int)(this[this.tableMemorizedLineItems.CategoryIDColumn]));
+                        return ((int)(this[this.tableMemorizedLineItem.CategoryIDColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'CategoryID\' in table \'MemorizedLineItems\' is DBNull.", e);
+                        throw new global::System.Data.StrongTypingException("The value for column \'CategoryID\' in table \'MemorizedLineItem\' is DBNull.", e);
                     }
                 }
                 set {
-                    this[this.tableMemorizedLineItems.CategoryIDColumn] = value;
+                    this[this.tableMemorizedLineItem.CategoryIDColumn] = value;
                 }
             }
             
@@ -6410,14 +6410,14 @@ namespace BanaData.Database {
             public string Memo {
                 get {
                     try {
-                        return ((string)(this[this.tableMemorizedLineItems.MemoColumn]));
+                        return ((string)(this[this.tableMemorizedLineItem.MemoColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'Memo\' in table \'MemorizedLineItems\' is DBNull.", e);
+                        throw new global::System.Data.StrongTypingException("The value for column \'Memo\' in table \'MemorizedLineItem\' is DBNull.", e);
                     }
                 }
                 set {
-                    this[this.tableMemorizedLineItems.MemoColumn] = value;
+                    this[this.tableMemorizedLineItem.MemoColumn] = value;
                 }
             }
             
@@ -6425,10 +6425,10 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public decimal Amount {
                 get {
-                    return ((decimal)(this[this.tableMemorizedLineItems.AmountColumn]));
+                    return ((decimal)(this[this.tableMemorizedLineItem.AmountColumn]));
                 }
                 set {
-                    this[this.tableMemorizedLineItems.AmountColumn] = value;
+                    this[this.tableMemorizedLineItem.AmountColumn] = value;
                 }
             }
             
@@ -6445,9 +6445,9 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public AccountsRow AccountsRow {
+            public AccountRow AccountsRow {
                 get {
-                    return ((AccountsRow)(this.GetParentRow(this.Table.ParentRelations["FK_Accounts_MemorizedLineItems"])));
+                    return ((AccountRow)(this.GetParentRow(this.Table.ParentRelations["FK_Accounts_MemorizedLineItems"])));
                 }
                 set {
                     this.SetParentRow(value, this.Table.ParentRelations["FK_Accounts_MemorizedLineItems"]);
@@ -6456,9 +6456,9 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public MemorizedPayeesRow MemorizedPayeesRow {
+            public MemorizedPayeeRow MemorizedPayeeRow {
                 get {
-                    return ((MemorizedPayeesRow)(this.GetParentRow(this.Table.ParentRelations["FK_MemorizedPayees_MemorizedLineItems"])));
+                    return ((MemorizedPayeeRow)(this.GetParentRow(this.Table.ParentRelations["FK_MemorizedPayees_MemorizedLineItems"])));
                 }
                 set {
                     this.SetParentRow(value, this.Table.ParentRelations["FK_MemorizedPayees_MemorizedLineItems"]);
@@ -6468,62 +6468,62 @@ namespace BanaData.Database {
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public bool IsAccountIDNull() {
-                return this.IsNull(this.tableMemorizedLineItems.AccountIDColumn);
+                return this.IsNull(this.tableMemorizedLineItem.AccountIDColumn);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public void SetAccountIDNull() {
-                this[this.tableMemorizedLineItems.AccountIDColumn] = global::System.Convert.DBNull;
+                this[this.tableMemorizedLineItem.AccountIDColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public bool IsCategoryIDNull() {
-                return this.IsNull(this.tableMemorizedLineItems.CategoryIDColumn);
+                return this.IsNull(this.tableMemorizedLineItem.CategoryIDColumn);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public void SetCategoryIDNull() {
-                this[this.tableMemorizedLineItems.CategoryIDColumn] = global::System.Convert.DBNull;
+                this[this.tableMemorizedLineItem.CategoryIDColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public bool IsMemoNull() {
-                return this.IsNull(this.tableMemorizedLineItems.MemoColumn);
+                return this.IsNull(this.tableMemorizedLineItem.MemoColumn);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public void SetMemoNull() {
-                this[this.tableMemorizedLineItems.MemoColumn] = global::System.Convert.DBNull;
+                this[this.tableMemorizedLineItem.MemoColumn] = global::System.Convert.DBNull;
             }
         }
         
         /// <summary>
         ///Represents strongly named DataRow class.
         ///</summary>
-        public partial class MemorizedPayeesRow : global::System.Data.DataRow {
+        public partial class MemorizedPayeeRow : global::System.Data.DataRow {
             
-            private MemorizedPayeesDataTable tableMemorizedPayees;
+            private MemorizedPayeeDataTable tableMemorizedPayee;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            internal MemorizedPayeesRow(global::System.Data.DataRowBuilder rb) : 
+            internal MemorizedPayeeRow(global::System.Data.DataRowBuilder rb) : 
                     base(rb) {
-                this.tableMemorizedPayees = ((MemorizedPayeesDataTable)(this.Table));
+                this.tableMemorizedPayee = ((MemorizedPayeeDataTable)(this.Table));
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public int ID {
                 get {
-                    return ((int)(this[this.tableMemorizedPayees.IDColumn]));
+                    return ((int)(this[this.tableMemorizedPayee.IDColumn]));
                 }
                 set {
-                    this[this.tableMemorizedPayees.IDColumn] = value;
+                    this[this.tableMemorizedPayee.IDColumn] = value;
                 }
             }
             
@@ -6531,10 +6531,10 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public string Payee {
                 get {
-                    return ((string)(this[this.tableMemorizedPayees.PayeeColumn]));
+                    return ((string)(this[this.tableMemorizedPayee.PayeeColumn]));
                 }
                 set {
-                    this[this.tableMemorizedPayees.PayeeColumn] = value;
+                    this[this.tableMemorizedPayee.PayeeColumn] = value;
                 }
             }
             
@@ -6542,10 +6542,10 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public int IStatus {
                 get {
-                    return ((int)(this[this.tableMemorizedPayees.IStatusColumn]));
+                    return ((int)(this[this.tableMemorizedPayee.IStatusColumn]));
                 }
                 set {
-                    this[this.tableMemorizedPayees.IStatusColumn] = value;
+                    this[this.tableMemorizedPayee.IStatusColumn] = value;
                 }
             }
             
@@ -6554,37 +6554,37 @@ namespace BanaData.Database {
             public string Memo {
                 get {
                     try {
-                        return ((string)(this[this.tableMemorizedPayees.MemoColumn]));
+                        return ((string)(this[this.tableMemorizedPayee.MemoColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'Memo\' in table \'MemorizedPayees\' is DBNull.", e);
+                        throw new global::System.Data.StrongTypingException("The value for column \'Memo\' in table \'MemorizedPayee\' is DBNull.", e);
                     }
                 }
                 set {
-                    this[this.tableMemorizedPayees.MemoColumn] = value;
+                    this[this.tableMemorizedPayee.MemoColumn] = value;
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public bool IsMemoNull() {
-                return this.IsNull(this.tableMemorizedPayees.MemoColumn);
+                return this.IsNull(this.tableMemorizedPayee.MemoColumn);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public void SetMemoNull() {
-                this[this.tableMemorizedPayees.MemoColumn] = global::System.Convert.DBNull;
+                this[this.tableMemorizedPayee.MemoColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public MemorizedLineItemsRow[] GetMemorizedLineItemsRows() {
+            public MemorizedLineItemRow[] GetMemorizedLineItemsRows() {
                 if ((this.Table.ChildRelations["FK_MemorizedPayees_MemorizedLineItems"] == null)) {
-                    return new MemorizedLineItemsRow[0];
+                    return new MemorizedLineItemRow[0];
                 }
                 else {
-                    return ((MemorizedLineItemsRow[])(base.GetChildRows(this.Table.ChildRelations["FK_MemorizedPayees_MemorizedLineItems"])));
+                    return ((MemorizedLineItemRow[])(base.GetChildRows(this.Table.ChildRelations["FK_MemorizedPayees_MemorizedLineItems"])));
                 }
             }
         }
@@ -6708,9 +6708,9 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public AccountsRow AccountsRow {
+            public AccountRow AccountsRow {
                 get {
-                    return ((AccountsRow)(this.GetParentRow(this.Table.ParentRelations["FK_Accounts_ReconcileInfo"])));
+                    return ((AccountRow)(this.GetParentRow(this.Table.ParentRelations["FK_Accounts_ReconcileInfo"])));
                 }
                 set {
                     this.SetParentRow(value, this.Table.ParentRelations["FK_Accounts_ReconcileInfo"]);
@@ -6768,25 +6768,25 @@ namespace BanaData.Database {
         /// <summary>
         ///Represents strongly named DataRow class.
         ///</summary>
-        public partial class CheckpointsRow : global::System.Data.DataRow {
+        public partial class CheckpointRow : global::System.Data.DataRow {
             
-            private CheckpointsDataTable tableCheckpoints;
+            private CheckpointDataTable tableCheckpoint;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            internal CheckpointsRow(global::System.Data.DataRowBuilder rb) : 
+            internal CheckpointRow(global::System.Data.DataRowBuilder rb) : 
                     base(rb) {
-                this.tableCheckpoints = ((CheckpointsDataTable)(this.Table));
+                this.tableCheckpoint = ((CheckpointDataTable)(this.Table));
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public int ID {
                 get {
-                    return ((int)(this[this.tableCheckpoints.IDColumn]));
+                    return ((int)(this[this.tableCheckpoint.IDColumn]));
                 }
                 set {
-                    this[this.tableCheckpoints.IDColumn] = value;
+                    this[this.tableCheckpoint.IDColumn] = value;
                 }
             }
             
@@ -6794,10 +6794,10 @@ namespace BanaData.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public System.DateTime Date {
                 get {
-                    return ((global::System.DateTime)(this[this.tableCheckpoints.DateColumn]));
+                    return ((global::System.DateTime)(this[this.tableCheckpoint.DateColumn]));
                 }
                 set {
-                    this[this.tableCheckpoints.DateColumn] = value;
+                    this[this.tableCheckpoint.DateColumn] = value;
                 }
             }
             
@@ -6873,9 +6873,9 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public SecuritiesRow SecuritiesRow {
+            public SecurityRow SecuritiesRow {
                 get {
-                    return ((SecuritiesRow)(this.GetParentRow(this.Table.ParentRelations["FK_Securities_SecurityReconcileInfo"])));
+                    return ((SecurityRow)(this.GetParentRow(this.Table.ParentRelations["FK_Securities_SecurityReconcileInfo"])));
                 }
                 set {
                     this.SetParentRow(value, this.Table.ParentRelations["FK_Securities_SecurityReconcileInfo"]);
@@ -6898,22 +6898,22 @@ namespace BanaData.Database {
         ///Row event argument class
         ///</summary>
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-        public class AccountsRowChangeEvent : global::System.EventArgs {
+        public class AccountRowChangeEvent : global::System.EventArgs {
             
-            private AccountsRow eventRow;
+            private AccountRow eventRow;
             
             private global::System.Data.DataRowAction eventAction;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public AccountsRowChangeEvent(AccountsRow row, global::System.Data.DataRowAction action) {
+            public AccountRowChangeEvent(AccountRow row, global::System.Data.DataRowAction action) {
                 this.eventRow = row;
                 this.eventAction = action;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public AccountsRow Row {
+            public AccountRow Row {
                 get {
                     return this.eventRow;
                 }
@@ -6966,22 +6966,22 @@ namespace BanaData.Database {
         ///Row event argument class
         ///</summary>
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-        public class SecuritiesRowChangeEvent : global::System.EventArgs {
+        public class SecurityRowChangeEvent : global::System.EventArgs {
             
-            private SecuritiesRow eventRow;
+            private SecurityRow eventRow;
             
             private global::System.Data.DataRowAction eventAction;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public SecuritiesRowChangeEvent(SecuritiesRow row, global::System.Data.DataRowAction action) {
+            public SecurityRowChangeEvent(SecurityRow row, global::System.Data.DataRowAction action) {
                 this.eventRow = row;
                 this.eventAction = action;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public SecuritiesRow Row {
+            public SecurityRow Row {
                 get {
                     return this.eventRow;
                 }
@@ -7000,22 +7000,22 @@ namespace BanaData.Database {
         ///Row event argument class
         ///</summary>
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-        public class SecurityPricesRowChangeEvent : global::System.EventArgs {
+        public class SecurityPriceRowChangeEvent : global::System.EventArgs {
             
-            private SecurityPricesRow eventRow;
+            private SecurityPriceRow eventRow;
             
             private global::System.Data.DataRowAction eventAction;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public SecurityPricesRowChangeEvent(SecurityPricesRow row, global::System.Data.DataRowAction action) {
+            public SecurityPriceRowChangeEvent(SecurityPriceRow row, global::System.Data.DataRowAction action) {
                 this.eventRow = row;
                 this.eventAction = action;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public SecurityPricesRow Row {
+            public SecurityPriceRow Row {
                 get {
                     return this.eventRow;
                 }
@@ -7102,22 +7102,22 @@ namespace BanaData.Database {
         ///Row event argument class
         ///</summary>
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-        public class BankingTransactionsRowChangeEvent : global::System.EventArgs {
+        public class BankingTransactionRowChangeEvent : global::System.EventArgs {
             
-            private BankingTransactionsRow eventRow;
+            private BankingTransactionRow eventRow;
             
             private global::System.Data.DataRowAction eventAction;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public BankingTransactionsRowChangeEvent(BankingTransactionsRow row, global::System.Data.DataRowAction action) {
+            public BankingTransactionRowChangeEvent(BankingTransactionRow row, global::System.Data.DataRowAction action) {
                 this.eventRow = row;
                 this.eventAction = action;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public BankingTransactionsRow Row {
+            public BankingTransactionRow Row {
                 get {
                     return this.eventRow;
                 }
@@ -7170,22 +7170,22 @@ namespace BanaData.Database {
         ///Row event argument class
         ///</summary>
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-        public class MemorizedLineItemsRowChangeEvent : global::System.EventArgs {
+        public class MemorizedLineItemRowChangeEvent : global::System.EventArgs {
             
-            private MemorizedLineItemsRow eventRow;
+            private MemorizedLineItemRow eventRow;
             
             private global::System.Data.DataRowAction eventAction;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public MemorizedLineItemsRowChangeEvent(MemorizedLineItemsRow row, global::System.Data.DataRowAction action) {
+            public MemorizedLineItemRowChangeEvent(MemorizedLineItemRow row, global::System.Data.DataRowAction action) {
                 this.eventRow = row;
                 this.eventAction = action;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public MemorizedLineItemsRow Row {
+            public MemorizedLineItemRow Row {
                 get {
                     return this.eventRow;
                 }
@@ -7204,22 +7204,22 @@ namespace BanaData.Database {
         ///Row event argument class
         ///</summary>
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-        public class MemorizedPayeesRowChangeEvent : global::System.EventArgs {
+        public class MemorizedPayeeRowChangeEvent : global::System.EventArgs {
             
-            private MemorizedPayeesRow eventRow;
+            private MemorizedPayeeRow eventRow;
             
             private global::System.Data.DataRowAction eventAction;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public MemorizedPayeesRowChangeEvent(MemorizedPayeesRow row, global::System.Data.DataRowAction action) {
+            public MemorizedPayeeRowChangeEvent(MemorizedPayeeRow row, global::System.Data.DataRowAction action) {
                 this.eventRow = row;
                 this.eventAction = action;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public MemorizedPayeesRow Row {
+            public MemorizedPayeeRow Row {
                 get {
                     return this.eventRow;
                 }
@@ -7272,22 +7272,22 @@ namespace BanaData.Database {
         ///Row event argument class
         ///</summary>
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-        public class CheckpointsRowChangeEvent : global::System.EventArgs {
+        public class CheckpointRowChangeEvent : global::System.EventArgs {
             
-            private CheckpointsRow eventRow;
+            private CheckpointRow eventRow;
             
             private global::System.Data.DataRowAction eventAction;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public CheckpointsRowChangeEvent(CheckpointsRow row, global::System.Data.DataRowAction action) {
+            public CheckpointRowChangeEvent(CheckpointRow row, global::System.Data.DataRowAction action) {
                 this.eventRow = row;
                 this.eventAction = action;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public CheckpointsRow Row {
+            public CheckpointRow Row {
                 get {
                     return this.eventRow;
                 }

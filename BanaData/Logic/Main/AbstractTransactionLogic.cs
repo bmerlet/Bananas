@@ -350,7 +350,7 @@ namespace BanaData.Logic.Main
         {
             // Delete from dataset
             var household = mainWindowLogic.Household;
-            var accountRow = household.Accounts.FindByID(accountID);
+            var accountRow = household.Account.FindByID(accountID);
             var transactionRow = household.Transactions.FindByID(transID);
 
             // Delete all line items

@@ -12,11 +12,11 @@ namespace BanaData.Database
 {
     public partial class Household
     {
-        partial class SecurityPricesDataTable
+        partial class SecurityPriceDataTable
         {
-            public SecurityPricesRow Add(SecuritiesRow security, DateTime date, decimal price)
+            public SecurityPriceRow Add(SecurityRow security, DateTime date, decimal price)
             {
-                var priceRow = NewSecurityPricesRow();
+                var priceRow = NewSecurityPriceRow();
 
                 UpdateSecurityPrice(priceRow, security, date, price);
 
@@ -25,7 +25,7 @@ namespace BanaData.Database
                 return priceRow;
             }
 
-            private static SecurityPricesRow UpdateSecurityPrice(SecurityPricesRow priceRow, SecuritiesRow security, DateTime date, decimal price)
+            private static SecurityPriceRow UpdateSecurityPrice(SecurityPriceRow priceRow, SecurityRow security, DateTime date, decimal price)
             {
                 priceRow.SecurityID = security.ID;
                 priceRow.Date = date;

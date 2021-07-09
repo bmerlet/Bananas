@@ -24,7 +24,7 @@ namespace BanaData.Logic.Items
             (id, src.Name, src.Description, src.Type, src.CreditLimit, src.InvestmentKind, src.Hidden);
 
         // Factory from DB row
-        public static AccountItem CreateFromDB(Household.AccountsRow accountsRow)
+        public static AccountItem CreateFromDB(Household.AccountRow accountsRow)
         {
             var desc = accountsRow.IsDescriptionNull() ? "" : accountsRow.Description;
             EInvestmentKind kind = accountsRow.IsIKindNull() ? EInvestmentKind.Invalid : accountsRow.Kind;

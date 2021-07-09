@@ -75,7 +75,7 @@ namespace BanaData.Logic.Dialogs
                 return null;
             }
 
-            foreach (Household.SecuritiesRow security in mainWindowLogic.Household.Securities.Rows)
+            foreach (Household.SecurityRow security in mainWindowLogic.Household.Security.Rows)
             {
                 if (security.ID != oldSecurityItem.ID)
                 {

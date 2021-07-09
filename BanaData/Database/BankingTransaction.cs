@@ -12,7 +12,7 @@ namespace BanaData.Database
 {
     public partial class Household
     {
-        partial class BankingTransactionsRow
+        partial class BankingTransactionRow
         {
             // Bridges to local enum types
             public ETransactionMedium Medium
@@ -38,11 +38,11 @@ namespace BanaData.Database
 
         }
 
-        partial class BankingTransactionsDataTable
+        partial class BankingTransactionDataTable
         {
-            public BankingTransactionsRow Add(TransactionsRow transactionRow, ETransactionMedium medium, uint checkNumber)
+            public BankingTransactionRow Add(TransactionsRow transactionRow, ETransactionMedium medium, uint checkNumber)
             {
-                var bankTransRow = NewBankingTransactionsRow();
+                var bankTransRow = NewBankingTransactionRow();
 
                 UpdateBankTransaction(bankTransRow, transactionRow, medium, checkNumber);
 
@@ -51,7 +51,7 @@ namespace BanaData.Database
                 return bankTransRow;
             }
 
-            public BankingTransactionsRow Update(TransactionsRow transactionRow, ETransactionMedium medium, uint checkNumber)
+            public BankingTransactionRow Update(TransactionsRow transactionRow, ETransactionMedium medium, uint checkNumber)
             {
                 var bankTransRow = transactionRow.GetBankingTransaction();
 
@@ -60,7 +60,7 @@ namespace BanaData.Database
                 return bankTransRow;
             }
 
-            private static BankingTransactionsRow UpdateBankTransaction(BankingTransactionsRow bankTransRow, TransactionsRow transactionRow, ETransactionMedium medium, uint checkNumber)
+            private static BankingTransactionRow UpdateBankTransaction(BankingTransactionRow bankTransRow, TransactionsRow transactionRow, ETransactionMedium medium, uint checkNumber)
             {
                 bankTransRow.TransactionID = transactionRow.ID;
                 bankTransRow.Medium = medium;

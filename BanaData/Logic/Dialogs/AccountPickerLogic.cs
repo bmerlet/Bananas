@@ -19,17 +19,17 @@ namespace BanaData.Logic.Dialogs
         #region Private memebers
 
         private readonly MainWindowLogic mainWindowLogic;
-        private readonly IEnumerable<Household.AccountsRow> oldPickedAccounts;
+        private readonly IEnumerable<Household.AccountRow> oldPickedAccounts;
 
         #endregion
 
         #region Constructor
 
-        public AccountPickerLogic(MainWindowLogic _mainWindowLogic, IEnumerable<Household.AccountsRow> pickedAccounts)
+        public AccountPickerLogic(MainWindowLogic _mainWindowLogic, IEnumerable<Household.AccountRow> pickedAccounts)
         {
             (mainWindowLogic, oldPickedAccounts) = (_mainWindowLogic, pickedAccounts);
 
-            foreach (Household.AccountsRow accountRow in mainWindowLogic.Household.Accounts)
+            foreach (Household.AccountRow accountRow in mainWindowLogic.Household.Account)
             {
                 accounts.Add(new AccountPickerItem(accountRow, oldPickedAccounts.Contains(accountRow)));
             }
@@ -47,7 +47,7 @@ namespace BanaData.Logic.Dialogs
 
     #endregion
 
-    #region UI properties
+        #region UI properties
 
         //
         // List of accounts
@@ -68,11 +68,11 @@ namespace BanaData.Logic.Dialogs
         #region Actions
 
         // Result
-        public IEnumerable<Household.AccountsRow> PickedAccounts;
+        public IEnumerable<Household.AccountRow> PickedAccounts;
 
         protected override bool? Commit()
         {
-            var pickedAccounts = new List<Household.AccountsRow>();
+            var pickedAccounts = new List<Household.AccountRow>();
             
             foreach(var acct in accounts)
             {
@@ -126,10 +126,10 @@ namespace BanaData.Logic.Dialogs
 
         public class AccountPickerItem : LogicBase
         {
-            public AccountPickerItem(Household.AccountsRow accountRow, bool selected) =>
+            public AccountPickerItem(Household.AccountRow accountRow, bool selected) =>
                 (AccountRow, AccountItem, isSelected) = (accountRow, AccountItem.CreateFromDB(accountRow), selected);
 
-            public readonly Household.AccountsRow AccountRow;
+            public readonly Household.AccountRow AccountRow;
 
             public AccountItem AccountItem { get; }
 

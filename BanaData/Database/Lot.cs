@@ -15,12 +15,12 @@ namespace BanaData.Database
     /// </summary>
     public class Lot
     {
-        public Lot(DateTime date, Household.SecuritiesRow security, decimal quantity, decimal securityPrice) =>
+        public Lot(DateTime date, Household.SecurityRow security, decimal quantity, decimal securityPrice) =>
             (Date, Security, Quantity, SecurityPrice) = (date, security, quantity, securityPrice);
 
         public DateTime Date { get; }
 
-        public Household.SecuritiesRow Security { get; }
+        public Household.SecurityRow Security { get; }
 
         public decimal Quantity { get; }
 
@@ -51,7 +51,7 @@ namespace BanaData.Database
         {
             int hashCode = 1531903380;
             hashCode = hashCode * -1521134295 + Date.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<Household.SecuritiesRow>.Default.GetHashCode(Security);
+            hashCode = hashCode * -1521134295 + EqualityComparer<Household.SecurityRow>.Default.GetHashCode(Security);
             hashCode = hashCode * -1521134295 + Quantity.GetHashCode();
             hashCode = hashCode * -1521134295 + SecurityPrice.GetHashCode();
             return hashCode;

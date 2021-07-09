@@ -83,7 +83,7 @@ namespace BanaData.Logic.Main
 
             // Get the account details
             var household = mainWindowLogic.Household;
-            var account = household.Accounts.FindByID(accountID);
+            var account = household.Account.FindByID(accountID);
 
             // Derived class specific action 
             OnNewAccount(account);
@@ -169,7 +169,7 @@ namespace BanaData.Logic.Main
         public void AddTransaction(int transactionID)
         {
             var household = mainWindowLogic.Household;
-            var account = household.Accounts.FindByID(accountID);
+            var account = household.Account.FindByID(accountID);
             var transRow = household.Transactions.FindByID(transactionID);
             var lineItems = GetLineItems(transRow);
 
@@ -431,17 +431,17 @@ namespace BanaData.Logic.Main
         #region Hooks provided by derived classes
 
         // Called by this class when a new account is set
-        protected virtual void OnNewAccount(Household.AccountsRow accountRow) { }
+        protected virtual void OnNewAccount(Household.AccountRow accountRow) { }
 
         // Create a transaction from DB info
         protected abstract AbstractTransactionLogic CreateTransactionFromDB(
-            Household.AccountsRow account,
+            Household.AccountRow account,
             Household.TransactionsRow transRow,
             List<LineItem> lineItems);
 
         // Create a mirror pseudo-transaction for transfers
         protected abstract AbstractTransactionLogic CreateMirrorTransaction(
-            Household.AccountsRow account,
+            Household.AccountRow account,
             Household.LineItemsRow lineItem);
 
         // Creaste an empty transaction

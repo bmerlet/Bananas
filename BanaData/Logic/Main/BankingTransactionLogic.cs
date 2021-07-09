@@ -216,19 +216,19 @@ namespace BanaData.Logic.Main
         private void CommitTransactionToDataSet()
         {
             var household = mainWindowLogic.Household;
-            var accountRow = household.Accounts.FindByID(accountID);
+            var accountRow = household.Account.FindByID(accountID);
 
             if (TransID == TRANSID_NOT_COMMITTED)
             {
                 // Create new transaction row
-                var transactionRow = household.Transactions.Add(accountRow, data.Date, data.Payee, data.Memo, data.Status, household.Checkpoints.GetMostRecentCheckpointID());
+                var transactionRow = household.Transactions.Add(accountRow, data.Date, data.Payee, data.Memo, data.Status, household.Checkpoint.GetMostRecentCheckpointID());
                 TransID = transactionRow.ID;
 
                 // Create new banking transaction row if needed
                 if (bankRegisterLogic.IsBank)
                 {
                     var _data = data as BankTransactionData;
-                    household.BankingTransactions.Add(transactionRow, _data.Medium, _data.CheckNumber);
+                    household.BankingTransaction.Add(transactionRow, _data.Medium, _data.CheckNumber);
                 }
 
                 // Create all line items
@@ -254,7 +254,7 @@ namespace BanaData.Logic.Main
                 if (bankRegisterLogic.IsBank)
                 {
                     var _data = data as BankTransactionData;
-                    household.BankingTransactions.Update(transactionRow, _data.Medium, _data.CheckNumber);
+                    household.BankingTransaction.Update(transactionRow, _data.Medium, _data.CheckNumber);
                 }
 
                 //

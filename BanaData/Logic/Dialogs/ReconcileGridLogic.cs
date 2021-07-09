@@ -19,14 +19,14 @@ namespace BanaData.Logic.Dialogs
     {
         #region Private members
 
-        private readonly Household.AccountsRow accountRow;
+        private readonly Household.AccountRow accountRow;
 
         #endregion
 
         #region Constructor
 
         public ReconcileGridLogic(
-            Household.AccountsRow _accountRow,
+            Household.AccountRow _accountRow,
             string title,
             IEnumerable<TransactionToReconcile> _transactions)
         {

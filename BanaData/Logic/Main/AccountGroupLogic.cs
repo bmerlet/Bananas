@@ -104,17 +104,17 @@ namespace BanaData.Logic.Main
             var household = mainWindow.Household;
 
             // Get list of accounts from database
-            IEnumerable<Household.AccountsRow> accounts =  Enumerable.Empty<Household.AccountsRow>();
+            IEnumerable<Household.AccountRow> accounts =  Enumerable.Empty<Household.AccountRow>();
             switch(type)
             {
                 case EType.Banking:
-                    accounts = household.Accounts.GetBankingAccounts();
+                    accounts = household.Account.GetBankingAccounts();
                     break;
                 case EType.Investment:
-                    accounts = household.Accounts.GetInvestmentAccounts();
+                    accounts = household.Account.GetInvestmentAccounts();
                     break;
                 case EType.Asset:
-                    accounts = household.Accounts.GetAssetAccounts();
+                    accounts = household.Account.GetAssetAccounts();
                     break;
             }
 

@@ -22,7 +22,7 @@ namespace BanaData.Logic.Dialogs
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
-        private readonly Household.AccountsRow accountRow;
+        private readonly Household.AccountRow accountRow;
         private Household.ReconcileInfoRow reconcileInfoRow;
 
         #endregion
@@ -31,7 +31,7 @@ namespace BanaData.Logic.Dialogs
 
         public ReconcileInfoLogic(MainWindowLogic _mainWindowLogic, int _accountID)
         {
-            (mainWindowLogic, accountRow) = (_mainWindowLogic, _mainWindowLogic.Household.Accounts.FindByID(_accountID));
+            (mainWindowLogic, accountRow) = (_mainWindowLogic, _mainWindowLogic.Household.Account.FindByID(_accountID));
 
             // Get DB
             var household = mainWindowLogic.Household;
@@ -271,9 +271,9 @@ namespace BanaData.Logic.Dialogs
 
         public class SecurityInfoItem
         {
-            public SecurityInfoItem(Household.SecuritiesRow securitiesRow, decimal quantity) => (SecuritiesRow, Quantity) = (securitiesRow, quantity);
+            public SecurityInfoItem(Household.SecurityRow securitiesRow, decimal quantity) => (SecuritiesRow, Quantity) = (securitiesRow, quantity);
 
-            public readonly Household.SecuritiesRow SecuritiesRow;
+            public readonly Household.SecurityRow SecuritiesRow;
             public string Symbol => SecuritiesRow.IsSymbolNull() ? SecuritiesRow.Name : SecuritiesRow.Symbol;
             public decimal Quantity { get; set; }
         }

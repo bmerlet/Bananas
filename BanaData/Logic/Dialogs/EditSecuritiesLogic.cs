@@ -117,7 +117,7 @@ namespace BanaData.Logic.Dialogs
             if (SelectedSecurity != null)
             {
                 // Delete only if no transactions
-                var securityRow = mainWindowLogic.Household.Securities.FindByID(SelectedSecurity.ID);
+                var securityRow = mainWindowLogic.Household.Security.FindByID(SelectedSecurity.ID);
                 if (securityRow.HasTransactions)
                 {
                     mainWindowLogic.ErrorMessage("This security cannot be deleted because it has transactions associated with it.");
@@ -140,7 +140,7 @@ namespace BanaData.Logic.Dialogs
             var household = mainWindowLogic.Household;
 
             // Create and commit new security
-            var newSecurityRow = household.Securities.Add(newSecurity.Name, newSecurity.Symbol, newSecurity.Type);
+            var newSecurityRow = household.Security.Add(newSecurity.Name, newSecurity.Symbol, newSecurity.Type);
 
             mainWindowLogic.CommitChanges();
 
@@ -153,7 +153,7 @@ namespace BanaData.Logic.Dialogs
             var household = mainWindowLogic.Household;
 
             // Update the row
-            household.Securities.Update(newSecurity.ID, newSecurity.Name, newSecurity.Symbol, newSecurity.Type);
+            household.Security.Update(newSecurity.ID, newSecurity.Name, newSecurity.Symbol, newSecurity.Type);
 
             // Commit
             mainWindowLogic.CommitChanges();
@@ -164,7 +164,7 @@ namespace BanaData.Logic.Dialogs
             var household = mainWindowLogic.Household;
 
             // Remove the security
-            household.Securities.FindByID(security.ID).Delete();
+            household.Security.FindByID(security.ID).Delete();
 
             mainWindowLogic.CommitChanges();
         }

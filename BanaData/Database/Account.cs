@@ -13,7 +13,7 @@ namespace BanaData.Database
     // Extensions to the account table
     public partial class Household
     {
-        partial class AccountsRow
+        partial class AccountRow
         {
             // Bridges to local enum types
             public EAccountType Type
@@ -205,16 +205,16 @@ namespace BanaData.Database
             }
         }
 
-        partial class AccountsDataTable
+        partial class AccountDataTable
         {
             // Get account by name
-            public AccountsRow GetByName(string name)
+            public AccountRow GetByName(string name)
             {
                 return this.SingleOrDefault(acc => acc.Name == name);
             }
 
             // Get banking accounts
-            public AccountsRow[] GetBankingAccounts()
+            public AccountRow[] GetBankingAccounts()
             {
                 var lquery =
                     from acc in this
@@ -225,7 +225,7 @@ namespace BanaData.Database
             }
 
             // Get investment accounts
-            public AccountsRow[] GetInvestmentAccounts()
+            public AccountRow[] GetInvestmentAccounts()
             {
                 var lquery =
                     from acc in this
@@ -236,7 +236,7 @@ namespace BanaData.Database
             }
 
             // Get asset accounts
-            public AccountsRow[] GetAssetAccounts()
+            public AccountRow[] GetAssetAccounts()
             {
                 var lquery =
                     from acc in this
@@ -248,9 +248,9 @@ namespace BanaData.Database
 
 
             // Adding/updating rows
-            public AccountsRow Add(string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind, bool hidden)
+            public AccountRow Add(string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind, bool hidden)
             {
-                var accRow = NewAccountsRow();
+                var accRow = NewAccountRow();
 
                 UpdateAccount(accRow, name, description, type, creditLimit, kind, hidden);
 
@@ -259,7 +259,7 @@ namespace BanaData.Database
                 return accRow;
             }
 
-            public AccountsRow Update(int id, string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind, bool hidden)
+            public AccountRow Update(int id, string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind, bool hidden)
             {
                 var accRow = FindByID(id);
 
@@ -268,7 +268,7 @@ namespace BanaData.Database
                 return accRow;
             }
 
-            private static void UpdateAccount(AccountsRow accRow, string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind, bool hidden)
+            private static void UpdateAccount(AccountRow accRow, string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind, bool hidden)
             {
                 accRow.Name = name;
                 accRow.Type = type;

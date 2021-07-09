@@ -22,7 +22,7 @@ namespace BanaData.Logic.Dialogs
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
-        private readonly Household.AccountsRow accountRow;
+        private readonly Household.AccountRow accountRow;
 
         #endregion
 
@@ -31,7 +31,7 @@ namespace BanaData.Logic.Dialogs
         public ShowRebalanceLogic(MainWindowLogic _mainWindowLogic, int accountID)
         {
             mainWindowLogic = _mainWindowLogic;
-            accountRow = mainWindowLogic.Household.Accounts.FindByID(accountID);
+            accountRow = mainWindowLogic.Household.Account.FindByID(accountID);
 
             var portfolio = accountRow.GetPortfolio(null);
             foreach(var securityRow in portfolio.GetSecuritiesRows())
@@ -212,12 +212,12 @@ namespace BanaData.Logic.Dialogs
 
         public class SecurityItem : LogicBase
         {
-            public SecurityItem(Household.SecuritiesRow securityRow, string symbol, decimal securityQuantity, decimal _securityPrice) =>
+            public SecurityItem(Household.SecurityRow securityRow, string symbol, decimal securityQuantity, decimal _securityPrice) =>
                 (SecurityRow, Symbol, SecurityQuantity, securityPrice) = (securityRow, symbol, securityQuantity, _securityPrice);
 
 
             // For logic
-            public readonly Household.SecuritiesRow SecurityRow;
+            public readonly Household.SecurityRow SecurityRow;
                 
             // Invoked when target changes
             public event EventHandler TargetChanged;

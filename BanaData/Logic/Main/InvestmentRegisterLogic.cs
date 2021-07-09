@@ -60,7 +60,7 @@ namespace BanaData.Logic.Main
         }
 
         // Routine to create a transaction from the DB
-        protected override AbstractTransactionLogic CreateTransactionFromDB(Household.AccountsRow accountRow, Household.TransactionsRow transRow, List<LineItem> lineItems)
+        protected override AbstractTransactionLogic CreateTransactionFromDB(Household.AccountRow accountRow, Household.TransactionsRow transRow, List<LineItem> lineItems)
         {
             // Get investment transaction info
             var investmentTransRow = transRow.GetInvestmentTransaction();
@@ -90,7 +90,7 @@ namespace BanaData.Logic.Main
 
         // Create a mirror pseudo-transaction for transfers
         protected override AbstractTransactionLogic CreateMirrorTransaction(
-            Household.AccountsRow accountRow,
+            Household.AccountRow accountRow,
             Household.LineItemsRow otherLineItemRow)
         {
             var otherTransRow = otherLineItemRow.TransactionsRow;

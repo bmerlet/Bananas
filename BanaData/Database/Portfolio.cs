@@ -32,7 +32,7 @@ namespace BanaData.Database
             var investmentTransaction = transaction.GetInvestmentTransaction();
 
             // Get security if any
-            Household.SecuritiesRow security = null;
+            Household.SecurityRow security = null;
             if (!investmentTransaction.IsSecurityIDNull())
             {
                 security = investmentTransaction.SecuritiesRow;
@@ -61,12 +61,12 @@ namespace BanaData.Database
             cashBalance -= lineItem.Amount;
         }
 
-        private void AddShares(DateTime date, Household.SecuritiesRow security, decimal quantity, decimal securityPrice)
+        private void AddShares(DateTime date, Household.SecurityRow security, decimal quantity, decimal securityPrice)
         {
             lots.Add(new Lot(date, security, quantity, securityPrice));
         }
 
-        private void RemoveShares(Household.SecuritiesRow security, decimal quantity)
+        private void RemoveShares(Household.SecurityRow security, decimal quantity)
         {
             // Only FIFO supported
             while (quantity > 0)
@@ -95,7 +95,7 @@ namespace BanaData.Database
             }
         }
 
-        public IEnumerable<Lot> GetLotsUsedForSale(Household.SecuritiesRow security, decimal quantity)
+        public IEnumerable<Lot> GetLotsUsedForSale(Household.SecurityRow security, decimal quantity)
         {
             // List of used lots
             var usedLots = new List<Lot>();
@@ -144,7 +144,7 @@ namespace BanaData.Database
             return lots.Select(l => l.Security.ID).Distinct();
         }
 
-        public IEnumerable<Household.SecuritiesRow> GetSecuritiesRows()
+        public IEnumerable<Household.SecurityRow> GetSecuritiesRows()
         {
             return lots.Select(l => l.Security).Distinct();
         }
@@ -175,8 +175,8 @@ namespace BanaData.Database
 
         // Computes cap gains from a hypothetical transaction (taking place today)
         static public ComputeSaleCapitalGainsResult ComputeSaleHypotheticalCapitalGains(
-            Household.AccountsRow accountRow,
-            Household.SecuritiesRow securityRow,
+            Household.AccountRow accountRow,
+            Household.SecurityRow securityRow,
             decimal securityQuantity,
             decimal securityPrice)
         {
@@ -184,10 +184,10 @@ namespace BanaData.Database
         }
 
         private static ComputeSaleCapitalGainsResult ComputeSaleCapitalGains(
-            Household.AccountsRow accountRow, 
+            Household.AccountRow accountRow, 
             DateTime date,
             Household.TransactionsRow transactionToExclude,
-            Household.SecuritiesRow securityRow,
+            Household.SecurityRow securityRow,
             decimal securityQuantity,
             decimal securityPrice,
             string description,

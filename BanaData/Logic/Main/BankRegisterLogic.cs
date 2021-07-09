@@ -38,7 +38,7 @@ namespace BanaData.Logic.Main
         #region Actions
 
         // Manage the visibility of the medium column when displaying a new account
-        protected override void OnNewAccount(Household.AccountsRow accountRow) 
+        protected override void OnNewAccount(Household.AccountRow accountRow) 
         {
             if (IsBank != (accountRow.Type == EAccountType.Bank))
             {
@@ -49,10 +49,10 @@ namespace BanaData.Logic.Main
         }
 
         // Routine to create a transaction from the DB
-        protected override AbstractTransactionLogic CreateTransactionFromDB(Household.AccountsRow accountRow, Household.TransactionsRow transRow, List<LineItem> lineItems) 
+        protected override AbstractTransactionLogic CreateTransactionFromDB(Household.AccountRow accountRow, Household.TransactionsRow transRow, List<LineItem> lineItems) 
         {
             // Get banking details
-            Household.BankingTransactionsRow transBankRow = (accountRow.Type == EAccountType.Bank) ? transRow.GetBankingTransaction() : null;
+            Household.BankingTransactionRow transBankRow = (accountRow.Type == EAccountType.Bank) ? transRow.GetBankingTransaction() : null;
 
             var transactionData = new BankingTransactionLogic.BankTransactionData(
                 transRow.Date,
@@ -75,7 +75,7 @@ namespace BanaData.Logic.Main
 
         // Create a mirror pseudo-transaction for transfers
         protected override AbstractTransactionLogic CreateMirrorTransaction(
-            Household.AccountsRow accountRow,
+            Household.AccountRow accountRow,
             Household.LineItemsRow otherLineItemRow)
         {
             var otherTransRow = otherLineItemRow.TransactionsRow;

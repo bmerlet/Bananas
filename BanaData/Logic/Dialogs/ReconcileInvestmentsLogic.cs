@@ -19,7 +19,7 @@ namespace BanaData.Logic.Dialogs
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
-        private readonly Household.AccountsRow accountRow;
+        private readonly Household.AccountRow accountRow;
 
         #endregion
 
@@ -27,7 +27,7 @@ namespace BanaData.Logic.Dialogs
 
         public ReconcileInvestmentsLogic(MainWindowLogic _mainWindowLogic, int accountID)
         {
-            (mainWindowLogic, accountRow) = (_mainWindowLogic, _mainWindowLogic.Household.Accounts.FindByID(accountID));
+            (mainWindowLogic, accountRow) = (_mainWindowLogic, _mainWindowLogic.Household.Account.FindByID(accountID));
 
             Title = "Reconcile: " + accountRow.Name;
 

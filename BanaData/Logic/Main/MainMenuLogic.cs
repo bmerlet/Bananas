@@ -213,7 +213,7 @@ namespace BanaData.Logic.Main
         {
             // Retreive account info
             int accountID = mainWindow.DisplayedAccountID;
-            bool isInvestment = mainWindow.Household.Accounts.FindByID(accountID).Type == EAccountType.Investment;
+            bool isInvestment = mainWindow.Household.Account.FindByID(accountID).Type == EAccountType.Investment;
 
             // Create logic and show reconcile info dialog
             var infoLogic = new ReconcileInfoLogic(mainWindow, accountID);
@@ -259,7 +259,7 @@ namespace BanaData.Logic.Main
             var quoter = new Quote();
 
             // Go through all investment accounts
-            foreach(Household.AccountsRow account in household.Accounts.Rows)
+            foreach(Household.AccountRow account in household.Account.Rows)
             {
                 if (account.Type == EAccountType.Investment)
                 {
@@ -277,7 +277,7 @@ namespace BanaData.Logic.Main
             // Now ask quote for all securities held
             foreach (int security in securities)
             {
-                var secRow = household.Securities.FindByID(security);
+                var secRow = household.Security.FindByID(security);
                 if (!secRow.IsSymbolNull())
                 {
                     var price = quoter.GetQuote(secRow.Symbol);
@@ -286,7 +286,7 @@ namespace BanaData.Logic.Main
 
                     if (price >= 0)
                     {
-                        household.SecurityPrices.Add(secRow, DateTime.Now, price);
+                        household.SecurityPrice.Add(secRow, DateTime.Now, price);
                     }
                 }
             }

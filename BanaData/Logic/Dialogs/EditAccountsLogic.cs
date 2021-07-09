@@ -30,7 +30,7 @@ namespace BanaData.Logic.Dialogs
 
             accountsSource = new ObservableCollection<AccountItem>();
 
-            foreach (Household.AccountsRow acct in mainWindowLogic.Household.Accounts.Rows)
+            foreach (Household.AccountRow acct in mainWindowLogic.Household.Account.Rows)
             {
                 // Skip hidden accounts if required
                 if (acct.Hidden && mainWindowLogic.UserSettings.HideClosedAccounts)
@@ -119,7 +119,7 @@ namespace BanaData.Logic.Dialogs
             if (SelectedAccount != null)
             {
                 // Delete only if no transactions
-                var accountRow = mainWindowLogic.Household.Accounts.FindByID(SelectedAccount.ID);
+                var accountRow = mainWindowLogic.Household.Account.FindByID(SelectedAccount.ID);
                 if (accountRow.HasTransactions)
                 {
                     mainWindowLogic.ErrorMessage("This account cannot be deleted because it has transactions associated with it.");
@@ -138,7 +138,7 @@ namespace BanaData.Logic.Dialogs
             var household = mainWindowLogic.Household;
 
             // Create and commit new account
-            var newAccountRow = household.Accounts.Add(newAccount.Name, newAccount.Description, newAccount.Type, newAccount.CreditLimit, newAccount.InvestmentKind, newAccount.Hidden);
+            var newAccountRow = household.Account.Add(newAccount.Name, newAccount.Description, newAccount.Type, newAccount.CreditLimit, newAccount.InvestmentKind, newAccount.Hidden);
 
             mainWindowLogic.CommitChanges();
             mainWindowLogic.UpdateAll();
@@ -152,7 +152,7 @@ namespace BanaData.Logic.Dialogs
             var household = mainWindowLogic.Household;
 
             // Update the row
-            household.Accounts.Update(newAccount.ID, newAccount.Name, newAccount.Description, newAccount.Type, newAccount.CreditLimit, newAccount.InvestmentKind, newAccount.Hidden);
+            household.Account.Update(newAccount.ID, newAccount.Name, newAccount.Description, newAccount.Type, newAccount.CreditLimit, newAccount.InvestmentKind, newAccount.Hidden);
 
             // Commit
             mainWindowLogic.CommitChanges();
@@ -164,7 +164,7 @@ namespace BanaData.Logic.Dialogs
             var household = mainWindowLogic.Household;
 
             // Remove the account
-            household.Accounts.FindByID(account.ID).Delete();
+            household.Account.FindByID(account.ID).Delete();
 
             mainWindowLogic.CommitChanges();
             mainWindowLogic.UpdateAll();

@@ -125,13 +125,13 @@ namespace BanaData.Logic.Dialogs
             var household = mainWindowLogic.Household;
 
             // Commit new payee
-            var newPayeeRow = household.MemorizedPayees.Add(newPayee.Payee, ETransactionStatus.Pending, newPayee.Memo);
+            var newPayeeRow = household.MemorizedPayee.Add(newPayee.Payee, ETransactionStatus.Pending, newPayee.Memo);
 
             // Commit all line items
             var newLineItems = new List<LineItem>();
             foreach (var lineItem in newPayee.LineItems)
             {
-                var newRow = household.MemorizedLineItems.Add(newPayeeRow, lineItem.CategoryID, lineItem.CategoryAccountID, lineItem.Memo, lineItem.Amount);
+                var newRow = household.MemorizedLineItem.Add(newPayeeRow, lineItem.CategoryID, lineItem.CategoryAccountID, lineItem.Memo, lineItem.Amount);
 
                 // Recreate line item with correct ID
                 newLineItems.Add(new LineItem(lineItem, newRow.ID));
@@ -149,8 +149,8 @@ namespace BanaData.Logic.Dialogs
             var household = mainWindowLogic.Household;
 
             // Update the memorized payee
-            var payeeRow = household.MemorizedPayees.FindByID(newPayee.ID);
-            household.MemorizedPayees.Update(payeeRow, newPayee.Payee, ETransactionStatus.Pending, newPayee.Memo);
+            var payeeRow = household.MemorizedPayee.FindByID(newPayee.ID);
+            household.MemorizedPayee.Update(payeeRow, newPayee.Payee, ETransactionStatus.Pending, newPayee.Memo);
 
             // Get existing line items
             var oldLineItems = payeeRow.GetMemorizedLineItemsRows();
@@ -167,7 +167,7 @@ namespace BanaData.Logic.Dialogs
                 }
                 else
                 {
-                    household.MemorizedLineItems.Update(oldLineItem, payeeRow, newLineItem.CategoryID, newLineItem.CategoryAccountID, newLineItem.Memo, newLineItem.Amount);
+                    household.MemorizedLineItem.Update(oldLineItem, payeeRow, newLineItem.CategoryID, newLineItem.CategoryAccountID, newLineItem.Memo, newLineItem.Amount);
                     newMemorizedLineItems.Add(newLineItem);
                 }
             }
@@ -179,7 +179,7 @@ namespace BanaData.Logic.Dialogs
             {
                 if (oldLineItems.FirstOrDefault(oli => oli.ID == newLineItem.ID) == null)
                 {
-                    var newRow = household.MemorizedLineItems.Add(payeeRow, newLineItem.CategoryID, newLineItem.CategoryAccountID, newLineItem.Memo, newLineItem.Amount);
+                    var newRow = household.MemorizedLineItem.Add(payeeRow, newLineItem.CategoryID, newLineItem.CategoryAccountID, newLineItem.Memo, newLineItem.Amount);
 
                     // Recreate line item with correct ID
                     newMemorizedLineItems.Add(new LineItem(newLineItem, newRow.ID));
@@ -200,11 +200,11 @@ namespace BanaData.Logic.Dialogs
             // Remove the corresponding memorized line items
             foreach (var lineItem in payee.LineItems)
             {
-                household.MemorizedLineItems.FindByID(lineItem.ID).Delete();
+                household.MemorizedLineItem.FindByID(lineItem.ID).Delete();
             }
 
             // Remove the memorized payee
-            household.MemorizedPayees.FindByID(payee.ID).Delete();
+            household.MemorizedPayee.FindByID(payee.ID).Delete();
 
             mainWindowLogic.CommitChanges();
             mainWindowLogic.UpdateMemorizedPayees();
