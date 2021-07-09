@@ -20,11 +20,15 @@
         <Grid DockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Button Content="Update quotes" Style="{StaticResource FormButton}" Command="{Binding UpdateQuotes}"/>
-            <TextBlock Text="{Binding Error}" Style="{StaticResource FormTextBlock}" Foreground="Red" Grid.Column="2"/>
+            <Button Content="Update quotes" Style="{StaticResource FormButton}" Command="{Binding UpdateQuotes}" Grid.Column="0"/>
+            <TextBlock Text="Deviation threshold:" Style="{StaticResource FormTextBlock}" Grid.Column="1"/>
+            <TextBox Text="{Binding Threshold, Converter={StaticResource percentTostringConverter}, Mode=TwoWay}" Style="{StaticResource FormTextBox}" Grid.Column="2" Width="40"/>
+            <TextBlock Text="{Binding Error}" Style="{StaticResource FormTextBlock}" Foreground="Red" Grid.Column="4"/>
         </Grid>
         
         <!-- Totals on the bottom -->

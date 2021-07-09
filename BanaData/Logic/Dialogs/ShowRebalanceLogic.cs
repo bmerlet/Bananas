@@ -60,6 +60,14 @@ namespace BanaData.Logic.Dialogs
         private readonly ObservableCollection<SecurityItem> securityItems = new ObservableCollection<SecurityItem>();
         public CollectionView SecuritiesSource { get; }
 
+        // Deviation percent threshold
+        private decimal threshold = 0.01M;
+        public decimal Threshold
+        {
+            get => threshold;
+            set { threshold = value; Recompute(); }
+        }
+
         // Command to update quotes
         public CommandBase UpdateQuotes { get; }
 
@@ -191,23 +199,32 @@ namespace BanaData.Logic.Dialogs
                     decimal diff = (si.Actual - si.Target) * TotalValue;
                     decimal numShares = diff / si.SecurityPrice;
 
-                    if (si.Actual > si.Target)
+                    if (Math.Abs(si.Actual - si.Target) >= Threshold)
                     {
-                        si.Status = $"Too high by {diff:C2}";
-                        si.Action = $"Sell {numShares:N1} shares of {si.Symbol}";
+                        if (si.Actual > si.Target)
+                        {
+                            si.Status = $"Too high by {diff:C2}";
+                            si.Action = $"Sell {numShares:N1} shares of {si.Symbol}";
 
-                        var cg = Portfolio.ComputeSaleHypotheticalCapitalGains(accountRow, si.SecurityRow, numShares, si.SecurityPrice);
-                        si.Consequences =
-                            (cg.ShortTermGain != 0 ? $"STCG: {cg.ShortTermGain:C2}" : "") +
-                            (cg.ShortTermGain != 0 && cg.LongTermGain != 0 ? ", " : "") +
-                            (cg.LongTermGain != 0 ? $"LTCG: {cg.LongTermGain:C2}" : "");
+                            var cg = Portfolio.ComputeSaleHypotheticalCapitalGains(accountRow, si.SecurityRow, numShares, si.SecurityPrice);
+                            si.Consequences =
+                                (cg.ShortTermGain != 0 ? $"STCG: {cg.ShortTermGain:C2}" : "") +
+                                (cg.ShortTermGain != 0 && cg.LongTermGain != 0 ? ", " : "") +
+                                (cg.LongTermGain != 0 ? $"LTCG: {cg.LongTermGain:C2}" : "");
+                        }
+                        else
+                        {
+                            si.Status = $"Too low by {-diff:C2}";
+                            si.Action = $"Buy {-numShares:N1} shares of {si.Symbol}";
+                            si.Consequences = "";
+                        }
                     }
                     else
                     {
-                        si.Status = $"Too low by {-diff:C2}";
-                        si.Action = $"Buy {-numShares:N1} shares of {si.Symbol}";
+                        si.Status = "OK";
+                        si.Action = "";
                         si.Consequences = "";
-                    };
+                    }
                 }
 
             }
