@@ -208,9 +208,22 @@ namespace BanaData.Logic.Dialogs
                     if (selectedLineItem != null)
                     {
                         selectedLineItem.BeginEdit();
+
+                        CategoryFocus = false;
+                        OnPropertyChanged(() => CategoryFocus);
+                        UpdateOverlayPosition = () =>
+                        {
+                            CategoryFocus = true;
+                            OnPropertyChanged(() => CategoryFocus);
+                        };
                     }
+                    else
+                    {
+                        UpdateOverlayPosition = null;
+                    }
+
                     OnPropertyChanged(() => EditedLineItem);
-                    OnPropertyChanged("UpdateOverlayPosition");
+                    OnPropertyChanged(() => UpdateOverlayPosition);
                 }
             }
         }
@@ -227,6 +240,9 @@ namespace BanaData.Logic.Dialogs
 
         // Delete command from context menu
         public CommandBase DeleteLineItem { get; }
+
+        // To focus the overlay on the category
+        public bool CategoryFocus { get; private set; }
 
         // Column widths
         private double widthOfCategoryColumn = 200;
@@ -290,6 +306,12 @@ namespace BanaData.Logic.Dialogs
         {
             if (selectedLineItem != null)
             {
+                if (selectedLineItem.Amount == 0)
+                {
+                    mainWindowLogic.ErrorMessage("Please enter an amount.");
+                    return;
+                }
+
                 selectedLineItem.EndEdit();
             }
 
@@ -318,9 +340,9 @@ namespace BanaData.Logic.Dialogs
             editSplitLogic.UpdateTotal();
         }
 
-        private void OnDeleteLineItem(object arg)
+        private void OnDeleteLineItem()
         {
-            var gvli = arg == null ? editedLineItem : arg as GridViewLineItem;
+            var gvli = editedLineItem;
             if (gvli == null)
             {
                 return;

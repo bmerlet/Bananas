@@ -21,6 +21,9 @@ namespace BanaData.Logic.Main
         // Transaction to show
         public object TransactionToScrollTo { get; protected set; }
 
+        // Action to follow an update of the overlay position 
+        public Action UpdateOverlayPosition { get; protected set; }
+
         public abstract void ProcessEnter();
         public abstract void MoveUp();
         public abstract void MoveDown();

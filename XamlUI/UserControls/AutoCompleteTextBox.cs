@@ -191,7 +191,7 @@ namespace XamlUI.UserControls
         public bool IsPopupOpen
         {
             get => popup != null && popup.IsOpen;
-            private set
+            set
             {
                 if (popup != null)
                 {

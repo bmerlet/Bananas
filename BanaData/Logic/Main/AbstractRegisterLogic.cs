@@ -391,14 +391,20 @@ namespace BanaData.Logic.Main
 
                     DateFocus = false;
                     OnPropertyChanged(() => DateFocus);
-                    mainWindowLogic.GuiServices.ExecuteAsync((Action)delegate ()
+
+                    UpdateOverlayPosition = () =>
                     {
                         DateFocus = true;
                         OnPropertyChanged(() => DateFocus);
-                    });
+                    };
                 }
+                else
+                {
+                    UpdateOverlayPosition = null;
+                }
+
                 OnPropertyChanged(() => EditedTransaction);
-                OnPropertyChanged("UpdateOverlayPosition");
+                OnPropertyChanged(() => UpdateOverlayPosition);
             }
         }
 

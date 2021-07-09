@@ -71,7 +71,7 @@ namespace XamlUI.UserControls
                 //
                 else if (e.PropertyName == "UpdateOverlayPosition")
                 {
-                    SetOverlayPosition();
+                    SetOverlayPosition(brl.UpdateOverlayPosition);
                 }
             }
         }
@@ -80,7 +80,7 @@ namespace XamlUI.UserControls
 
         #region Overlay
 
-        private void SetOverlayPosition()
+        private void SetOverlayPosition(Action actionAfterOverlayPositionIsUpdated)
         {
             Dispatcher.BeginInvoke((Action)delegate ()
             {
@@ -93,6 +93,10 @@ namespace XamlUI.UserControls
                         var pos = lvi.TranslatePoint(new Point(0, 0), _listView);
                         _overlay.Visibility = Visibility.Visible;
                         _overlay.Margin = new Thickness(3 + pos.X, pos.Y, 0, 0);
+                        if (actionAfterOverlayPositionIsUpdated != null)
+                        {
+                            Dispatcher.BeginInvoke(actionAfterOverlayPositionIsUpdated, DispatcherPriority.ContextIdle, null);
+                        }
                     }
                 }
             }, DispatcherPriority.ContextIdle, null);
@@ -100,7 +104,7 @@ namespace XamlUI.UserControls
 
         protected void OnListViewScrollChanged(object source, ScrollChangedEventArgs e)
         {
-            SetOverlayPosition();
+            SetOverlayPosition(null);
         }
 
         #endregion
@@ -111,17 +115,12 @@ namespace XamlUI.UserControls
         {
             base.OnKeyDown(e);
 
-            if (DataContext is BaseRegisterLogic brl && _listView.SelectedItem is IEditableObject editableObject)
+            if (DataContext is BaseRegisterLogic && _listView.SelectedItem is IEditableObject editableObject)
             {
                 if (e.Key == Key.Escape)
                 {
                     editableObject.CancelEdit();
                     editableObject.BeginEdit();
-                    e.Handled = true;
-                }
-                else if (e.Key == Key.Enter || e.Key == Key.Return)
-                {
-                    brl.ProcessEnter();
                     e.Handled = true;
                 }
             }
@@ -131,21 +130,37 @@ namespace XamlUI.UserControls
         {
             base.OnPreviewKeyDown(e);
 
-            bool isFromAutoCompleteTextBoxWithPopupOpen =
-                e.OriginalSource is WatermarkTextBox wtb &&
-                wtb.TemplatedParent is AutoCompleteTextBox actb &&
-                actb.IsPopupOpen;
-
-            if (DataContext is BaseRegisterLogic brl && !isFromAutoCompleteTextBoxWithPopupOpen)
+            if (DataContext is BaseRegisterLogic brl )
             {
-                if (e.Key == Key.Up)
+                AutoCompleteTextBox AutoCompleteTextBoxWithPopupOpen = null;
+                if(e.OriginalSource is WatermarkTextBox wtb &&
+                    wtb.TemplatedParent is AutoCompleteTextBox actb &&
+                    actb.IsPopupOpen)
+                {
+                    AutoCompleteTextBoxWithPopupOpen = actb;
+                }
+
+                if (e.Key == Key.Up && AutoCompleteTextBoxWithPopupOpen == null)
                 {
                     brl.MoveUp();
                     e.Handled = true;
+                    return;
                 }
-                if (e.Key == Key.Down)
+
+                if (e.Key == Key.Down && AutoCompleteTextBoxWithPopupOpen == null)
                 {
                     brl.MoveDown();
+                    e.Handled = true;
+                    return;
+                }
+
+                if (e.Key == Key.Enter || e.Key == Key.Return)
+                {
+                    if (AutoCompleteTextBoxWithPopupOpen != null)
+                    {
+                        AutoCompleteTextBoxWithPopupOpen.IsPopupOpen = false;
+                    }
+                    brl.ProcessEnter();
                     e.Handled = true;
                 }
             }
