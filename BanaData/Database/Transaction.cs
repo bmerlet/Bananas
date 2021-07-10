@@ -93,11 +93,11 @@ namespace BanaData.Database
                 return transactionRow;
             }
 
-            public TransactionRow Update(int transactionID, AccountRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status)
+            public TransactionRow Update(int transactionID, AccountRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status, int checkpointID)
             {
                 var transactionRow = FindByID(transactionID);
 
-                UpdateTransaction(transactionRow, accountRow, date, payee, memo, status, transactionRow.CheckpointID);
+                UpdateTransaction(transactionRow, accountRow, date, payee, memo, status, checkpointID);
 
                 return transactionRow;
             }

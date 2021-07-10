@@ -134,7 +134,7 @@ namespace XamlUI.UserControls
                 futureText = futureText.Insert(CaretIndex, e.Text);
             }
 
-            if (!string.IsNullOrWhiteSpace(futureText) && !decimal.TryParse(futureText, out _))
+            if (!Parse(futureText, out _))
             {
                 // Can't parse - don't accept
                 e.Handled = true;
@@ -175,14 +175,28 @@ namespace XamlUI.UserControls
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(futureText))
+            if (futureText != null && !Parse(futureText, out _))
             {
-                if (!decimal.TryParse(futureText, out _))
-                {
-                    // Can't parse - don't accept
-                    e.Handled = true;
-                }
+                // Can't parse - don't accept
+                e.Handled = true;
             }
+        }
+
+        private bool Parse(string text, out decimal val)
+        {
+            val = 0;
+            text = text.Trim();
+
+            // All those parse as 0
+            if (text == "" ||
+                text == "-" ||
+                text == "." ||
+                text == "-.")
+            {
+                return true;
+            }
+
+            return decimal.TryParse(text, out val);            
         }
 
         // Update amount property when text changes
@@ -190,16 +204,12 @@ namespace XamlUI.UserControls
         {
             base.OnTextChanged(e);
 
+            // Parse current text
+            Parse(Text, out decimal amount);
+
             // Update amount property
             internalAmountUpdate = true;
-            if (string.IsNullOrWhiteSpace(Text))
-            {
-                Amount = 0;
-            }
-            else
-            {
-                Amount = decimal.Parse(Text);
-            }
+            Amount = amount;
             internalAmountUpdate = false;
         }
 
@@ -210,8 +220,10 @@ namespace XamlUI.UserControls
 
             if (!string.IsNullOrEmpty(Text))
             {
+                Parse(Text, out decimal amount);
+
                 internalAmountUpdate = true;
-                Amount = decimal.Parse(Text);
+                Amount = amount;
                 Text = Amount.ToString(formatString);
                 internalAmountUpdate = false;
             }

@@ -248,7 +248,7 @@ namespace BanaData.Logic.Main
             else
             {
                 // Update transaction row
-                var transactionRow = household.Transaction.Update(TransID, accountRow, data.Date, data.Payee, data.Memo, data.Status);
+                var transactionRow = household.Transaction.Update(TransID, accountRow, data.Date, data.Payee, data.Memo, data.Status, household.Checkpoint.GetMostRecentCheckpointID());
 
                 // Update banking transaction if needed
                 if (bankRegisterLogic.IsBank)

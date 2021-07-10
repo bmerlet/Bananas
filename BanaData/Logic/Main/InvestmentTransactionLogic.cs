@@ -700,7 +700,7 @@ namespace BanaData.Logic.Main
             else
             {
                 // Update transaction row
-                var transactionRow = household.Transaction.Update(TransID, accountRow, data.Date, data.Memo, data.Payee, data.Status);
+                var transactionRow = household.Transaction.Update(TransID, accountRow, data.Date, data.Memo, data.Payee, data.Status, household.Checkpoint.GetMostRecentCheckpointID());
 
                 // Update investment transaction
                 household.InvestmentTransaction.Update(transactionRow, data.Type, securityRow, data.SecurityPrice, data.SecurityQuantity, data.Commission);

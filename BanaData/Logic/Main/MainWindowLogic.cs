@@ -277,6 +277,19 @@ namespace BanaData.Logic.Main
 
         public void UpdateAll()
         {
+            // Close registers
+            BankAccountGroup.SelectedAccount = null;
+            AssetAccountGroup.SelectedAccount = null;
+            InvestmentAccountGroup.SelectedAccount = null;
+            IsInvestmentRegisterVisible = false;
+            IsBankRegisterVisible = false;
+            DisplayedAccountID = -1;
+            MainMenuLogic.Reconcile.SetCanExecute(false);
+            MainMenuLogic.ShowHoldings.SetCanExecute(false);
+            MainMenuLogic.ShowRebalance.SetCanExecute(false);
+            OnPropertyChanged(() => IsInvestmentRegisterVisible);
+            OnPropertyChanged(() => IsBankRegisterVisible);
+
             // Update accounts
             NetWorth = 0;
             NetWorth += BankAccountGroup.UpdateAccountsAndBalances();
