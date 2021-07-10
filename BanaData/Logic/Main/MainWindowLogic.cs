@@ -488,7 +488,8 @@ namespace BanaData.Logic.Main
             // Add all top-level categories
             foreach (var category in Household.Category)
             {
-                if (category.IsParentIDNull())
+                // Exclude internal categories (not used)
+                if (category.IsParentIDNull() && !category.Name.StartsWith("_"))
                 {
                     var description = category.IsDescriptionNull() ? "" : category.Description;
                     var taxInfo = category.IsTaxInfoNull() ? "" : category.TaxInfo;
@@ -530,7 +531,10 @@ namespace BanaData.Logic.Main
             // Add all possible transfers
             foreach (var account in Household.Account)
             {
-                Categories.Add(new CategoryItem(account.ID, account.Name));
+                if (!account.Hidden)
+                {
+                    Categories.Add(new CategoryItem(account.ID, account.Name));
+                }
             }
 
             Categories.Sort();

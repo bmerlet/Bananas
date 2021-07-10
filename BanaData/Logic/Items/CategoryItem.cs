@@ -93,6 +93,16 @@ namespace BanaData.Logic.Items
         // Sort on full name
         public int CompareTo(CategoryItem other)
         {
+            // Categories first, transfers next
+            if (AccountID >= 0 && other.AccountID < 0)
+            {
+                return 1;
+            }
+            if (AccountID < 0 && other.AccountID >= 0)
+            {
+                return -1;
+            }
+
             return FullName.CompareTo(other.FullName);
         }
 
