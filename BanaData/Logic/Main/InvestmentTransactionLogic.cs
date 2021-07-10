@@ -99,26 +99,26 @@ namespace BanaData.Logic.Main
         public bool IsSecuritySymbolVisible => investmentTransactionType.IsSecuritySymbolVisible;
 
         //
-        // Security price
-        //
-        public decimal SecurityPrice
-        {
-            get => data.SecurityPrice;
-            set => data.SecurityPrice = value;
-        }
-        public int SecurityQuantityTabIndex => investmentTransactionType.SecurityQuantityTabIndex;
-        public bool IsSecurityQuantityVisible => investmentTransactionType.IsSecurityQuantityVisible;
-
-        //
         // Security quantity
         //
         public decimal SecurityQuantity
         {
             get => data.SecurityQuantity;
-            set => data.SecurityQuantity = value;
+            set { data.SecurityQuantity = value; RecomputeAmount(); RecomputeSharePrice(); }
         }
         public int SecurityPriceTabIndex => investmentTransactionType.SecurityPriceTabIndex;
         public bool IsSecurityPriceVisible => investmentTransactionType.IsSecurityPriceVisible;
+
+        //
+        // Security price
+        //
+        public decimal SecurityPrice
+        {
+            get => data.SecurityPrice;
+            set { data.SecurityPrice = value; RecomputeAmount(); }
+        }
+        public int SecurityQuantityTabIndex => investmentTransactionType.SecurityQuantityTabIndex;
+        public bool IsSecurityQuantityVisible => investmentTransactionType.IsSecurityQuantityVisible;
 
         //
         // Commission
@@ -126,7 +126,7 @@ namespace BanaData.Logic.Main
         public decimal Commission
         {
             get => data.Commission;
-            set => data.Commission = value;
+            set { data.Commission = value; RecomputeAmount(); RecomputeSharePrice(); }
         }
         public int CommissionTabIndex => investmentTransactionType.CommissionTabIndex;
         public bool IsCommissionVisible => investmentTransactionType.IsCommissionVisible;
@@ -365,6 +365,8 @@ namespace BanaData.Logic.Main
 
             OnPropertyChanged(() => Description);
 
+            ShowCapitalGains.SetCanExecute(data.Type == EInvestmentTransactionType.Sell || data.Type == EInvestmentTransactionType.SellAndTransferCash);
+
             // Clear the backup
             backup = null;
         }
@@ -444,6 +446,33 @@ namespace BanaData.Logic.Main
             data.SecurityID = id;
         }
 
+        // For buy/sell, recompute the amount when the #shares, share price or commission is changed
+        private void RecomputeAmount()
+        {
+            if (data.Type == EInvestmentTransactionType.Buy || data.Type == EInvestmentTransactionType.BuyFromTransferredCash ||
+                data.Type == EInvestmentTransactionType.Sell || data.Type == EInvestmentTransactionType.SellAndTransferCash)
+            {
+                // Compute amount
+                data.LineItems[0].Amount = data.SecurityQuantity * data.SecurityPrice - data.Commission;
+                OnPropertyChanged(() => Amount);
+            }
+        }
+
+        // For reinvestment, recompute the share price every time the amount or number of shares is changed
+        protected override void RecomputeSharePrice()
+        {
+            if (data.Type == EInvestmentTransactionType.ReinvestDividends || data.Type == EInvestmentTransactionType.ReinvestShortTermCapitalGains ||
+                data.Type == EInvestmentTransactionType.ReinvestMediumTermCapitalGains || data.Type == EInvestmentTransactionType.ReinvestLongTermCapitalGains)
+            {
+                // Compute share price
+                if (data.SecurityQuantity > 0)
+                {
+                    data.SecurityPrice = data.Amount / data.SecurityQuantity;
+                    OnPropertyChanged(() => SecurityPrice);
+                }
+            }
+        }
+
         private void CommitTransactionToDataSet()
         {
             var household = mainWindowLogic.Household;
@@ -470,7 +499,12 @@ namespace BanaData.Logic.Main
 
                 // Create the line item
                 var li = data.LineItems[0];
-                var liRow = household.LineItem.Add(transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount);
+                ETransactionStatus? transferStatus = (li.CategoryAccountID < 0) ? null : ETransactionStatus.Pending as ETransactionStatus?;
+                var liRow = household.LineItem.Add(transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount, transferStatus);
+                if (li.CategoryAccountID >= 0)
+                {
+                    liRow.TransferStatus = ETransactionStatus.Pending;
+                }
                 li.ID = liRow.ID;
             }
             else if (TransID == TRANSID_TRANSFER_FILLIN)
@@ -491,7 +525,8 @@ namespace BanaData.Logic.Main
                 // Update the line item
                 var li = data.LineItems[0];
                 var liRow = household.LineItem.FindByID(li.ID);
-                household.LineItem.Update(liRow, transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount);
+                ETransactionStatus? transferStatus = (li.CategoryAccountID < 0) ? null : ETransactionStatus.Pending as ETransactionStatus?;
+                household.LineItem.Update(liRow, transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount, transferStatus);
             }
 
             mainWindowLogic.CommitChanges();

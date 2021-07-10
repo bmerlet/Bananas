@@ -415,7 +415,7 @@
                 Text="{Binding EditedTransaction.Category, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 ItemsSource="{Binding EditedTransaction.CategoriesSource}"
                 Visibility="{Binding EditedTransaction.IsCategoryVisible, Converter={StaticResource visibilityBoolConverter}}"
-                Watermark="Tx dest"/>
+                Watermark="Tx/category"/>
 
             <!-- Obscure category when not in use  -->
             <TextBlock

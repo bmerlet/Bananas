@@ -8,6 +8,11 @@ using BanaData.Database;
 
 namespace BanaData.Logic.Main
 {
+    #region Factory
+
+    /// <summary>
+    /// Factory for classes implementing the details of the various investment transaction types
+    /// </summary>
     internal class InvestmentTransactionType
     {
         public static IInvestmentTransactionType GetInvestmentTransactionType(EInvestmentTransactionType type)
@@ -66,6 +71,10 @@ namespace BanaData.Logic.Main
         }
     }
 
+    #endregion
+
+    #region Interface for investment transaction type helpers
+
     internal interface IInvestmentTransactionType
     {
         bool IsSecuritySymbolVisible { get; }
@@ -94,6 +103,10 @@ namespace BanaData.Logic.Main
         void CleanupData(InvestmentTransactionLogic.InvestmentTransactionData data);
     }
 
+    #endregion
+
+    #region Abstract class for investment transaction type helpers
+
     internal abstract class AInvestmentTransactionType : IInvestmentTransactionType
     {
         public bool IsSecuritySymbolVisible => SecuritySymbolTabIndex >= 0;
@@ -119,6 +132,10 @@ namespace BanaData.Logic.Main
 
         public virtual void CleanupData(InvestmentTransactionLogic.InvestmentTransactionData data) { }
     }
+
+    #endregion
+
+    #region Interest helper
 
     internal class InvestmentTransactionInterest : AInvestmentTransactionType
     {
@@ -150,11 +167,29 @@ namespace BanaData.Logic.Main
         }
     }
 
+    #endregion
+
+    #region CashIn/CashOut helper
+
     // Cash in/out is same as transfer in/out, except we pick a category in stead of a transfer
     internal class InvestmentTransactionCashInOut : InvestmentTransactionXInOut
     {
         public override bool IsTransfer => false;
+
+        public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
+        {
+            if (string.IsNullOrWhiteSpace(data.Category))
+            {
+                return "Please choose a category";
+            }
+
+            return base.CheckData(data);
+        }
     }
+
+    #endregion
+
+    #region XIn/XOut helper
 
     internal class InvestmentTransactionXInOut : AInvestmentTransactionType
     {
@@ -170,7 +205,7 @@ namespace BanaData.Logic.Main
 
             if (string.IsNullOrWhiteSpace(data.Category))
             {
-                return "Please choose a category or transfer account";
+                return "Please choose a transfer account";
             }
 
             return null;
@@ -185,6 +220,10 @@ namespace BanaData.Logic.Main
         }
     }
 
+    #endregion
+
+    #region SharesIn helper
+
     internal class InvestmentTransactionSharesIn : AInvestmentTransactionType
     {
         public override int SecuritySymbolTabIndex => 3;
@@ -193,6 +232,11 @@ namespace BanaData.Logic.Main
 
         public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {
+            if (data.SecurityID < 0)
+            {
+                return "Please enter a security symbol.";
+            }
+
             if (data.SecurityQuantity == 0)
             {
                 return "Please enter a number of shares.";
@@ -214,6 +258,10 @@ namespace BanaData.Logic.Main
         }
     }
 
+    #endregion
+
+    #region SharesOut helper
+
     internal class InvestmentTransactionSharesOut : AInvestmentTransactionType
     {
         public override int SecuritySymbolTabIndex => 3;
@@ -221,6 +269,11 @@ namespace BanaData.Logic.Main
 
         public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {
+            if (data.SecurityID < 0)
+            {
+                return "Please enter a security symbol.";
+            }
+
             if (data.SecurityQuantity == 0)
             {
                 return "Please enter a number of shares.";
@@ -237,6 +290,10 @@ namespace BanaData.Logic.Main
             data.LineItems[0].Category = "";
         }
     }
+
+    #endregion
+
+    #region Buy/Sell helper
 
     internal class InvestmentTransactionBuyOrSell : AInvestmentTransactionType
     {
@@ -248,6 +305,11 @@ namespace BanaData.Logic.Main
 
         public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {
+            if (data.SecurityID < 0)
+            {
+                return "Please enter a security symbol.";
+            }
+
             if (data.SecurityQuantity == 0)
             {
                 return "Please enter a number of shares.";
@@ -256,6 +318,16 @@ namespace BanaData.Logic.Main
             if (data.SecurityPrice == 0)
             {
                 return "Please enter a share price.";
+            }
+
+            // Check amount
+            decimal expectedAmount = data.SecurityQuantity * data.SecurityPrice - data.Commission;
+            if (data.LineItems[0].Amount != expectedAmount)
+            {
+                return
+                    "The amount should be the number of shares times the share price minus commission" + Environment.NewLine +
+                    $"But {data.SecurityQuantity:N4} * {data.SecurityPrice:C4} - {data.Commission:C2} = {expectedAmount:C2}" + Environment.NewLine +
+                    $"While the amount is {data.LineItems[0].Amount}";
             }
 
             return null;
@@ -267,35 +339,33 @@ namespace BanaData.Logic.Main
         }
     }
 
-    internal class InvestmentTransactionBuyOrSellAndTransfer : AInvestmentTransactionType
+    #endregion
+
+    #region BuyX, SellX helper
+
+    // Just like buy or sell but with a transfer
+    internal class InvestmentTransactionBuyOrSellAndTransfer : InvestmentTransactionBuyOrSell
     {
-        public override int SecuritySymbolTabIndex => 3;
-        public override int SecurityQuantityTabIndex => 4;
-        public override int SecurityPriceTabIndex => 5;
-        public override int CommissionTabIndex => 6;
-        public override int AmountTabIndex => 7;
         public override int CategoryTabIndex => 8;
 
         public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {
-            if (data.SecurityQuantity == 0)
-            {
-                return "Please enter a number of shares.";
-            }
-
-            if (data.SecurityPrice == 0)
-            {
-                return "Please enter a share price.";
-            }
-
             if (string.IsNullOrWhiteSpace(data.Category))
             {
                 return "Please choose a transfer account";
             }
 
-            return null;
+            return base.CheckData(data);
+        }
+
+        public override void CleanupData(InvestmentTransactionLogic.InvestmentTransactionData data)
+        {
         }
     }
+
+    #endregion
+
+    #region Dividends helper
 
     internal class InvestmentTransactionDivs : AInvestmentTransactionType
     {
@@ -304,6 +374,11 @@ namespace BanaData.Logic.Main
 
         public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {
+            if (data.SecurityID < 0)
+            {
+                return "Please enter a security symbol.";
+            }
+
             if (data.Amount == 0)
             {
                 return "Please enter an amount.";
@@ -316,10 +391,13 @@ namespace BanaData.Logic.Main
             data.SecurityPrice = 0;
             data.SecurityQuantity = 0;
             data.Commission = 0;
-            data.LineItems[0].Amount = 0;
             data.LineItems[0].Category = "";
         }
     }
+
+    #endregion
+
+    #region DivX helper
 
     internal class InvestmentTransactionTransferDivs : AInvestmentTransactionType
     {
@@ -329,6 +407,11 @@ namespace BanaData.Logic.Main
 
         public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {
+            if (data.SecurityID < 0)
+            {
+                return "Please enter a security symbol.";
+            }
+
             if (data.Amount == 0)
             {
                 return "Please enter an amount.";
@@ -349,6 +432,10 @@ namespace BanaData.Logic.Main
             data.Commission = 0;
         }
     }
+
+    #endregion
+
+    #region ReinvDiv helper
 
     internal class InvestmentTransactionReinvestDivs : AInvestmentTransactionType
     {
@@ -360,27 +447,46 @@ namespace BanaData.Logic.Main
 
         public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {
+            if (data.SecurityID < 0)
+            {
+                return "Please choose a security symbol.";
+            }
+
+            if (data.Amount == 0)
+            {
+                return "Please enter an amount.";
+            }
+
             if (data.SecurityQuantity == 0)
             {
                 return "Please enter a number of shares.";
             }
 
-            if (data.SecurityPrice == 0)
+            decimal expectedSecurityPrice = data.Amount / data.SecurityQuantity;
+            if (data.SecurityPrice != expectedSecurityPrice)
             {
-                return "Please enter a share price.";
+                return
+                    "The share price should be the dividend amount divided by the number of shares" + Environment.NewLine +
+                    $"But {data.Amount:C2} * {data.SecurityQuantity:N4} = {expectedSecurityPrice:C4}" + Environment.NewLine +
+                    $"While the share price is {data.SecurityPrice:C4}";
             }
 
-            if (string.IsNullOrWhiteSpace(data.Category))
-            {
-                return "Please choose a transfer account";
-            }
 
             return null;
         }
     }
 
+    #endregion
+
+    #region Unsupported helper
+
     internal class InvestmentTransactionNotSupported : AInvestmentTransactionType
     {
+        public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
+        {
+            return "Not supported";
+        }
+
         public override void CleanupData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {
             data.SecurityID = -1;
@@ -392,6 +498,7 @@ namespace BanaData.Logic.Main
         }
     }
 
+    #endregion
 }
 
 

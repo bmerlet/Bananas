@@ -234,7 +234,8 @@ namespace BanaData.Logic.Main
                 // Create all line items
                 foreach(var li in data.LineItems)
                 {
-                    var liRow = household.LineItem.Add(transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount);
+                    ETransactionStatus? transferStatus = (li.CategoryAccountID < 0) ? null : ETransactionStatus.Pending as ETransactionStatus?;
+                    var liRow = household.LineItem.Add(transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount, transferStatus);
                     li.ID = liRow.ID;
                 }
             }
@@ -271,14 +272,15 @@ namespace BanaData.Logic.Main
                 // Second update or create the other ones
                 foreach (var li in data.LineItems)
                 {
+                    ETransactionStatus? transferStatus = (li.CategoryAccountID < 0) ? null : ETransactionStatus.Pending as ETransactionStatus?;
                     if (li.ID >= 0)
                     {
                         var liRow = household.LineItem.FindByID(li.ID);
-                        household.LineItem.Update(liRow, transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount);
+                        household.LineItem.Update(liRow, transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount, transferStatus);
                     }
                     else
                     {
-                        var liRow = household.LineItem.Add(transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount);
+                        var liRow = household.LineItem.Add(transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount, transferStatus);
                         li.ID = liRow.ID;
                     }
                 }

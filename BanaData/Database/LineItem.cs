@@ -59,26 +59,33 @@ namespace BanaData.Database
 
         partial class LineItemDataTable
         {
-            public LineItemRow Add(TransactionRow transactionRow, int categoryId, int categoryAccountId, string memo, decimal amount)
+            public LineItemRow Add(TransactionRow transactionRow, int categoryId, int categoryAccountId, string memo, decimal amount, ETransactionStatus? transferStatus)
             {
                 var lineItemRow = NewLineItemRow();
 
-                UpdateLineItem(lineItemRow, transactionRow, categoryId, categoryAccountId, memo, amount);
+                UpdateLineItem(lineItemRow, transactionRow, categoryId, categoryAccountId, memo, amount, transferStatus);
 
                 Rows.Add(lineItemRow);
 
                 return lineItemRow;
             }
 
-            public LineItemRow Update(LineItemRow lineItemRow, TransactionRow transactionRow, int categoryId, int categoryAccountId, string memo, decimal amount)
+            public LineItemRow Update(LineItemRow lineItemRow, TransactionRow transactionRow, int categoryId, int categoryAccountId, string memo, decimal amount, ETransactionStatus? transferStatus)
             {
-                UpdateLineItem(lineItemRow, transactionRow, categoryId, categoryAccountId, memo, amount);
+                UpdateLineItem(lineItemRow, transactionRow, categoryId, categoryAccountId, memo, amount, transferStatus);
 
                 return lineItemRow;
             }
 
 
-            private static LineItemRow UpdateLineItem(LineItemRow lineItemRow, TransactionRow transactionRow, int categoryId, int categoryAccountId, string memo, decimal amount)
+            private static LineItemRow UpdateLineItem(
+                LineItemRow lineItemRow,
+                TransactionRow transactionRow,
+                int categoryId,
+                int categoryAccountId, 
+                string memo,
+                decimal amount, 
+                ETransactionStatus? transferStatus)
             {
                 lineItemRow.TransactionID = transactionRow.ID;
 
@@ -108,6 +115,15 @@ namespace BanaData.Database
                 }
 
                 lineItemRow.Amount = amount;
+
+                if (transferStatus.HasValue)
+                {
+                    lineItemRow.TransferStatus = transferStatus.Value;
+                }
+                else
+                {
+                    lineItemRow.SetITransferStatusNull();
+                }
 
                 return lineItemRow;
             }

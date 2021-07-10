@@ -289,7 +289,7 @@ namespace BanaData.Logic.Dialogs
             household.BankingTransaction.Add(transactionRow,ETransactionMedium.None, 0);
 
             // Create the line items
-            household.LineItem.Add(transactionRow, reconcileInfoRow.InterestCategoryID, -1, "", interestAmount);
+            household.LineItem.Add(transactionRow, reconcileInfoRow.InterestCategoryID, -1, "", interestAmount, null);
 
             // Post newly created transaction ID
             InterestTransactionID = transactionRow.ID;

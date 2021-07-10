@@ -950,7 +950,8 @@ namespace BanaData.Serializations
                     lih.CategoryID,
                     lih.AccountID,
                     lih.Memo,
-                    lih.Amount);
+                    lih.Amount,
+                    null);
             }
 
             return transRow;
@@ -1230,7 +1231,7 @@ namespace BanaData.Serializations
             decimal commission)
         {
             var transRow = household.Transaction.Add(accountRow, date, payee, memo, status, checkpointID);
-            household.LineItem.Add(transRow, categoryID, categoryAccountID, null, amount);
+            household.LineItem.Add(transRow, categoryID, categoryAccountID, null, amount, null);
             household.InvestmentTransaction.Add(transRow, type, securityRow, securityPrice, securityQuantity, commission);
 
             return transRow;

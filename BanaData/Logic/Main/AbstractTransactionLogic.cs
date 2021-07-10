@@ -126,6 +126,7 @@ namespace BanaData.Logic.Main
                         OnPropertyChanged(() => Payment);
                         OnPropertyChanged(() => Deposit);
                         OnPropertyChanged(() => AmountString);
+                        RecomputeSharePrice();
                     }
                     else
                     {
@@ -429,6 +430,9 @@ namespace BanaData.Logic.Main
             }
             OnPropertyChanged(() => Status);
         }
+
+        // Used in investment derived class
+        protected virtual void RecomputeSharePrice() { }
 
         #endregion
 
