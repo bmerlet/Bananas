@@ -104,6 +104,7 @@
     <Compile Include="Logic\Main\InvestmentRegisterLogic.cs" />
     <Compile Include="Logic\Main\InvestmentTransactionLogic.cs" />
     <Compile Include="Logic\Main\BaseRegisterLogic.cs" />
+    <Compile Include="Logic\Main\InvestmentTransactionType.cs" />
     <Compile Include="Logic\Main\MainWindowLogic.cs" />
     <Compile Include="Logic\Main\MainMenuLogic.cs" />
     <Compile Include="Logic\Dialogs\OpenFileLogic.cs" />

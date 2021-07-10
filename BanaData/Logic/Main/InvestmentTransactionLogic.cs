@@ -23,6 +23,9 @@ namespace BanaData.Logic.Main
         // Our data
         private new readonly InvestmentTransactionData data;
 
+        // Behavior of transaction (based on type)
+        private IInvestmentTransactionType investmentTransactionType;
+
         #endregion
 
         #region Constructors
@@ -61,6 +64,7 @@ namespace BanaData.Logic.Main
 
         public override decimal AmountForCashBalance => (IsCashIn || IsCashOut) ? data.Amount : 0;
 
+        // For register to compute share balances:
         public int SecurityID => data.SecurityID;
         public decimal SecurityQuantityDecimal => data.SecurityQuantity;
 
@@ -90,9 +94,8 @@ namespace BanaData.Logic.Main
             get => GetSecuritySymbol(data.SecurityID);
             set => SetSecuritySymbol(value);
         }
-        public int SecuritySymbolColumnNumber { get; private set; }
-        public int SecuritySymbolTabIndex { get; private set; }
-        public bool IsSecuritySymbolVisible { get; private set; }
+        public int SecuritySymbolTabIndex => investmentTransactionType.SecuritySymbolTabIndex;
+        public bool IsSecuritySymbolVisible => investmentTransactionType.IsSecuritySymbolVisible;
 
         //
         // Security price
@@ -102,9 +105,8 @@ namespace BanaData.Logic.Main
             get => data.SecurityPrice;
             set => data.SecurityPrice = value;
         }
-        public int SecurityQuantityColumnNumber { get; private set; }
-        public int SecurityQuantityTabIndex { get; private set; }
-        public bool IsSecurityQuantityVisible { get; private set; }
+        public int SecurityQuantityTabIndex => investmentTransactionType.SecurityQuantityTabIndex;
+        public bool IsSecurityQuantityVisible => investmentTransactionType.IsSecurityQuantityVisible;
 
         //
         // Security quantity
@@ -114,9 +116,8 @@ namespace BanaData.Logic.Main
             get => data.SecurityQuantity;
             set => data.SecurityQuantity = value;
         }
-        public int SecurityPriceColumnNumber { get; private set; }
-        public int SecurityPriceTabIndex { get; private set; }
-        public bool IsSecurityPriceVisible { get; private set; }
+        public int SecurityPriceTabIndex => investmentTransactionType.SecurityPriceTabIndex;
+        public bool IsSecurityPriceVisible => investmentTransactionType.IsSecurityPriceVisible;
 
         //
         // Commission
@@ -126,9 +127,8 @@ namespace BanaData.Logic.Main
             get => data.Commission;
             set => data.Commission = value;
         }
-        public int CommissionColumnNumber { get; private set; }
-        public int CommissionTabIndex { get; private set; }
-        public bool IsCommissionVisible { get; private set; }
+        public int CommissionTabIndex => investmentTransactionType.CommissionTabIndex;
+        public bool IsCommissionVisible => investmentTransactionType.IsCommissionVisible;
 
         // Share balance
         // ShareBalanceString is the UI property, ShareBalance is updated by the logic
@@ -152,16 +152,14 @@ namespace BanaData.Logic.Main
         //
         // Amount supplement
         //
-        public int AmountColumnNumber { get; private set; }
-        public int AmountTabIndex { get; private set; }
-        public bool IsAmountVisible { get; private set; }
+        public int AmountTabIndex => investmentTransactionType.AmountTabIndex;
+        public bool IsAmountVisible => investmentTransactionType.IsAmountVisible;
 
         //
         // Category supplement
         //
-        public int CategoryColumnNumber { get; private set; }
-        public int CategoryTabIndex { get; private set; }
-        public bool IsCategoryVisible { get; private set; }
+        public int CategoryTabIndex => investmentTransactionType.CategoryTabIndex;
+        public bool IsCategoryVisible => investmentTransactionType.IsCategoryVisible;
 
         //
         // Command to show capital gains on a sale
@@ -390,172 +388,7 @@ namespace BanaData.Logic.Main
             }
 
             data.Type = value;
-
-            int column = 4;
-
-            switch (data.Type)
-            {
-                case EInvestmentTransactionType.InterestIncome:
-                    column = ShowSecuritySymbol(false, column);
-                    column = ShowSecurityTextBoxes(false, false, column);
-                    column = ShowAmountBox(true, column);
-                    ShowTransferBox(false, column);
-                    break;
-
-                case EInvestmentTransactionType.CashIn:
-                case EInvestmentTransactionType.CashOut:
-                case EInvestmentTransactionType.TransferCashIn:
-                case EInvestmentTransactionType.TransferCashOut:
-                    column = ShowSecuritySymbol(false, column);
-                    column = ShowSecurityTextBoxes(false, false, column);
-                    column = ShowAmountBox(true, column);
-                    ShowTransferBox(true, column);
-                    break;
-
-                case EInvestmentTransactionType.SharesIn:
-                case EInvestmentTransactionType.SharesOut:
-                    column = ShowSecuritySymbol(true, column);
-                    column = ShowSecurityTextBoxes(true, false, column);
-                    column = ShowAmountBox(false, column);
-                    ShowTransferBox(false, column);
-                    break;
-
-                case EInvestmentTransactionType.Buy:
-                case EInvestmentTransactionType.Sell:
-                    column = ShowSecuritySymbol(true, column);
-                    column = ShowSecurityTextBoxes(true, true, column);
-                    column = ShowAmountBox(true, column);
-                    ShowTransferBox(false, column);
-                    break;
-
-                case EInvestmentTransactionType.BuyFromTransferredCash:
-                case EInvestmentTransactionType.SellAndTransferCash:
-                    column = ShowSecuritySymbol(true, column);
-                    column = ShowSecurityTextBoxes(true, true, column);
-                    column = ShowAmountBox(true, column);
-                    ShowTransferBox(true, column);
-                    break;
-
-                case EInvestmentTransactionType.Dividends:
-                case EInvestmentTransactionType.ShortTermCapitalGains:
-                case EInvestmentTransactionType.LongTermCapitalGains:
-                    column = ShowSecuritySymbol(true, column);
-                    column = ShowSecurityTextBoxes(false, false, column);
-                    column = ShowAmountBox(true, column);
-                    ShowTransferBox(false, column);
-                    break;
-
-                case EInvestmentTransactionType.TransferDividends:
-                case EInvestmentTransactionType.TransferShortTermCapitalGains:
-                case EInvestmentTransactionType.TransferLongTermCapitalGains:
-                    column = ShowSecuritySymbol(true, column);
-                    column = ShowSecurityTextBoxes(false, false, column);
-                    column = ShowAmountBox(true, column);
-                    ShowTransferBox(true, column);
-                    break;
-
-                case EInvestmentTransactionType.ReinvestDividends:
-                case EInvestmentTransactionType.ReinvestLongTermCapitalGains:
-                case EInvestmentTransactionType.ReinvestMediumTermCapitalGains:
-                case EInvestmentTransactionType.ReinvestShortTermCapitalGains:
-                    column = ShowAmountBox(true, column);
-                    column = ShowSecuritySymbol(true, column);
-                    column = ShowSecurityTextBoxes(true, true, column);
-                    ShowTransferBox(false, column);
-                    break;
-
-                case EInvestmentTransactionType.Grant:
-                case EInvestmentTransactionType.Vest:
-                case EInvestmentTransactionType.Exercise:
-                case EInvestmentTransactionType.Expire:
-                    column = ShowAmountBox(false, column);
-                    column = ShowSecuritySymbol(false, column);
-                    column = ShowSecurityTextBoxes(false, false, column);
-                    ShowTransferBox(false, column);
-                    break;
-            }
-        }
-
-        private int ShowSecuritySymbol(bool show, int column)
-        {
-            IsSecuritySymbolVisible = show;
-            OnPropertyChanged(() => IsSecuritySymbolVisible);
-
-            if (show)
-            {
-                SecuritySymbolTabIndex = column - 1;
-                SecuritySymbolColumnNumber = column++;
-                OnPropertyChanged(() => SecuritySymbolColumnNumber);
-                OnPropertyChanged(() => SecuritySymbolTabIndex);
-            }
-
-            return column;
-        }
-
-        private int ShowSecurityTextBoxes(bool show, bool showCommission, int column)
-        {
-            IsSecurityQuantityVisible = show;
-            IsSecurityPriceVisible = show;
-            IsCommissionVisible = showCommission;
-
-            OnPropertyChanged(() => IsSecurityQuantityVisible);
-            OnPropertyChanged(() => IsSecurityPriceVisible);
-            OnPropertyChanged(() => IsCommissionVisible);
-
-            if (show)
-            {
-                SecurityQuantityTabIndex = column - 1;
-                SecurityQuantityColumnNumber = column++;
-                SecurityPriceTabIndex = column - 1;
-                SecurityPriceColumnNumber = column++;
-
-                OnPropertyChanged(() => SecurityQuantityColumnNumber);
-                OnPropertyChanged(() => SecurityQuantityTabIndex);
-                OnPropertyChanged(() => SecurityPriceColumnNumber);
-                OnPropertyChanged(() => SecurityPriceTabIndex);
-
-                if (showCommission)
-                {
-                    CommissionTabIndex = column - 1;
-                    CommissionColumnNumber = column++;
-                    OnPropertyChanged(() => CommissionColumnNumber);
-                    OnPropertyChanged(() => CommissionTabIndex);
-                }
-            }
-
-            return column;
-        }
-
-        private int ShowAmountBox(bool show, int column)
-        {
-            IsAmountVisible = show;
-            OnPropertyChanged(() => IsAmountVisible);
-
-            if (show)
-            {
-                AmountTabIndex = column - 1;
-                AmountColumnNumber = column++;
-                OnPropertyChanged(() => AmountColumnNumber);
-                OnPropertyChanged(() => AmountTabIndex);
-            }
-
-            return column;
-        }
-
-        private int ShowTransferBox(bool show, int column)
-        {
-            IsCategoryVisible = show;
-            OnPropertyChanged(() => IsCategoryVisible);
-
-            if (show)
-            {
-                CategoryTabIndex = column - 1;
-                CategoryColumnNumber = column++;
-                OnPropertyChanged(() => CategoryColumnNumber);
-                OnPropertyChanged(() => CategoryTabIndex);
-            }
-
-            return column;
+            investmentTransactionType = InvestmentTransactionType.GetInvestmentTransactionType(value);
         }
 
         private string GetSecuritySymbol(int id)

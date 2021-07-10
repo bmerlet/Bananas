@@ -275,23 +275,25 @@
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfStatusColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfDateColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfTypeColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfDescriptionColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfMemoColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfSecuritySymbolColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfSecurityQuantityColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfSecurityPriceColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfCommissionColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfSecurityBalanceColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfAmountColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfBalanceColumn}"/>
+                <ColumnDefinition Width="{Binding Widths.WidthOfCategoryColumn}"/>
             </Grid.ColumnDefinitions>
 
             <!-- Status -->
             <ComboBox
                 Grid.Column="0"
                 ToolTip="Transaction status"
-                Width="{Binding Widths.WidthOfStatusColumn}"
                 ItemsSource="{Binding EditedTransaction.StatusSource}"
                 SelectedItem="{Binding EditedTransaction.Status, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
@@ -300,16 +302,13 @@
                 Grid.Column="1"
                 ToolTip="Transaction date"
                 KeyboardNavigation.TabIndex="0"
-                Width="{Binding Widths.WidthOfDateColumn}"
                 Date="{Binding EditedTransaction.Date, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 t:FocusAttachedProperty.IsFocused="{Binding DateFocus}"/>
 
             <!-- Type -->
             <local:AutoCompleteTextBox 
                 KeyboardNavigation.TabIndex="1"
-                ToolTip="Transaction type"
                 Grid.Column="2"
-                Width="{Binding Widths.WidthOfTypeColumn}"
                 Style="{StaticResource InvestmentTransactionTypeStyle}"
                 Text="{Binding EditedTransaction.Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 ItemsSource="{Binding TypesSource}"/>
@@ -317,18 +316,15 @@
             <!-- Memo -->
             <local:WatermarkTextBox 
                 KeyboardNavigation.TabIndex="2"
-                Grid.Column="3"
+                Grid.Column="4"
                 ToolTip="Transaction memo"
-                Width="{Binding Widths.WidthOfMemoColumn}"
                 Text="{Binding EditedTransaction.Memo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 Watermark="Memo"/>
 
             <!-- Security symbol -->
             <local:AutoCompleteTextBox
-                ToolTip="Security symbol"
-                Grid.Column="{Binding EditedTransaction.SecuritySymbolColumnNumber}"
+                Grid.Column="5"
                 KeyboardNavigation.TabIndex="{Binding EditedTransaction.SecuritySymbolTabIndex}"
-                Width="{Binding Widths.WidthOfSecuritySymbolColumn}"
                 Style="{StaticResource InvestmentTransactionSecuritySymbolStyle}"
                 Text="{Binding EditedTransaction.SecuritySymbol, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 ItemsSource="{Binding SecuritiesView}"
@@ -337,9 +333,8 @@
             <!-- Security quantity -->
             <local:AmountBox
                 ToolTip="Security quantity"
-                Grid.Column="{Binding EditedTransaction.SecurityQuantityColumnNumber}"
+                Grid.Column="6"
                 KeyboardNavigation.TabIndex="{Binding EditedTransaction.SecurityQuantityTabIndex}"
-                Width="{Binding Widths.WidthOfSecurityQuantityColumn}"
                 Amount="{Binding EditedTransaction.SecurityQuantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 Visibility="{Binding EditedTransaction.IsSecurityQuantityVisible, Converter={StaticResource visibilityBoolConverter}}"
                 Precision="4"
@@ -348,9 +343,8 @@
             <!-- Security price -->
             <local:AmountBox
                 ToolTip="Security price per share"
-                Grid.Column="{Binding EditedTransaction.SecurityPriceColumnNumber}"
+                Grid.Column="7"
                 KeyboardNavigation.TabIndex="{Binding EditedTransaction.SecurityPriceTabIndex}"
-                Width="{Binding Widths.WidthOfSecurityPriceColumn}"
                 Amount="{Binding EditedTransaction.SecurityPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 Visibility="{Binding EditedTransaction.IsSecurityPriceVisible, Converter={StaticResource visibilityBoolConverter}}"
                 Precision="4"
@@ -359,9 +353,8 @@
             <!-- Commission -->
             <local:AmountBox
                 ToolTip="Transaction commission"
-                Grid.Column="{Binding EditedTransaction.CommissionColumnNumber}"
+                Grid.Column="8"
                 KeyboardNavigation.TabIndex="{Binding EditedTransaction.CommissionTabIndex}"
-                Width="{Binding Widths.WidthOfCommissionColumn}"
                 Amount="{Binding EditedTransaction.Commission, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 Visibility="{Binding EditedTransaction.IsCommissionVisible, Converter={StaticResource visibilityBoolConverter}}"
                 Watermark="Comm"/>
@@ -369,19 +362,16 @@
             <!-- Dollar amount -->
             <local:AmountBox
                 ToolTip="Dollar amount"
-                Grid.Column="{Binding EditedTransaction.AmountColumnNumber}"
+                Grid.Column="10"
                 KeyboardNavigation.TabIndex="{Binding EditedTransaction.AmountTabIndex}"
-                Width="{Binding Widths.WidthOfAmountColumn}"
                 Amount="{Binding EditedTransaction.Amount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 Visibility="{Binding EditedTransaction.IsAmountVisible, Converter={StaticResource visibilityBoolConverter}}"
                 Watermark="Amount"/>
 
             <!-- Category (tx dest) -->
             <local:AutoCompleteTextBox 
-                ToolTip="Transaction category or transfer"
-                Grid.Column="{Binding EditedTransaction.CategoryColumnNumber}"
+                Grid.Column="12"
                 KeyboardNavigation.TabIndex="{Binding EditedTransaction.CategoryTabIndex}"
-                Width="{Binding Widths.WidthOfCategoryColumn}"
                 Style="{StaticResource CategoryBoxStyle}"
                 Text="{Binding EditedTransaction.Category, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 ItemsSource="{Binding TransfersSource}"
