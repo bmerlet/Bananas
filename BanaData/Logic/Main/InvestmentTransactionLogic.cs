@@ -10,6 +10,7 @@ using Toolbox.UILogic;
 using BanaData.Database;
 using BanaData.Logic.Items;
 using BanaData.Logic.Dialogs;
+using System.Collections.ObjectModel;
 
 namespace BanaData.Logic.Main
 {
@@ -156,8 +157,11 @@ namespace BanaData.Logic.Main
         public bool IsAmountVisible => investmentTransactionType.IsAmountVisible;
 
         //
-        // Category supplement
+        // Category source
         //
+        public IEnumerable<CategoryItem> CategoriesSource =>
+            investmentTransactionType.IsTransfer ? mainWindowLogic.Transfers : mainWindowLogic.Categories;
+
         public int CategoryTabIndex => investmentTransactionType.CategoryTabIndex;
         public bool IsCategoryVisible => investmentTransactionType.IsCategoryVisible;
 
@@ -406,6 +410,7 @@ namespace BanaData.Logic.Main
 
             OnPropertyChanged(() => IsCategoryVisible);
             OnPropertyChanged(() => CategoryTabIndex);
+            OnPropertyChanged(() => CategoriesSource);
         }
 
         private string GetSecuritySymbol(int id)

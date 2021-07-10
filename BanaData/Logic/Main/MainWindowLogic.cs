@@ -109,7 +109,13 @@ namespace BanaData.Logic.Main
         public readonly List<MemorizedPayeeItem> MemorizedPayees = new List<MemorizedPayeeItem>();
 
         // List of categories, as displayed in the UI
+        // Categories only (non-hidden)
         public readonly List<CategoryItem> Categories = new List<CategoryItem>();
+        // Transfers only
+        public readonly List<CategoryItem> Transfers = new List<CategoryItem>();
+        // Categories and transfers
+        public readonly List<CategoryItem> CategoriesAndTransfers = new List<CategoryItem>();
+        // Hidden (system) categories
         public readonly List<CategoryItem> HiddenCategories = new List<CategoryItem>();
 
         // List of securities
@@ -304,7 +310,6 @@ namespace BanaData.Logic.Main
 
             // Compute the known categories
             BuildCategoriesList();
-            InvestmentRegister.UpdateTransfersSource();
 
             // Compute the known securities
             BuildSecuritiesList();
@@ -485,6 +490,9 @@ namespace BanaData.Logic.Main
         private void BuildCategoriesList()
         {
             Categories.Clear();
+            Transfers.Clear();
+            CategoriesAndTransfers.Clear();
+            HiddenCategories.Clear();
 
             // Add all top-level categories
             foreach (var category in Household.Category)
@@ -494,13 +502,15 @@ namespace BanaData.Logic.Main
                 {
                     var description = category.IsDescriptionNull() ? "" : category.Description;
                     var taxInfo = category.IsTaxInfoNull() ? "" : category.TaxInfo;
+                    var categoryItem = new CategoryItem(category.ID, category.Name, description, category.IsIncome, taxInfo, null);
                     if (category.Name.StartsWith("_"))
                     {
-                        HiddenCategories.Add(new CategoryItem(category.ID, category.Name, description, category.IsIncome, taxInfo, null));
+                        HiddenCategories.Add(categoryItem);
                     }
                     else
                     {
-                        Categories.Add(new CategoryItem(category.ID, category.Name, description, category.IsIncome, taxInfo, null));
+                        Categories.Add(categoryItem);
+                        CategoriesAndTransfers.Add(categoryItem);
                     }
                 }
             }
@@ -517,19 +527,21 @@ namespace BanaData.Logic.Main
                     if (!category.IsParentIDNull())
                     {
                         // If this category is not in the list yet
-                        if (Categories.FirstOrDefault(c => c.ID == category.ID) == null)
+                        if (CategoriesAndTransfers.FirstOrDefault(c => c.ID == category.ID) == null)
                         {
                             categoryNotFound = true;
 
                             // Find parent in list
-                            var parent = Categories.FirstOrDefault(c => c.ID == category.ParentID);
+                            var parent = CategoriesAndTransfers.FirstOrDefault(c => c.ID == category.ParentID);
                             if (parent != null)
                             {
                                 // Create category
                                 var description = category.IsDescriptionNull() ? "" : category.Description;
                                 var taxInfo = category.IsTaxInfoNull() ? "" : category.TaxInfo;
                                 var categoryItem = new CategoryItem(category.ID, category.Name, description, category.IsIncome, taxInfo, parent);
+
                                 Categories.Add(categoryItem);
+                                CategoriesAndTransfers.Add(categoryItem);
                             }
                         }                        
                     }
@@ -541,11 +553,15 @@ namespace BanaData.Logic.Main
             {
                 if (!account.Hidden)
                 {
-                    Categories.Add(new CategoryItem(account.ID, account.Name));
+                    var transferItem = new CategoryItem(account.ID, account.Name);
+                    Transfers.Add(transferItem);
+                    CategoriesAndTransfers.Add(transferItem);
                 }
             }
 
             Categories.Sort();
+            Transfers.Sort();
+            CategoriesAndTransfers.Sort();
             HiddenCategories.Sort();
         }
 

@@ -153,7 +153,7 @@ namespace BanaData.Logic.Dialogs
             }
 
             // Create our own copy of the category list, to avoid filter issue on nested dialogs
-            categories = new List<CategoryItem>(mainWindowLogic.Categories);
+            categories = new List<CategoryItem>(mainWindowLogic.CategoriesAndTransfers);
 
             // Update total when a line is deleted
             gridViewLineItems.CollectionChanged += (o, e) => editSplitLogic.UpdateTotal();

@@ -110,7 +110,7 @@ namespace BanaData.Logic.Main
             }
         }
 
-        public IEnumerable<CategoryItem> Categories => mainWindowLogic.Categories;
+        public IEnumerable<CategoryItem> Categories => mainWindowLogic.CategoriesAndTransfers;
 
         // Amount (UI property for investments, and also used to recompute balance)
         public decimal Amount

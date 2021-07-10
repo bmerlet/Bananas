@@ -67,7 +67,7 @@ namespace BanaData.Logic.Items
             }
             else
             {
-                var cat = mainWindowLogic.Categories.FirstOrDefault(c => c.FullName == category);
+                var cat = mainWindowLogic.CategoriesAndTransfers.FirstOrDefault(c => c.FullName == category);
                 if (cat == null)
                 {
                     throw new ArgumentException($"Category {category} does not exist");

@@ -68,7 +68,7 @@ namespace BanaData.Serializations
             sw.WriteLine("!Type:Cat");
             foreach(Household.CategoryRow categoryRow in household.Category.Rows)
             {
-                sw.WriteLine($"N{mainWindowLogic.Categories.Find(c => c.ID == categoryRow.ID).FullName}");
+                sw.WriteLine($"N{mainWindowLogic.CategoriesAndTransfers.Find(c => c.ID == categoryRow.ID).FullName}");
                 if (!categoryRow.IsDescriptionNull())
                 {
                     sw.WriteLine($"D{categoryRow.Description}");
@@ -331,7 +331,7 @@ namespace BanaData.Serializations
                 sw.WriteLine($"M{transactionRow.Memo}");
             }
 
-            sw.WriteLine("L" + mainWindowLogic.Categories.Find(c => c.AccountID == transactionRow.AccountID).FullName);
+            sw.WriteLine("L" + mainWindowLogic.CategoriesAndTransfers.Find(c => c.AccountID == transactionRow.AccountID).FullName);
         }
 
 
@@ -513,7 +513,7 @@ namespace BanaData.Serializations
                 sw.WriteLine($"M{transactionRow.Memo}");
             }
 
-            sw.WriteLine("L" + mainWindowLogic.Categories.Find(c => c.AccountID == transactionRow.AccountID).FullName);
+            sw.WriteLine("L" + mainWindowLogic.CategoriesAndTransfers.Find(c => c.AccountID == transactionRow.AccountID).FullName);
 
             sw.WriteLine($"${Math.Abs(amount):N2}");
         }
@@ -539,11 +539,11 @@ namespace BanaData.Serializations
             string letter = forSplit ? "S" : "L";
             if (!lineItemRow.IsCategoryIDNull())
             {
-                sw.WriteLine(letter + mainWindowLogic.Categories.Find(c => c.ID == lineItemRow.CategoryID).FullName);
+                sw.WriteLine(letter + mainWindowLogic.CategoriesAndTransfers.Find(c => c.ID == lineItemRow.CategoryID).FullName);
             }
             else if (!lineItemRow.IsAccountIDNull())
             {
-                sw.WriteLine(letter + mainWindowLogic.Categories.Find(c => c.AccountID == lineItemRow.AccountID).FullName);
+                sw.WriteLine(letter + mainWindowLogic.CategoriesAndTransfers.Find(c => c.AccountID == lineItemRow.AccountID).FullName);
             }
         }
 
@@ -593,11 +593,11 @@ namespace BanaData.Serializations
             string letter = forSplit ? "S" : "L";
             if (!lineItemRow.IsCategoryIDNull())
             {
-                sw.WriteLine(letter + mainWindowLogic.Categories.Find(c => c.ID == lineItemRow.CategoryID).FullName);
+                sw.WriteLine(letter + mainWindowLogic.CategoriesAndTransfers.Find(c => c.ID == lineItemRow.CategoryID).FullName);
             }
             else if (!lineItemRow.IsAccountIDNull())
             {
-                sw.WriteLine(letter + mainWindowLogic.Categories.Find(c => c.AccountID == lineItemRow.AccountID).FullName);
+                sw.WriteLine(letter + mainWindowLogic.CategoriesAndTransfers.Find(c => c.AccountID == lineItemRow.AccountID).FullName);
             }
         }
 

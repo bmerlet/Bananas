@@ -33,7 +33,7 @@ namespace BanaData.Logic.Dialogs
 
             foreach (var catList in new IEnumerable<CategoryItem>[] { mainWindowLogic.Categories, mainWindowLogic.HiddenCategories })
             {
-                foreach (var cat in catList.Where(c => c.ID >= 0))
+                foreach (var cat in catList)
                 {
                     bool inUse = false;
 
@@ -144,9 +144,13 @@ namespace BanaData.Logic.Dialogs
                 var newCategory = logic.NewCategoryItem;
                 newCategory = AddCategoryToDataSet(newCategory);
 
-                // Update UI
+                // Update main lists
                 mainWindowLogic.Categories.Add(newCategory);
                 mainWindowLogic.Categories.Sort();
+                mainWindowLogic.CategoriesAndTransfers.Add(newCategory);
+                mainWindowLogic.CategoriesAndTransfers.Sort();
+
+                // Update dialog list
                 var newEditCategory = new EditCategoryItem(newCategory, false);
                 categoriesSource.Add(newEditCategory);
                 SelectedCategory = newEditCategory;
@@ -174,12 +178,16 @@ namespace BanaData.Logic.Dialogs
                     bool oldIsInUse = SelectedCategory.IsInUse;
                     UpdateCategoryInDataSet(updatedCategory);
 
-                    // Update UI
+                    // Update main lists
                     mainWindowLogic.Categories.Remove(SelectedCategory.CategoryItem);
-                    categoriesSource.Remove(SelectedCategory);
-
                     mainWindowLogic.Categories.Add(updatedCategory);
                     mainWindowLogic.Categories.Sort();
+                    mainWindowLogic.CategoriesAndTransfers.Remove(SelectedCategory.CategoryItem);
+                    mainWindowLogic.CategoriesAndTransfers.Add(updatedCategory);
+                    mainWindowLogic.CategoriesAndTransfers.Sort();
+
+                    // Update dialog list
+                    categoriesSource.Remove(SelectedCategory);
                     var updatedEditCategory = new EditCategoryItem(updatedCategory, oldIsInUse);
                     categoriesSource.Add(updatedEditCategory);
                     SelectedCategory = updatedEditCategory;
@@ -195,12 +203,6 @@ namespace BanaData.Logic.Dialogs
             var categoryToDelete = SelectedCategory;
             if (categoryToDelete != null)
             {
-                if (categoryToDelete.CategoryItem.AccountID >= 0)
-                {
-                    mainWindowLogic.ErrorMessage("Transfers cannot be deleted");
-                    return;
-                }
-
                 if (categoryToDelete.IsInUse)
                 {
                     mainWindowLogic.ErrorMessage("This category cannot be deleted because it is used by some transactions");
@@ -222,6 +224,7 @@ namespace BanaData.Logic.Dialogs
                 DeleteCategoryFromDataSet(categoryToDelete.CategoryItem);
                 categoriesSource.Remove(categoryToDelete);
                 mainWindowLogic.Categories.Remove(categoryToDelete.CategoryItem);
+                mainWindowLogic.CategoriesAndTransfers.Remove(categoryToDelete.CategoryItem);
             }
         }
 

@@ -19,9 +19,11 @@ namespace BanaData.Logic.Main
 
                 case EInvestmentTransactionType.CashIn:
                 case EInvestmentTransactionType.CashOut:
+                    return new InvestmentTransactionCashInOut();
+
                 case EInvestmentTransactionType.TransferCashIn:
                 case EInvestmentTransactionType.TransferCashOut:
-                    return new InvestmentTransactionCashInOut();
+                    return new InvestmentTransactionXInOut();
 
                 case EInvestmentTransactionType.SharesIn:
                     return new InvestmentTransactionSharesIn();
@@ -83,6 +85,7 @@ namespace BanaData.Logic.Main
 
         bool IsCategoryVisible { get; }
         int CategoryTabIndex { get; }
+        bool IsTransfer { get; }
 
         // Check that the data is OK for the transaction type
         string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data);
@@ -110,6 +113,7 @@ namespace BanaData.Logic.Main
 
         public bool IsCategoryVisible => CategoryTabIndex >= 0;
         public virtual int CategoryTabIndex => -1;
+        public virtual bool IsTransfer => true;
 
         public virtual string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data) { return null; }
 
@@ -120,6 +124,7 @@ namespace BanaData.Logic.Main
     {
         public override int AmountTabIndex => 3;
         public override int CategoryTabIndex => 4;
+        public override bool IsTransfer => false;
 
         public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {
@@ -145,7 +150,13 @@ namespace BanaData.Logic.Main
         }
     }
 
-    internal class InvestmentTransactionCashInOut : AInvestmentTransactionType
+    // Cash in/out is same as transfer in/out, except we pick a category in stead of a transfer
+    internal class InvestmentTransactionCashInOut : InvestmentTransactionXInOut
+    {
+        public override bool IsTransfer => false;
+    }
+
+    internal class InvestmentTransactionXInOut : AInvestmentTransactionType
     {
         public override int AmountTabIndex => 3;
         public override int CategoryTabIndex => 4;

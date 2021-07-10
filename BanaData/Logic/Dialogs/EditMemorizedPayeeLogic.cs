@@ -55,7 +55,7 @@ namespace BanaData.Logic.Dialogs
         // Category (when not split)
         public string Category { get; set; }
         public bool? CategoryEnabled { get; private set; }
-        public IEnumerable<CategoryItem> Categories => mainWindowLogic.Categories;
+        public IEnumerable<CategoryItem> Categories => mainWindowLogic.CategoriesAndTransfers;
 
         // Type (when not split)
         public string[] TypeSource { get; } = new string[] { DEPOSIT, PAYMENT };

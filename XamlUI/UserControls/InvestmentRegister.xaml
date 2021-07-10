@@ -413,7 +413,7 @@
                 KeyboardNavigation.TabIndex="{Binding EditedTransaction.CategoryTabIndex}"
                 Style="{StaticResource CategoryBoxStyle}"
                 Text="{Binding EditedTransaction.Category, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                ItemsSource="{Binding TransfersSource}"
+                ItemsSource="{Binding EditedTransaction.CategoriesSource}"
                 Visibility="{Binding EditedTransaction.IsCategoryVisible, Converter={StaticResource visibilityBoolConverter}}"
                 Watermark="Tx dest"/>
 

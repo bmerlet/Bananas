@@ -31,7 +31,7 @@ namespace BanaData.Logic.Dialogs
 
             Type = categoryItem.IsIncome ? INCOME : EXPENSE;
             Parent = categoryItem.Parent == null ? "" : categoryItem.Parent.FullName;
-            Categories = mainWindowLogic.Categories;
+            Categories = mainWindowLogic.CategoriesAndTransfers;
 
             TaxInfo = categoryItem.TaxInfo;
         }
