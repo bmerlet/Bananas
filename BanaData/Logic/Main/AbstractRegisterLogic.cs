@@ -96,9 +96,7 @@ namespace BanaData.Logic.Main
             // (for performance)
             temporaryTransactionList.Clear();
 
-            var accTransRel = household.Relations["FK_Accounts_Transactions"];
-
-            foreach (Household.TransactionRow transRow in account.GetChildRows(accTransRel))
+            foreach (Household.TransactionRow transRow in account.GetTransactionRows())
             {
                 var lineItems = GetLineItems(transRow);
                 var trans = CreateTransactionFromDB(account, transRow, lineItems);

@@ -527,8 +527,7 @@ namespace BanaData.Logic.Main
         {
             foreach (Household.SecurityRow security in Household.Security.Rows)
             {
-                var symbol = security.IsSymbolNull() ? "" : security.Symbol;
-                Securities.Add(new SecurityItem(security.ID, security.Name, symbol, security.Type));
+                Securities.Add(new SecurityItem(security.ID, security.Name, security.Symbol, security.Type));
             }
 
             SecuritiesView = (CollectionView)CollectionViewSource.GetDefaultView(Securities);

@@ -278,7 +278,7 @@ namespace BanaData.Logic.Main
             foreach (int security in securities)
             {
                 var secRow = household.Security.FindByID(security);
-                if (!secRow.IsSymbolNull())
+                if (secRow.Symbol != Household.SecurityRow.SYMBOL_NONE)
                 {
                     var price = quoter.GetQuote(secRow.Symbol);
 

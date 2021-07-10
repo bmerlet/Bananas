@@ -21,6 +21,10 @@ namespace BanaData.Database
                 set { IType = (int)value; }
             }
 
+            // Symbol used for securities without a symbol
+            public const string SYMBOL_NONE = "N/A";
+
+            // Get most recent price, or most recent price known at a given date
             public decimal GetMostRecentPrice(DateTime? limit = null)
             {
                 decimal price = 0;
@@ -48,19 +52,7 @@ namespace BanaData.Database
 
             public bool HasSame(string symbol, ESecurityType type)
             {
-                if (IsSymbolNull())
-                {
-                    if (!string.IsNullOrWhiteSpace(symbol))
-                    {
-                        return false;
-                    }
-                }
-                else if (Symbol != symbol)
-                {
-                    return false;
-                }
-
-                return Type == type;
+                return Symbol == symbol && Type == type;
             }
 
         }
@@ -74,7 +66,7 @@ namespace BanaData.Database
 
             public SecurityRow GetBySymbol(string symbol)
             {
-                return this.First(sec => !sec.IsSymbolNull() && sec.Symbol == symbol);
+                return this.First(sec => sec.Symbol == symbol);
             }
 
             public SecurityRow Add(string name, string symbol, ESecurityType type)
@@ -98,16 +90,7 @@ namespace BanaData.Database
             private static SecurityRow UpdateSecurity(SecurityRow secRow, string name, string symbol, ESecurityType type)
             {
                 secRow.Name = name;
-
-                if (string.IsNullOrWhiteSpace(symbol))
-                {
-                    secRow.SetSymbolNull();
-                }
-                else
-                {
-                    secRow.Symbol = symbol;
-                }
-
+                secRow.Symbol = symbol;
                 secRow.Type = type;
 
                 return secRow;

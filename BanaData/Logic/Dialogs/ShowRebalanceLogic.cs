@@ -125,7 +125,14 @@ namespace BanaData.Logic.Dialogs
             var quote = new Quote();
             foreach(var si in securityItems)
             {
-                si.SecurityPrice = quote.GetQuote(si.Symbol);
+                if (si.Symbol != Household.SecurityRow.SYMBOL_NONE)
+                {
+                    si.SecurityPrice = quote.GetQuote(si.Symbol);
+                }
+                else
+                {
+                    mainWindowLogic.ErrorMessage($"Cannot update quote for a security that does not have a symbol. The security is '{si.SecurityRow.Name}'");
+                }
             }
 
             Recompute();

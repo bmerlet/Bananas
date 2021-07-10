@@ -72,7 +72,6 @@ namespace BanaData.Logic.Dialogs
                 foreach (var securityID in portfolio.GetSecurities())
                 {
                     var securityRow = mainWindowLogic.Household.Security.FindByID(securityID);
-                    string symbol = securityRow.IsSymbolNull() ? "??" : securityRow.Symbol;
 
                     // Get lots for this securoty
                     var lots = portfolio.Lots.ToList().FindAll(l => l.Security.ID == securityID);
@@ -84,7 +83,7 @@ namespace BanaData.Logic.Dialogs
                     TotalValue += price * lots.Sum(l => l.Quantity);
 
                     // Build list of lots
-                    securityItems.Add(new SecurityItem(securityRow.Name, symbol, lots, price));
+                    securityItems.Add(new SecurityItem(securityRow.Name, securityRow.Symbol, lots, price));
                 }
 
                 OnPropertyChanged(() => TotalValue);

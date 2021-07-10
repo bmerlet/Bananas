@@ -71,7 +71,7 @@ namespace BanaData.Logic.Dialogs
 
             if (string.IsNullOrWhiteSpace(Symbol))
             {
-                mainWindowLogic.ErrorMessage("Security symbol cannot be blank");
+                mainWindowLogic.ErrorMessage($"Security symbol cannot be blank. Use '{Household.SecurityRow.SYMBOL_NONE}' for securities without a symbol.");
                 return null;
             }
 
@@ -81,12 +81,12 @@ namespace BanaData.Logic.Dialogs
                 {
                     if (security.Name == Name)
                     {
-                        mainWindowLogic.ErrorMessage("There is already a security with this name");
+                        mainWindowLogic.ErrorMessage($"There is already a security with the name '{Name}'");
                         return null;
                     }
-                    if (!security.IsSymbolNull() && security.Symbol == Symbol)
+                    if (Symbol != Household.SecurityRow.SYMBOL_NONE && security.Symbol == Symbol)
                     {
-                        mainWindowLogic.ErrorMessage("There is already a security with this symbol");
+                        mainWindowLogic.ErrorMessage($"There is already a security with the symbol '{Symbol}'");
                         return null;
                     }
                 }

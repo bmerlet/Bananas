@@ -162,7 +162,7 @@ namespace BanaData.Serializations
             {
                 sw.WriteLine("!Type:Security");
                 sw.WriteLine($"N{securityRow.Name}");
-                if (!securityRow.IsSymbolNull())
+                if (securityRow.Symbol != Household.SecurityRow.SYMBOL_NONE)
                 {
                     sw.WriteLine($"S{securityRow.Symbol}");
                 }
@@ -609,16 +609,16 @@ namespace BanaData.Serializations
         {
             foreach (Household.SecurityPriceRow spr in household.SecurityPrice.Rows)
             {
-                sw.WriteLine("!Type:Prices");
 
                 var securityRow = spr.SecuritiesRow;
-                if (!securityRow.IsSymbolNull())
+                if (securityRow.Symbol != Household.SecurityRow.SYMBOL_NONE)
                 {
+                    sw.WriteLine("!Type:Prices");
                     var dateString = GetDateString(spr.Date);
                     sw.WriteLine($"\"{securityRow.Symbol}\",{spr.Value:N2},\"{dateString}\"");
+                    sw.WriteLine("^");
                 }
 
-                sw.WriteLine("^");
             }
         }
 

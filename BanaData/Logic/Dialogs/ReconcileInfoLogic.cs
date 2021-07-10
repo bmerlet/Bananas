@@ -274,7 +274,7 @@ namespace BanaData.Logic.Dialogs
             public SecurityInfoItem(Household.SecurityRow securitiesRow, decimal quantity) => (SecuritiesRow, Quantity) = (securitiesRow, quantity);
 
             public readonly Household.SecurityRow SecuritiesRow;
-            public string Symbol => SecuritiesRow.IsSymbolNull() ? SecuritiesRow.Name : SecuritiesRow.Symbol;
+            public string Symbol => SecuritiesRow.Symbol == Household.SecurityRow.SYMBOL_NONE ? SecuritiesRow.Name : SecuritiesRow.Symbol;
             public decimal Quantity { get; set; }
         }
 

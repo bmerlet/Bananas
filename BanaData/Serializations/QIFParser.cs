@@ -605,7 +605,7 @@ namespace BanaData.Serializations
         private void ParseOneSecurity(TextReader sr)
         {
             string name = null;
-            string symbol = null;
+            string symbol = Household.SecurityRow.SYMBOL_NONE;
             ESecurityType type = ESecurityType.Invalid;
 
             while (true)

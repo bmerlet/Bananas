@@ -566,7 +566,7 @@ namespace BanaData.Logic.Main
             {
                 var household = mainWindowLogic.Household;
                 var security = household.Security.FindByID(id);
-                result = security.IsSymbolNull() ? "" : security.Symbol;
+                result = security.Symbol;
             }
 
             return result;
