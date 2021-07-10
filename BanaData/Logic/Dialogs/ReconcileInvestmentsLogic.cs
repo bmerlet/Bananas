@@ -45,8 +45,8 @@ namespace BanaData.Logic.Dialogs
             var priorStatementPortfolio = accountRow.GetPortfolio(accountRow.IsLastStatementDateNull() ? reconcileInfo.StatementDate : accountRow.LastStatementDate);
             foreach(var securityReconcileInfo in reconcileInfo.GetSecurityReconcileInfoRows())
             {
-                decimal prioStatementQuantity = priorStatementPortfolio.Lots.Where(l => l.Security == securityReconcileInfo.SecuritiesRow).Sum(l => l.Quantity);
-                trackers.Add(new SecurityTracker(securityReconcileInfo.SecuritiesRow.Symbol, prioStatementQuantity, 0, securityReconcileInfo.SecurityQuantity, 0, "N4"));
+                decimal prioStatementQuantity = priorStatementPortfolio.Lots.Where(l => l.Security == securityReconcileInfo.SecurityRow).Sum(l => l.Quantity);
+                trackers.Add(new SecurityTracker(securityReconcileInfo.SecurityRow.Symbol, prioStatementQuantity, 0, securityReconcileInfo.SecurityQuantity, 0, "N4"));
             }
 
             TrackersSource = (CollectionView)CollectionViewSource.GetDefaultView(trackers);
@@ -91,7 +91,7 @@ namespace BanaData.Logic.Dialogs
                     tr.Date,
                     null,
                     investmentTransactionRow.GetDescription(),
-                    investmentTransactionRow.IsSecurityIDNull() ? null : investmentTransactionRow.SecuritiesRow.Symbol,
+                    investmentTransactionRow.IsSecurityIDNull() ? null : investmentTransactionRow.SecurityRow.Symbol,
                     amount,
                     false);
 
@@ -106,7 +106,7 @@ namespace BanaData.Logic.Dialogs
                 var transaction = new TransactionToReconcile(
                     li.ID,
                     li.TransferStatus == ETransactionStatus.Cleared,
-                    li.TransactionsRow.Date,
+                    li.TransactionRow.Date,
                     null,
                     "",
                     null,
@@ -166,7 +166,7 @@ namespace BanaData.Logic.Dialogs
                         {
                             var tr = mainWindowLogic.Household.Transaction.FindByID(trans.ID);
                             var itr = tr.GetInvestmentTransaction();
-                            if (!itr.IsSecurityIDNull() && itr.SecuritiesRow.Symbol == tracker.Symbol)
+                            if (!itr.IsSecurityIDNull() && itr.SecurityRow.Symbol == tracker.Symbol)
                             {
                                 quantity += itr.IsSecurityIn ? itr.SecurityQuantity : -itr.SecurityQuantity;
                             }

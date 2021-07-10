@@ -35,7 +35,7 @@ namespace BanaData.Database
             Household.SecurityRow security = null;
             if (!investmentTransaction.IsSecurityIDNull())
             {
-                security = investmentTransaction.SecuritiesRow;
+                security = investmentTransaction.SecurityRow;
             }
 
             // Don't! The commission is taken into account in the transaction's amount
@@ -155,8 +155,8 @@ namespace BanaData.Database
             // Get transaction info
             var transactionRow = household.Transaction.FindByID(transactionID);
             var investmentTransactionRow = transactionRow.GetInvestmentTransaction();
-            var securityRow = investmentTransactionRow.SecuritiesRow;
-            var accountRow = transactionRow.AccountsRow;
+            var securityRow = investmentTransactionRow.SecurityRow;
+            var accountRow = transactionRow.AccountRow;
 
             decimal quantity = investmentTransactionRow.SecurityQuantity;
             decimal price = investmentTransactionRow.SecurityPrice;

@@ -436,7 +436,7 @@ namespace BanaData.Logic.Main
             foreach (var mpr in Household.MemorizedPayee)
             {
                 // Get memorized line item(s)
-                var dbLineItems = mpr.GetMemorizedLineItemsRows();
+                var dbLineItems = mpr.GetMemorizedLineItemRows();
                 var lineItems = new List<LineItem>(dbLineItems.Length);
                 foreach (var dbli in dbLineItems)
                 {

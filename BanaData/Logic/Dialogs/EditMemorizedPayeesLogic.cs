@@ -153,7 +153,7 @@ namespace BanaData.Logic.Dialogs
             household.MemorizedPayee.Update(payeeRow, newPayee.Payee, ETransactionStatus.Pending, newPayee.Memo);
 
             // Get existing line items
-            var oldLineItems = payeeRow.GetMemorizedLineItemsRows();
+            var oldLineItems = payeeRow.GetMemorizedLineItemRows();
 
             // Delete line items that don't exist in the new payee
             // Modify the other ones
@@ -174,7 +174,7 @@ namespace BanaData.Logic.Dialogs
             mainWindowLogic.CommitChanges();
 
             // Create the line items that don't exist
-            oldLineItems = payeeRow.GetMemorizedLineItemsRows();
+            oldLineItems = payeeRow.GetMemorizedLineItemRows();
             foreach (var newLineItem in newPayee.LineItems)
             {
                 if (oldLineItems.FirstOrDefault(oli => oli.ID == newLineItem.ID) == null)

@@ -227,7 +227,7 @@ namespace BanaData.Serializations
                 // Now find all transfers that have this account as destination
                 foreach(var lineItemRow in household.LineItem.Where(li => !li.IsAccountIDNull() && li.AccountID == accountRow.ID))
                 {
-                    var transactionRow = lineItemRow.TransactionsRow;
+                    var transactionRow = lineItemRow.TransactionRow;
 
                     // If filtering on checkpoint, skip transactions that do not match
                     if (checkpointID >= 0 && transactionRow.CheckpointID != checkpointID)
@@ -441,7 +441,7 @@ namespace BanaData.Serializations
 
             if (!investmentTransactionRow.IsSecurityIDNull())
             {
-                sw.WriteLine($"Y{investmentTransactionRow.SecuritiesRow.Name}");
+                sw.WriteLine($"Y{investmentTransactionRow.SecurityRow.Name}");
             }
 
             if (!investmentTransactionRow.IsSecurityPriceNull())
@@ -483,12 +483,12 @@ namespace BanaData.Serializations
                     sw.WriteLine("^");
                     ExportDate(sw, transactionRow.Date);
                     sw.WriteLine("NMiscIncX");
-                    sw.WriteLine($"Y{investmentTransactionRow.SecuritiesRow.Name}");
+                    sw.WriteLine($"Y{investmentTransactionRow.SecurityRow.Name}");
                     ExportTransactionStatus(sw, transactionRow.Status, true);
                     sw.WriteLine($"U{investmentTransactionRow.Commission:N2}");
                     sw.WriteLine($"T{investmentTransactionRow.Commission:N2}");
                     sw.WriteLine($"M{investmentTransactionRow.Commission:N2} as a fee");
-                    sw.WriteLine($"L_DivInc|[{transactionRow.AccountsRow.Name}]");
+                    sw.WriteLine($"L_DivInc|[{transactionRow.AccountRow.Name}]");
                 }
                 else
                 {
@@ -557,7 +557,7 @@ namespace BanaData.Serializations
 
             foreach(Household.MemorizedPayeeRow mpr in household.MemorizedPayee.Rows)
             {
-                var liRows = mpr.GetMemorizedLineItemsRows();
+                var liRows = mpr.GetMemorizedLineItemRows();
                 decimal amount = liRows.Sum(li => li.Amount);
 
                 sw.WriteLine(amount > 0 ? "KD" : "KP");
@@ -610,7 +610,7 @@ namespace BanaData.Serializations
             foreach (Household.SecurityPriceRow spr in household.SecurityPrice.Rows)
             {
 
-                var securityRow = spr.SecuritiesRow;
+                var securityRow = spr.SecurityRow;
                 if (securityRow.Symbol != Household.SecurityRow.SYMBOL_NONE)
                 {
                     sw.WriteLine("!Type:Prices");

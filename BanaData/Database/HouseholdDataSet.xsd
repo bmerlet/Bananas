@@ -245,64 +245,64 @@
       <xs:selector xpath=".//mstns:RebalanceTarget" />
       <xs:field xpath="mstns:SecurityID" />
     </xs:keyref>
+    <xs:keyref name="FK_Security_SecurityReconcileInfo" refer="SecuritiesKey1" msprop:rel_Generator_UserChildTable="SecurityReconcileInfo" msprop:rel_Generator_ChildPropName="GetSecurityReconcileInfoRows" msprop:rel_Generator_UserRelationName="FK_Security_SecurityReconcileInfo" msprop:rel_Generator_ParentPropName="SecurityRow" msprop:rel_Generator_RelationVarName="relationFK_Security_SecurityReconcileInfo" msprop:rel_Generator_UserParentTable="Security">
+      <xs:selector xpath=".//mstns:SecurityReconcileInfo" />
+      <xs:field xpath="mstns:SecurityID" />
+    </xs:keyref>
     <xs:keyref name="FK_ReconcileInfo_SecurityReconcileInfo" refer="ReconcileInfo_Constraint1" msprop:rel_Generator_UserChildTable="SecurityReconcileInfo" msprop:rel_Generator_ChildPropName="GetSecurityReconcileInfoRows" msprop:rel_Generator_UserRelationName="FK_ReconcileInfo_SecurityReconcileInfo" msprop:rel_Generator_RelationVarName="relationFK_ReconcileInfo_SecurityReconcileInfo" msprop:rel_Generator_UserParentTable="ReconcileInfo" msprop:rel_Generator_ParentPropName="ReconcileInfoRow">
       <xs:selector xpath=".//mstns:SecurityReconcileInfo" />
       <xs:field xpath="mstns:ReconcileInfoID" />
     </xs:keyref>
-    <xs:keyref name="FK_Securities_SecurityReconcileInfo" refer="SecuritiesKey1" msprop:rel_Generator_UserChildTable="SecurityReconcileInfo" msprop:rel_Generator_ChildPropName="GetSecurityReconcileInfoRows" msprop:rel_Generator_UserRelationName="FK_Securities_SecurityReconcileInfo" msprop:rel_Generator_RelationVarName="relationFK_Securities_SecurityReconcileInfo" msprop:rel_Generator_UserParentTable="Security" msprop:rel_Generator_ParentPropName="SecuritiesRow">
-      <xs:selector xpath=".//mstns:SecurityReconcileInfo" />
-      <xs:field xpath="mstns:SecurityID" />
-    </xs:keyref>
-    <xs:keyref name="FK_Accounts_ReconcileInfo" refer="Constraint1" msprop:rel_Generator_UserChildTable="ReconcileInfo" msprop:rel_Generator_ChildPropName="GetReconcileInfoRows" msprop:rel_Generator_UserRelationName="FK_Accounts_ReconcileInfo" msprop:rel_Generator_RelationVarName="relationFK_Accounts_ReconcileInfo" msprop:rel_Generator_UserParentTable="Account" msprop:rel_Generator_ParentPropName="AccountsRow">
+    <xs:keyref name="FK_Account_ReconcileInfo" refer="Constraint1" msprop:rel_Generator_UserChildTable="ReconcileInfo" msprop:rel_Generator_ChildPropName="GetReconcileInfoRows" msprop:rel_Generator_UserRelationName="FK_Account_ReconcileInfo" msprop:rel_Generator_ParentPropName="AccountRow" msprop:rel_Generator_RelationVarName="relationFK_Account_ReconcileInfo" msprop:rel_Generator_UserParentTable="Account">
       <xs:selector xpath=".//mstns:ReconcileInfo" />
       <xs:field xpath="mstns:AccountID" />
     </xs:keyref>
-    <xs:keyref name="FK_Categories_ReconcileInfo" refer="Category_Constraint1" msprop:rel_Generator_UserChildTable="ReconcileInfo" msprop:rel_Generator_ChildPropName="GetReconcileInfoRows" msprop:rel_Generator_UserRelationName="FK_Categories_ReconcileInfo" msprop:rel_Generator_RelationVarName="relationFK_Categories_ReconcileInfo" msprop:rel_Generator_UserParentTable="Category" msprop:rel_Generator_ParentPropName="CategoriesRow" msdata:UpdateRule="None" msdata:DeleteRule="None">
+    <xs:keyref name="FK_Category_ReconcileInfo" refer="Category_Constraint1" msprop:rel_Generator_UserChildTable="ReconcileInfo" msprop:rel_Generator_ChildPropName="GetReconcileInfoRows" msprop:rel_Generator_UserRelationName="FK_Category_ReconcileInfo" msprop:rel_Generator_ParentPropName="CategoryRow" msprop:rel_Generator_RelationVarName="relationFK_Category_ReconcileInfo" msprop:rel_Generator_UserParentTable="Category" msdata:UpdateRule="None" msdata:DeleteRule="None">
       <xs:selector xpath=".//mstns:ReconcileInfo" />
       <xs:field xpath="mstns:InterestCategoryID" />
+    </xs:keyref>
+    <xs:keyref name="FK_Category_MemorizedLineItem" refer="Category_Constraint1" msprop:rel_Generator_UserChildTable="MemorizedLineItem" msprop:rel_Generator_ChildPropName="GetMemorizedLineItemRows" msprop:rel_Generator_UserRelationName="FK_Category_MemorizedLineItem" msprop:rel_Generator_ParentPropName="CategoryRow" msprop:rel_Generator_RelationVarName="relationFK_Category_MemorizedLineItem" msprop:rel_Generator_UserParentTable="Category">
+      <xs:selector xpath=".//mstns:MemorizedLineItem" />
+      <xs:field xpath="mstns:CategoryID" />
+    </xs:keyref>
+    <xs:keyref name="FK_MemorizedPayee_MemorizedLineItem" refer="MemorizedPayee_Constraint1" msprop:rel_Generator_UserChildTable="MemorizedLineItem" msprop:rel_Generator_ChildPropName="GetMemorizedLineItemRows" msprop:rel_Generator_UserRelationName="FK_MemorizedPayee_MemorizedLineItem" msprop:rel_Generator_RelationVarName="relationFK_MemorizedPayee_MemorizedLineItem" msprop:rel_Generator_UserParentTable="MemorizedPayee" msprop:rel_Generator_ParentPropName="MemorizedPayeeRow">
+      <xs:selector xpath=".//mstns:MemorizedLineItem" />
+      <xs:field xpath="mstns:MemorizedPayeeID" />
     </xs:keyref>
     <xs:keyref name="FK_Account_MemorizedLineItem" refer="Constraint1" msprop:rel_Generator_UserChildTable="MemorizedLineItem" msprop:rel_Generator_ChildPropName="GetMemorizedLineItemRows" msprop:rel_Generator_UserRelationName="FK_Account_MemorizedLineItem" msprop:rel_Generator_ParentPropName="AccountRow" msprop:rel_Generator_RelationVarName="relationFK_Account_MemorizedLineItem" msprop:rel_Generator_UserParentTable="Account">
       <xs:selector xpath=".//mstns:MemorizedLineItem" />
       <xs:field xpath="mstns:AccountID" />
     </xs:keyref>
-    <xs:keyref name="FK_MemorizedPayees_MemorizedLineItems" refer="MemorizedPayee_Constraint1" msprop:rel_Generator_UserChildTable="MemorizedLineItem" msprop:rel_Generator_ChildPropName="GetMemorizedLineItemsRows" msprop:rel_Generator_UserRelationName="FK_MemorizedPayees_MemorizedLineItems" msprop:rel_Generator_RelationVarName="relationFK_MemorizedPayees_MemorizedLineItems" msprop:rel_Generator_UserParentTable="MemorizedPayee" msprop:rel_Generator_ParentPropName="MemorizedPayeeRow">
-      <xs:selector xpath=".//mstns:MemorizedLineItem" />
-      <xs:field xpath="mstns:MemorizedPayeeID" />
-    </xs:keyref>
-    <xs:keyref name="FK_Categories_MemorizedLineItems" refer="Category_Constraint1" msprop:rel_Generator_UserChildTable="MemorizedLineItem" msprop:rel_Generator_ChildPropName="GetMemorizedLineItemRows" msprop:rel_Generator_UserRelationName="FK_Categories_MemorizedLineItems" msprop:rel_Generator_RelationVarName="relationFK_Categories_MemorizedLineItems" msprop:rel_Generator_UserParentTable="Category" msprop:rel_Generator_ParentPropName="CategoriesRow">
-      <xs:selector xpath=".//mstns:MemorizedLineItem" />
-      <xs:field xpath="mstns:CategoryID" />
-    </xs:keyref>
-    <xs:keyref name="FK_Securities_InvestmentTransactions" refer="SecuritiesKey1" msprop:rel_Generator_UserChildTable="InvestmentTransaction" msprop:rel_Generator_ChildPropName="GetInvestmentTransactionRows" msprop:rel_Generator_UserRelationName="FK_Securities_InvestmentTransactions" msprop:rel_Generator_RelationVarName="relationFK_Securities_InvestmentTransactions" msprop:rel_Generator_UserParentTable="Security" msprop:rel_Generator_ParentPropName="SecuritiesRow" msdata:UpdateRule="None" msdata:DeleteRule="None">
+    <xs:keyref name="FK_Security_InvestmentTransaction" refer="SecuritiesKey1" msprop:rel_Generator_UserChildTable="InvestmentTransaction" msprop:rel_Generator_ChildPropName="GetInvestmentTransactionRows" msprop:rel_Generator_UserRelationName="FK_Security_InvestmentTransaction" msprop:rel_Generator_ParentPropName="SecurityRow" msprop:rel_Generator_RelationVarName="relationFK_Security_InvestmentTransaction" msprop:rel_Generator_UserParentTable="Security" msdata:UpdateRule="None" msdata:DeleteRule="None">
       <xs:selector xpath=".//mstns:InvestmentTransaction" />
       <xs:field xpath="mstns:SecurityID" />
     </xs:keyref>
-    <xs:keyref name="FK_Transactions_InvestmentTransactions" refer="Transaction_Constraint1" msprop:rel_Generator_UserChildTable="InvestmentTransaction" msprop:rel_Generator_ChildPropName="GetInvestmentTransactionRows" msprop:rel_Generator_UserRelationName="FK_Transactions_InvestmentTransactions" msprop:rel_Generator_RelationVarName="relationFK_Transactions_InvestmentTransactions" msprop:rel_Generator_UserParentTable="Transaction" msprop:rel_Generator_ParentPropName="TransactionsRow" msdata:AcceptRejectRule="Cascade">
+    <xs:keyref name="FK_Transaction_InvestmentTransaction" refer="Transaction_Constraint1" msprop:rel_Generator_UserChildTable="InvestmentTransaction" msprop:rel_Generator_ChildPropName="GetInvestmentTransactionRows" msprop:rel_Generator_UserRelationName="FK_Transaction_InvestmentTransaction" msprop:rel_Generator_ParentPropName="TransactionRow" msprop:rel_Generator_RelationVarName="relationFK_Transaction_InvestmentTransaction" msprop:rel_Generator_UserParentTable="Transaction" msdata:AcceptRejectRule="Cascade">
       <xs:selector xpath=".//mstns:InvestmentTransaction" />
       <xs:field xpath="mstns:TransactionID" />
     </xs:keyref>
-    <xs:keyref name="FK_Transactions_BankTransactions" refer="Transaction_Constraint1" msprop:rel_Generator_UserChildTable="BankingTransaction" msprop:rel_Generator_ChildPropName="GetBankingTransactionRows" msprop:rel_Generator_UserRelationName="FK_Transactions_BankTransactions" msprop:rel_Generator_ParentPropName="TransactionsRow" msprop:rel_Generator_RelationVarName="relationFK_Transactions_BankTransactions" msprop:rel_Generator_UserParentTable="Transaction">
+    <xs:keyref name="FK_Transaction_BankTransaction" refer="Transaction_Constraint1" msprop:rel_Generator_UserChildTable="BankingTransaction" msprop:rel_Generator_ChildPropName="GetBankingTransactionRows" msprop:rel_Generator_UserRelationName="FK_Transaction_BankTransaction" msprop:rel_Generator_ParentPropName="TransactionRow" msprop:rel_Generator_RelationVarName="relationFK_Transaction_BankTransaction" msprop:rel_Generator_UserParentTable="Transaction">
       <xs:selector xpath=".//mstns:BankingTransaction" />
       <xs:field xpath="mstns:TransactionID" />
     </xs:keyref>
-    <xs:keyref name="FK_Transactions_LineItems" refer="Transaction_Constraint1" msprop:rel_Generator_UserChildTable="LineItem" msprop:rel_Generator_ChildPropName="GetLineItemRows" msprop:rel_Generator_UserRelationName="FK_Transactions_LineItems" msprop:rel_Generator_ParentPropName="TransactionsRow" msprop:rel_Generator_RelationVarName="relationFK_Transactions_LineItems" msprop:rel_Generator_UserParentTable="Transaction">
+    <xs:keyref name="FK_Transaction_LineItem" refer="Transaction_Constraint1" msprop:rel_Generator_UserChildTable="LineItem" msprop:rel_Generator_ChildPropName="GetLineItemRows" msprop:rel_Generator_UserRelationName="FK_Transaction_LineItem" msprop:rel_Generator_ParentPropName="TransactionRow" msprop:rel_Generator_RelationVarName="relationFK_Transaction_LineItem" msprop:rel_Generator_UserParentTable="Transaction">
       <xs:selector xpath=".//mstns:LineItem" />
       <xs:field xpath="mstns:TransactionID" />
     </xs:keyref>
-    <xs:keyref name="FK_Accounts_Transactions" refer="Constraint1" msprop:rel_Generator_UserChildTable="Transaction" msprop:rel_Generator_ChildPropName="GetTransactionRows" msprop:rel_Generator_UserRelationName="FK_Accounts_Transactions" msprop:rel_Generator_ParentPropName="AccountsRow" msprop:rel_Generator_RelationVarName="relationFK_Accounts_Transactions" msprop:rel_Generator_UserParentTable="Account" msdata:DeleteRule="None">
+    <xs:keyref name="FK_Account_Transaction" refer="Constraint1" msprop:rel_Generator_UserChildTable="Transaction" msprop:rel_Generator_ChildPropName="GetTransactionRows" msprop:rel_Generator_UserRelationName="FK_Account_Transaction" msprop:rel_Generator_ParentPropName="AccountRow" msprop:rel_Generator_RelationVarName="relationFK_Account_Transaction" msprop:rel_Generator_UserParentTable="Account" msdata:DeleteRule="None">
       <xs:selector xpath=".//mstns:Transaction" />
       <xs:field xpath="mstns:AccountID" />
     </xs:keyref>
-    <xs:keyref name="FK_Securities_SecurityPrices" refer="SecuritiesKey1" msprop:rel_Generator_UserChildTable="SecurityPrice" msprop:rel_Generator_ChildPropName="GetSecurityPriceRows" msprop:rel_Generator_UserRelationName="FK_Securities_SecurityPrices" msprop:rel_Generator_ParentPropName="SecuritiesRow" msprop:rel_Generator_RelationVarName="relationFK_Securities_SecurityPrices" msprop:rel_Generator_UserParentTable="Security">
+    <xs:keyref name="FK_Security_SecurityPrice" refer="SecuritiesKey1" msprop:rel_Generator_UserChildTable="SecurityPrice" msprop:rel_Generator_ChildPropName="GetSecurityPriceRows" msprop:rel_Generator_UserRelationName="FK_Security_SecurityPrice" msprop:rel_Generator_ParentPropName="SecurityRow" msprop:rel_Generator_RelationVarName="relationFK_Security_SecurityPrice" msprop:rel_Generator_UserParentTable="Security">
       <xs:selector xpath=".//mstns:SecurityPrice" />
       <xs:field xpath="mstns:SecurityID" />
     </xs:keyref>
   </xs:element>
   <xs:annotation>
     <xs:appinfo>
-      <msdata:Relationship name="Accounts_LineItems" msdata:parent="Account" msdata:child="LineItem" msdata:parentkey="ID" msdata:childkey="AccountID" msprop:Generator_UserChildTable="LineItem" msprop:Generator_ChildPropName="GetLineItemRows" msprop:Generator_UserRelationName="Accounts_LineItems" msprop:Generator_ParentPropName="AccountsRow" msprop:Generator_RelationVarName="relationAccounts_LineItems" msprop:Generator_UserParentTable="Account" />
-      <msdata:Relationship name="Categories_LineItems" msdata:parent="Category" msdata:child="LineItem" msdata:parentkey="ID" msdata:childkey="CategoryID" msprop:Generator_UserChildTable="LineItem" msprop:Generator_ChildPropName="GetLineItemRows" msprop:Generator_UserRelationName="Categories_LineItems" msprop:Generator_ParentPropName="CategoriesRow" msprop:Generator_RelationVarName="relationCategories_LineItems" msprop:Generator_UserParentTable="Category" />
-      <msdata:Relationship name="Checkpoints_Transactions" msdata:parent="Checkpoint" msdata:child="Transaction" msdata:parentkey="ID" msdata:childkey="CheckpointID" msprop:Generator_UserChildTable="Transaction" msprop:Generator_ChildPropName="GetTransactionsRows" msprop:Generator_UserRelationName="Checkpoints_Transactions" msprop:Generator_RelationVarName="relationCheckpoints_Transactions" msprop:Generator_UserParentTable="Checkpoint" msprop:Generator_ParentPropName="CheckpointRow" />
+      <msdata:Relationship name="Account_LineItem" msdata:parent="Account" msdata:child="LineItem" msdata:parentkey="ID" msdata:childkey="AccountID" msprop:Generator_UserChildTable="LineItem" msprop:Generator_ChildPropName="GetLineItemRows" msprop:Generator_UserRelationName="Account_LineItem" msprop:Generator_ParentPropName="AccountRow" msprop:Generator_RelationVarName="relationAccount_LineItem" msprop:Generator_UserParentTable="Account" />
+      <msdata:Relationship name="Category_LineItem" msdata:parent="Category" msdata:child="LineItem" msdata:parentkey="ID" msdata:childkey="CategoryID" msprop:Generator_UserChildTable="LineItem" msprop:Generator_ChildPropName="GetLineItemRows" msprop:Generator_UserRelationName="Category_LineItem" msprop:Generator_ParentPropName="CategoryRow" msprop:Generator_RelationVarName="relationCategory_LineItem" msprop:Generator_UserParentTable="Category" />
+      <msdata:Relationship name="Checkpoint_Transaction" msdata:parent="Checkpoint" msdata:child="Transaction" msdata:parentkey="ID" msdata:childkey="CheckpointID" msprop:Generator_UserChildTable="Transaction" msprop:Generator_ChildPropName="GetTransactionRows" msprop:Generator_UserRelationName="Checkpoint_Transaction" msprop:Generator_RelationVarName="relationCheckpoint_Transaction" msprop:Generator_UserParentTable="Checkpoint" msprop:Generator_ParentPropName="CheckpointRow" />
     </xs:appinfo>
   </xs:annotation>
 </xs:schema>

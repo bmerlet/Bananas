@@ -98,14 +98,14 @@ namespace BanaData.Logic.Dialogs
                 {
                     foreach(var sri in reconcileInfoRow.GetSecurityReconcileInfoRows())
                     {
-                        var securityInfoItem = securityInfos.FirstOrDefault(sii => sii.Symbol == sri.SecuritiesRow.Symbol);
+                        var securityInfoItem = securityInfos.FirstOrDefault(sii => sii.Symbol == sri.SecurityRow.Symbol);
                         if (securityInfoItem != null)
                         {
                             securityInfoItem.Quantity = sri.SecurityQuantity;
                         }
                         else
                         {
-                            securityInfos.Add(new SecurityInfoItem(sri.SecuritiesRow, sri.SecurityQuantity));
+                            securityInfos.Add(new SecurityInfoItem(sri.SecurityRow, sri.SecurityQuantity));
                         }
                     }
                 }
@@ -245,12 +245,12 @@ namespace BanaData.Logic.Dialogs
 
             foreach (var si in securityInfos)
             {
-                var existingRow = reconcileInfoRow.GetSecurityReconcileInfoRows().FirstOrDefault(sri => sri.SecuritiesRow == si.SecuritiesRow);
+                var existingRow = reconcileInfoRow.GetSecurityReconcileInfoRows().FirstOrDefault(sri => sri.SecurityRow == si.SecurityRow);
                 if (existingRow == null)
                 {
                     var reconcileSecurityInfoRow = household.SecurityReconcileInfo.NewSecurityReconcileInfoRow();
                     reconcileSecurityInfoRow.ReconcileInfoID = reconcileInfoRow.ID;
-                    reconcileSecurityInfoRow.SecurityID = si.SecuritiesRow.ID;
+                    reconcileSecurityInfoRow.SecurityID = si.SecurityRow.ID;
                     reconcileSecurityInfoRow.SecurityQuantity = si.Quantity;
                     household.SecurityReconcileInfo.Rows.Add(reconcileSecurityInfoRow);
                 }
@@ -271,10 +271,10 @@ namespace BanaData.Logic.Dialogs
 
         public class SecurityInfoItem
         {
-            public SecurityInfoItem(Household.SecurityRow securitiesRow, decimal quantity) => (SecuritiesRow, Quantity) = (securitiesRow, quantity);
+            public SecurityInfoItem(Household.SecurityRow securitiesRow, decimal quantity) => (SecurityRow, Quantity) = (securitiesRow, quantity);
 
-            public readonly Household.SecurityRow SecuritiesRow;
-            public string Symbol => SecuritiesRow.Symbol == Household.SecurityRow.SYMBOL_NONE ? SecuritiesRow.Name : SecuritiesRow.Symbol;
+            public readonly Household.SecurityRow SecurityRow;
+            public string Symbol => SecurityRow.Symbol == Household.SecurityRow.SYMBOL_NONE ? SecurityRow.Name : SecurityRow.Symbol;
             public decimal Quantity { get; set; }
         }
 

@@ -80,8 +80,8 @@ namespace BanaData.Database
             {
                 return GetDescription(
                     Type,
-                    TransactionsRow.GetAmount(),
-                    IsSecurityIDNull() ? "" : SecuritiesRow.Symbol,
+                    TransactionRow.GetAmount(),
+                    IsSecurityIDNull() ? "" : SecurityRow.Symbol,
                     IsSecurityQuantityNull() ? 0 : SecurityQuantity,
                     IsSecurityPriceNull() ? 0 : SecurityPrice);
             }

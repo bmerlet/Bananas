@@ -893,7 +893,7 @@ namespace BanaData.Serializations
                         li.Amount == -lineItemHolders[0].Amount)
                     {
                         // Verify this transaction took place in the account targetted by our line item
-                        if (li.TransactionsRow.AccountID == lineItemHolders[0].AccountID)
+                        if (li.TransactionRow.AccountID == lineItemHolders[0].AccountID)
                         {
                             // Found you
                             bankTransactionTracker.FoundIDs.Add(li.ID); // ZZZ ???
@@ -1199,7 +1199,7 @@ namespace BanaData.Serializations
                         li.Amount == -amount)
                     {
                         // Verify this transaction took place in the account targetted by our line item
-                        if (li.TransactionsRow.AccountID == categoryAccountID)
+                        if (li.TransactionRow.AccountID == categoryAccountID)
                         {
                             // Found you
                             investmentTransactionTracker.FoundIDs.Add(li.ID); // ZZZ ???
@@ -1365,7 +1365,7 @@ namespace BanaData.Serializations
             foreach (var mpr in household.MemorizedPayee.Rows.Cast< Household.MemorizedPayeeRow>().Where(m => m.HasSame(payee, status, memo)))
             {
                 // Compare line items
-                var lineItemRows = mpr.GetMemorizedLineItemsRows();
+                var lineItemRows = mpr.GetMemorizedLineItemRows();
                 if (lineItemRows.Length != lineItemHolders.Count)
                 {
                     continue;
@@ -1854,7 +1854,7 @@ namespace BanaData.Serializations
                         continue;
                     }
 
-                    var sourceTransactionRow = sourceLineItemRow.TransactionsRow;
+                    var sourceTransactionRow = sourceLineItemRow.TransactionRow;
                     int targetAccountID = sourceLineItemRow.AccountID;
 
                     // Skip transfers to self
@@ -1913,7 +1913,7 @@ namespace BanaData.Serializations
                     if (tuple == null)
                     {
                         var targetAccountRow = household.Account.FindByID(targetAccountID);
-                        Log += $"Warning: Could not pair transaction on account {sourceTransactionRow.AccountsRow.Name}" + eol+
+                        Log += $"Warning: Could not pair transaction on account {sourceTransactionRow.AccountRow.Name}" + eol+
                             $"to/from account {targetAccountRow.Name} on {sourceTransactionRow.Date} for ${sourceLineItemRow.Amount};" + eol;
                         Log += "Changing category to <none>." + eol;
 
@@ -1934,11 +1934,11 @@ namespace BanaData.Serializations
             foreach (var pair in pairs)
             {
                 var lineItemRow1 = household.LineItem.FindByID(pair.Item1);
-                var transactionRow1 = lineItemRow1.TransactionsRow;
+                var transactionRow1 = lineItemRow1.TransactionRow;
                 var lineItemsRow1 =  transactionRow1.GetLineItemRows();
 
                 var lineItemRow2 = household.LineItem.FindByID(pair.Item2);
-                var transactionRow2 = lineItemRow2.TransactionsRow;
+                var transactionRow2 = lineItemRow2.TransactionRow;
                 var lineItemsRow2 = transactionRow2.GetLineItemRows();
 
                 Household.TransactionRow transactionToDelete = null;
@@ -1961,8 +1961,8 @@ namespace BanaData.Serializations
                 else
                 {
                     // If one of the transactions is an investment transaction involving securities, delete the other
-                    var accountRow1 = transactionRow1.AccountsRow;
-                    var accountRow2 = transactionRow2.AccountsRow;
+                    var accountRow1 = transactionRow1.AccountRow;
+                    var accountRow2 = transactionRow2.AccountRow;
 
                     if (accountRow1.Type == EAccountType.Investment &&
                         transactionRow1.GetInvestmentTransaction() is Household.InvestmentTransactionRow investmentTransactionRow1 &&
@@ -2009,11 +2009,11 @@ namespace BanaData.Serializations
                 lineItemToDelete.Delete();
 
                 // Delete transaction
-                if (transactionToDelete.AccountsRow.Type == EAccountType.Investment)
+                if (transactionToDelete.AccountRow.Type == EAccountType.Investment)
                 {
                     transactionToDelete.GetInvestmentTransaction().Delete();
                 }
-                else if (transactionToDelete.AccountsRow.Type == EAccountType.Bank)
+                else if (transactionToDelete.AccountRow.Type == EAccountType.Bank)
                 {
                     transactionToDelete.GetBankingTransaction().Delete();
                 }
@@ -2044,18 +2044,18 @@ namespace BanaData.Serializations
             foreach (Household.ReconcileInfoRow reconcileInfoRow in household.ReconcileInfo)
             {
                 var reconcileInfo = new SupplementalInfo.ReconcileInfo(
-                    reconcileInfoRow.AccountsRow.Name,
+                    reconcileInfoRow.AccountRow.Name,
                     reconcileInfoRow.StatementDate,
                     reconcileInfoRow.StatementBalance,
                     reconcileInfoRow.IsInterestAmountNull() ? 0 : reconcileInfoRow.InterestAmount,
                     reconcileInfoRow.IsInterestDateNull() ? null : reconcileInfoRow.InterestDate as DateTime?,
-                    reconcileInfoRow.IsInterestCategoryIDNull() ? null : reconcileInfoRow.CategoriesRow.FullName);
+                    reconcileInfoRow.IsInterestCategoryIDNull() ? null : reconcileInfoRow.CategoryRow.FullName);
 
                 foreach (var securityReconcileInfoRow in reconcileInfoRow.GetSecurityReconcileInfoRows())
                 {
                     reconcileInfo.SecurityReconcileInfos.Add(
                         new SupplementalInfo.ReconcileInfo.SecurityReconcileInfo(
-                            securityReconcileInfoRow.SecuritiesRow.Name, securityReconcileInfoRow.SecurityQuantity));
+                            securityReconcileInfoRow.SecurityRow.Name, securityReconcileInfoRow.SecurityQuantity));
                 }
 
                 supplementalInfo.ReconcileInfos.Add(reconcileInfo);

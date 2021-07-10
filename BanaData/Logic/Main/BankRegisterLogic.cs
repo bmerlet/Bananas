@@ -78,8 +78,8 @@ namespace BanaData.Logic.Main
             Household.AccountRow accountRow,
             Household.LineItemRow otherLineItemRow)
         {
-            var otherTransRow = otherLineItemRow.TransactionsRow;
-            var otherAccountRow = otherTransRow.AccountsRow;
+            var otherTransRow = otherLineItemRow.TransactionRow;
+            var otherAccountRow = otherTransRow.AccountRow;
 
             var lineItem = new LineItem(
                 mainWindowLogic,

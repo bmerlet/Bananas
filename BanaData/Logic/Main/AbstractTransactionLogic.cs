@@ -383,7 +383,7 @@ namespace BanaData.Logic.Main
             if (TransID == TRANSID_TRANSFER_FILLIN)
             {
                 var liRow = household.LineItem.FindByID(data.LineItems[0].ID);
-                var transRow = liRow.TransactionsRow;
+                var transRow = liRow.TransactionRow;
                 mainWindowLogic.GotoTransaction(transRow.AccountID, transRow.ID, data.LineItems[0].ID);
             }
             else

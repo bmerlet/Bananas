@@ -348,7 +348,7 @@ namespace BanaData.Logic.Dialogs
                              type == EInvestmentTransactionType.ReinvestDividends ||
                              type == EInvestmentTransactionType.TransferDividends))
                         {
-                            string symbol = investmentTransactionRow.SecuritiesRow.Symbol;
+                            string symbol = investmentTransactionRow.SecurityRow.Symbol;
                             string description = EnumDescriptionAttribute.GetDescription(type);
                             decimal amount = transactionRow.GetAmount() * (type == EInvestmentTransactionType.TransferDividends ? -1 : 1);
                             tempTransList.Add(new TransactionItem(transactionRow.Date, accountName, symbol, description, amount, 0, 0, 0));
@@ -362,7 +362,7 @@ namespace BanaData.Logic.Dialogs
                              type == EInvestmentTransactionType.ReinvestShortTermCapitalGains ||
                              type == EInvestmentTransactionType.TransferShortTermCapitalGains))
                         {
-                            string symbol = investmentTransactionRow.SecuritiesRow.Symbol;
+                            string symbol = investmentTransactionRow.SecurityRow.Symbol;
                             string description = EnumDescriptionAttribute.GetDescription(type);
                             decimal amount = transactionRow.GetAmount() * (type == EInvestmentTransactionType.TransferShortTermCapitalGains ? -1 : 1);
                             tempTransList.Add(new TransactionItem(transactionRow.Date, accountName, symbol, description, 0, amount, 0, 0));
@@ -376,7 +376,7 @@ namespace BanaData.Logic.Dialogs
                              type == EInvestmentTransactionType.ReinvestLongTermCapitalGains ||
                              type == EInvestmentTransactionType.TransferLongTermCapitalGains))
                         {
-                            string symbol = investmentTransactionRow.SecuritiesRow.Symbol;
+                            string symbol = investmentTransactionRow.SecurityRow.Symbol;
                             string description = EnumDescriptionAttribute.GetDescription(type);
                             decimal amount = transactionRow.GetAmount() * (type == EInvestmentTransactionType.TransferLongTermCapitalGains ? -1 : 1);
                             tempTransList.Add(new TransactionItem(transactionRow.Date, accountName, symbol, description, 0, 0, amount, 0));
@@ -389,7 +389,7 @@ namespace BanaData.Logic.Dialogs
                             (type == EInvestmentTransactionType.Sell ||
                              type == EInvestmentTransactionType.SellAndTransferCash))
                         {
-                            string symbol = investmentTransactionRow.SecuritiesRow.Symbol;
+                            string symbol = investmentTransactionRow.SecurityRow.Symbol;
                             var sale = Portfolio.ComputeSaleCapitalGains(household, transactionRow.ID, false);
 
                             tempTransList.Add(new TransactionItem(transactionRow.Date, accountName, symbol, sale.Description, 0, sale.ShortTermGain, sale.LongTermGain, 0));

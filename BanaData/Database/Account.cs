@@ -81,7 +81,7 @@ namespace BanaData.Database
                 // Add tansfers to/from that account
                 foreach (var lineItemRow in GetLineItemRows())
                 {
-                    var transRow = lineItemRow.TransactionsRow;
+                    var transRow = lineItemRow.TransactionRow;
                     if (transRow.AccountID != ID)
                     {
                         if (!filter || lineItemRow.TransferStatus == statusToFilterOn)
@@ -104,7 +104,7 @@ namespace BanaData.Database
             public IEnumerable<LineItemRow> GetUnreconciledTransfers()
             {
                 return GetLineItemRows()
-                    .Where(li => li.TransactionsRow.AccountID != ID)
+                    .Where(li => li.TransactionRow.AccountID != ID)
                     .Where(li => li.TransferStatus != ETransactionStatus.Reconciled);
             }
 
@@ -121,7 +121,7 @@ namespace BanaData.Database
                 // Add tansfers to/from that account
                 foreach (var lineItemRow in GetLineItemRows())
                 {
-                    if (lineItemRow.TransactionsRow.AccountID != ID)
+                    if (lineItemRow.TransactionRow.AccountID != ID)
                     {
                         portfolio.ApplyTransfer(lineItemRow);
                     }

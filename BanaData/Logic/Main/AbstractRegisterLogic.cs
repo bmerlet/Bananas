@@ -108,7 +108,7 @@ namespace BanaData.Logic.Main
             {
                 if (!lineItemRow.IsAccountIDNull() && lineItemRow.AccountID == accountID)
                 {
-                    var transferTransactionRow = lineItemRow.TransactionsRow;
+                    var transferTransactionRow = lineItemRow.TransactionRow;
                     if (transferTransactionRow.AccountID != accountID)
                     {
                         var trans = CreateMirrorTransaction(account, lineItemRow);
@@ -341,12 +341,12 @@ namespace BanaData.Logic.Main
                 string category = "";
                 if (!dbli.IsAccountIDNull())
                 {
-                    category = "[" + dbli.AccountsRow.Name + "]";
+                    category = "[" + dbli.AccountRow.Name + "]";
                     catAccntID = dbli.AccountID;
                 }
                 else if (!dbli.IsCategoryIDNull())
                 {
-                    category = dbli.CategoriesRow.FullName;
+                    category = dbli.CategoryRow.FullName;
                     catID = dbli.CategoryID;
                 }
                 string memo = dbli.IsMemoNull() ? "" : dbli.Memo;

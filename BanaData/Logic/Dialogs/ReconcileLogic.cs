@@ -116,7 +116,7 @@ namespace BanaData.Logic.Dialogs
                 var transaction = new TransactionToReconcile(
                     li.ID,
                     li.TransferStatus == ETransactionStatus.Cleared,
-                    li.TransactionsRow.Date,
+                    li.TransactionRow.Date,
                     "",
                     "",
                     null,
