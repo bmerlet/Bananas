@@ -388,6 +388,24 @@ namespace BanaData.Logic.Main
 
             data.Type = value;
             investmentTransactionType = InvestmentTransactionType.GetInvestmentTransactionType(value);
+
+            OnPropertyChanged(() => IsSecuritySymbolVisible);
+            OnPropertyChanged(() => SecuritySymbolTabIndex);
+
+            OnPropertyChanged(() => IsSecurityQuantityVisible);
+            OnPropertyChanged(() => SecurityQuantityTabIndex);
+
+            OnPropertyChanged(() => IsSecurityPriceVisible);
+            OnPropertyChanged(() => SecurityPriceTabIndex);
+
+            OnPropertyChanged(() => IsCommissionVisible);
+            OnPropertyChanged(() => CommissionTabIndex);
+
+            OnPropertyChanged(() => IsAmountVisible);
+            OnPropertyChanged(() => AmountTabIndex);
+
+            OnPropertyChanged(() => IsCategoryVisible);
+            OnPropertyChanged(() => CategoryTabIndex);
         }
 
         private string GetSecuritySymbol(int id)

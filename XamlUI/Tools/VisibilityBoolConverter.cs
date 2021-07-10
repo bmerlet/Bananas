@@ -15,6 +15,11 @@ namespace XamlUI.Tools
         {
             if (value is bool visible)
             {
+                if (parameter is string option && option == "FLIP")
+                {
+                    visible = !visible;
+                }
+
                 return visible ? Visibility.Visible : Visibility.Collapsed;
             }
 

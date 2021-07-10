@@ -268,6 +268,11 @@
                     <Setter Property="HorizontalContentAlignment" Value="Right"/>
                 </Style>
 
+                <Style TargetType="TextBlock">
+                    <Setter Property="ContextMenu" Value="{StaticResource TransactionContextMenu}"/>
+                    <Setter Property="Background" Value="WhiteSmoke"/>
+                </Style>
+
             </Grid.Resources>
 
             <Grid.RowDefinitions>
@@ -314,7 +319,7 @@
                 ItemsSource="{Binding TypesSource}"/>
             
             <!-- Obscure description -->
-            <TextBlock Background="WhiteSmoke" Grid.Column="3"/>
+            <TextBlock Grid.Column="3"/>
 
             <!-- Memo -->
             <local:WatermarkTextBox 
@@ -333,6 +338,11 @@
                 ItemsSource="{Binding SecuritiesView}"
                 Visibility="{Binding EditedTransaction.IsSecuritySymbolVisible, Converter={StaticResource visibilityBoolConverter}}"/>
 
+            <!-- Obscure security symbol when not in use  -->
+            <TextBlock
+                Grid.Column="5"
+                Visibility="{Binding EditedTransaction.IsSecuritySymbolVisible, Converter={StaticResource visibilityBoolConverter}, ConverterParameter=FLIP}"/>
+
             <!-- Security quantity -->
             <local:AmountBox
                 ToolTip="Security quantity"
@@ -342,6 +352,11 @@
                 Visibility="{Binding EditedTransaction.IsSecurityQuantityVisible, Converter={StaticResource visibilityBoolConverter}}"
                 Precision="4"
                 Watermark="# shares"/>
+
+            <!-- Obscure security quantity when not in use  -->
+            <TextBlock
+                Grid.Column="6"
+                Visibility="{Binding EditedTransaction.IsSecurityQuantityVisible, Converter={StaticResource visibilityBoolConverter}, ConverterParameter=FLIP}"/>
 
             <!-- Security price -->
             <local:AmountBox
@@ -353,6 +368,11 @@
                 Precision="4"
                 Watermark="Shr price"/>
 
+            <!-- Obscure security price when not in use  -->
+            <TextBlock
+                Grid.Column="7"
+                Visibility="{Binding EditedTransaction.IsSecurityPriceVisible, Converter={StaticResource visibilityBoolConverter}, ConverterParameter=FLIP}"/>
+
             <!-- Commission -->
             <local:AmountBox
                 ToolTip="Transaction commission"
@@ -361,6 +381,14 @@
                 Amount="{Binding EditedTransaction.Commission, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 Visibility="{Binding EditedTransaction.IsCommissionVisible, Converter={StaticResource visibilityBoolConverter}}"
                 Watermark="Comm"/>
+
+            <!-- Obscure commission when not in use  -->
+            <TextBlock
+                Grid.Column="8"
+                Visibility="{Binding EditedTransaction.IsCommissionVisible, Converter={StaticResource visibilityBoolConverter}, ConverterParameter=FLIP}"/>
+
+            <!-- Obscure share bal -->
+            <TextBlock Grid.Column="9"/>
 
             <!-- Dollar amount -->
             <local:AmountBox
@@ -371,6 +399,14 @@
                 Visibility="{Binding EditedTransaction.IsAmountVisible, Converter={StaticResource visibilityBoolConverter}}"
                 Watermark="Amount"/>
 
+            <!-- Obscure commission when not in use  -->
+            <TextBlock
+                Grid.Column="10"
+                Visibility="{Binding EditedTransaction.IsAmountVisible, Converter={StaticResource visibilityBoolConverter}, ConverterParameter=FLIP}"/>
+
+            <!-- Obscure balance -->
+            <TextBlock Grid.Column="11"/>
+
             <!-- Category (tx dest) -->
             <local:AutoCompleteTextBox 
                 Grid.Column="12"
@@ -380,6 +416,11 @@
                 ItemsSource="{Binding TransfersSource}"
                 Visibility="{Binding EditedTransaction.IsCategoryVisible, Converter={StaticResource visibilityBoolConverter}}"
                 Watermark="Tx dest"/>
+
+            <!-- Obscure category when not in use  -->
+            <TextBlock
+                Grid.Column="12"
+                Visibility="{Binding EditedTransaction.IsCategoryVisible, Converter={StaticResource visibilityBoolConverter}, ConverterParameter=FLIP}"/>
         </Grid>
     </Grid>
 </local:ListviewWithOverlay>
