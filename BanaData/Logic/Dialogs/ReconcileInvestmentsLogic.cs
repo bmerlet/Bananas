@@ -74,15 +74,10 @@ namespace BanaData.Logic.Dialogs
                 var investmentTransactionRow = tr.GetInvestmentTransaction();
 
                 // Compute dollar amount
-                decimal amount = tr.GetAmount();
-                if (investmentTransactionRow.IsCashOut)
+                decimal amount = 0;
+                if (investmentTransactionRow.IsCashOut || investmentTransactionRow.IsCashIn)
                 {
-                    amount = -amount;
-                }
-                else if (investmentTransactionRow.IsTransferIn || investmentTransactionRow.IsTransferOut)
-                {
-                    // transfers are cash-neutral
-                    amount = 0;
+                    amount = tr.GetAmount();
                 }
 
                 var transaction = new TransactionToReconcile(
