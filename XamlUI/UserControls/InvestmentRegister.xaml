@@ -312,6 +312,9 @@
                 Style="{StaticResource InvestmentTransactionTypeStyle}"
                 Text="{Binding EditedTransaction.Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 ItemsSource="{Binding TypesSource}"/>
+            
+            <!-- Obscure description -->
+            <TextBlock Background="WhiteSmoke" Grid.Column="3"/>
 
             <!-- Memo -->
             <local:WatermarkTextBox 

@@ -84,6 +84,10 @@ namespace BanaData.Logic.Main
         bool IsCategoryVisible { get; }
         int CategoryTabIndex { get; }
 
+        // Check that the data is OK for the transaction type
+        string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data);
+
+        // Zero out not needed values
         void CleanupData(InvestmentTransactionLogic.InvestmentTransactionData data);
     }
 
@@ -107,6 +111,8 @@ namespace BanaData.Logic.Main
         public bool IsCategoryVisible => CategoryTabIndex >= 0;
         public virtual int CategoryTabIndex => -1;
 
+        public virtual string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data) { return null; }
+
         public virtual void CleanupData(InvestmentTransactionLogic.InvestmentTransactionData data) { }
     }
 
@@ -114,6 +120,21 @@ namespace BanaData.Logic.Main
     {
         public override int AmountTabIndex => 3;
         public override int CategoryTabIndex => 4;
+
+        public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
+        {
+            if (data.Amount == 0)
+            {
+                return "Please enter an amount.";
+            }
+
+            if (string.IsNullOrWhiteSpace(data.Category))
+            {
+                return "Please choose a category.";
+            }
+
+            return null;
+        }
 
         public override void CleanupData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {
@@ -128,6 +149,21 @@ namespace BanaData.Logic.Main
     {
         public override int AmountTabIndex => 3;
         public override int CategoryTabIndex => 4;
+
+        public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
+        {
+            if (data.Amount == 0)
+            {
+                return "Please enter an amount.";
+            }
+
+            if (string.IsNullOrWhiteSpace(data.Category))
+            {
+                return "Please choose a category or transfer account";
+            }
+
+            return null;
+        }
 
         public override void CleanupData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {
@@ -144,6 +180,21 @@ namespace BanaData.Logic.Main
         public override int SecurityQuantityTabIndex => 4;
         public override int SecurityPriceTabIndex => 5;
 
+        public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
+        {
+            if (data.SecurityQuantity == 0)
+            {
+                return "Please enter a number of shares.";
+            }
+
+            if (data.SecurityPrice == 0)
+            {
+                return "Please enter a share price.";
+            }
+
+            return null;
+        }
+
         public override void CleanupData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {
             data.Commission = 0;
@@ -156,6 +207,16 @@ namespace BanaData.Logic.Main
     {
         public override int SecuritySymbolTabIndex => 3;
         public override int SecurityQuantityTabIndex => 4;
+
+        public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
+        {
+            if (data.SecurityQuantity == 0)
+            {
+                return "Please enter a number of shares.";
+            }
+
+            return null;
+        }
 
         public override void CleanupData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {
@@ -174,6 +235,21 @@ namespace BanaData.Logic.Main
         public override int CommissionTabIndex => 6;
         public override int AmountTabIndex => 7;
 
+        public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
+        {
+            if (data.SecurityQuantity == 0)
+            {
+                return "Please enter a number of shares.";
+            }
+
+            if (data.SecurityPrice == 0)
+            {
+                return "Please enter a share price.";
+            }
+
+            return null;
+        }
+
         public override void CleanupData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {
             data.LineItems[0].Category = "";
@@ -188,6 +264,26 @@ namespace BanaData.Logic.Main
         public override int CommissionTabIndex => 6;
         public override int AmountTabIndex => 7;
         public override int CategoryTabIndex => 8;
+
+        public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
+        {
+            if (data.SecurityQuantity == 0)
+            {
+                return "Please enter a number of shares.";
+            }
+
+            if (data.SecurityPrice == 0)
+            {
+                return "Please enter a share price.";
+            }
+
+            if (string.IsNullOrWhiteSpace(data.Category))
+            {
+                return "Please choose a transfer account";
+            }
+
+            return null;
+        }
     }
 
     internal class InvestmentTransactionDivs : AInvestmentTransactionType
@@ -195,6 +291,15 @@ namespace BanaData.Logic.Main
         public override int SecuritySymbolTabIndex => 3;
         public override int AmountTabIndex => 4;
 
+        public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
+        {
+            if (data.Amount == 0)
+            {
+                return "Please enter an amount.";
+            }
+
+            return null;
+        }
         public override void CleanupData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {
             data.SecurityPrice = 0;
@@ -211,6 +316,21 @@ namespace BanaData.Logic.Main
         public override int AmountTabIndex => 4;
         public override int CategoryTabIndex => 5;
 
+        public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
+        {
+            if (data.Amount == 0)
+            {
+                return "Please enter an amount.";
+            }
+
+            if (string.IsNullOrWhiteSpace(data.Category))
+            {
+                return "Please choose a transfer account";
+            }
+
+            return null;
+        }
+
         public override void CleanupData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {
             data.SecurityPrice = 0;
@@ -226,6 +346,26 @@ namespace BanaData.Logic.Main
         public override int SecurityPriceTabIndex => 6;
         public override int CommissionTabIndex => 7;
         public override int AmountTabIndex => 4;
+
+        public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
+        {
+            if (data.SecurityQuantity == 0)
+            {
+                return "Please enter a number of shares.";
+            }
+
+            if (data.SecurityPrice == 0)
+            {
+                return "Please enter a share price.";
+            }
+
+            if (string.IsNullOrWhiteSpace(data.Category))
+            {
+                return "Please choose a transfer account";
+            }
+
+            return null;
+        }
     }
 
     internal class InvestmentTransactionNotSupported : AInvestmentTransactionType

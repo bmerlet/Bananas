@@ -274,15 +274,6 @@ namespace BanaData.Logic.Main
                 }
             }
 
-            // No type
-            //if (data.Type == EInvestmentTransactionType.None)
-            //{
-            //    mainWindowLogic.ErrorMessage("Please choose a transaction type");
-            //    return (false, false);
-            //}
-
-            // No quantity ZZZZZZZZZZZZZZZZ More
-
             if (backup.Status == ETransactionStatus.Reconciled && data.Status != ETransactionStatus.Reconciled)
             {
                 if (!mainWindowLogic.YesNoQuestion("Are you sure you want to un-reconcile this transaction"))
@@ -322,6 +313,14 @@ namespace BanaData.Logic.Main
                     BeginEdit();
                     return (false, false);
                 }
+            }
+
+            // Check based on transaction type
+            string error = investmentTransactionType.CheckData(data);
+            if (error != null)
+            {
+                mainWindowLogic.ErrorMessage(error);
+                return (false, false);
             }
 
             return (true, true);
@@ -430,79 +429,7 @@ namespace BanaData.Logic.Main
             //
             // Remove irrelevant input based on type
             //
-            switch (data.Type)
-            {
-                case EInvestmentTransactionType.InterestIncome:
-                    data.SecurityID = -1;
-                    data.SecurityPrice = 0;
-                    data.SecurityQuantity = 0;
-                    data.Commission = 0;
-                    data.LineItems[0].Category = "";
-                    break;
-
-                case EInvestmentTransactionType.CashIn:
-                case EInvestmentTransactionType.CashOut:
-                case EInvestmentTransactionType.TransferCashIn:
-                case EInvestmentTransactionType.TransferCashOut:
-                    data.SecurityID = -1;
-                    data.SecurityPrice = 0;
-                    data.SecurityQuantity = 0;
-                    data.Commission = 0;
-                    break;
-
-                case EInvestmentTransactionType.SharesIn:
-                case EInvestmentTransactionType.SharesOut:
-                    data.Commission = 0;
-                    data.LineItems[0].Amount = 0;
-                    data.LineItems[0].Category = "";
-                    break;
-
-                case EInvestmentTransactionType.Buy:
-                case EInvestmentTransactionType.Sell:
-                    data.LineItems[0].Category = "";
-                    break;
-
-                case EInvestmentTransactionType.BuyFromTransferredCash:
-                case EInvestmentTransactionType.SellAndTransferCash:
-                    break;
-
-                case EInvestmentTransactionType.Dividends:
-                case EInvestmentTransactionType.ShortTermCapitalGains:
-                case EInvestmentTransactionType.LongTermCapitalGains:
-                    data.SecurityPrice = 0;
-                    data.SecurityQuantity = 0;
-                    data.Commission = 0;
-                    data.LineItems[0].Category = "";
-                    break;
-
-                case EInvestmentTransactionType.TransferDividends:
-                case EInvestmentTransactionType.TransferShortTermCapitalGains:
-                case EInvestmentTransactionType.TransferLongTermCapitalGains:
-                    data.SecurityPrice = 0;
-                    data.SecurityQuantity = 0;
-                    data.Commission = 0;
-                    break;
-
-                case EInvestmentTransactionType.ReinvestDividends:
-                case EInvestmentTransactionType.ReinvestLongTermCapitalGains:
-                case EInvestmentTransactionType.ReinvestMediumTermCapitalGains:
-                case EInvestmentTransactionType.ReinvestShortTermCapitalGains:
-                    data.Commission = 0;
-                    data.LineItems[0].Category = "";
-                    break;
-
-                case EInvestmentTransactionType.Grant:
-                case EInvestmentTransactionType.Vest:
-                case EInvestmentTransactionType.Exercise:
-                case EInvestmentTransactionType.Expire:
-                    data.SecurityID = -1;
-                    data.SecurityPrice = 0;
-                    data.SecurityQuantity = 0;
-                    data.Commission = 0;
-                    data.LineItems[0].Amount = 0;
-                    data.LineItems[0].Category = "";
-                    break;
-            }
+            investmentTransactionType.CleanupData(data);
 
             //
             // Save to DB
