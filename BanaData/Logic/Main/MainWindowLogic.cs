@@ -110,6 +110,7 @@ namespace BanaData.Logic.Main
 
         // List of categories, as displayed in the UI
         public readonly List<CategoryItem> Categories = new List<CategoryItem>();
+        public readonly List<CategoryItem> HiddenCategories = new List<CategoryItem>();
 
         // List of securities
         public readonly ObservableCollection<SecurityItem> Securities = new ObservableCollection<SecurityItem>();
@@ -489,11 +490,18 @@ namespace BanaData.Logic.Main
             foreach (var category in Household.Category)
             {
                 // Exclude internal categories (not used)
-                if (category.IsParentIDNull() && !category.Name.StartsWith("_"))
+                if (category.IsParentIDNull())
                 {
                     var description = category.IsDescriptionNull() ? "" : category.Description;
                     var taxInfo = category.IsTaxInfoNull() ? "" : category.TaxInfo;
-                    Categories.Add(new CategoryItem(category.ID, category.Name, description, category.IsIncome, taxInfo, null));
+                    if (category.Name.StartsWith("_"))
+                    {
+                        HiddenCategories.Add(new CategoryItem(category.ID, category.Name, description, category.IsIncome, taxInfo, null));
+                    }
+                    else
+                    {
+                        Categories.Add(new CategoryItem(category.ID, category.Name, description, category.IsIncome, taxInfo, null));
+                    }
                 }
             }
 
@@ -538,6 +546,7 @@ namespace BanaData.Logic.Main
             }
 
             Categories.Sort();
+            HiddenCategories.Sort();
         }
 
         private void BuildSecuritiesList()

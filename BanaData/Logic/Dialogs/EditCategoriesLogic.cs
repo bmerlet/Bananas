@@ -10,6 +10,7 @@ using System.Windows.Data;
 using Toolbox.UILogic;
 using BanaData.Logic.Main;
 using BanaData.Logic.Items;
+using BanaData.Database;
 
 namespace BanaData.Logic.Dialogs
 {
@@ -29,15 +30,19 @@ namespace BanaData.Logic.Dialogs
             var household = mainWindowLogic.Household;
 
             categoriesSource = new ObservableCollection<EditCategoryItem>();
-            foreach (var cat in mainWindowLogic.Categories.Where(c => c.ID >= 0))
+
+            foreach (var catList in new IEnumerable<CategoryItem>[] { mainWindowLogic.Categories, mainWindowLogic.HiddenCategories })
             {
-                bool inUse = false;
+                foreach (var cat in catList.Where(c => c.ID >= 0))
+                {
+                    bool inUse = false;
 
-                // Find if this category is in use
-                inUse = household.LineItem.FirstOrDefault(li => !li.IsCategoryIDNull() && li.CategoryID == cat.ID) != null;
-                inUse |= household.MemorizedLineItem.FirstOrDefault(li => !li.IsCategoryIDNull() && li.CategoryID == cat.ID) != null;
+                    // Find if this category is in use
+                    inUse = household.LineItem.FirstOrDefault(li => !li.IsCategoryIDNull() && li.CategoryID == cat.ID) != null;
+                    inUse |= household.MemorizedLineItem.FirstOrDefault(li => !li.IsCategoryIDNull() && li.CategoryID == cat.ID) != null;
 
-                categoriesSource.Add(new EditCategoryItem(cat, inUse));
+                    categoriesSource.Add(new EditCategoryItem(cat, inUse));
+                }
             }
 
             CategoriesSource = (CollectionView)CollectionViewSource.GetDefaultView(categoriesSource);
