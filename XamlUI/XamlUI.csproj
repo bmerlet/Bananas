@@ -88,6 +88,9 @@
     <Compile Include="Dialogs\EditSplit.xaml.cs">
       <DependentUpon>EditSplit.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\PasswordPrompt.xaml.cs">
+      <DependentUpon>PasswordPrompt.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\Reconcile.xaml.cs">
       <DependentUpon>Reconcile.xaml</DependentUpon>
     </Compile>
@@ -190,6 +193,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\EditSplit.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\PasswordPrompt.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

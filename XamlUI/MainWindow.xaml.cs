@@ -73,7 +73,7 @@ namespace XamlUI
             Closed += (o, e) =>
             {
                 logic.SaveUserSettings();
-                logic.Save();
+                logic.SaveIfDirty();
             };
         }
 
@@ -176,6 +176,10 @@ namespace XamlUI
             else if (logic is ShowRebalanceLogic showRebalanceLogic)
             {
                 dialog = new ShowRebalance(showRebalanceLogic);
+            }
+            else if (logic is PasswordPromptLogic passwordPromptLogic)
+            {
+                dialog = new PasswordPrompt(passwordPromptLogic);
             }
             else
             {

@@ -36,6 +36,9 @@ namespace BanaData.Logic.Main
         private readonly Timer saveTimer = new Timer(300 * 1000);
         private readonly object householdLock = new object();
 
+        // Password used for the current file
+        private string password;
+
         #endregion
 
         #region Constructor 
@@ -63,15 +66,6 @@ namespace BanaData.Logic.Main
             InvestmentAccountGroup.AccountClicked += (o, e) => OnInvestmentAccountClicked(e.AccountID);
             AssetAccountGroup.AccountClicked += (o, e) => OnBankAccountClicked(o as AccountGroupLogic, e.AccountID);
 
-            if (UserSettings.LastFileOpened != null)
-            {
-                OpenFile(UserSettings.LastFileOpened);
-            }
-            else
-            {
-                UpdateAll();
-            }
-
             // Create list of investment transaction type
             foreach(EInvestmentTransactionType itt in Enum.GetValues(typeof(EInvestmentTransactionType)))
             {
@@ -83,6 +77,19 @@ namespace BanaData.Logic.Main
             // Setup timer to save to disk every 5 minutes
             saveTimer.Elapsed += OnSaveTimerElapsed;
             saveTimer.Enabled = true;
+
+            GuiServices.ExecuteAsync((Action)delegate ()
+            {
+                if (UserSettings.LastFileOpened != null)
+                {
+                    OpenFile(UserSettings.LastFileOpened);
+                }
+                else
+                {
+                    UpdateAll();
+                }
+            });
+
         }
 
         #endregion
@@ -201,6 +208,17 @@ namespace BanaData.Logic.Main
 
         public void OpenFile(string file)
         {
+            if (file.EndsWith(".BAN", StringComparison.InvariantCultureIgnoreCase))
+            {
+                // Ask for password
+                var logic = new PasswordPromptLogic(password, "Open file");
+                if (!GuiServices.ShowDialog(logic))
+                {
+                    return;
+                }
+                password = logic.Password;
+            }
+
             ReadFromFile(file);
             UpdateAll();
         }
@@ -210,8 +228,18 @@ namespace BanaData.Logic.Main
             SaveToFile(file);
 
             UserSettings.LastFileOpened = file;
-            Dirty = false;
             UpdateTitle();
+        }
+
+        public void SetPassword()
+        {
+            var logic = new PasswordPromptLogic(password, "Change password");
+            if (GuiServices.ShowDialog(logic))
+            {
+                password = logic.Password;
+                SaveToFile(UserSettings.LastFileOpened);
+                UpdateTitle();
+            }
         }
 
         public void ImportQIF(string file)
@@ -280,6 +308,14 @@ namespace BanaData.Logic.Main
         public void SaveUserSettings()
         {
             settingsManager.Save(UserSettings);
+        }
+
+        public void SaveIfDirty()
+        {
+            if (Dirty)
+            {
+                Save();
+            }
         }
 
         public void Save()
@@ -417,7 +453,7 @@ namespace BanaData.Logic.Main
                 if (file.EndsWith(".BAN", StringComparison.InvariantCultureIgnoreCase))
                 {
                     var serializer = new BANSerializer(Household);
-                    serializer.Write(file, null); // null password for now
+                    serializer.Write(file, password);
                 }
                 else if (file.EndsWith(".XBAN", StringComparison.InvariantCultureIgnoreCase))
                 {
@@ -437,7 +473,7 @@ namespace BanaData.Logic.Main
                 if (file.EndsWith(".BAN", StringComparison.InvariantCultureIgnoreCase))
                 {
                     var serializer = new BANSerializer(Household);
-                    serializer.Read(file, null); // null password for now
+                    serializer.Read(file, password);
                 }
                 else if (file.EndsWith(".XBAN", StringComparison.InvariantCultureIgnoreCase))
                 {
@@ -465,10 +501,7 @@ namespace BanaData.Logic.Main
         // Save to disk every 5 minutes
         private void OnSaveTimerElapsed(object sender, ElapsedEventArgs e)
         {
-            if (Dirty)
-            {
-                SaveToFile(UserSettings.LastFileOpened);
-            }
+            SaveIfDirty();
         }
 
         // Builds or rebuilds the list of memorized payees

@@ -25,7 +25,7 @@ namespace BanaData.Serializations
                 (byte[] key, byte[] iv) = GetKeyFromPassword(password);
                 var encryptor = aes.CreateEncryptor(key, iv);
 
-                using (var fileStream = new FileStream(file, FileMode.Truncate, FileAccess.Write))
+                using (var fileStream = new FileStream(file, FileMode.Create, FileAccess.Write))
                 {
                     using (var encryptStream = new CryptoStream(fileStream, encryptor, CryptoStreamMode.Write))
                     {

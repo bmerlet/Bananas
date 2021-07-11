@@ -28,6 +28,7 @@ namespace BanaData.Logic.Main
             Open = new CommandBase(OnOpen);
             Save = new CommandBase(OnSave);
             SaveAs = new CommandBase(OnSaveAs);
+            SetPassword = new CommandBase(OnSetPassword);
             Import = new CommandBase(OnImport);
             Merge = new CommandBase(OnMerge);
             Export = new CommandBase(OnExport);
@@ -96,6 +97,16 @@ namespace BanaData.Logic.Main
             {
                 mainWindow.SaveFile(logic.File);
             }
+        }
+
+        //
+        // Set password
+        //
+        public CommandBase SetPassword { get; }
+
+        private void OnSetPassword()
+        {
+            mainWindow.SetPassword();
         }
 
         //
