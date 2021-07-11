@@ -201,12 +201,17 @@ namespace BanaData.Logic.Main
 
         public void OpenFile(string file)
         {
-            if (file.EndsWith(".XBAN", StringComparison.InvariantCultureIgnoreCase))
-            {
-                ReadFromFile(file);
-            }
-
+            ReadFromFile(file);
             UpdateAll();
+        }
+
+        public void SaveFile(string file)
+        {
+            SaveToFile(file);
+
+            UserSettings.LastFileOpened = file;
+            Dirty = false;
+            UpdateTitle();
         }
 
         public void ImportQIF(string file)
@@ -404,12 +409,21 @@ namespace BanaData.Logic.Main
             OnPropertyChanged(() => Title);
         }
 
-        // Save dataset to file in XML
+        // Save dataset to file in XML, encrypted or not
         private void SaveToFile(string file)
         {
             lock (householdLock)
             {
-                Household.WriteXml(file);
+                if (file.EndsWith(".BAN", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    var serializer = new BANSerializer(Household);
+                    serializer.Write(file, null); // null password for now
+                }
+                else if (file.EndsWith(".XBAN", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    Household.WriteXml(file);
+                }
+
                 Dirty = false;
             }
 
@@ -420,9 +434,21 @@ namespace BanaData.Logic.Main
         {
             try
             {
-                Household.Clear();
-                Household.AcceptChanges();
-                Household.ReadXml(file);
+                if (file.EndsWith(".BAN", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    var serializer = new BANSerializer(Household);
+                    serializer.Read(file, null); // null password for now
+                }
+                else if (file.EndsWith(".XBAN", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    Household.Clear();
+                    Household.AcceptChanges();
+                    Household.ReadXml(file);
+                }
+                else
+                {
+                    throw new InvalidOperationException("File extension not supported");
+                }
             }
             catch (Exception e)
             {

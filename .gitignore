@@ -7,6 +7,7 @@
 *.userosscache
 *.sln.docstates
 *.xban
+*.ban
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

@@ -26,11 +26,12 @@ namespace BanaData.Logic.Main
             mainWindow = _mainWindow;
 
             Open = new CommandBase(OnOpen);
+            Save = new CommandBase(OnSave);
+            SaveAs = new CommandBase(OnSaveAs);
             Import = new CommandBase(OnImport);
             Merge = new CommandBase(OnMerge);
             Export = new CommandBase(OnExport);
             DifferentialExport = new CommandBase(OnDifferentialExport);
-            Save = new CommandBase(OnSave);
             Exit = new CommandBase(OnExit);
 
             EditAccounts = new CommandBase(OnEditAccounts);
@@ -62,10 +63,38 @@ namespace BanaData.Logic.Main
 
         private void OnOpen()
         {
-            OpenFileLogic logic = new OpenFileLogic(mainWindow.UserSettings.LastFileOpened, "Banana files (*.xban)|*.xban|Any file (*.*)|*.*", "Open file");
+            OpenFileLogic logic = new OpenFileLogic(
+                mainWindow.UserSettings.LastFileOpened, 
+                "Banana files (*.ban)|*.ban|Banana XML files (*.xban)|*.xban|Any file (*.*)|*.*", "Open file");
             if (mainWindow.GuiServices.ShowDialog(logic))
             {
                 mainWindow.OpenFile(logic.File);
+            }
+        }
+
+        //
+        // Save
+        //
+        public CommandBase Save { get; }
+
+        private void OnSave()
+        {
+            mainWindow.Save();
+        }
+
+        //
+        // Save as
+        //
+        public CommandBase SaveAs { get; }
+
+        private void OnSaveAs()
+        {
+            SaveFileLogic logic = new SaveFileLogic(
+                mainWindow.UserSettings.LastFileOpened,
+                "Banana files (*.ban)|*.ban|Banana XML files (*.xban)|*.xban|Any file (*.*)|*.*", "Save file");
+            if (mainWindow.GuiServices.ShowDialog(logic))
+            {
+                mainWindow.SaveFile(logic.File);
             }
         }
 
@@ -130,16 +159,6 @@ namespace BanaData.Logic.Main
             {
                 mainWindow.DifferentialExportQIF(logic.File);
             }
-        }
-
-        //
-        // Save
-        //
-        public CommandBase Save { get; }
-
-        private void OnSave()
-        {
-            mainWindow.Save();
         }
 
         //
