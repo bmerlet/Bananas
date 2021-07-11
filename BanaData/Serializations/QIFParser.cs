@@ -2030,6 +2030,12 @@ namespace BanaData.Serializations
         {
             var supplementalInfo = new SupplementalInfo();
 
+            // Persons
+            foreach(Household.PersonRow personRow in household.Person.Rows)
+            {
+                supplementalInfo.Persons.Add(personRow.Name);
+            }
+
             // Accounts: Hidden flag in accounts, IRA kind in accounts, last statement date
             foreach(Household.AccountRow accountRow in household.Account.Rows)
             {
@@ -2038,7 +2044,8 @@ namespace BanaData.Serializations
                         accountRow.Name,
                         accountRow.Hidden,
                         accountRow.Type == EAccountType.Investment && accountRow.Kind == EInvestmentKind.TraditionalIRA,
-                        accountRow.IsLastStatementDateNull() ? null : accountRow.LastStatementDate as DateTime?));
+                        accountRow.IsLastStatementDateNull() ? null : accountRow.LastStatementDate as DateTime?,
+                        accountRow.IsPersonIDNull() ? null : accountRow.Name));
             }
 
             // ReconcileInfo table and SecurityReconcileInfo table
@@ -2075,7 +2082,15 @@ namespace BanaData.Serializations
 
         private void ApplySupplementalInfo(SupplementalInfo supplementalInfo)
         {
-            // Accounts: Hidden flag in accounts, IRA kind in accounts, last statement date
+            // Persons
+            foreach(var person in supplementalInfo.Persons)
+            {
+                var personRow = household.Person.NewPersonRow();
+                personRow.Name = person;
+                household.Person.AddPersonRow(personRow);
+            }
+
+            // Accounts: Hidden flag in accounts, IRA kind in accounts, last statement date, owner
             foreach (Household.AccountRow accountRow in household.Account.Rows)
             {
                 var sai = supplementalInfo.Accounts.FirstOrDefault(a => a.Name == accountRow.Name);
@@ -2089,6 +2104,10 @@ namespace BanaData.Serializations
                     if (sai.LastStatementDate.HasValue)
                     {
                         accountRow.LastStatementDate = sai.LastStatementDate.Value;
+                    }
+                    if (sai.Person != null)
+                    {
+                        accountRow.PersonID = household.Person.Rows.Cast<Household.PersonRow>().Single(p => p.Name == sai.Person).ID;
                     }
                 }
             }
@@ -2155,17 +2174,21 @@ namespace BanaData.Serializations
 
         private class SupplementalInfo
         {
+            // Persons in the household
+            public readonly List<string> Persons = new List<string>();
+
             // Account info
             public readonly List<Account> Accounts = new List<Account>();
             public class Account
             {
-                public Account(string name, bool hidden, bool isIRA, DateTime? lastStatementDate) =>
-                    (Name, Hidden, IsIRA, LastStatementDate) = (name, hidden, isIRA, lastStatementDate);
+                public Account(string name, bool hidden, bool isIRA, DateTime? lastStatementDate, string person) =>
+                    (Name, Hidden, IsIRA, LastStatementDate, Person) = (name, hidden, isIRA, lastStatementDate, person);
 
                 public readonly string Name;
                 public readonly bool Hidden;
                 public readonly bool IsIRA;
                 public readonly DateTime? LastStatementDate;
+                public readonly string Person;
             }
 
             // Reconcile info table
