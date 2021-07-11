@@ -73,7 +73,7 @@
                             <ColumnDefinition Width="100"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Net Worth:" Margin="5"/>
-                        <TextBlock Text="{Binding NetWorth, StringFormat=C2}" Grid.Column="1" HorizontalAlignment="Right" Margin="5"/>
+                        <TextBlock Text="{Binding NetWorth, StringFormat=N2}" Grid.Column="1" HorizontalAlignment="Right" Margin="5"/>
                     </Grid>
                     <Grid/>
                 </DockPanel>

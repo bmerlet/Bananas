@@ -79,10 +79,10 @@
                 <ColumnDefinition Width="{Binding LTCGColumnWidth}"/>
                 <ColumnDefinition Width="{Binding InterestColumnWidth}"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="4" Text="{Binding TotalDividend, StringFormat=C2}" HorizontalAlignment="Right"/>
-            <TextBlock Grid.Column="5" Text="{Binding TotalSTCG, StringFormat=C2}" HorizontalAlignment="Right"/>
-            <TextBlock Grid.Column="6" Text="{Binding TotalLTCG, StringFormat=C2}" HorizontalAlignment="Right"/>
-            <TextBlock Grid.Column="7" Text="{Binding TotalInterest, StringFormat=C2}" HorizontalAlignment="Right"/>
+            <TextBlock Grid.Column="4" Text="{Binding TotalDividend, StringFormat=N2}" HorizontalAlignment="Right"/>
+            <TextBlock Grid.Column="5" Text="{Binding TotalSTCG, StringFormat=N2}" HorizontalAlignment="Right"/>
+            <TextBlock Grid.Column="6" Text="{Binding TotalLTCG, StringFormat=N2}" HorizontalAlignment="Right"/>
+            <TextBlock Grid.Column="7" Text="{Binding TotalInterest, StringFormat=N2}" HorizontalAlignment="Right"/>
         </Grid>
 
         <!-- Main listview -->

@@ -159,7 +159,7 @@
                             <DataTemplate>
                                 <TextBlock
                                     Text="{Binding BalanceString, Mode=OneWay}"
-                                    Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"
+                                    Foreground="{Binding BalanceState, Converter={StaticResource transactionStateToBrushConverter}}"
                                     HorizontalAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>

@@ -215,9 +215,9 @@ namespace BanaData.Logic.Dialogs
 
                             var cg = Portfolio.ComputeSaleHypotheticalCapitalGains(accountRow, si.SecurityRow, numShares, si.SecurityPrice);
                             si.Consequences =
-                                (cg.ShortTermGain != 0 ? $"STCG: {cg.ShortTermGain:C2}" : "") +
+                                (cg.ShortTermGain != 0 ? $"STCG: {cg.ShortTermGain:N2}" : "") +
                                 (cg.ShortTermGain != 0 && cg.LongTermGain != 0 ? ", " : "") +
-                                (cg.LongTermGain != 0 ? $"LTCG: {cg.LongTermGain:C2}" : "");
+                                (cg.LongTermGain != 0 ? $"LTCG: {cg.LongTermGain:N2}" : "");
                         }
                         else
                         {

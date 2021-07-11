@@ -326,8 +326,8 @@ namespace BanaData.Logic.Main
             {
                 return
                     "The amount should be the number of shares times the share price minus commission" + Environment.NewLine +
-                    $"But {data.SecurityQuantity:N4} * {data.SecurityPrice:C4} - {data.Commission:C2} = {expectedAmount:C2}" + Environment.NewLine +
-                    $"While the amount is {data.LineItems[0].Amount}";
+                    $"But {data.SecurityQuantity:N4} * {data.SecurityPrice:N4} - {data.Commission:N2} = {expectedAmount:N2}" + Environment.NewLine +
+                    $"While the amount is {data.LineItems[0].Amount:N2}";
             }
 
             return null;
@@ -467,8 +467,8 @@ namespace BanaData.Logic.Main
             {
                 return
                     "The share price should be the dividend amount divided by the number of shares" + Environment.NewLine +
-                    $"But {data.Amount:C2} * {data.SecurityQuantity:N4} = {expectedSecurityPrice:C4}" + Environment.NewLine +
-                    $"While the share price is {data.SecurityPrice:C4}";
+                    $"But {data.Amount:N2} * {data.SecurityQuantity:N4} = {expectedSecurityPrice:N4}" + Environment.NewLine +
+                    $"While the share price is {data.SecurityPrice:N4}";
             }
 
 

@@ -36,7 +36,7 @@
 
         <!-- Footer -->
         <TextBlock Text="{Binding Footer}" Grid.Row="2"/>
-        <TextBlock Text="{Binding Balance, StringFormat=C2}" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right"/>
+        <TextBlock Text="{Binding Balance, StringFormat=N2}" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right"/>
 
         <!-- List of accounts -->
         <ListView 
@@ -61,7 +61,7 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock 
-                                    Text="{Binding Balance, StringFormat=C2}"
+                                    Text="{Binding Balance, StringFormat=N2}"
                                     Foreground="{Binding Balance, Converter={StaticResource amountToColorConverter}}"
                                     TextAlignment="Right" />
                             </DataTemplate>

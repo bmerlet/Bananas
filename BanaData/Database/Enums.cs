@@ -192,7 +192,8 @@ namespace BanaData.Database
     {
         Idle = 0,
         Reconciled = 1,
-        TransferFillIn = 2
+        TransferFillIn = 2,
+        NegativeAmount = 4
     }
 
 }

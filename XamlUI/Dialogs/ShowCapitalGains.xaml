@@ -24,10 +24,10 @@
             <TextBlock Text="{Binding QuantityUsed, StringFormat=N4}" HorizontalAlignment="Right"/>
         </DataTemplate>
         <DataTemplate x:Key="CostBasisColumnTemplate">
-            <TextBlock Text="{Binding CostBasis, StringFormat=C4}" HorizontalAlignment="Right"/>
+            <TextBlock Text="{Binding CostBasis, StringFormat=N4}" HorizontalAlignment="Right"/>
         </DataTemplate>
         <DataTemplate x:Key="GainColumnTemplate">
-            <TextBlock Text="{Binding Gain, StringFormat=C2}" HorizontalAlignment="Right"/>
+            <TextBlock Text="{Binding Gain, StringFormat=N2}" HorizontalAlignment="Right"/>
         </DataTemplate>
 
     </Window.Resources>
@@ -54,7 +54,7 @@
             </Grid.RowDefinitions>
 
             <TextBlock Text="Long term capital gains:" Style="{StaticResource FormTextBlock}"/>
-            <TextBlock Text="{Binding LongTermGain, StringFormat=C2}" Grid.Column="2" FontWeight="Bold" HorizontalAlignment="Right" Style="{StaticResource FormTextBlock}"/>
+            <TextBlock Text="{Binding LongTermGain, StringFormat=N2}" Grid.Column="2" FontWeight="Bold" HorizontalAlignment="Right" Style="{StaticResource FormTextBlock}"/>
 
             <ListView 
                 Grid.ColumnSpan="3" Grid.Row="1" 
@@ -78,7 +78,7 @@
             </ListView>
 
             <TextBlock Text="Short term capital gains:" Grid.Row="2" Style="{StaticResource FormTextBlock}"/>
-            <TextBlock Text="{Binding ShortTermGain, StringFormat=C2}" Grid.Row="2" Grid.Column="2" FontWeight="Bold" HorizontalAlignment="Right" Style="{StaticResource FormTextBlock}"/>
+            <TextBlock Text="{Binding ShortTermGain, StringFormat=N2}" Grid.Row="2" Grid.Column="2" FontWeight="Bold" HorizontalAlignment="Right" Style="{StaticResource FormTextBlock}"/>
 
             <ListView 
                 Grid.ColumnSpan="3" Grid.Row="3" 

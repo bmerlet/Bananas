@@ -156,7 +156,7 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock 
-                                    Text="{Binding Path=SecurityPrice, Converter={StaticResource amountToStringConverter}, ConverterParameter=C4}"
+                                    Text="{Binding Path=SecurityPrice, Converter={StaticResource amountToStringConverter}, ConverterParameter=N4}"
                                     Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"
                                     HorizontalAlignment="Right"/>
                             </DataTemplate>
@@ -199,7 +199,7 @@
                             <DataTemplate>
                                 <TextBlock 
                                     Text="{Binding Path=Amount, Converter={StaticResource amountToStringConverter}}"
-                                    Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"
+                                    Foreground="{Binding AmountState, Converter={StaticResource transactionStateToBrushConverter}}"
                                     HorizontalAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
@@ -211,7 +211,7 @@
                             <DataTemplate>
                                 <TextBlock
                                     Text="{Binding BalanceString, Mode=OneWay}"
-                                    Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"
+                                    Foreground="{Binding BalanceState, Converter={StaticResource transactionStateToBrushConverter}}"
                                     HorizontalAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>

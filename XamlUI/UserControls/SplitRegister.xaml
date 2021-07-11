@@ -39,7 +39,7 @@
                     <GridViewColumn Header="Amount" Width="{Binding WidthOfAmountColumn, Mode=TwoWay}">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Path=Amount, StringFormat=C2}" TextAlignment="Right"/>
+                                <TextBlock Text="{Binding Path=Amount, StringFormat=N2}" TextAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

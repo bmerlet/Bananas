@@ -223,8 +223,8 @@ namespace BanaData.Logic.Main
                 ErrorMessage(parser.Log, "Import results");
             }
 
-            // Save to a .XBAN (ZZZ Revisit later)
-            file = file.Substring(0, file.Length - 3) + "xban";
+            // Save to a .BAN (ZZZ Revisit later)
+            file = file.Substring(0, file.Length - 3) + "BAN";
             UserSettings.LastFileOpened = file;
 
             SaveToFile(file);

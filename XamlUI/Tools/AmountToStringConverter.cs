@@ -29,7 +29,7 @@ namespace XamlUI.Tools
                 }
                 else
                 {
-                    result = amount.ToString("C2");
+                    result = amount.ToString("N2");
                 }
             }
 
@@ -60,7 +60,7 @@ namespace XamlUI.Tools
                 }
                 else
                 {
-                    result = amount.ToString("C2");
+                    result = amount.ToString("N2");
                 }
             }
 

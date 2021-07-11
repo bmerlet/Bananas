@@ -22,7 +22,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <TextBlock Text="{Binding NumberOfCheckedItems, FallbackValue=NumberOfItemsChecked}"/>
-            <TextBlock Text="{Binding TotalCleared, StringFormat=C2, FallbackValue=0}" HorizontalAlignment="Right" Grid.Column="2"/>
+            <TextBlock Text="{Binding TotalCleared, StringFormat=N2, FallbackValue=0}" HorizontalAlignment="Right" Grid.Column="2"/>
         </Grid>
 
         <!-- transactions -->
@@ -87,7 +87,7 @@
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Amount, StringFormat=C2}" HorizontalAlignment="Right"/>
+                                <TextBlock Text="{Binding Amount, StringFormat=N2}" HorizontalAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

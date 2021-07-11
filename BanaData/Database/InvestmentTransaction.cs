@@ -110,25 +110,25 @@ namespace BanaData.Database
                         break;
 
                     case EInvestmentTransactionType.InterestIncome:
-                        desc = $"Received ${amount:C2} in interest";
+                        desc = $"Received {amount:C2} in interest";
                         break;
 
                     case EInvestmentTransactionType.SharesIn:
-                        desc = $"Received {quantity} {symbol} @ ${price}";
+                        desc = $"Received {quantity:N4} {symbol} @ ${price}";
                         break;
 
                     case EInvestmentTransactionType.SharesOut:
-                        desc = $"Removed {quantity} {symbol}";
+                        desc = $"Removed {quantity:N4} {symbol}";
                         break;
 
                     case EInvestmentTransactionType.Buy:
                     case EInvestmentTransactionType.BuyFromTransferredCash:
-                        desc = $"Bought {quantity} {symbol} @ ${price}";
+                        desc = $"Bought {quantity:N4} {symbol} @ {price:C2}";
                         break;
 
                     case EInvestmentTransactionType.Sell:
                     case EInvestmentTransactionType.SellAndTransferCash:
-                        desc = $"Sold {quantity} {symbol} @ ${price}";
+                        desc = $"Sold {quantity:N4} {symbol} @ ${price:C2}";
                         break;
 
                     case EInvestmentTransactionType.Dividends:
@@ -143,7 +143,7 @@ namespace BanaData.Database
                     case EInvestmentTransactionType.ReinvestLongTermCapitalGains:
                     case EInvestmentTransactionType.ReinvestMediumTermCapitalGains:
                     case EInvestmentTransactionType.ReinvestShortTermCapitalGains:
-                        desc = $"Reinvested {amount:C2} as {quantity} shares of {symbol}";
+                        desc = $"Reinvested {amount:C2} as {quantity:N4} shares of {symbol}";
                         break;
 
                     case EInvestmentTransactionType.ShortTermCapitalGains:

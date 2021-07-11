@@ -125,7 +125,6 @@ namespace BanaData.Logic.Main
                         data.LineItems[0].Amount = value;
                         OnPropertyChanged(() => Payment);
                         OnPropertyChanged(() => Deposit);
-                        OnPropertyChanged(() => AmountString);
                         RecomputeSharePrice();
                     }
                     else
@@ -135,9 +134,6 @@ namespace BanaData.Logic.Main
                 }
             }
         }
-
-        // Amount as a string
-        public string AmountString => data.Amount.ToString("N");
 
         // Payment
         public decimal Payment
@@ -152,7 +148,6 @@ namespace BanaData.Logic.Main
                         data.LineItems[0].Amount = -value;
                         OnPropertyChanged(() => Deposit);
                         OnPropertyChanged(() => Amount);
-                        OnPropertyChanged(() => AmountString);
                     }
                     else
                     {
@@ -184,7 +179,6 @@ namespace BanaData.Logic.Main
                         data.LineItems[0].Amount = value;
                         OnPropertyChanged(() => Payment);
                         OnPropertyChanged(() => Amount);
-                        OnPropertyChanged(() => AmountString);
                     }
                     else
                     {
@@ -223,6 +217,12 @@ namespace BanaData.Logic.Main
         public ETransactionState TransactionState =>
             (data.Status == ETransactionStatus.Reconciled ? ETransactionState.Reconciled : ETransactionState.Idle) |
             (TransID == TRANSID_TRANSFER_FILLIN ? ETransactionState.TransferFillIn : ETransactionState.Idle);
+
+        // Composite transaction status, for the forecolor of the amount
+        public ETransactionState AmountState => TransactionState | (data.Amount < 0 ? ETransactionState.NegativeAmount : ETransactionState.Idle);
+
+        // Composite transaction status, for the forecolor of the balance
+        public ETransactionState BalanceState => TransactionState | (balance < 0 ? ETransactionState.NegativeAmount : ETransactionState.Idle);
 
         // Commands
         public CommandBase GotoOtherSideOfTransfer { get; }
@@ -266,7 +266,6 @@ namespace BanaData.Logic.Main
                 backup.LineItems.ForEach(li => data.LineItems.Add(new LineItem(li)));
 
                 OnPropertyChanged(() => Amount);
-                OnPropertyChanged(() => AmountString);
                 OnPropertyChanged(() => Category);
                 OnPropertyChanged(() => Payment);
                 OnPropertyChanged(() => Deposit);
@@ -311,7 +310,6 @@ namespace BanaData.Logic.Main
             if (data.Amount != backup.Amount)
             {
                 OnPropertyChanged(() => Amount);
-                OnPropertyChanged(() => AmountString);
                 OnPropertyChanged(() => Payment);
                 OnPropertyChanged(() => Deposit);
             }
