@@ -44,7 +44,8 @@ namespace BanaData.Database
             static public bool CashOut(EInvestmentTransactionType type) =>
                 type == EInvestmentTransactionType.CashOut ||
                 type == EInvestmentTransactionType.TransferCashOut ||
-                type == EInvestmentTransactionType.Buy;
+                type == EInvestmentTransactionType.Buy ||
+                type == EInvestmentTransactionType.Exercise;
 
             // Transactions that transfer cash into the account 
             static public bool TransferIn(EInvestmentTransactionType type) =>
@@ -67,7 +68,8 @@ namespace BanaData.Database
                 type == EInvestmentTransactionType.ReinvestShortTermCapitalGains ||
                 type == EInvestmentTransactionType.ReinvestMediumTermCapitalGains ||
                 type == EInvestmentTransactionType.ReinvestLongTermCapitalGains ||
-                type == EInvestmentTransactionType.Buy;
+                type == EInvestmentTransactionType.Buy ||
+                type == EInvestmentTransactionType.Exercise;
 
             // Transactions that removes some shares of a security
             static public bool SecurityOut(EInvestmentTransactionType type) =>
@@ -123,6 +125,7 @@ namespace BanaData.Database
 
                     case EInvestmentTransactionType.Buy:
                     case EInvestmentTransactionType.BuyFromTransferredCash:
+                    case EInvestmentTransactionType.Exercise:
                         desc = $"Bought {quantity:N4} {symbol} @ {price:C2}";
                         break;
 
@@ -164,7 +167,6 @@ namespace BanaData.Database
 
                     case EInvestmentTransactionType.Grant:
                     case EInvestmentTransactionType.Vest:
-                    case EInvestmentTransactionType.Exercise:
                     case EInvestmentTransactionType.Expire:
                         desc = $"{EnumDescriptionAttribute.GetDescription(type)}: Not supported";
                         break;

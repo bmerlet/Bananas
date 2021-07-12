@@ -38,6 +38,7 @@ namespace BanaData.Logic.Main
 
                 case EInvestmentTransactionType.Buy:
                 case EInvestmentTransactionType.Sell:
+                case EInvestmentTransactionType.Exercise:
                     return new InvestmentTransactionBuyOrSell();
 
                 case EInvestmentTransactionType.BuyFromTransferredCash:
@@ -62,7 +63,6 @@ namespace BanaData.Logic.Main
 
                 case EInvestmentTransactionType.Grant:
                 case EInvestmentTransactionType.Vest:
-                case EInvestmentTransactionType.Exercise:
                 case EInvestmentTransactionType.Expire:
                     return new InvestmentTransactionNotSupported();
             }
