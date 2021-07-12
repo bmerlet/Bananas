@@ -1,0 +1,57 @@
+﻿<Window x:Class="XamlUI.Dialogs.ShowHoldingsPerPerson"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:XamlUI.Dialogs"
+        xmlns:w="clr-namespace:XamlUI.UserControls"
+        xmlns:l="clr-namespace:BanaData.Logic.Dialogs;assembly=BanaData"
+        mc:Ignorable="d"
+        Title="Holdings per household member"
+        Icon="/XamlUI;component/Images/Bananas.ico"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        SizeToContent="WidthAndHeight">
+    <DockPanel>
+
+        <DockPanel.Resources>
+            <HierarchicalDataTemplate DataType="{x:Type l:ShowHoldingsPerPersonLogic+PersonItem}" ItemsSource="{Binding AccountsSource}">
+
+                <!-- First level -->
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding Name}" Width="250"/>
+                    <TextBlock TextAlignment="Right" Text="{Binding Value, StringFormat=N2}" Width="100"/>
+                </StackPanel>
+
+                <!-- Second level-->
+                <HierarchicalDataTemplate.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Name}" Width="231"/>
+                            <TextBlock TextAlignment="Right" Text="{Binding Value, StringFormat=N2}" Width="100"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </HierarchicalDataTemplate.ItemTemplate>
+            </HierarchicalDataTemplate>
+        </DockPanel.Resources>
+
+        <!-- Done panel -->
+        <w:DonePanel DockPanel.Dock="Bottom"/>
+
+        <!-- Column names -->
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <TextBlock Margin="20,5,0,5" Text="Household member" Width="250"/>
+            <TextBlock Margin="0,5" Text="Value" Width="100"/>
+        </StackPanel>
+
+        <!-- Total panel -->
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom">
+            <TextBlock Margin="20,5,0,5" Text="Total value:" Width="250"/>
+            <TextBlock Margin="0,5" Text="{Binding TotalValue, StringFormat=N2}" Width="100" TextAlignment="Right"/>
+        </StackPanel>
+
+        <!-- Main panel -->
+        <TreeView Height="200" Width="400" ItemsSource="{Binding PersonsSource}"/>
+
+    </DockPanel>
+</Window>

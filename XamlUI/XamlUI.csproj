@@ -109,6 +109,9 @@
     <Compile Include="Dialogs\ShowHoldings.xaml.cs">
       <DependentUpon>ShowHoldings.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\ShowHoldingsPerPerson.xaml.cs">
+      <DependentUpon>ShowHoldingsPerPerson.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\ShowRebalance.xaml.cs">
       <DependentUpon>ShowRebalance.xaml</DependentUpon>
     </Compile>
@@ -224,6 +227,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\ShowHoldings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\ShowHoldingsPerPerson.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

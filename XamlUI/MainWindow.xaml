@@ -47,9 +47,10 @@
             </MenuItem>
             <MenuItem Header="View">
                 <MenuItem Header="Show closed accounts" IsCheckable="True" IsChecked="{Binding ShowClosedAccounts}"/>
-                <MenuItem Header="Show holdings" Command="{Binding ShowHoldings}"/>
-                <MenuItem Header="Show rebalance dashboard" Command="{Binding ShowRebalance}"/>
-                <MenuItem Header="Show yearly capital gains and dividends" Command="{Binding ShowYearlyCapGainsAndDividends}"/>
+                <MenuItem Header="Show holdings..." Command="{Binding ShowHoldings}"/>
+                <MenuItem Header="Show household members holdings..." Command="{Binding ShowHoldingsPerPerson}"/>
+                <MenuItem Header="Show rebalance dashboard..." Command="{Binding ShowRebalance}"/>
+                <MenuItem Header="Show yearly capital gains and dividends..." Command="{Binding ShowYearlyCapGainsAndDividends}"/>
             </MenuItem>
             <MenuItem Header="Test" Command="{Binding Test}"/>
         </Menu>
