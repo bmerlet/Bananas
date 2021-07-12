@@ -37,6 +37,7 @@ namespace BanaData.Logic.Main
 
             EditAccounts = new CommandBase(OnEditAccounts);
             EditCategories = new CommandBase(OnEditCategories);
+            EditPersons = new CommandBase(OnEditPersons);
             EditMemorizedPayees = new CommandBase(OnEditMemorizedPayees);
             EditSecurities = new CommandBase(OnEditSecurities);
 
@@ -205,6 +206,17 @@ namespace BanaData.Logic.Main
         private void OnEditCategories()
         {
             var logic = new EditCategoriesLogic(mainWindow);
+            mainWindow.GuiServices.ShowDialog(logic);
+        }
+
+        //
+        // Edit persons
+        //
+        public CommandBase EditPersons { get; }
+
+        private void OnEditPersons()
+        {
+            var logic = new EditPersonsLogic(mainWindow);
             mainWindow.GuiServices.ShowDialog(logic);
         }
 

@@ -70,7 +70,7 @@ namespace BanaData.Logic.Dialogs
         private void OnAddAccount()
         {
             // Create new account
-            var account = new AccountItem(-1, "", "", EAccountType.Bank, 0, EInvestmentKind.Invalid, false);
+            var account = new AccountItem(-1, "", "", EAccountType.Bank, 0, EInvestmentKind.Invalid, false, null);
 
             var logic = new EditAccountLogic(mainWindowLogic, account, true);
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
@@ -138,7 +138,8 @@ namespace BanaData.Logic.Dialogs
             var household = mainWindowLogic.Household;
 
             // Create and commit new account
-            var newAccountRow = household.Account.Add(newAccount.Name, newAccount.Description, newAccount.Type, newAccount.CreditLimit, newAccount.InvestmentKind, newAccount.Hidden);
+            var newAccountRow = household.Account.Add(
+                newAccount.Name, newAccount.Description, newAccount.Type, newAccount.CreditLimit, newAccount.InvestmentKind, newAccount.Hidden, FindPersonRow(newAccount.Owner));
 
             mainWindowLogic.CommitChanges();
             mainWindowLogic.UpdateAll();
@@ -152,7 +153,8 @@ namespace BanaData.Logic.Dialogs
             var household = mainWindowLogic.Household;
 
             // Update the row
-            household.Account.Update(newAccount.ID, newAccount.Name, newAccount.Description, newAccount.Type, newAccount.CreditLimit, newAccount.InvestmentKind, newAccount.Hidden);
+            household.Account.Update(
+                newAccount.ID, newAccount.Name, newAccount.Description, newAccount.Type, newAccount.CreditLimit, newAccount.InvestmentKind, newAccount.Hidden, FindPersonRow(newAccount.Owner));
 
             // Commit
             mainWindowLogic.CommitChanges();
@@ -168,6 +170,18 @@ namespace BanaData.Logic.Dialogs
 
             mainWindowLogic.CommitChanges();
             mainWindowLogic.UpdateAll();
+        }
+
+        private Household.PersonRow FindPersonRow(string owner)
+        {
+            Household.PersonRow personRow = null;
+
+            if (owner != null)
+            {
+                personRow = mainWindowLogic.Household.Person.Rows.Cast<Household.PersonRow>().Where(pr => pr.Name == owner).SingleOrDefault();
+            }
+
+            return personRow;
         }
 
         #endregion

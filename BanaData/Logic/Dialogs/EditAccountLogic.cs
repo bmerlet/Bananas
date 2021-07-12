@@ -38,6 +38,13 @@ namespace BanaData.Logic.Dialogs
             investmentKind = accountItem.InvestmentKind;
 
             IsHidden = accountItem.Hidden;
+
+            var owners = new List<string>();
+            owners.AddRange(mainWindowLogic.Household.Person.Rows.Cast<Household.PersonRow>().Select<Household.PersonRow, string>(p => p.Name));
+            owners.Sort();
+            owners.Insert(0, "<None>");
+            Owners = owners.ToArray();
+            Owner = accountItem.Owner ?? Owners[0];
         }
 
         #endregion
@@ -83,11 +90,15 @@ namespace BanaData.Logic.Dialogs
         public bool? IsHidden { get; set; }
         public bool? IsHiddenEnabled => true;
 
+        // Owner
+        public string[] Owners { get; }
+        public string Owner { get; set; }
+
         #endregion
 
         #region Result
 
-        public AccountItem NewAccountItem => new AccountItem(oldAccountItem.ID, Name, Description, type, CreditLimit, investmentKind, IsHidden == true); 
+        public AccountItem NewAccountItem => new AccountItem(oldAccountItem.ID, Name, Description, type, CreditLimit, investmentKind, IsHidden == true, Owner == Owners[0] ? null : Owner); 
 
         #endregion
 
@@ -117,13 +128,16 @@ namespace BanaData.Logic.Dialogs
                 return null;
             }
 
+            string owner = Owner == Owners[0] ? null : Owner;
+
             bool change =
                 oldAccountItem.Name != Name ||
                 oldAccountItem.Description != Description ||
                 oldAccountItem.Type != type ||
                 oldAccountItem.CreditLimit != CreditLimit ||
                 oldAccountItem.InvestmentKind != investmentKind ||
-                oldAccountItem.Hidden != (IsHidden == true);
+                oldAccountItem.Hidden != (IsHidden == true) ||
+                oldAccountItem.Owner != owner;
 
             return change;
         }

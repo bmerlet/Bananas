@@ -520,7 +520,7 @@ namespace BanaData.Serializations
             else
             {
                 // Updated account
-                household.Account.Update(accountRow.ID, name, description, type, creditLimit, kind, accountRow.Hidden);
+                household.Account.Update(accountRow.ID, name, description, type, creditLimit, kind, accountRow.Hidden, null);
                 accountTracker.UpdatedIDs.Add(accountRow.ID);
             }
 
@@ -540,7 +540,7 @@ namespace BanaData.Serializations
                 kind = EInvestmentKind.TraditionalIRA;
             }
 
-            return household.Account.Add(name, description, type, creditLimit, kind, hidden);
+            return household.Account.Add(name, description, type, creditLimit, kind, hidden, null);
         }
 
         private void ReconcileMergedAccounts()

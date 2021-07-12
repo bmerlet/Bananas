@@ -248,27 +248,27 @@ namespace BanaData.Database
 
 
             // Adding/updating rows
-            public AccountRow Add(string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind, bool hidden)
+            public AccountRow Add(string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind, bool hidden, PersonRow personRow)
             {
                 var accRow = NewAccountRow();
 
-                UpdateAccount(accRow, name, description, type, creditLimit, kind, hidden);
+                UpdateAccount(accRow, name, description, type, creditLimit, kind, hidden, personRow);
 
                 Rows.Add(accRow);
 
                 return accRow;
             }
 
-            public AccountRow Update(int id, string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind, bool hidden)
+            public AccountRow Update(int id, string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind, bool hidden, PersonRow personRow)
             {
                 var accRow = FindByID(id);
 
-                UpdateAccount(accRow, name, description, type, creditLimit, kind, hidden);
+                UpdateAccount(accRow, name, description, type, creditLimit, kind, hidden, personRow);
 
                 return accRow;
             }
 
-            private static void UpdateAccount(AccountRow accRow, string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind, bool hidden)
+            private static void UpdateAccount(AccountRow accRow, string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind, bool hidden, PersonRow personRow)
             {
                 accRow.Name = name;
                 accRow.Type = type;
@@ -295,6 +295,15 @@ namespace BanaData.Database
                 else
                 {
                     accRow.SetKindNull();
+                }
+
+                if (personRow == null)
+                {
+                    accRow.SetPersonIDNull();
+                }
+                else
+                {
+                    accRow.PersonID = personRow.ID;
                 }
             }
         }

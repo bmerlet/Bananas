@@ -79,6 +79,9 @@
     <Compile Include="Dialogs\EditMemorizedPayees.xaml.cs">
       <DependentUpon>EditMemorizedPayees.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\EditPersons.xaml.cs">
+      <DependentUpon>EditPersons.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\EditSecurities.xaml.cs">
       <DependentUpon>EditSecurities.xaml</DependentUpon>
     </Compile>
@@ -181,6 +184,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\EditMemorizedPayees.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\EditPersons.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
