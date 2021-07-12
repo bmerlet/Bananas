@@ -16,6 +16,9 @@ namespace BanaData.Logic
         // Execute async on UI thread
         void ExecuteAsync(Delegate method, params object[] args);
 
+        // Wait cursor
+        void SetCursor(bool wait);
+
         // Exit the application
         void Exit();
     }

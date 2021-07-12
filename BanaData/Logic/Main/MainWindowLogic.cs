@@ -244,8 +244,13 @@ namespace BanaData.Logic.Main
 
         public void ImportQIF(string file)
         {
+            GuiServices.SetCursor(true);
+
             var parser = new QIFParser(this);
             parser.ImportFromQIF(file, true);
+
+            GuiServices.SetCursor(false);
+
             if (!string.IsNullOrEmpty(parser.Log))
             {
                 ErrorMessage(parser.Log, "Import results");
@@ -261,8 +266,13 @@ namespace BanaData.Logic.Main
 
         public void MergeQIF(string file)
         {
+            GuiServices.SetCursor(true);
+
             var parser = new QIFParser(this);
             bool change = parser.MergeFromQIF(file);
+
+            GuiServices.SetCursor(false);
+
             if (!string.IsNullOrEmpty(parser.Log))
             {
                 ErrorMessage(parser.Log, "Merge results");
@@ -277,9 +287,13 @@ namespace BanaData.Logic.Main
 
         public void ExportQIF(string file)
         {
+            GuiServices.SetCursor(true);
+
             var exporter = new QIFWriter(this);
             exporter.ExportToQIF(file);
             ErrorMessage("Export completed", "Export results");
+
+            GuiServices.SetCursor(false);
         }
 
         public void DifferentialExportQIF(string file)
@@ -450,6 +464,8 @@ namespace BanaData.Logic.Main
         {
             lock (householdLock)
             {
+                GuiServices.SetCursor(true);
+
                 if (file.EndsWith(".BAN", StringComparison.InvariantCultureIgnoreCase))
                 {
                     var serializer = new BANSerializer(Household);
@@ -460,6 +476,7 @@ namespace BanaData.Logic.Main
                     Household.WriteXml(file);
                 }
 
+                GuiServices.SetCursor(false);
                 Dirty = false;
             }
 
@@ -470,6 +487,8 @@ namespace BanaData.Logic.Main
         {
             try
             {
+                GuiServices.SetCursor(true);
+
                 if (file.EndsWith(".BAN", StringComparison.InvariantCultureIgnoreCase))
                 {
                     var serializer = new BANSerializer(Household);
@@ -490,7 +509,10 @@ namespace BanaData.Logic.Main
             {
                 //DataRow[] rowErrors = Household.Accounts.GetErrors();
                 ErrorMessage($"Error reading file {System.IO.Path.GetFileName(file)}: {e.Message}");
-
+            }
+            finally
+            {
+                GuiServices.SetCursor(false);
             }
 
             UserSettings.LastFileOpened = file;

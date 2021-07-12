@@ -259,6 +259,11 @@ namespace XamlUI
             Dispatcher.BeginInvoke(method, System.Windows.Threading.DispatcherPriority.ContextIdle, args);
         }
 
+        public void SetCursor(bool wait)
+        {
+            Mouse.OverrideCursor = wait ? Cursors.Wait : Cursors.Arrow;
+        }
+
 
         public void Exit()
         {
