@@ -193,59 +193,6 @@ namespace BanaData.Logic.Main
             }
         }
 
-        // User hit enter on the register
-        public override void ProcessEnter()
-        {
-            var transaction = SelectedTransaction;
-            if (transaction != null)
-            {
-                bool wasEmptyTransaction = transaction.TransID == AbstractTransactionLogic.TRANSID_NOT_COMMITTED;
-
-                (bool needCommit, bool moveDown) = transaction.ValidateEndEdit();
-
-                if (needCommit)
-                {
-                    // Remove from transaction list if needed
-                    if (wasEmptyTransaction)
-                    {
-                        // Remove transaction from list as its ID is about to change
-                        // And the ID is what is used to determine equality.
-                        // We don't want the list to get confused.
-                        logicIsChangingSelection = true;
-                        SelectedTransaction = null;
-                        logicIsChangingSelection = false;
-                        transactions.Remove(transaction);
-                    }
-
-                    // Commit changes
-                    transaction.EndEdit();
-
-                    // Put back in list
-                    if (wasEmptyTransaction)
-                    {
-                        transactions.Add(transaction);
-                    }
-
-                    // Update balances
-                    RecomputeBalances();
-                }
-
-                if (moveDown)
-                {
-                    if (wasEmptyTransaction)
-                    {
-                        // Create an empty transaction if we consumed the previous one
-                        AddEmptyTransactionAtBottom(true);
-                    }
-                    else
-                    {
-                        // Move the selection down one row otherwise
-                        MoveDown();
-                    }
-                }
-            }
-        }
-
         // Recompute cash balance
         public override void RecomputeBalances()
         {
@@ -263,22 +210,168 @@ namespace BanaData.Logic.Main
             }
         }
 
-        public override void MoveUp()
+        // User hit enter on the register
+        public override void ProcessEnter()
         {
-            if (GetPreviousTransaction(SelectedTransaction) is AbstractTransactionLogic prevTransaction)
+            var transaction = SelectedTransaction;
+            if (transaction != null)
             {
-                logicIsChangingSelection = true;
-                SelectedTransaction = prevTransaction;
-                logicIsChangingSelection = false;
+                bool transactionChanged = transaction.HasTransactionChanged;
+                if (!transactionChanged)
+                {
+                    // Nothing has changed, treat this as a move down
+                    transaction.CancelEdit();
+                    MoveDownInternal();
+                }
+                else
+                {
+                    bool wasEmptyTransaction = transaction.TransID == AbstractTransactionLogic.TRANSID_NOT_COMMITTED;
+
+                    bool wasCommitted = CommitTransactionIfNeeded(transaction);
+
+                    if (wasCommitted)
+                    {
+                        // Move down
+                        if (wasEmptyTransaction)
+                        {
+                            // Create an empty transaction since we consumed the previous one
+                            AddEmptyTransactionAtBottom(true);
+                        }
+                        else
+                        {
+                            // Move the selection down one row otherwise
+                            MoveDownInternal();
+                        }
+                    }
+                }
             }
         }
 
+        // Down arrow action
         public override void MoveDown()
+        {
+            var transaction = SelectedTransaction;
+            if (transaction != null)
+            {
+                if (transaction.HasTransactionChanged)
+                {
+                    bool wasEmptyTransaction = transaction.TransID == AbstractTransactionLogic.TRANSID_NOT_COMMITTED;
+
+                    if (mainWindowLogic.YesNoQuestion("Do you want to save the changes to the transaction you were on?"))
+                    {
+                        bool wasCommitted = CommitTransactionIfNeeded(transaction);
+                        if (wasCommitted)
+                        {
+                            // Move down
+                            if (wasEmptyTransaction)
+                            {
+                                // Create an empty transaction since we consumed the previous one
+                                AddEmptyTransactionAtBottom(true);
+                            }
+                            else
+                            {
+                                // Move the selection down one row otherwise
+                                MoveDownInternal();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        transaction.CancelEdit();
+                        MoveDownInternal();
+                    }
+                }
+                else
+                {
+                    transaction.CancelEdit();
+                    MoveDownInternal();
+                }
+            }
+        }
+
+        // Up arrow action
+        public override void MoveUp()
+        {
+            var transaction = SelectedTransaction;
+            if (transaction != null)
+            {
+                if (transaction.HasTransactionChanged)
+                {
+                    if (mainWindowLogic.YesNoQuestion("Do you want to save the changes to the transaction you were on?"))
+                    {
+                        bool wasCommitted = CommitTransactionIfNeeded(transaction);
+                        if (wasCommitted)
+                        {
+                            // Move the selection up one row
+                            MoveUpInternal();
+                        }
+                    }
+                    else
+                    {
+                        transaction.CancelEdit();
+                        MoveUpInternal();
+                    }
+                }
+                else
+                {
+                    transaction.CancelEdit();
+                    MoveUpInternal();
+                }
+            }
+        }
+
+        private bool CommitTransactionIfNeeded(AbstractTransactionLogic transaction)
+        {
+            bool wasEmptyTransaction = transaction.TransID == AbstractTransactionLogic.TRANSID_NOT_COMMITTED;
+
+            bool needCommit = transaction.DoesTransactionNeedComit;
+
+            if (needCommit)
+            {
+                // Remove from transaction list if needed
+                if (wasEmptyTransaction)
+                {
+                    // Remove transaction from list as its ID is about to change
+                    // And the ID is what is used to determine equality.
+                    // We don't want the list to get confused.
+                    logicIsChangingSelection = true;
+                    SelectedTransaction = null;
+                    logicIsChangingSelection = false;
+                    transactions.Remove(transaction);
+                }
+
+                // Commit changes
+                transaction.EndEdit();
+
+                // Put back in list
+                if (wasEmptyTransaction)
+                {
+                    transactions.Add(transaction);
+                }
+
+                // Update balances
+                RecomputeBalances();
+            }
+
+            return needCommit;
+        }
+
+        private void MoveDownInternal()
         {
             if (GetNextTransaction(SelectedTransaction) is AbstractTransactionLogic nextTransaction)
             {
                 logicIsChangingSelection = true;
                 SelectedTransaction = nextTransaction;
+                logicIsChangingSelection = false;
+            }
+        }
+
+        private void MoveUpInternal()
+        {
+            if (GetPreviousTransaction(SelectedTransaction) is AbstractTransactionLogic prevTransaction)
+            {
+                logicIsChangingSelection = true;
+                SelectedTransaction = prevTransaction;
                 logicIsChangingSelection = false;
             }
         }

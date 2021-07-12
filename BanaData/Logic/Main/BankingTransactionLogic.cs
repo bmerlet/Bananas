@@ -127,68 +127,63 @@ namespace BanaData.Logic.Main
             Console.WriteLine($"Cancel edit transaction date {Date.ToShortDateString()} Payee {Payee} amount {Payment}");
         }
 
-        // Returns if there is something to commit and if we need to move down
-        public override (bool needCommit, bool moveDown) ValidateEndEdit()
+        // Is there a change to the transaction?
+        public override bool HasTransactionChanged => backup != null && !backup.Equals(data);
+
+        // Returns if there is something to commit
+        public override bool DoesTransactionNeedComit
         {
-            // Out of sequence
-            if (backup == null)
+            get
             {
-                return (false, TransID >= 0);
-            }
-
-            // No change
-            if (backup.Equals(data))
-            {
-                if (TransID >= 0)
+                // Out of sequence
+                if (backup == null)
                 {
-                    backup = null;
-                    return (false, true);
-                }
-                else
-                {
-                    return (false, false);
-                }
-            }
-
-            Console.WriteLine($"End edit transaction date {Date.ToShortDateString()} Payee {Payee} amount {Payment}");
-
-            // Check the changes
-            if (TransID == TRANSID_TRANSFER_FILLIN)
-            {
-                // We only allow changing the status, as it is stored in the transfer line item
-                var tmpData = new BankTransactionData(data as BankTransactionData) { Status = backup.Status };
-                
-                if (!tmpData.Equals(backup))
-                {
-                    mainWindowLogic.ErrorMessage("Cannot edit this end of the transfer - please edit the other end");
-                    CancelEdit();
                     BeginEdit();
-                    return (false, false);
+                    return false;
                 }
-            }
 
-            if (backup.Status == ETransactionStatus.Reconciled && data.Status != ETransactionStatus.Reconciled)
-            {
-                if (!mainWindowLogic.YesNoQuestion("Are you sure you want to un-reconcile this transaction"))
+                Console.WriteLine($"End edit transaction date {Date.ToShortDateString()} Payee {Payee} amount {Payment}");
+
+                // Check the changes
+                if (TransID == TRANSID_TRANSFER_FILLIN)
                 {
-                    CancelEdit();
-                    BeginEdit();
-                    return (false, false);
-                }
-            }
+                    // We only allow changing the status, as it is stored in the transfer line item
+                    var tmpData = new BankTransactionData(data as BankTransactionData) { Status = backup.Status };
 
-            if (backup.Status == ETransactionStatus.Reconciled && backup.Amount != data.Amount)
-            {
-                if (!mainWindowLogic.YesNoQuestion("Are you sure you want to change the amount of this reconciled transaction"))
+                    if (!tmpData.Equals(backup))
+                    {
+                        mainWindowLogic.ErrorMessage("Cannot edit this end of the transfer - please edit the other end");
+                        CancelEdit();
+                        BeginEdit();
+                        return false;
+                    }
+                }
+
+                if (backup.Status == ETransactionStatus.Reconciled && data.Status != ETransactionStatus.Reconciled)
                 {
-                    CancelEdit();
-                    BeginEdit();
-                    return (false, false);
+                    if (!mainWindowLogic.YesNoQuestion("Are you sure you want to un-reconcile this transaction"))
+                    {
+                        CancelEdit();
+                        BeginEdit();
+                        return false;
+                    }
                 }
-            }
 
-            return (true, true);
+                if (backup.Status == ETransactionStatus.Reconciled && backup.Amount != data.Amount)
+                {
+                    if (!mainWindowLogic.YesNoQuestion("Are you sure you want to change the amount of this reconciled transaction"))
+                    {
+                        CancelEdit();
+                        BeginEdit();
+                        return false;
+                    }
+                }
+
+                return true;
+            }
         }
+
+
 
         public override void EndEdit()
         {

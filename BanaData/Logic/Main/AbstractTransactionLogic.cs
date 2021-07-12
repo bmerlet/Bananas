@@ -125,6 +125,7 @@ namespace BanaData.Logic.Main
                         data.LineItems[0].Amount = value;
                         OnPropertyChanged(() => Payment);
                         OnPropertyChanged(() => Deposit);
+                        OnPropertyChanged(() => AmountState);
                         RecomputeSharePrice();
                     }
                     else
@@ -148,6 +149,7 @@ namespace BanaData.Logic.Main
                         data.LineItems[0].Amount = -value;
                         OnPropertyChanged(() => Deposit);
                         OnPropertyChanged(() => Amount);
+                        OnPropertyChanged(() => AmountState);
                     }
                     else
                     {
@@ -201,6 +203,7 @@ namespace BanaData.Logic.Main
                     balance = value;
                     BalanceString = balance.ToString("N");
                     OnPropertyChanged(() => BalanceString);
+                    OnPropertyChanged(() => BalanceState);
                 }
             }
         }
@@ -272,7 +275,11 @@ namespace BanaData.Logic.Main
             }
         }
 
-        public abstract (bool needCommit, bool moveDown) ValidateEndEdit();
+        // Provided by derived classes to know if the transaction was changed
+        public abstract bool HasTransactionChanged { get; }
+
+        // Provided by derived classes to know if the transaction should be committed
+        public abstract bool DoesTransactionNeedComit { get; }
 
 
         public virtual void EndEdit()

@@ -235,99 +235,92 @@ namespace BanaData.Logic.Main
             Console.WriteLine($"Cancel edit transaction date {Date.ToShortDateString()} Type {Type} amount {Payment}");
         }
 
+        // Is there a change to commit?
+        public override bool HasTransactionChanged => backup != null && !backup.Equals(data);
+
         // Returns if there is something to commit and if we need to move down
-        public override (bool needCommit, bool moveDown) ValidateEndEdit()
+        public override bool DoesTransactionNeedComit
         {
-            // Out of sequence
-            if (backup == null)
+            get
             {
-                return (false, TransID >= 0);
-            }
-
-            // No change
-            if (backup.Equals(data))
-            {
-                if (TransID >= 0)
+                // Out of sequence
+                if (backup == null)
                 {
-                    backup = null;
-                    return (false, true);
-                }
-                else
-                {
-                    return (false, false);
-                }
-            }
-
-            Console.WriteLine($"End edit transaction date {Date.ToShortDateString()} Type {Type} amount {Payment}");
-
-            //
-            // Check the changes
-            //
-
-            // Dead end of transfer
-            if (TransID == TRANSID_TRANSFER_FILLIN)
-            {
-                // We only allow changing the status, as it is stored in the transfer line item
-                var tmpData = new InvestmentTransactionData(data) { Status = backup.Status };
-                if (!tmpData.Equals(backup))
-                {
-                    mainWindowLogic.ErrorMessage("Cannot edit this end of the transfer - please edit the other end");
-                    CancelEdit();
                     BeginEdit();
-                    return (false, false);
+                    return false;
                 }
-            }
 
-            if (backup.Status == ETransactionStatus.Reconciled && data.Status != ETransactionStatus.Reconciled)
-            {
-                if (!mainWindowLogic.YesNoQuestion("Are you sure you want to un-reconcile this transaction"))
+                Console.WriteLine($"End edit transaction date {Date.ToShortDateString()} Type {Type} amount {Payment}");
+
+                //
+                // Check the changes
+                //
+
+                // Dead end of transfer
+                if (TransID == TRANSID_TRANSFER_FILLIN)
                 {
-                    CancelEdit();
-                    BeginEdit();
-                    return (false, false);
+                    // We only allow changing the status, as it is stored in the transfer line item
+                    var tmpData = new InvestmentTransactionData(data) { Status = backup.Status };
+                    if (!tmpData.Equals(backup))
+                    {
+                        mainWindowLogic.ErrorMessage("Cannot edit this end of the transfer - please edit the other end");
+                        CancelEdit();
+                        BeginEdit();
+                        return false;
+                    }
                 }
-            }
 
-            if (backup.Status == ETransactionStatus.Reconciled && backup.Amount != data.Amount)
-            {
-                if (!mainWindowLogic.YesNoQuestion("Are you sure you want to change the amount of this reconciled transaction"))
+                if (backup.Status == ETransactionStatus.Reconciled && data.Status != ETransactionStatus.Reconciled)
                 {
-                    CancelEdit();
-                    BeginEdit();
-                    return (false, false);
+                    if (!mainWindowLogic.YesNoQuestion("Are you sure you want to un-reconcile this transaction"))
+                    {
+                        CancelEdit();
+                        BeginEdit();
+                        return false;
+                    }
                 }
-            }
 
-            var _backup = backup as InvestmentTransactionData;
-            if (backup.Status == ETransactionStatus.Reconciled && _backup.SecurityQuantity != data.SecurityQuantity)
-            {
-                if (!mainWindowLogic.YesNoQuestion("Are you sure you want to change the number of shares of this reconciled transaction"))
+                if (backup.Status == ETransactionStatus.Reconciled && backup.Amount != data.Amount)
                 {
-                    CancelEdit();
-                    BeginEdit();
-                    return (false, false);
+                    if (!mainWindowLogic.YesNoQuestion("Are you sure you want to change the amount of this reconciled transaction"))
+                    {
+                        CancelEdit();
+                        BeginEdit();
+                        return false;
+                    }
                 }
-            }
 
-            if (backup.Status == ETransactionStatus.Reconciled && _backup.SecurityID != data.SecurityID)
-            {
-                if (!mainWindowLogic.YesNoQuestion("Are you sure you want to change the security of this reconciled transaction"))
+                var _backup = backup as InvestmentTransactionData;
+                if (backup.Status == ETransactionStatus.Reconciled && _backup.SecurityQuantity != data.SecurityQuantity)
                 {
-                    CancelEdit();
-                    BeginEdit();
-                    return (false, false);
+                    if (!mainWindowLogic.YesNoQuestion("Are you sure you want to change the number of shares of this reconciled transaction"))
+                    {
+                        CancelEdit();
+                        BeginEdit();
+                        return false;
+                    }
                 }
-            }
 
-            // Check based on transaction type
-            string error = investmentTransactionType.CheckData(data);
-            if (error != null)
-            {
-                mainWindowLogic.ErrorMessage(error);
-                return (false, false);
-            }
+                if (backup.Status == ETransactionStatus.Reconciled && _backup.SecurityID != data.SecurityID)
+                {
+                    if (!mainWindowLogic.YesNoQuestion("Are you sure you want to change the security of this reconciled transaction"))
+                    {
+                        CancelEdit();
+                        BeginEdit();
+                        return false;
+                    }
+                }
 
-            return (true, true);
+                // Check based on transaction type
+                string error = investmentTransactionType.CheckData(data);
+                if (error != null)
+                {
+                    mainWindowLogic.ErrorMessage(error);
+                    return false;
+                }
+
+                return true;
+            }
         }
 
         public override void EndEdit()

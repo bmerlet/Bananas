@@ -261,7 +261,7 @@ namespace XamlUI
 
         public void SetCursor(bool wait)
         {
-            Mouse.OverrideCursor = wait ? Cursors.Wait : Cursors.Arrow;
+            Dispatcher.Invoke(() => Mouse.OverrideCursor = wait ? Cursors.Wait : Cursors.Arrow);
         }
 
 
