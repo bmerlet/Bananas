@@ -220,8 +220,10 @@ namespace BanaData.Logic.Main
                 if (!transactionChanged)
                 {
                     // Nothing has changed, treat this as a move down
-                    transaction.CancelEdit();
-                    MoveDownInternal();
+                    if (MoveDownInternal())
+                    {
+                        transaction.CancelEdit();
+                    }
                 }
                 else
                 {
@@ -295,6 +297,8 @@ namespace BanaData.Logic.Main
             var transaction = SelectedTransaction;
             if (transaction != null)
             {
+                bool moveUp = false;
+
                 if (transaction.HasTransactionChanged)
                 {
                     if (mainWindowLogic.YesNoQuestion("Do you want to save the changes to the transaction you were on?"))
@@ -308,14 +312,20 @@ namespace BanaData.Logic.Main
                     }
                     else
                     {
-                        transaction.CancelEdit();
-                        MoveUpInternal();
+                        moveUp = true;
                     }
                 }
                 else
                 {
-                    transaction.CancelEdit();
-                    MoveUpInternal();
+                    moveUp = true;
+                }
+
+                if (moveUp)
+                {
+                    if (MoveUpInternal())
+                    {
+                        transaction.CancelEdit();
+                    }
                 }
             }
         }
@@ -356,24 +366,30 @@ namespace BanaData.Logic.Main
             return needCommit;
         }
 
-        private void MoveDownInternal()
+        private bool MoveDownInternal()
         {
             if (GetNextTransaction(SelectedTransaction) is AbstractTransactionLogic nextTransaction)
             {
                 logicIsChangingSelection = true;
                 SelectedTransaction = nextTransaction;
                 logicIsChangingSelection = false;
+                return true;
             }
+
+            return false;
         }
 
-        private void MoveUpInternal()
+        private bool MoveUpInternal()
         {
             if (GetPreviousTransaction(SelectedTransaction) is AbstractTransactionLogic prevTransaction)
             {
                 logicIsChangingSelection = true;
                 SelectedTransaction = prevTransaction;
                 logicIsChangingSelection = false;
+                return true;
             }
+
+            return false;
         }
 
         #endregion

@@ -57,6 +57,9 @@ namespace BanaData.Logic.Main
             // Main menu
             MainMenuLogic = new MainMenuLogic(this);
 
+            // Search command
+            Search = new CommandBase(OnSearch);
+
             // Account groups
             BankAccountGroup = new AccountGroupLogic(this, AccountGroupLogic.EType.Banking);
             InvestmentAccountGroup = new AccountGroupLogic(this, AccountGroupLogic.EType.Investment);
@@ -190,6 +193,15 @@ namespace BanaData.Logic.Main
             get => UserSettings.AccountWidth;
             set => UserSettings.AccountWidth = value;
         }
+
+        // Search box
+        private string searchText;
+        public string SearchText
+        {
+            get => searchText;
+            set { searchText = value; Search.Execute(); }
+        }
+        public CommandBase Search { get; }
 
         // The accounts and balances displayed on the left side
         public AccountGroupLogic BankAccountGroup { get; private set; }
@@ -700,6 +712,14 @@ namespace BanaData.Logic.Main
             }
 
             NotifySecurityChange();
+        }
+
+        private void OnSearch()
+        {
+            if (!string.IsNullOrWhiteSpace(searchText))
+            {
+                ErrorMessage($"Looking for {searchText}: Not yet implemented");
+            }
         }
 
         #endregion

@@ -229,6 +229,8 @@ namespace BanaData.Logic.Main
 
                 OnPropertyChanged(() => Description);
 
+                //Console.WriteLine("backup = null from CANCEL");
+                //Console.WriteLine(System.Environment.StackTrace);
                 backup = null;
             }
 
@@ -361,6 +363,8 @@ namespace BanaData.Logic.Main
             ShowCapitalGains.SetCanExecute(data.Type == EInvestmentTransactionType.Sell || data.Type == EInvestmentTransactionType.SellAndTransferCash);
 
             // Clear the backup
+            //Console.WriteLine("backup = null from END EDIT");
+            //Console.WriteLine(System.Environment.StackTrace);
             backup = null;
         }
 
