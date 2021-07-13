@@ -1,0 +1,51 @@
+﻿<Window x:Class="XamlUI.Dialogs.SearchResult"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:XamlUI.Dialogs"
+        xmlns:w="clr-namespace:XamlUI.UserControls"
+        mc:Ignorable="d"
+        Title="Search results"
+        Icon="/XamlUI;component/Images/Bananas.ico"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        SizeToContent="WidthAndHeight">
+    <DockPanel>
+
+        <!-- Done panel -->
+        <w:DonePanel DockPanel.Dock="Bottom"/>
+
+        <!-- Other search -->
+        
+        <!-- Main panel -->
+        <ListView
+            Width="540" Height="300"
+            ItemsSource="{Binding FoundItemsSource}">
+
+            <!-- Make the list view items use all the horizontal space -->
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListView.ItemContainerStyle>
+
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Date" Width="80" DisplayMemberBinding="{Binding Date, StringFormat=MM/dd/yyyy}"/>
+                    <GridViewColumn Header="Payee" Width="120" DisplayMemberBinding="{Binding Payee}"/>
+                    <GridViewColumn Header="Memo" Width="120" DisplayMemberBinding="{Binding Memo}"/>
+                    <GridViewColumn Header="Category" Width="120" DisplayMemberBinding="{Binding Category}"/>
+                    <GridViewColumn Header="Amount" Width="80">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Amount, StringFormat=N2}" TextAlignment="Right"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+    </DockPanel>
+</Window>

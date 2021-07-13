@@ -718,7 +718,7 @@ namespace BanaData.Logic.Main
         {
             if (!string.IsNullOrWhiteSpace(searchText))
             {
-                ErrorMessage($"Looking for {searchText}: Not yet implemented");
+                GuiServices.ShowDialog(new SearchResultLogic(this, searchText));
             }
         }
 

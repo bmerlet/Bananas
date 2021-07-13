@@ -103,6 +103,9 @@
     <Compile Include="Dialogs\ReconcileInvestments.xaml.cs">
       <DependentUpon>ReconcileInvestments.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\SearchResult.xaml.cs">
+      <DependentUpon>SearchResult.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\ShowCapitalGains.xaml.cs">
       <DependentUpon>ShowCapitalGains.xaml</DependentUpon>
     </Compile>
@@ -219,6 +222,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\ReconcileInvestments.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\SearchResult.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
