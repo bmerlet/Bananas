@@ -64,8 +64,14 @@
 
             <!-- Search box -->
             <StackPanel Orientation="Horizontal" Grid.Column="1">
-                <ucs:WatermarkTextBox Style="{StaticResource FormWatermarkTextBox}" Watermark="Search string" Text="{Binding SearchText, Mode=TwoWay}" Width="80"/>
-                <Button Style="{StaticResource FormButton}" Content="Search" Command="{Binding Search}" Width="60"/>
+                <ucs:WatermarkTextBox x:Name="searchTextBox" Style="{StaticResource FormWatermarkTextBox}" Watermark="Search string" Text="{Binding SearchText, Mode=TwoWay}" Width="80">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Return" 
+                            Command="{Binding Search, UpdateSourceTrigger=PropertyChanged}"
+                            CommandParameter="{Binding ElementName=searchTextBox, Path=Text}"/>
+                    </TextBox.InputBindings>
+                </ucs:WatermarkTextBox>
+                <Button Style="{StaticResource FormButton}" Content="Search" Command="{Binding Search}" CommandParameter="{Binding ElementName=searchTextBox, Path=Text}" Width="60"/>
             </StackPanel>
         </Grid>
         <Grid>

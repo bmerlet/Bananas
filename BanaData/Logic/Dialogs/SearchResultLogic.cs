@@ -16,24 +16,19 @@ namespace BanaData.Logic.Dialogs
     {
         private readonly MainWindowLogic mainWindowLogic;
 
-        public SearchResultLogic(MainWindowLogic _mainWindowLogic, string _searchText)
+        public SearchResultLogic(MainWindowLogic _mainWindowLogic, string searchText)
         {
-            (mainWindowLogic, searchText) = (_mainWindowLogic, _searchText);
+            (mainWindowLogic, SearchText) = (_mainWindowLogic, searchText);
 
             FoundItemsSource = (CollectionView)CollectionViewSource.GetDefaultView(foundItems);
             FoundItemsSource.SortDescriptions.Add(new SortDescription("Date", ListSortDirection.Descending));
 
             Search = new CommandBase(OnSearch);
 
-            OnSearch();
+            OnSearch(SearchText);
         }
 
-        private string searchText;
-        public string SearchText
-        {
-            get => searchText;
-            set { searchText = value; OnSearch(); }
-        }
+        public string SearchText { get; set; }
 
         public CommandBase Search { get; }
 
@@ -45,8 +40,9 @@ namespace BanaData.Logic.Dialogs
             mainWindowLogic.GotoTransaction(item.TransRow.AccountID, item.TransRow.ID, -1);
         }
 
-        private void OnSearch()
+        private void OnSearch(object arg)
         {
+            string searchText = arg as string;
             if (string.IsNullOrWhiteSpace(searchText))
             {
                 return;

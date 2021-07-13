@@ -199,7 +199,7 @@ namespace BanaData.Logic.Main
         public string SearchText
         {
             get => searchText;
-            set { searchText = value; Search.Execute(); }
+            set { searchText = value; /* Search.Execute(); ZZZ */}
         }
         public CommandBase Search { get; }
 
@@ -714,11 +714,11 @@ namespace BanaData.Logic.Main
             NotifySecurityChange();
         }
 
-        private void OnSearch()
+        private void OnSearch(object arg)
         {
-            if (!string.IsNullOrWhiteSpace(searchText))
+            if (arg is string text && !string.IsNullOrWhiteSpace(text))
             {
-                GuiServices.ShowDialog(new SearchResultLogic(this, searchText));
+                GuiServices.ShowDialog(new SearchResultLogic(this, text));
             }
         }
 

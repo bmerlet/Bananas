@@ -18,8 +18,17 @@
 
         <!-- Other search -->
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Right">
-            <w:WatermarkTextBox Style="{StaticResource FormWatermarkTextBox}" Watermark="Search text" Text="{Binding SearchText, Mode=TwoWay}" Width="80"/>
-            <Button Style="{StaticResource FormButton}" Content="Search" Width="60" Command="{Binding Search}"/>
+            <w:WatermarkTextBox x:Name="searchTextBox" Style="{StaticResource FormWatermarkTextBox}" 
+                                Watermark="Search text" Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="80">
+                <TextBox.InputBindings>
+                    <KeyBinding Key="Return" 
+                            Command="{Binding Search, UpdateSourceTrigger=PropertyChanged}"
+                            CommandParameter="{Binding ElementName=searchTextBox, Path=Text}"/>
+                </TextBox.InputBindings>
+
+            </w:WatermarkTextBox>
+            <Button Style="{StaticResource FormButton}" Content="Search" Width="60"
+                    Command="{Binding Search}" CommandParameter="{Binding ElementName=searchTextBox, Path=Text}"/>
         </StackPanel>
         
         <!-- Main panel -->
