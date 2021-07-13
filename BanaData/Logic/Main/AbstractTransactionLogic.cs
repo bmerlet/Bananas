@@ -76,9 +76,6 @@ namespace BanaData.Logic.Main
             set => data.Payee = value;
         }
 
-        // Memorized payees
-        public IEnumerable<MemorizedPayeeItem> Payees => mainWindowLogic.MemorizedPayees;
-
         // Memo
         public string Memo
         {
@@ -105,12 +102,10 @@ namespace BanaData.Logic.Main
                 }
                 else
                 {
-                    mainWindowLogic.ErrorMessage("Cannot set category for split transactions");
+                    mainWindowLogic.ErrorMessage("Cannot set category for split transaction");
                 }
             }
         }
-
-        public IEnumerable<CategoryItem> Categories => mainWindowLogic.CategoriesAndTransfers;
 
         // Amount (UI property for investments, and also used to recompute balance)
         public decimal Amount

@@ -51,8 +51,6 @@ namespace BanaData.Logic.Main
             ShowHoldings.SetCanExecute(false);
             ShowRebalance = new CommandBase(OnShowRebalance);
             ShowRebalance.SetCanExecute(false);
-
-            Test = new CommandBase(OnTest);
         }
 
         #endregion
@@ -391,19 +389,6 @@ namespace BanaData.Logic.Main
         private void OnShowRebalance()
         {
             mainWindow.GuiServices.ShowDialog(new ShowRebalanceLogic(mainWindow, mainWindow.DisplayedAccountID));
-        }
-
-        #endregion
-
-        #region Test button
-
-        public CommandBase Test { get; }
-
-        private void OnTest()
-        {
-            var q = new Web.Quote();
-            var price = q.GetQuote("XOM");
-            Console.WriteLine("XOM price: " + price);
         }
 
         #endregion

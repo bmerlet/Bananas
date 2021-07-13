@@ -54,11 +54,15 @@ namespace BanaData.Logic.Main
             // Get settings
             UserSettings = settingsManager.Load() ?? new UserSettings();
 
-            // Create logic for main window subcomponents
+            // Main menu
             MainMenuLogic = new MainMenuLogic(this);
+
+            // Account groups
             BankAccountGroup = new AccountGroupLogic(this, AccountGroupLogic.EType.Banking);
             InvestmentAccountGroup = new AccountGroupLogic(this, AccountGroupLogic.EType.Investment);
             AssetAccountGroup = new AccountGroupLogic(this, AccountGroupLogic.EType.Asset);
+
+            // Registers
             BankRegister = new BankRegisterLogic(this);
             InvestmentRegister = new InvestmentRegisterLogic(this);
 
@@ -67,7 +71,7 @@ namespace BanaData.Logic.Main
             AssetAccountGroup.AccountClicked += (o, e) => OnBankAccountClicked(o as AccountGroupLogic, e.AccountID);
 
             // Create list of investment transaction type
-            foreach(EInvestmentTransactionType itt in Enum.GetValues(typeof(EInvestmentTransactionType)))
+            foreach (EInvestmentTransactionType itt in Enum.GetValues(typeof(EInvestmentTransactionType)))
             {
                 investmentTransactionTypes.Add(new InvestmentTransactionTypeItem(itt));
             }
@@ -88,9 +92,23 @@ namespace BanaData.Logic.Main
                 {
                     UpdateAll();
                 }
+
             });
 
         }
+
+        #endregion
+
+        #region Events
+
+        // The security list has changed
+        public event EventHandler SecuritiesChanged;
+
+        // The memorized payees have changed
+        public event EventHandler MemorizedPayeesChanged;
+
+        // The category list has changed
+        public event EventHandler CategoriesChanged;
 
         #endregion
 
@@ -127,7 +145,6 @@ namespace BanaData.Logic.Main
 
         // List of securities
         public readonly ObservableCollection<SecurityItem> Securities = new ObservableCollection<SecurityItem>();
-        public CollectionView SecuritiesView { get; private set; }
 
         // List of investment transaction types
         private readonly List<InvestmentTransactionTypeItem> investmentTransactionTypes = new List<InvestmentTransactionTypeItem>();
@@ -191,20 +208,7 @@ namespace BanaData.Logic.Main
 
         #endregion
 
-        #region Services
-
-        public void ErrorMessage(string message, string title = "Error")
-        {
-            var logic = new ErrorLogic(message, title);
-            GuiServices.ShowDialog(logic);
-        }
-
-        // returns true if answer is yes
-        public bool YesNoQuestion(string question)
-        {
-            var logic = new QuestionLogic(question);
-            return GuiServices.ShowDialog(logic);
-        }
+        #region File services
 
         public void OpenFile(string file)
         {
@@ -303,6 +307,45 @@ namespace BanaData.Logic.Main
             ErrorMessage("Differential export completed; new checkpoint created", "Export results");
         }
 
+        public void SaveIfDirty()
+        {
+            if (Dirty)
+            {
+                Save();
+            }
+        }
+
+        public void Save()
+        {
+            SaveToFile(UserSettings.LastFileOpened);
+        }
+
+        public void SaveUserSettings()
+        {
+            settingsManager.Save(UserSettings);
+        }
+
+        #endregion
+
+        #region UI Services
+
+        public void ErrorMessage(string message, string title = "Error")
+        {
+            var logic = new ErrorLogic(message, title);
+            GuiServices.ShowDialog(logic);
+        }
+
+        // returns true if answer is yes
+        public bool YesNoQuestion(string question)
+        {
+            var logic = new QuestionLogic(question);
+            return GuiServices.ShowDialog(logic);
+        }
+
+        #endregion
+
+        #region DB services
+
         // Commit changes to household data set
         public void CommitChanges()
         {
@@ -319,23 +362,9 @@ namespace BanaData.Logic.Main
             }
         }
 
-        public void SaveUserSettings()
-        {
-            settingsManager.Save(UserSettings);
-        }
+        #endregion
 
-        public void SaveIfDirty()
-        {
-            if (Dirty)
-            {
-                Save();
-            }
-        }
-
-        public void Save()
-        {
-            SaveToFile(UserSettings.LastFileOpened);
-        }
+        #region Updates and notifications
 
         public void UpdateAll()
         {
@@ -368,6 +397,18 @@ namespace BanaData.Logic.Main
 
             // Compute the known securities
             BuildSecuritiesList();
+        }
+
+        // Action after securities are changed
+        public void NotifySecurityChange()
+        {
+            SecuritiesChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        // Action after categories are changed
+        public void NotifyCategoriesChanged()
+        {
+            CategoriesChanged?.Invoke(this, EventArgs.Empty);
         }
 
         // Action after memorized payees are changed
@@ -565,6 +606,7 @@ namespace BanaData.Logic.Main
             }
 
             MemorizedPayees.Sort();
+            MemorizedPayeesChanged?.Invoke(this, EventArgs.Empty);
         }
 
         // Builds or rebuilds the list of categories
@@ -644,18 +686,20 @@ namespace BanaData.Logic.Main
             Transfers.Sort();
             CategoriesAndTransfers.Sort();
             HiddenCategories.Sort();
+
+            CategoriesChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private void BuildSecuritiesList()
         {
+            Securities.Clear();
+
             foreach (Household.SecurityRow security in Household.Security.Rows)
             {
                 Securities.Add(new SecurityItem(security.ID, security.Name, security.Symbol, security.Type));
             }
 
-            SecuritiesView = (CollectionView)CollectionViewSource.GetDefaultView(Securities);
-            SecuritiesView.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
-
+            NotifySecurityChange();
         }
 
         #endregion

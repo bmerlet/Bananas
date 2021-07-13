@@ -149,6 +149,7 @@ namespace BanaData.Logic.Dialogs
                 mainWindowLogic.Categories.Sort();
                 mainWindowLogic.CategoriesAndTransfers.Add(newCategory);
                 mainWindowLogic.CategoriesAndTransfers.Sort();
+                mainWindowLogic.NotifyCategoriesChanged();
 
                 // Update dialog list
                 var newEditCategory = new EditCategoryItem(newCategory, false);
@@ -185,6 +186,7 @@ namespace BanaData.Logic.Dialogs
                     mainWindowLogic.CategoriesAndTransfers.Remove(SelectedCategory.CategoryItem);
                     mainWindowLogic.CategoriesAndTransfers.Add(updatedCategory);
                     mainWindowLogic.CategoriesAndTransfers.Sort();
+                    mainWindowLogic.NotifyCategoriesChanged();
 
                     // Update dialog list
                     categoriesSource.Remove(SelectedCategory);
@@ -225,6 +227,7 @@ namespace BanaData.Logic.Dialogs
                 categoriesSource.Remove(categoryToDelete);
                 mainWindowLogic.Categories.Remove(categoryToDelete.CategoryItem);
                 mainWindowLogic.CategoriesAndTransfers.Remove(categoryToDelete.CategoryItem);
+                mainWindowLogic.NotifyCategoriesChanged();
             }
         }
 

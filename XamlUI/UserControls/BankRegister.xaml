@@ -238,7 +238,7 @@
                 Style="{StaticResource PayeeBoxStyle}"
                 Text="{Binding EditedTransaction.Payee, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 ItemSelectedCommand="{Binding EditedTransaction.PayeeSelected}"
-                ItemsSource="{Binding EditedTransaction.Payees}"/>
+                ItemsSource="{Binding MemorizedPayees}"/>
             
             <!-- Memo -->
             <local:WatermarkTextBox
@@ -251,7 +251,7 @@
                 Grid.Column="4"
                 Style="{StaticResource CategoryBoxStyle}"
                 Text="{Binding EditedTransaction.Category, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                ItemsSource="{Binding EditedTransaction.Categories}"/>
+                ItemsSource="{Binding CategoriesAndTransfers}"/>
 
             <!-- Payment -->
             <local:AmountBox

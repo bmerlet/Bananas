@@ -9,6 +9,8 @@ using System.Windows.Data;
 using Toolbox.UILogic;
 using BanaData.Database;
 using BanaData.Logic.Items;
+using BanaData.Collections;
+using System.ComponentModel;
 
 namespace BanaData.Logic.Main
 {
@@ -21,6 +23,22 @@ namespace BanaData.Logic.Main
         {
             // Create column width manager
             Widths = new ColumnWidths(mainWindowLogic, this);
+
+            // Payee view
+            MemorizedPayees = (CollectionView)CollectionViewSource.GetDefaultView(memorizedPayees);
+            MemorizedPayees.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
+
+            // Be notified when memorized payees change
+            mainWindowLogic.MemorizedPayeesChanged += (s, e) => UpdateMemorizedPayees();
+            UpdateMemorizedPayees();
+
+            // Categories view
+            CategoriesAndTransfers = (CollectionView)CollectionViewSource.GetDefaultView(categoriesAndTransfers);
+            CategoriesAndTransfers.SortDescriptions.Add(new SortDescription("FullName", ListSortDirection.Ascending));
+
+            // Be notified when categories change
+            mainWindowLogic.CategoriesChanged += (s, e) => UpdateCategoriesAndTransfers();
+            UpdateCategoriesAndTransfers();
         }
 
         #endregion
@@ -29,6 +47,14 @@ namespace BanaData.Logic.Main
 
         // If banking account (as opposed to credit card)
         public bool IsBank { get; private set; }
+
+        // Memorized payees
+        private WpfObservableRangeCollection<MemorizedPayeeItem> memorizedPayees = new WpfObservableRangeCollection<MemorizedPayeeItem>();
+        public CollectionView MemorizedPayees { get; }
+
+        // Categories
+        private WpfObservableRangeCollection<CategoryItem> categoriesAndTransfers = new WpfObservableRangeCollection<CategoryItem>();
+        public CollectionView CategoriesAndTransfers;
 
         // Column widths
         public ColumnWidths Widths { get; }
@@ -104,6 +130,15 @@ namespace BanaData.Logic.Main
             return bankingTransaction;
         }
 
+        private void UpdateMemorizedPayees()
+        {
+            memorizedPayees.ReplaceRange(mainWindowLogic.MemorizedPayees);
+        }
+
+        private void UpdateCategoriesAndTransfers()
+        {
+            categoriesAndTransfers.ReplaceRange(mainWindowLogic.CategoriesAndTransfers);
+        }
 
         #endregion
 

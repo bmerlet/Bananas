@@ -57,6 +57,7 @@ namespace BanaData.Serializations
 
             // Create a new checkpoint
             household.Checkpoint.AddCheckpointRow(DateTime.Now);
+            mainWindowLogic.CommitChanges();
         }
 
         #endregion

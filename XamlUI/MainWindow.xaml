@@ -52,7 +52,6 @@
                 <MenuItem Header="Show rebalance dashboard..." Command="{Binding ShowRebalance}"/>
                 <MenuItem Header="Show yearly capital gains and dividends..." Command="{Binding ShowYearlyCapGainsAndDividends}"/>
             </MenuItem>
-            <MenuItem Header="Test" Command="{Binding Test}"/>
         </Menu>
         <Grid>
             <Grid.ColumnDefinitions>

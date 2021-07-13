@@ -74,6 +74,7 @@ namespace BanaData.Logic.Dialogs
 
                 // Upate main list
                 mainWindowLogic.Securities.Add(newSecurity);
+                mainWindowLogic.NotifySecurityChange();
 
                 // Update UI
                 securitySource.Add(newSecurity);
@@ -100,6 +101,7 @@ namespace BanaData.Logic.Dialogs
                     // Upate main list
                     mainWindowLogic.Securities.Remove(SelectedSecurity);
                     mainWindowLogic.Securities.Add(newSecurity);
+                    mainWindowLogic.NotifySecurityChange();
 
                     // Update UI
                     securitySource.Remove(SelectedSecurity);
@@ -129,6 +131,7 @@ namespace BanaData.Logic.Dialogs
 
                 // Upate main list
                 mainWindowLogic.Securities.Remove(SelectedSecurity);
+                mainWindowLogic.NotifySecurityChange();
 
                 // Update UI
                 securitySource.Remove(SelectedSecurity);

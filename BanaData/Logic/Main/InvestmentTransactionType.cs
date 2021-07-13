@@ -463,7 +463,7 @@ namespace BanaData.Logic.Main
             }
 
             decimal expectedSecurityPrice = data.Amount / data.SecurityQuantity;
-            if (data.SecurityPrice != expectedSecurityPrice)
+            if (data.SecurityPrice != Math.Round(expectedSecurityPrice, 4))
             {
                 return
                     "The share price should be the dividend amount divided by the number of shares" + Environment.NewLine +
