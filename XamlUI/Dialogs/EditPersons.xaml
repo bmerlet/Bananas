@@ -20,12 +20,6 @@
             Width="250" Height="150"
             ItemsSource="{Binding PersonsSource}">
 
-            <!-- Make the list view items use all the horizontal space -->
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                </Style>
-            </ListView.ItemContainerStyle>
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Name" Width="240">

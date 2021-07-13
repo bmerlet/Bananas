@@ -199,6 +199,11 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        
+        <!-- Make all ListViewItem occupy the whole horizontal space-->
+        <Style TargetType="ListViewItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        </Style>
 
     </Application.Resources>
 </Application>

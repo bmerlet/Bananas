@@ -30,13 +30,6 @@
             SelectionMode="Single"
             ItemsSource="{Binding Transactions}">
 
-            <!-- Make the list view items use all the horizontal space -->
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                </Style>
-            </ListView.ItemContainerStyle>
-            
             <ListView.View>
                 <GridView>
 

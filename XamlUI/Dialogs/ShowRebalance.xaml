@@ -48,12 +48,6 @@
         <ListView
             ItemsSource="{Binding SecuritiesSource}">
             
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                </Style>
-            </ListView.ItemContainerStyle>
-
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Security" Width="{Binding WidthOfSecurityColumn, Mode=TwoWay}" DisplayMemberBinding="{Binding Symbol}"/>

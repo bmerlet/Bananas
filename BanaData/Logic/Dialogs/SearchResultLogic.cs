@@ -23,21 +23,35 @@ namespace BanaData.Logic.Dialogs
             FoundItemsSource = (CollectionView)CollectionViewSource.GetDefaultView(foundItems);
             FoundItemsSource.SortDescriptions.Add(new SortDescription("Date", ListSortDirection.Descending));
 
-            PerformSearch();
+            Search = new CommandBase(OnSearch);
+
+            OnSearch();
         }
 
         private string searchText;
         public string SearchText
         {
             get => searchText;
-            set { searchText = value; PerformSearch(); }
+            set { searchText = value; OnSearch(); }
         }
+
+        public CommandBase Search { get; }
 
         private readonly WpfObservableRangeCollection<FoundItem> foundItems = new WpfObservableRangeCollection<FoundItem>();
         public CollectionView FoundItemsSource { get; }
 
-        private void PerformSearch()
+        public void GoTo(FoundItem item)
         {
+            mainWindowLogic.GotoTransaction(item.TransRow.AccountID, item.TransRow.ID, -1);
+        }
+
+        private void OnSearch()
+        {
+            if (string.IsNullOrWhiteSpace(searchText))
+            {
+                return;
+            }
+
             var household = mainWindowLogic.Household;
             var tmpList = new List<FoundItem>();
 
@@ -136,20 +150,21 @@ namespace BanaData.Logic.Dialogs
 
         public class FoundItem
         {
-            private readonly Household.TransactionRow transRow;
-
-            public FoundItem(Household.TransactionRow _transRow)
+            public FoundItem(Household.TransactionRow transRow)
             {
-                transRow = _transRow;
+                TransRow = transRow;
             }
 
-            public DateTime Date => transRow.Date;
-            public string Payee => transRow.IsPayeeNull() ? "" : transRow.Payee;
-            public string Memo => transRow.IsMemoNull() ? "" : transRow.Memo;
-            public string Category => transRow.GetLineItemRows().Length > 1 ? "<Split>" :
-                (!transRow.GetLineItemRows().Single().IsCategoryIDNull() ? transRow.GetLineItemRows().Single().CategoryRow.FullName :
-                (!transRow.GetLineItemRows().Single().IsAccountIDNull() ? transRow.GetLineItemRows().Single().AccountRow.Name : ""));
-            public decimal Amount => transRow.GetLineItemRows().Sum(li => li.Amount);
+            public readonly Household.TransactionRow TransRow;
+
+            public string Account => TransRow.AccountRow.Name;
+            public DateTime Date => TransRow.Date;
+            public string Payee => TransRow.IsPayeeNull() ? "" : TransRow.Payee;
+            public string Memo => TransRow.IsMemoNull() ? "" : TransRow.Memo;
+            public string Category => TransRow.GetLineItemRows().Length > 1 ? "<Split>" :
+                (!TransRow.GetLineItemRows().Single().IsCategoryIDNull() ? TransRow.GetLineItemRows().Single().CategoryRow.FullName :
+                (!TransRow.GetLineItemRows().Single().IsAccountIDNull() ? TransRow.GetLineItemRows().Single().AccountRow.Name : ""));
+            public decimal Amount => TransRow.GetLineItemRows().Sum(li => li.Amount);
         }
     }
 }

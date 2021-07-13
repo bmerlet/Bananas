@@ -36,13 +36,6 @@
             ScrollViewer.ScrollChanged="OnListViewScrollChanged"
             ItemsSource="{Binding Transactions, IsAsync=True}">
 
-            <!-- Make the list view items use all the horizontal space -->
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                </Style>
-            </ListView.ItemContainerStyle>
-
             <!-- View definition -->
             <ListView.View>
                 <GridView>

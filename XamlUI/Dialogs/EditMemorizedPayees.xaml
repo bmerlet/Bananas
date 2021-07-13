@@ -28,13 +28,6 @@
             SelectedItem="{Binding SelectedMemorizedPayee, Mode=TwoWay}"
             MouseDoubleClick="OnListviewDoubleClick">
 
-            <!-- Make the list view items use all the horizontal space -->
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                </Style>
-            </ListView.ItemContainerStyle>
-
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Payee" Width="200" DisplayMemberBinding="{Binding Payee}"/>

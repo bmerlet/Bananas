@@ -17,24 +17,24 @@
         <w:DonePanel DockPanel.Dock="Bottom"/>
 
         <!-- Other search -->
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Right">
+            <w:WatermarkTextBox Style="{StaticResource FormWatermarkTextBox}" Watermark="Search text" Text="{Binding SearchText, Mode=TwoWay}" Width="80"/>
+            <Button Style="{StaticResource FormButton}" Content="Search" Width="60" Command="{Binding Search}"/>
+        </StackPanel>
         
         <!-- Main panel -->
         <ListView
-            Width="540" Height="300"
+            Width="760" Height="300"
+            SelectionMode="Single"
+            MouseDoubleClick="OnListViewMouseDoubleClick"
             ItemsSource="{Binding FoundItemsSource}">
-
-            <!-- Make the list view items use all the horizontal space -->
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                </Style>
-            </ListView.ItemContainerStyle>
 
             <ListView.View>
                 <GridView>
+                    <GridViewColumn Header="Account" Width="100" DisplayMemberBinding="{Binding Account}"/>
                     <GridViewColumn Header="Date" Width="80" DisplayMemberBinding="{Binding Date, StringFormat=MM/dd/yyyy}"/>
-                    <GridViewColumn Header="Payee" Width="120" DisplayMemberBinding="{Binding Payee}"/>
-                    <GridViewColumn Header="Memo" Width="120" DisplayMemberBinding="{Binding Memo}"/>
+                    <GridViewColumn Header="Payee" Width="180" DisplayMemberBinding="{Binding Payee}"/>
+                    <GridViewColumn Header="Memo" Width="180" DisplayMemberBinding="{Binding Memo}"/>
                     <GridViewColumn Header="Category" Width="120" DisplayMemberBinding="{Binding Category}"/>
                     <GridViewColumn Header="Amount" Width="80">
                         <GridViewColumn.CellTemplate>

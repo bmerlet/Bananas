@@ -27,5 +27,15 @@ namespace XamlUI.Dialogs
 
             InitializeComponent();
         }
+
+        private void OnListViewMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (DataContext is SearchResultLogic logic && sender is ListView listView && listView.SelectedItem is SearchResultLogic.FoundItem item)
+            {
+                DialogResult = true;
+                //Close();
+                logic.GoTo(item);
+            }
+        }
     }
 }

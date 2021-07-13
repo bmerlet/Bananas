@@ -119,12 +119,6 @@
                 </DataTemplate>
             </ListView.Resources>
 
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                </Style>
-            </ListView.ItemContainerStyle>
-
             <ListView.View>
                 <GridView>
                     <!-- Date column -->
