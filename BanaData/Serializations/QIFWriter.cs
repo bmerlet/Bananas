@@ -195,11 +195,7 @@ namespace BanaData.Serializations
 
             foreach (Household.AccountRow accountRow in household.Account.Rows)
             {
-                sw.WriteLine("!Account");
-                string accountType = GetAccountType(accountRow, true);
-                ExportOneAccount(sw, accountRow, accountType);
-
-                sw.WriteLine($"!Type:{accountType}");
+                bool accountWritten = false;
 
                 // Get all transactions on this account
                 foreach (var transactionRow in accountRow.GetTransactionRows())
@@ -208,6 +204,17 @@ namespace BanaData.Serializations
                     if (checkpointID >= 0 && transactionRow.CheckpointID != checkpointID)
                     {
                         continue;
+                    }
+
+                    // Write the account as a header first time around
+                    if (!accountWritten)
+                    {
+                        sw.WriteLine("!Account");
+                        string accountType = GetAccountType(accountRow, true);
+                        ExportOneAccount(sw, accountRow, accountType);
+
+                        sw.WriteLine($"!Type:{accountType}");
+                        accountWritten = true;
                     }
 
                     ExportDate(sw, transactionRow.Date);

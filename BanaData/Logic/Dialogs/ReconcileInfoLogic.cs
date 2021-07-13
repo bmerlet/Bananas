@@ -39,7 +39,7 @@ namespace BanaData.Logic.Dialogs
             // Fill out properties with account info
             BasicInfo = $"Information to reconcile account {accountRow.Name}";
 
-            // Get last statement end date
+            // Get prior statement end date
             PriorStatementEndDate = accountRow.IsLastStatementDateNull() ? new DateTime(2021, 01, 01) : accountRow.LastStatementDate;
 
             // Compute last reconciled balance
@@ -124,7 +124,21 @@ namespace BanaData.Logic.Dialogs
         //
         // Statement dates
         //
-        public DateTime PriorStatementEndDate { get; }
+        private DateTime priorStatementEndDate;
+        public DateTime PriorStatementEndDate
+        {
+            get => priorStatementEndDate;
+            set
+            {
+                if (priorStatementEndDate != value)
+                {
+                    priorStatementEndDate = value;
+                    GuessSecurities(PriorStatementEndDate, statementEndDate);
+                }
+            }
+        }
+        public bool IsPriorStatementEndDateEnabled { get; }
+
         private DateTime statementEndDate;
         public DateTime StatementEndDate
         {
@@ -203,6 +217,8 @@ namespace BanaData.Logic.Dialogs
         {
             var household = mainWindowLogic.Household;
             bool adding = reconcileInfoRow == null;
+
+            accountRow.LastStatementDate = PriorStatementEndDate;
 
             int categoryID = -1;
             if (IsInterestInfoVisible)

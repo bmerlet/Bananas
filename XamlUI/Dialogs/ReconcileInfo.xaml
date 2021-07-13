@@ -122,7 +122,7 @@
 
             <!-- Row 1: Prior statement end date -->
             <TextBlock Text="Prior statement end date:" Grid.Row="1"/>
-            <w:DateBox Date="{Binding PriorStatementEndDate}"  Grid.Row="1" Grid.Column="1" IsEnabled="False"/>
+            <w:DateBox Date="{Binding PriorStatementEndDate, Mode=TwoWay}"  Grid.Row="1" Grid.Column="1"/>
 
             <!-- Row 2: Statement end date -->
             <TextBlock Text="Statement end date:" Grid.Row="2"/>

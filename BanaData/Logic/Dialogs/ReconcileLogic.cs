@@ -259,6 +259,7 @@ namespace BanaData.Logic.Dialogs
         private void UpdateAllMarkedTransactionsTo(ETransactionStatus newStatus)
         {
             var household = mainWindowLogic.Household;
+            var latestCheckpoint = household.Checkpoint.GetMostRecentCheckpointID();
 
             foreach (var trList in new ReconcileGridLogic[] { Payments, Deposits })
             {
@@ -268,11 +269,13 @@ namespace BanaData.Logic.Dialogs
                     {
                         var liRow = household.LineItem.FindByID(tr.ID);
                         liRow.TransferStatus = tr.IsCleared == true ? newStatus : ETransactionStatus.Pending;
+                        liRow.TransactionRow.CheckpointID = latestCheckpoint;
                     }
                     else
                     {
                         var transRow = household.Transaction.FindByID(tr.ID);
                         transRow.Status = tr.IsCleared == true ? newStatus : ETransactionStatus.Pending;
+                        transRow.CheckpointID = latestCheckpoint;
                     }
                 }
             }

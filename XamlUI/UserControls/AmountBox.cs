@@ -9,10 +9,18 @@ using System.Windows.Input;
 
 namespace XamlUI.UserControls
 {
+    /// <summary>
+    /// Widget to enter a decimal amount
+    /// </summary>
     class AmountBox : WatermarkTextBox
     {
+        #region Private members
+
         private bool internalAmountUpdate;
+        private bool internalTextUpdate;
         private string formatString = "N";
+
+        #endregion
 
         #region Dependency Properties
 
@@ -43,6 +51,7 @@ namespace XamlUI.UserControls
         {
             if (!internalAmountUpdate)
             {
+                internalTextUpdate = true;
                 if (amount == 0 && !ShowZeroAmount)
                 {
                     Text = "";
@@ -51,6 +60,7 @@ namespace XamlUI.UserControls
                 {
                     Text = amount.ToString(formatString);
                 }
+                internalTextUpdate = false;
             }
         }
 
@@ -78,7 +88,9 @@ namespace XamlUI.UserControls
         {
             if (Amount == 0)
             {
+                internalTextUpdate = true;
                 Text = showZeroAmount ? Amount.ToString(formatString) : "";
+                internalTextUpdate = false;
             }
         }
 
@@ -108,7 +120,9 @@ namespace XamlUI.UserControls
 
             if (ShowZeroAmount || Amount != 0)
             {
+                internalTextUpdate = true;
                 Text = Amount.ToString(formatString);
+                internalTextUpdate = false;
             }
         }
 
@@ -204,13 +218,16 @@ namespace XamlUI.UserControls
         {
             base.OnTextChanged(e);
 
-            // Parse current text
-            Parse(Text, out decimal amount);
+            if (!internalTextUpdate)
+            {
+                // Parse current text
+                Parse(Text, out decimal amount);
 
-            // Update amount property
-            internalAmountUpdate = true;
-            Amount = amount;
-            internalAmountUpdate = false;
+                // Update amount property
+                internalAmountUpdate = true;
+                Amount = amount;
+                internalAmountUpdate = false;
+            }
         }
 
         // Reformat amount and update the amount property when moving away
