@@ -61,14 +61,11 @@ namespace BanaData.Logic.Dialogs
 
             // Setup view of security
             SecurityInfoSource = (CollectionView)CollectionViewSource.GetDefaultView(securityInfos);
-            SecurityInfoSource.SortDescriptions.Add(new SortDescription("Symbol", ListSortDirection.Ascending));
-            
-            // Guess the securities available in this account, by looking at what was there for the prior statement
-            // date and what was there for the current statement date
-            if (accountRow.Type == EAccountType.Investment)
-            {
-                GuessSecurities(PriorStatementEndDate, StatementEndDate);
-            }
+            SecurityInfoSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
+
+            // Guess the securities available in this account by applying all the reconciled transactions
+            // and also looking at the portfolio at the last statement date
+            GuessSecurities(StatementEndDate);
 
             // Find if there is a reconcile info available for this account
             var reconcileInfos = accountRow.GetReconcileInfoRows();
@@ -124,20 +121,7 @@ namespace BanaData.Logic.Dialogs
         //
         // Statement dates
         //
-        private DateTime priorStatementEndDate;
-        public DateTime PriorStatementEndDate
-        {
-            get => priorStatementEndDate;
-            set
-            {
-                if (priorStatementEndDate != value)
-                {
-                    priorStatementEndDate = value;
-                    GuessSecurities(PriorStatementEndDate, statementEndDate);
-                }
-            }
-        }
-        public bool IsPriorStatementEndDateEnabled { get; }
+        public DateTime PriorStatementEndDate { get; set; }
 
         private DateTime statementEndDate;
         public DateTime StatementEndDate
@@ -148,7 +132,7 @@ namespace BanaData.Logic.Dialogs
                 if (statementEndDate != value)
                 {
                     statementEndDate = value;
-                    GuessSecurities(PriorStatementEndDate, statementEndDate);
+                    GuessSecurities(statementEndDate);
                 }
             }
         }
@@ -180,7 +164,7 @@ namespace BanaData.Logic.Dialogs
 
         #region Actions
 
-        public void GuessSecurities(DateTime start, DateTime end)
+        public void GuessSecurities(DateTime end)
         {
             if (accountRow.Type != EAccountType.Investment)
             {
@@ -199,9 +183,9 @@ namespace BanaData.Logic.Dialogs
                 securityInfos.Add(new SecurityInfoItem(security, quantity));
             }
 
-            // Get the portfolio at the beginning
-            portfolio = accountRow.GetPortfolio(start);
-            
+            // Get the reconciled protfolio state
+            portfolio = accountRow.GetPortfolio(null, null, ETransactionStatus.Reconciled);
+
             // Add any missing security with a presumed quantity of zero
             foreach (var security in portfolio.GetSecuritiesRows())
             {
@@ -290,6 +274,7 @@ namespace BanaData.Logic.Dialogs
             public SecurityInfoItem(Household.SecurityRow securitiesRow, decimal quantity) => (SecurityRow, Quantity) = (securitiesRow, quantity);
 
             public readonly Household.SecurityRow SecurityRow;
+            public string Name => SecurityRow.Name;
             public string Symbol => SecurityRow.Symbol == Household.SecurityRow.SYMBOL_NONE ? SecurityRow.Name : SecurityRow.Symbol;
             public decimal Quantity { get; set; }
         }

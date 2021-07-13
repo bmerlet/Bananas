@@ -31,7 +31,13 @@
             <ListView.View>
                 <GridView>
                     <GridView.Columns>
-                        <GridViewColumn Header="Security" Width="100" DisplayMemberBinding="{Binding Symbol}"/>
+                        <GridViewColumn Header="Security" Width="100">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Symbol}" ToolTip="{Binding Name}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
                         <GridViewColumn Header="Prior statement" Width="100">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>

@@ -42,10 +42,10 @@ namespace BanaData.Logic.Dialogs
             Title = "Reconcile: " + accountRow.Name;
 
             // Build properties
-            Payments = new ReconcileGridLogic(accountRow, "Payments:", BuildTransactionList(false));
+            Payments = new ReconcileGridLogic(accountRow, "Payments:", BuildTransactionList(reconcileInfo, false));
             Payments.ClearedBalanceChanged += OnClearedBalanceChanged;
 
-            Deposits = new ReconcileGridLogic(accountRow, "Deposits:", BuildTransactionList(true));
+            Deposits = new ReconcileGridLogic(accountRow, "Deposits:", BuildTransactionList(reconcileInfo, true));
             Deposits.ClearedBalanceChanged += OnClearedBalanceChanged;
 
             MarkAll = new CommandBase(OnMarkAll);
@@ -55,7 +55,7 @@ namespace BanaData.Logic.Dialogs
             UpdateBalances();
         }
 
-        private IEnumerable<TransactionToReconcile> BuildTransactionList(bool deposit)
+        private IEnumerable<TransactionToReconcile> BuildTransactionList(Household.ReconcileInfoRow reconcileInfoRow,  bool deposit)
         {
             // Find all candidates
             var transactions = new List<TransactionToReconcile>();
@@ -64,6 +64,12 @@ namespace BanaData.Logic.Dialogs
             // Process regular transactions
             foreach (Household.TransactionRow tr in accountRow.GetUnreconciledTransactions())
             {
+                // Ignore transactions after the statement date
+                if (tr.Date.CompareTo(reconcileInfoRow.StatementDate) > 0)
+                {
+                    continue;
+                }
+
                 // Compute amount
                 var lineItems = tr.GetLineItemRows();
                 decimal amount = lineItems.Sum(li => li.Amount);

@@ -26,15 +26,14 @@ namespace BanaData.Logic.Main
 
             // Payee view
             MemorizedPayees = (CollectionView)CollectionViewSource.GetDefaultView(memorizedPayees);
-            MemorizedPayees.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
+            MemorizedPayees.SortDescriptions.Add(new SortDescription("Payee", ListSortDirection.Ascending));
 
             // Be notified when memorized payees change
             mainWindowLogic.MemorizedPayeesChanged += (s, e) => UpdateMemorizedPayees();
             UpdateMemorizedPayees();
 
-            // Categories view
+            // Categories view - already sorted by the main window code
             CategoriesAndTransfers = (CollectionView)CollectionViewSource.GetDefaultView(categoriesAndTransfers);
-            CategoriesAndTransfers.SortDescriptions.Add(new SortDescription("FullName", ListSortDirection.Ascending));
 
             // Be notified when categories change
             mainWindowLogic.CategoriesChanged += (s, e) => UpdateCategoriesAndTransfers();
@@ -49,12 +48,12 @@ namespace BanaData.Logic.Main
         public bool IsBank { get; private set; }
 
         // Memorized payees
-        private WpfObservableRangeCollection<MemorizedPayeeItem> memorizedPayees = new WpfObservableRangeCollection<MemorizedPayeeItem>();
+        private readonly WpfObservableRangeCollection<MemorizedPayeeItem> memorizedPayees = new WpfObservableRangeCollection<MemorizedPayeeItem>();
         public CollectionView MemorizedPayees { get; }
 
         // Categories
-        private WpfObservableRangeCollection<CategoryItem> categoriesAndTransfers = new WpfObservableRangeCollection<CategoryItem>();
-        public CollectionView CategoriesAndTransfers;
+        private readonly WpfObservableRangeCollection<CategoryItem> categoriesAndTransfers = new WpfObservableRangeCollection<CategoryItem>();
+        public CollectionView CategoriesAndTransfers { get; }
 
         // Column widths
         public ColumnWidths Widths { get; }

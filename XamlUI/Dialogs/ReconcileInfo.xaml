@@ -7,6 +7,8 @@
         xmlns:w="clr-namespace:XamlUI.UserControls"
         xmlns:t="clr-namespace:XamlUI.Tools"
         mc:Ignorable="d"
+        xmlns:dialogs="clr-namespace:BanaData.Logic.Dialogs;assembly=BanaData"
+        d:DataContext="{d:DesignInstance Type=dialogs:ReconcileInfoLogic}"
         Title="Reconcile Info"
         Icon="/XamlUI;component/Images/Bananas.ico"
         ResizeMode="NoResize"
@@ -95,7 +97,7 @@
                                 <ColumnDefinition Width="200"/>
                                 <ColumnDefinition Width="100"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding Symbol}" Margin="5"/>
+                            <TextBlock Text="{Binding Symbol}" ToolTip="{Binding Name}" Margin="5"/>
                             <w:AmountBox Amount="{Binding Quantity, Mode=TwoWay}" Precision="4" Grid.Column="1"/>
                         </Grid>
                     </DataTemplate>

@@ -39,22 +39,26 @@ namespace BanaData.Logic.Dialogs
             decimal statementCashBalance = reconcileInfo.StatementBalance;
 
             // Create tracker for cash balance
-            trackers.Add(new SecurityTracker("Cash", priorStatementCashBalance, 0, statementCashBalance, 0, "C2"));
+            trackers.Add(new SecurityTracker("Cash", "Cash", priorStatementCashBalance, 0, statementCashBalance, 0, "C2"));
 
             // Add trackers for securities
-            var priorStatementPortfolio = accountRow.GetPortfolio(accountRow.IsLastStatementDateNull() ? reconcileInfo.StatementDate : accountRow.LastStatementDate);
-            foreach(var securityReconcileInfo in reconcileInfo.GetSecurityReconcileInfoRows())
+            var reconciledPortfolio = accountRow.GetPortfolio(null, null, ETransactionStatus.Reconciled);
+            foreach (var securityReconcileInfo in reconcileInfo.GetSecurityReconcileInfoRows())
             {
-                decimal prioStatementQuantity = priorStatementPortfolio.Lots.Where(l => l.Security == securityReconcileInfo.SecurityRow).Sum(l => l.Quantity);
-                trackers.Add(new SecurityTracker(securityReconcileInfo.SecurityRow.Symbol, prioStatementQuantity, 0, securityReconcileInfo.SecurityQuantity, 0, "N4"));
+                decimal prioStatementQuantity = reconciledPortfolio.Lots.Where(l => l.Security == securityReconcileInfo.SecurityRow).Sum(l => l.Quantity);
+                trackers.Add(new SecurityTracker(
+                    securityReconcileInfo.SecurityRow.Name,
+                    securityReconcileInfo.SecurityRow.Symbol,
+                    prioStatementQuantity, 0, 
+                    securityReconcileInfo.SecurityQuantity, 0, "N4"));
             }
 
             TrackersSource = (CollectionView)CollectionViewSource.GetDefaultView(trackers);
-            TrackersSource.SortDescriptions.Add(new SortDescription("Date", ListSortDirection.Ascending));
+            TrackersSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
 
 
             // Build transaction list
-            Transactions = new ReconcileGridLogic(accountRow, "Transactions:", BuildTransactionList());
+            Transactions = new ReconcileGridLogic(accountRow, "Transactions:", BuildTransactionList(reconcileInfo));
             Transactions.ClearedBalanceChanged += OnClearedBalanceChanged;
 
             MarkAll = new CommandBase(OnMarkAll);
@@ -64,13 +68,19 @@ namespace BanaData.Logic.Dialogs
             UpdateBalances();
         }
 
-        private IEnumerable<TransactionToReconcile> BuildTransactionList()
+        private IEnumerable<TransactionToReconcile> BuildTransactionList(Household.ReconcileInfoRow reconcileInfoRow)
         {
             // Find all candidates
             var transactions = new List<TransactionToReconcile>();
             // Process regular transactions
             foreach (Household.TransactionRow tr in accountRow.GetUnreconciledTransactions())
             {
+                // Ignore transactions after the statement date
+                if (tr.Date.CompareTo(reconcileInfoRow.StatementDate) > 0)
+                {
+                    continue;
+                }
+
                 var investmentTransactionRow = tr.GetInvestmentTransaction();
 
                 // Compute dollar amount
@@ -270,9 +280,12 @@ namespace BanaData.Logic.Dialogs
         // Tracker for one security or cash
         public class SecurityTracker : LogicBase
         {
-            public SecurityTracker(string symbol, decimal priorStatementBalance, decimal _clearedBalance, decimal statementBalance, decimal _balanceToClear, string formatString) =>
-                (Symbol, PriorStatementBalance, clearedBalance, StatementBalance, balanceToClear, FormatString) =
-                (symbol, priorStatementBalance, _clearedBalance, statementBalance, _balanceToClear, formatString);
+            public SecurityTracker(string name, string symbol, decimal priorStatementBalance, decimal _clearedBalance, decimal statementBalance, decimal _balanceToClear, string formatString) =>
+                (Name, Symbol, PriorStatementBalance, clearedBalance, StatementBalance, balanceToClear, FormatString) =
+                (name, symbol, priorStatementBalance, _clearedBalance, statementBalance, _balanceToClear, formatString);
+
+            // Security name
+            public string Name { get; }
 
             // Security symbol
             public string Symbol { get; }
