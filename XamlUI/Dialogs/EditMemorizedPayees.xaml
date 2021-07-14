@@ -8,9 +8,8 @@
         mc:Ignorable="d"
         Title="Edit Memorized Payees"
         Icon="/XamlUI;component/Images/Bananas.ico"
-        ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
-        SizeToContent="WidthAndHeight">
+        SizeToContent="Width" Height="380">
     <DockPanel>
         
         <!-- Done panel -->
@@ -22,7 +21,7 @@
         <!-- Main panel: Listview of memorized payees -->
         <ListView
             x:Name="listView"
-            Height="300" Grid.ColumnSpan="3"
+            Grid.ColumnSpan="3"
             SelectionMode="Single"
             ItemsSource="{Binding MemorizedPayeesSource}"
             SelectedItem="{Binding SelectedMemorizedPayee, Mode=TwoWay}"
@@ -31,6 +30,7 @@
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Payee" Width="200" DisplayMemberBinding="{Binding Payee}"/>
+                    <GridViewColumn Header="Memo" Width="200" DisplayMemberBinding="{Binding Memo}"/>
                     <GridViewColumn Header="Amount" Width="80">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>

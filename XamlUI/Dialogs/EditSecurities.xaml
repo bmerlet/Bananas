@@ -8,9 +8,8 @@
         mc:Ignorable="d"
         Title="Edit Securities"
         Icon="/XamlUI;component/Images/Bananas.ico"
-        ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
-        SizeToContent="WidthAndHeight">
+        SizeToContent="Width" Height="380">
 
     <DockPanel>
         
@@ -24,7 +23,6 @@
         <!-- Main panel: Listbox of securitiess -->
         <ListView
             x:Name="listView"
-            Height="300" Grid.ColumnSpan="3"
             AlternationCount="2"
             SelectionMode="Single"
             ItemsSource="{Binding SecuritiesSource}"

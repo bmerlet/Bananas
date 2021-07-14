@@ -9,9 +9,8 @@
         mc:Ignorable="d"
         Title="Edit Categories"
         Icon="/XamlUI;component/Images/Bananas.ico"
-        ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
-        SizeToContent="WidthAndHeight">
+        SizeToContent="Width" Height="420">
     <DockPanel>
         <!-- Done panel -->
         <w:DonePanel DockPanel.Dock="Bottom"/>
@@ -33,7 +32,7 @@
         <!-- Main panel: Listbox of categories -->
         <ListView
             x:Name="listView"
-            Height="300" Width="670" Grid.Row="1" Grid.ColumnSpan="4"
+            Grid.Row="1" Grid.ColumnSpan="4"
             SelectionMode="Single"
             ItemsSource="{Binding CategoriesSource}"
             SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
