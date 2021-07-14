@@ -14,7 +14,13 @@ namespace BanaData.Logic.Dialogs
 {
     public class SearchResultLogic : LogicBase
     {
+        #region Private members
+
         private readonly MainWindowLogic mainWindowLogic;
+
+        #endregion
+        
+        #region Constructor
 
         public SearchResultLogic(MainWindowLogic _mainWindowLogic, string searchText)
         {
@@ -28,12 +34,20 @@ namespace BanaData.Logic.Dialogs
             OnSearch(SearchText);
         }
 
+        #endregion
+
+        #region UI properties
+
         public string SearchText { get; set; }
 
         public CommandBase Search { get; }
 
         private readonly WpfObservableRangeCollection<FoundItem> foundItems = new WpfObservableRangeCollection<FoundItem>();
         public CollectionView FoundItemsSource { get; }
+
+        #endregion
+
+        #region Actions
 
         public void GoTo(FoundItem item)
         {
@@ -144,6 +158,10 @@ namespace BanaData.Logic.Dialogs
             foundItems.ReplaceRange(tmpList);
         }
 
+        #endregion
+
+        #region FoundItem class
+
         public class FoundItem
         {
             public FoundItem(Household.TransactionRow transRow)
@@ -162,5 +180,7 @@ namespace BanaData.Logic.Dialogs
                 (!TransRow.GetLineItemRows().Single().IsAccountIDNull() ? TransRow.GetLineItemRows().Single().AccountRow.Name : ""));
             public decimal Amount => TransRow.GetLineItemRows().Sum(li => li.Amount);
         }
+
+        #endregion
     }
 }

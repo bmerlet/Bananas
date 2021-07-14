@@ -11,15 +11,14 @@ using BanaData.Database;
 using BanaData.Logic.Items;
 using BanaData.Logic.Dialogs;
 using System.Collections.ObjectModel;
+using System.Windows.Data;
+using BanaData.Collections;
 
 namespace BanaData.Logic.Main
 {
     public class InvestmentTransactionLogic : AbstractTransactionLogic
     {
         #region Private fields
-
-        // Parent logics
-        //private readonly InvestmentRegisterLogic investmentRegisterLogic;
 
         // Our data
         private new readonly InvestmentTransactionData data;
@@ -42,12 +41,20 @@ namespace BanaData.Logic.Main
 
             ShowCapitalGains = new CommandBase(OnShowCapitalGains);
             ShowCapitalGains.SetCanExecute(data.Type == EInvestmentTransactionType.Sell || data.Type == EInvestmentTransactionType.SellAndTransferCash);
+
+            // Security view
+            SecuritiesView = (CollectionView)CollectionViewSource.GetDefaultView(securities);
+            SecuritiesView.SortDescriptions.Add(new SortDescription("Symbol", ListSortDirection.Ascending));
+
+            // Be notified when securities change
+            mainWindowLogic.SecuritiesChanged += (s, e) => UpdateSecurities();
+            UpdateSecurities();
         }
 
         public InvestmentTransactionLogic(
             MainWindowLogic _mainWindowLogic,
             int _accountID)
-            : this(_mainWindowLogic, _accountID, AbstractTransactionLogic.TRANSID_NOT_COMMITTED,
+            : this(_mainWindowLogic, _accountID, TRANSID_NOT_COMMITTED,
                   new InvestmentTransactionData(DateTime.Today, "", "", ETransactionStatus.Pending, new LineItem[] { new LineItem(_mainWindowLogic, -1, "", -1, -1, "", 0, false) },
                     EInvestmentTransactionType.Dividends, -1, 0, 0, 0)) { }
 
@@ -98,13 +105,16 @@ namespace BanaData.Logic.Main
         public int SecuritySymbolTabIndex => investmentTransactionType.SecuritySymbolTabIndex;
         public bool IsSecuritySymbolVisible => investmentTransactionType.IsSecuritySymbolVisible;
 
+        private readonly WpfObservableRangeCollection<SecurityItem> securities = new WpfObservableRangeCollection<SecurityItem>();
+        public CollectionView SecuritiesView { get; }
+
         //
         // Security quantity
         //
         public decimal SecurityQuantity
         {
             get => data.SecurityQuantity;
-            set { data.SecurityQuantity = value; RecomputeAmount(); RecomputeSharePrice(); }
+            set { data.SecurityQuantity = value; RecomputeAmount(); OnAmountChanged(); }
         }
         public int SecurityPriceTabIndex => investmentTransactionType.SecurityPriceTabIndex;
         public bool IsSecurityPriceVisible => investmentTransactionType.IsSecurityPriceVisible;
@@ -126,7 +136,7 @@ namespace BanaData.Logic.Main
         public decimal Commission
         {
             get => data.Commission;
-            set { data.Commission = value; RecomputeAmount(); RecomputeSharePrice(); }
+            set { data.Commission = value; RecomputeAmount(); OnAmountChanged(); }
         }
         public int CommissionTabIndex => investmentTransactionType.CommissionTabIndex;
         public bool IsCommissionVisible => investmentTransactionType.IsCommissionVisible;
@@ -391,6 +401,7 @@ namespace BanaData.Logic.Main
 
             data.Type = value;
             investmentTransactionType = InvestmentTransactionType.GetInvestmentTransactionType(value);
+            UpdateSecurities();
 
             OnPropertyChanged(() => IsSecuritySymbolVisible);
             OnPropertyChanged(() => SecuritySymbolTabIndex);
@@ -456,7 +467,7 @@ namespace BanaData.Logic.Main
         }
 
         // For reinvestment, recompute the share price every time the amount or number of shares is changed
-        protected override void RecomputeSharePrice()
+        protected override void OnAmountChanged()
         {
             if (data.Type == EInvestmentTransactionType.ReinvestDividends || data.Type == EInvestmentTransactionType.ReinvestShortTermCapitalGains ||
                 data.Type == EInvestmentTransactionType.ReinvestMediumTermCapitalGains || data.Type == EInvestmentTransactionType.ReinvestLongTermCapitalGains)
@@ -467,6 +478,27 @@ namespace BanaData.Logic.Main
                     data.SecurityPrice = data.Amount / data.SecurityQuantity;
                     OnPropertyChanged(() => SecurityPrice);
                 }
+            }
+        }
+
+        // When changing date, recompute list of securities present in the account
+        protected override void OnDateChanged()
+        {
+            UpdateSecurities();
+        }
+
+        private void UpdateSecurities()
+        {
+            if (investmentTransactionType != null && investmentTransactionType.IsFilteringSecurity)
+            {
+                var household = mainWindowLogic.Household;
+                var accountRow = household.Account.FindByID(accountID);
+                var portfolio = accountRow.GetPortfolio(data.Date);
+                securities.ReplaceRange(portfolio.GetSecurities().Select<int, SecurityItem>(sid => mainWindowLogic.Securities.First(s => s.ID == sid)));
+            }
+            else
+            {
+                securities.ReplaceRange(mainWindowLogic.Securities);
             }
         }
 

@@ -66,7 +66,7 @@ namespace BanaData.Logic.Main
         public DateTime Date
         {
             get => data.Date;
-            set => data.Date = value;
+            set { data.Date = value; OnDateChanged(); }
         }
 
         // Payee
@@ -121,7 +121,7 @@ namespace BanaData.Logic.Main
                         OnPropertyChanged(() => Payment);
                         OnPropertyChanged(() => Deposit);
                         OnPropertyChanged(() => AmountState);
-                        RecomputeSharePrice();
+                        OnAmountChanged();
                     }
                     else
                     {
@@ -432,7 +432,8 @@ namespace BanaData.Logic.Main
         }
 
         // Used in investment derived class
-        protected virtual void RecomputeSharePrice() { }
+        protected virtual void OnAmountChanged() { }
+        protected virtual void OnDateChanged() { }
 
         #endregion
 

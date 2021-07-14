@@ -39,11 +39,11 @@ namespace BanaData.Logic.Main
                 case EInvestmentTransactionType.Buy:
                 case EInvestmentTransactionType.Sell:
                 case EInvestmentTransactionType.Exercise:
-                    return new InvestmentTransactionBuyOrSell();
+                    return new InvestmentTransactionBuyOrSell(type);
 
                 case EInvestmentTransactionType.BuyFromTransferredCash:
                 case EInvestmentTransactionType.SellAndTransferCash:
-                    return new InvestmentTransactionBuyOrSellAndTransfer();
+                    return new InvestmentTransactionBuyOrSellAndTransfer(type);
 
                 case EInvestmentTransactionType.Dividends:
                 case EInvestmentTransactionType.ShortTermCapitalGains:
@@ -79,6 +79,7 @@ namespace BanaData.Logic.Main
     {
         bool IsSecuritySymbolVisible { get; }
         int SecuritySymbolTabIndex { get; }
+        bool IsFilteringSecurity { get; }
 
         bool IsSecurityQuantityVisible { get; }
         int SecurityQuantityTabIndex { get; }
@@ -111,6 +112,7 @@ namespace BanaData.Logic.Main
     {
         public bool IsSecuritySymbolVisible => SecuritySymbolTabIndex >= 0;
         public virtual int SecuritySymbolTabIndex => -1;
+        public virtual bool IsFilteringSecurity => false;
 
         public bool IsSecurityQuantityVisible => SecurityQuantityTabIndex >= 0;
         public virtual int SecurityQuantityTabIndex => -1;
@@ -266,6 +268,7 @@ namespace BanaData.Logic.Main
     {
         public override int SecuritySymbolTabIndex => 3;
         public override int SecurityQuantityTabIndex => 4;
+        public override bool IsFilteringSecurity => true;
 
         public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {
@@ -297,11 +300,17 @@ namespace BanaData.Logic.Main
 
     internal class InvestmentTransactionBuyOrSell : AInvestmentTransactionType
     {
+        public InvestmentTransactionBuyOrSell(EInvestmentTransactionType type)
+        {
+            IsFilteringSecurity = type == EInvestmentTransactionType.Sell || type == EInvestmentTransactionType.SellAndTransferCash;
+        }
+
         public override int SecuritySymbolTabIndex => 3;
         public override int SecurityQuantityTabIndex => 4;
         public override int SecurityPriceTabIndex => 5;
         public override int CommissionTabIndex => 6;
         public override int AmountTabIndex => 7;
+        public override bool IsFilteringSecurity { get; }
 
         public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {
@@ -346,6 +355,8 @@ namespace BanaData.Logic.Main
     // Just like buy or sell but with a transfer
     internal class InvestmentTransactionBuyOrSellAndTransfer : InvestmentTransactionBuyOrSell
     {
+        public InvestmentTransactionBuyOrSellAndTransfer(EInvestmentTransactionType type) : base(type) { }
+
         public override int CategoryTabIndex => 8;
 
         public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
@@ -371,6 +382,7 @@ namespace BanaData.Logic.Main
     {
         public override int SecuritySymbolTabIndex => 3;
         public override int AmountTabIndex => 4;
+        public override bool IsFilteringSecurity => true;
 
         public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {
@@ -386,6 +398,7 @@ namespace BanaData.Logic.Main
 
             return null;
         }
+
         public override void CleanupData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {
             data.SecurityPrice = 0;
@@ -404,6 +417,7 @@ namespace BanaData.Logic.Main
         public override int SecuritySymbolTabIndex => 3;
         public override int AmountTabIndex => 4;
         public override int CategoryTabIndex => 5;
+        public override bool IsFilteringSecurity => true;
 
         public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {
@@ -444,6 +458,7 @@ namespace BanaData.Logic.Main
         public override int SecurityPriceTabIndex => 6;
         public override int CommissionTabIndex => 7;
         public override int AmountTabIndex => 4;
+        public override bool IsFilteringSecurity => true;
 
         public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {

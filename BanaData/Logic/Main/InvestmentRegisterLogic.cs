@@ -23,14 +23,6 @@ namespace BanaData.Logic.Main
         {
             // Create column width manager
             Widths = new ColumnWidths(mainWindowLogic);
-
-            // Security view
-            SecuritiesView = (CollectionView)CollectionViewSource.GetDefaultView(securities);
-            SecuritiesView.SortDescriptions.Add(new SortDescription("Symbol", ListSortDirection.Ascending));
-
-            // Be notified when securities change
-            mainWindowLogic.SecuritiesChanged += (s, e) => UpdateSecurities();
-            UpdateSecurities();
         }
 
         #endregion
@@ -43,10 +35,6 @@ namespace BanaData.Logic.Main
 
         // Investment transaction type list
         public CollectionView TypesSource => mainWindowLogic.InvestmentTransactionTypesView;
-
-        // Security list
-        private readonly WpfObservableRangeCollection<SecurityItem> securities = new WpfObservableRangeCollection<SecurityItem>();
-        public CollectionView SecuritiesView { get; }
 
         // Column widths
         public ColumnWidths Widths { get; }
@@ -110,7 +98,7 @@ namespace BanaData.Logic.Main
                 lineItem.Amount > 0 ? EInvestmentTransactionType.TransferCashIn : EInvestmentTransactionType.TransferCashOut,
                 -1, 0, 0, 0);
 
-            var investmentTransaction = new InvestmentTransactionLogic(mainWindowLogic, accountID, -2, transactionData);
+            var investmentTransaction = new InvestmentTransactionLogic(mainWindowLogic,  accountID, AbstractTransactionLogic.TRANSID_TRANSFER_FILLIN, transactionData);
 
             return investmentTransaction;
         }
@@ -154,12 +142,6 @@ namespace BanaData.Logic.Main
 
                 itl.ShareBalance = balance;
             }
-        }
-
-        // Update securities list
-        private void UpdateSecurities()
-        {
-            securities.ReplaceRange(mainWindowLogic.Securities);
         }
 
         #endregion
