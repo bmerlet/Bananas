@@ -315,6 +315,11 @@ namespace BanaData.Logic.Main
                 OnPropertyChanged(() => Payment);
                 OnPropertyChanged(() => Deposit);
             }
+
+            if (mainWindowLogic.UserSettings.PlayKaChingSound)
+            {
+                mainWindowLogic.GuiServices.KaChing();
+            }
         }
 
         #endregion

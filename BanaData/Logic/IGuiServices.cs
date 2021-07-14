@@ -19,6 +19,9 @@ namespace BanaData.Logic
         // Wait cursor
         void SetCursor(bool wait);
 
+        // KaChing sound
+        void KaChing();
+
         // Exit the application
         void Exit();
     }

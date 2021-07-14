@@ -350,6 +350,15 @@ namespace BanaData.Logic.Main
         }
 
         //
+        // Play Ka-Ching sound toggle
+        //
+        public bool PlayKaChingSound
+        {
+            get => mainWindow.UserSettings.PlayKaChingSound;
+            set { mainWindow.UserSettings.PlayKaChingSound = value; mainWindow.SaveUserSettings(); }
+        }
+
+        //
         // Show yearly capital gains and dividends
         //
         public CommandBase ShowYearlyCapGainsAndDividends { get; }

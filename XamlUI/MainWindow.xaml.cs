@@ -19,6 +19,7 @@ using BanaData.Logic;
 using BanaData.Logic.Dialogs;
 using BanaData.Logic.Main;
 using XamlUI.Dialogs;
+using System.Media;
 
 namespace XamlUI
 {
@@ -268,6 +269,10 @@ namespace XamlUI
             Dispatcher.Invoke(() => Mouse.OverrideCursor = wait ? Cursors.Wait : Cursors.Arrow);
         }
 
+        public void KaChing()
+        {
+            kaChing.Play();
+        }
 
         public void Exit()
         {
@@ -275,5 +280,21 @@ namespace XamlUI
         }
 
         #endregion
+
+        static private class kaChing
+        {
+            static private readonly SoundPlayer soundPlayer;
+            static kaChing()
+            {
+                // Embedded as "Resource" doesn't seem to work
+                //var sri = Application.GetResourceStream(new Uri("pack://application:,,,.Sounds.kaching.wav", UriKind.RelativeOrAbsolute));
+                soundPlayer = new SoundPlayer("Sounds/kaching.wav");
+            }
+
+            static public void Play()
+            {
+                soundPlayer.Play();
+            }
+        }
     }
 }

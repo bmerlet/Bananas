@@ -55,6 +55,8 @@
                 </MenuItem>
                 <MenuItem Header="View">
                     <MenuItem Header="Show closed accounts" IsCheckable="True" IsChecked="{Binding ShowClosedAccounts}"/>
+                    <MenuItem Header="Play Ka-Ching sound" IsCheckable="True" IsChecked="{Binding PlayKaChingSound}"/>
+                    <Separator/>
                     <MenuItem Header="Show holdings..." Command="{Binding ShowHoldings}"/>
                     <MenuItem Header="Show household members holdings..." Command="{Binding ShowHoldingsPerPerson}"/>
                     <MenuItem Header="Show rebalance dashboard..." Command="{Binding ShowRebalance}"/>

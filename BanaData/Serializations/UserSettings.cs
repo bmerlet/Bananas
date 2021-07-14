@@ -24,6 +24,9 @@ namespace BanaData.Serializations
         // Last file opened
         public string LastFileOpened;
 
+        // Play Ka-Ching sound
+        public bool PlayKaChingSound;
+
         // Column widths (bank register)
         public double WidthOfDateColumn = 80;
         public double WidthOfMediumColumn = 80;
