@@ -52,7 +52,7 @@ namespace XamlUI.UserControls
                 if (e.PropertyName == "TransactionToScrollTo")
                 {
                     _listView.UpdateLayout();
-                    _listView.ScrollIntoView(brl.TransactionToScrollTo);
+                    _listView.ScrollToCenterOfView(brl.TransactionToScrollTo);
                 }
                 //
                 // Scroll to bottom: Go to the bottom of the listview

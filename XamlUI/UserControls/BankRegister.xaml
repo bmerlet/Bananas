@@ -25,6 +25,18 @@
             ScrollViewer.ScrollChanged="OnListViewScrollChanged"
             ItemsSource="{Binding Transactions, IsAsync=True}">
 
+            <!-- Neutralize the change of colrs when the mouse is over a row -->
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="BorderBrush" Value="Transparent" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.ItemContainerStyle>
+
             <!-- View definition -->
             <ListView.View>
                 <GridView>
