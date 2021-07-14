@@ -105,6 +105,13 @@ namespace BanaData.Logic.Dialogs
                             securityInfos.Add(new SecurityInfoItem(sri.SecurityRow, sri.SecurityQuantity));
                         }
                     }
+
+                    // Adjust tab index in collection order
+                    int tabIndex = 2;
+                    foreach(SecurityInfoItem sii in SecurityInfoSource)
+                    {
+                        sii.TabIndex = tabIndex++;
+                    }
                 }
             }
         }
@@ -267,7 +274,7 @@ namespace BanaData.Logic.Dialogs
 
         #endregion
 
-        #region Suport classes
+        #region SecurityInfoItem class
 
         public class SecurityInfoItem
         {
@@ -277,6 +284,7 @@ namespace BanaData.Logic.Dialogs
             public string Name => SecurityRow.Name;
             public string Symbol => SecurityRow.Symbol == Household.SecurityRow.SYMBOL_NONE ? SecurityRow.Name : SecurityRow.Symbol;
             public decimal Quantity { get; set; }
+            public int TabIndex { get; set; }
         }
 
         #endregion

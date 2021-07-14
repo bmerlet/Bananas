@@ -98,7 +98,11 @@
                                 <ColumnDefinition Width="100"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="{Binding Symbol}" ToolTip="{Binding Name}" Margin="5"/>
-                            <w:AmountBox Amount="{Binding Quantity, Mode=TwoWay}" Precision="4" Grid.Column="1"/>
+                            <w:AmountBox 
+                                Grid.Column="1"
+                                Amount="{Binding Quantity, Mode=TwoWay}"
+                                Precision="4"
+                                KeyboardNavigation.TabIndex="{Binding TabIndex}"/>
                         </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
