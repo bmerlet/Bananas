@@ -49,6 +49,13 @@ namespace BanaData.Logic.Main
             // Be notified when securities change
             mainWindowLogic.SecuritiesChanged += (s, e) => UpdateSecurities();
             UpdateSecurities();
+
+            // Category view
+            CategoriesOrTransferView = (CollectionView)CollectionViewSource.GetDefaultView(transfers);
+
+            // Be notified when categories change
+            mainWindowLogic.CategoriesChanged += (s, e) => UpdateCategories();
+            UpdateCategories();
         }
 
         public InvestmentTransactionLogic(
@@ -106,7 +113,7 @@ namespace BanaData.Logic.Main
         public bool IsSecuritySymbolVisible => investmentTransactionType.IsSecuritySymbolVisible;
 
         private readonly WpfObservableRangeCollection<SecurityItem> securities = new WpfObservableRangeCollection<SecurityItem>();
-        public CollectionView SecuritiesView { get; }
+        public CollectionView SecuritiesView { get; private set; }
 
         //
         // Security quantity
@@ -169,6 +176,11 @@ namespace BanaData.Logic.Main
         //
         // Category source
         //
+        private readonly CollectionViewSource categoriesCollectionViewSource = new CollectionViewSource();
+        private readonly WpfObservableRangeCollection<CategoryItem> categories = new WpfObservableRangeCollection<CategoryItem>();
+        private readonly WpfObservableRangeCollection<CategoryItem> transfers = new WpfObservableRangeCollection<CategoryItem>();
+        public CollectionView CategoriesOrTransferView { get; private set; }
+
         public IEnumerable<CategoryItem> CategoriesSource =>
             investmentTransactionType.IsTransfer ? mainWindowLogic.Transfers : mainWindowLogic.Categories;
 
@@ -401,7 +413,17 @@ namespace BanaData.Logic.Main
 
             data.Type = value;
             investmentTransactionType = InvestmentTransactionType.GetInvestmentTransactionType(value);
+
             UpdateSecurities();
+
+            // If switching from transfers to categories or vice versa
+            var newCategoriesOrTransferView = (CollectionView)CollectionViewSource.GetDefaultView(investmentTransactionType.IsTransfer ? transfers : categories);
+            if (CategoriesOrTransferView != newCategoriesOrTransferView)
+            {
+                CategoriesOrTransferView = newCategoriesOrTransferView;
+                data.LineItems[0].Category = "";
+                OnPropertyChanged(() => Category);
+            }
 
             OnPropertyChanged(() => IsSecuritySymbolVisible);
             OnPropertyChanged(() => SecuritySymbolTabIndex);
@@ -500,6 +522,12 @@ namespace BanaData.Logic.Main
             {
                 securities.ReplaceRange(mainWindowLogic.Securities);
             }
+        }
+
+        private void UpdateCategories()
+        {
+            categories.ReplaceRange(mainWindowLogic.Categories);
+            transfers.ReplaceRange(mainWindowLogic.Transfers);
         }
 
         private void CommitTransactionToDataSet()
