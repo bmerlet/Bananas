@@ -72,6 +72,8 @@
     <Compile Include="Logic\Dialogs\AccountListPickerLogic.cs" />
     <Compile Include="Logic\Dialogs\AccountPickerLogic.cs" />
     <Compile Include="Logic\Dialogs\EditPersonsLogic.cs" />
+    <Compile Include="Logic\Dialogs\EditTransactionReportLogic.cs" />
+    <Compile Include="Logic\Dialogs\EditTransactionReportsLogic.cs" />
     <Compile Include="Logic\Dialogs\PasswordPromptLogic.cs" />
     <Compile Include="Logic\Dialogs\ReconcileGridLogic.cs" />
     <Compile Include="Logic\Dialogs\ReconcileInvestmentsLogic.cs" />
@@ -100,6 +102,7 @@
     <Compile Include="Logic\Items\LineItem.cs" />
     <Compile Include="Logic\Items\MemorizedPayeeItem.cs" />
     <Compile Include="Logic\Items\SecurityItem.cs" />
+    <Compile Include="Logic\Items\TransactionReportItem.cs" />
     <Compile Include="Logic\Items\TransactionToReconcile.cs" />
     <Compile Include="Logic\Main\AbstractRegisterLogic.cs" />
     <Compile Include="Logic\Main\AbstractTransactionLogic.cs" />

@@ -12,7 +12,7 @@
   <xs:element name="Household" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="Household" msprop:Generator_UserDSName="Household">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element name="Account" msprop:Generator_TableClassName="AccountDataTable" msprop:Generator_TableVarName="tableAccount" msprop:Generator_TablePropName="Account" msprop:Generator_RowDeletingName="AccountRowDeleting" msprop:Generator_RowChangingName="AccountRowChanging" msprop:Generator_RowEvHandlerName="AccountRowChangeEventHandler" msprop:Generator_RowDeletedName="AccountRowDeleted" msprop:Generator_UserTableName="Account" msprop:Generator_RowChangedName="AccountRowChanged" msprop:Generator_RowEvArgName="AccountRowChangeEvent" msprop:Generator_RowClassName="AccountRow">
+        <xs:element name="Account" msprop:Generator_TableClassName="AccountDataTable" msprop:Generator_TableVarName="tableAccount" msprop:Generator_RowChangedName="AccountRowChanged" msprop:Generator_TablePropName="Account" msprop:Generator_RowDeletingName="AccountRowDeleting" msprop:Generator_RowChangingName="AccountRowChanging" msprop:Generator_RowEvHandlerName="AccountRowChangeEventHandler" msprop:Generator_RowDeletedName="AccountRowDeleted" msprop:Generator_RowClassName="AccountRow" msprop:Generator_UserTableName="Account" msprop:Generator_RowEvArgName="AccountRowChangeEvent">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
@@ -27,7 +27,7 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="Category" msprop:Generator_TableClassName="CategoryDataTable" msprop:Generator_TableVarName="tableCategory" msprop:Generator_TablePropName="Category" msprop:Generator_RowDeletingName="CategoryRowDeleting" msprop:Generator_RowChangingName="CategoryRowChanging" msprop:Generator_RowEvHandlerName="CategoryRowChangeEventHandler" msprop:Generator_RowDeletedName="CategoryRowDeleted" msprop:Generator_UserTableName="Category" msprop:Generator_RowChangedName="CategoryRowChanged" msprop:Generator_RowEvArgName="CategoryRowChangeEvent" msprop:Generator_RowClassName="CategoryRow">
+        <xs:element name="Category" msprop:Generator_TableClassName="CategoryDataTable" msprop:Generator_TableVarName="tableCategory" msprop:Generator_RowChangedName="CategoryRowChanged" msprop:Generator_TablePropName="Category" msprop:Generator_RowDeletingName="CategoryRowDeleting" msprop:Generator_RowChangingName="CategoryRowChanging" msprop:Generator_RowEvHandlerName="CategoryRowChangeEventHandler" msprop:Generator_RowDeletedName="CategoryRowDeleted" msprop:Generator_RowClassName="CategoryRow" msprop:Generator_UserTableName="Category" msprop:Generator_RowEvArgName="CategoryRowChangeEvent">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
@@ -39,7 +39,7 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="Security" msprop:Generator_TableClassName="SecurityDataTable" msprop:Generator_TableVarName="tableSecurity" msprop:Generator_TablePropName="Security" msprop:Generator_RowDeletingName="SecurityRowDeleting" msprop:Generator_RowChangingName="SecurityRowChanging" msprop:Generator_RowEvHandlerName="SecurityRowChangeEventHandler" msprop:Generator_RowDeletedName="SecurityRowDeleted" msprop:Generator_UserTableName="Security" msprop:Generator_RowChangedName="SecurityRowChanged" msprop:Generator_RowEvArgName="SecurityRowChangeEvent" msprop:Generator_RowClassName="SecurityRow">
+        <xs:element name="Security" msprop:Generator_TableClassName="SecurityDataTable" msprop:Generator_TableVarName="tableSecurity" msprop:Generator_RowChangedName="SecurityRowChanged" msprop:Generator_TablePropName="Security" msprop:Generator_RowDeletingName="SecurityRowDeleting" msprop:Generator_RowChangingName="SecurityRowChanging" msprop:Generator_RowEvHandlerName="SecurityRowChangeEventHandler" msprop:Generator_RowDeletedName="SecurityRowDeleted" msprop:Generator_RowClassName="SecurityRow" msprop:Generator_UserTableName="Security" msprop:Generator_RowEvArgName="SecurityRowChangeEvent">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
@@ -49,7 +49,7 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="SecurityPrice" msprop:Generator_TableClassName="SecurityPriceDataTable" msprop:Generator_TableVarName="tableSecurityPrice" msprop:Generator_TablePropName="SecurityPrice" msprop:Generator_RowDeletingName="SecurityPriceRowDeleting" msprop:Generator_RowChangingName="SecurityPriceRowChanging" msprop:Generator_RowEvHandlerName="SecurityPriceRowChangeEventHandler" msprop:Generator_RowDeletedName="SecurityPriceRowDeleted" msprop:Generator_UserTableName="SecurityPrice" msprop:Generator_RowChangedName="SecurityPriceRowChanged" msprop:Generator_RowEvArgName="SecurityPriceRowChangeEvent" msprop:Generator_RowClassName="SecurityPriceRow">
+        <xs:element name="SecurityPrice" msprop:Generator_TableClassName="SecurityPriceDataTable" msprop:Generator_TableVarName="tableSecurityPrice" msprop:Generator_RowChangedName="SecurityPriceRowChanged" msprop:Generator_TablePropName="SecurityPrice" msprop:Generator_RowDeletingName="SecurityPriceRowDeleting" msprop:Generator_RowChangingName="SecurityPriceRowChanging" msprop:Generator_RowEvHandlerName="SecurityPriceRowChangeEventHandler" msprop:Generator_RowDeletedName="SecurityPriceRowDeleted" msprop:Generator_RowClassName="SecurityPriceRow" msprop:Generator_UserTableName="SecurityPrice" msprop:Generator_RowEvArgName="SecurityPriceRowChangeEvent">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
@@ -59,7 +59,7 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="Transaction" msprop:Generator_TableClassName="TransactionDataTable" msprop:Generator_TableVarName="tableTransaction" msprop:Generator_TablePropName="Transaction" msprop:Generator_RowDeletingName="TransactionRowDeleting" msprop:Generator_RowChangingName="TransactionRowChanging" msprop:Generator_RowEvHandlerName="TransactionRowChangeEventHandler" msprop:Generator_RowDeletedName="TransactionRowDeleted" msprop:Generator_UserTableName="Transaction" msprop:Generator_RowChangedName="TransactionRowChanged" msprop:Generator_RowEvArgName="TransactionRowChangeEvent" msprop:Generator_RowClassName="TransactionRow">
+        <xs:element name="Transaction" msprop:Generator_TableClassName="TransactionDataTable" msprop:Generator_TableVarName="tableTransaction" msprop:Generator_RowChangedName="TransactionRowChanged" msprop:Generator_TablePropName="Transaction" msprop:Generator_RowDeletingName="TransactionRowDeleting" msprop:Generator_RowChangingName="TransactionRowChanging" msprop:Generator_RowEvHandlerName="TransactionRowChangeEventHandler" msprop:Generator_RowDeletedName="TransactionRowDeleted" msprop:Generator_RowClassName="TransactionRow" msprop:Generator_UserTableName="Transaction" msprop:Generator_RowEvArgName="TransactionRowChangeEvent">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
@@ -72,7 +72,7 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="LineItem" msprop:Generator_TableClassName="LineItemDataTable" msprop:Generator_TableVarName="tableLineItem" msprop:Generator_TablePropName="LineItem" msprop:Generator_RowDeletingName="LineItemRowDeleting" msprop:Generator_RowChangingName="LineItemRowChanging" msprop:Generator_RowEvHandlerName="LineItemRowChangeEventHandler" msprop:Generator_RowDeletedName="LineItemRowDeleted" msprop:Generator_UserTableName="LineItem" msprop:Generator_RowChangedName="LineItemRowChanged" msprop:Generator_RowEvArgName="LineItemRowChangeEvent" msprop:Generator_RowClassName="LineItemRow">
+        <xs:element name="LineItem" msprop:Generator_TableClassName="LineItemDataTable" msprop:Generator_TableVarName="tableLineItem" msprop:Generator_RowChangedName="LineItemRowChanged" msprop:Generator_TablePropName="LineItem" msprop:Generator_RowDeletingName="LineItemRowDeleting" msprop:Generator_RowChangingName="LineItemRowChanging" msprop:Generator_RowEvHandlerName="LineItemRowChangeEventHandler" msprop:Generator_RowDeletedName="LineItemRowDeleted" msprop:Generator_RowClassName="LineItemRow" msprop:Generator_UserTableName="LineItem" msprop:Generator_RowEvArgName="LineItemRowChangeEvent">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
@@ -85,7 +85,7 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="BankingTransaction" msprop:Generator_TableClassName="BankingTransactionDataTable" msprop:Generator_TableVarName="tableBankingTransaction" msprop:Generator_TablePropName="BankingTransaction" msprop:Generator_RowDeletingName="BankingTransactionRowDeleting" msprop:Generator_RowChangingName="BankingTransactionRowChanging" msprop:Generator_RowEvHandlerName="BankingTransactionRowChangeEventHandler" msprop:Generator_RowDeletedName="BankingTransactionRowDeleted" msprop:Generator_UserTableName="BankingTransaction" msprop:Generator_RowChangedName="BankingTransactionRowChanged" msprop:Generator_RowEvArgName="BankingTransactionRowChangeEvent" msprop:Generator_RowClassName="BankingTransactionRow">
+        <xs:element name="BankingTransaction" msprop:Generator_TableClassName="BankingTransactionDataTable" msprop:Generator_TableVarName="tableBankingTransaction" msprop:Generator_RowChangedName="BankingTransactionRowChanged" msprop:Generator_TablePropName="BankingTransaction" msprop:Generator_RowDeletingName="BankingTransactionRowDeleting" msprop:Generator_RowChangingName="BankingTransactionRowChanging" msprop:Generator_RowEvHandlerName="BankingTransactionRowChangeEventHandler" msprop:Generator_RowDeletedName="BankingTransactionRowDeleted" msprop:Generator_RowClassName="BankingTransactionRow" msprop:Generator_UserTableName="BankingTransaction" msprop:Generator_RowEvArgName="BankingTransactionRowChangeEvent">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
@@ -95,7 +95,7 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="InvestmentTransaction" msprop:Generator_TableClassName="InvestmentTransactionDataTable" msprop:Generator_TableVarName="tableInvestmentTransaction" msprop:Generator_TablePropName="InvestmentTransaction" msprop:Generator_RowDeletingName="InvestmentTransactionRowDeleting" msprop:Generator_RowChangingName="InvestmentTransactionRowChanging" msprop:Generator_RowEvHandlerName="InvestmentTransactionRowChangeEventHandler" msprop:Generator_RowDeletedName="InvestmentTransactionRowDeleted" msprop:Generator_UserTableName="InvestmentTransaction" msprop:Generator_RowChangedName="InvestmentTransactionRowChanged" msprop:Generator_RowEvArgName="InvestmentTransactionRowChangeEvent" msprop:Generator_RowClassName="InvestmentTransactionRow">
+        <xs:element name="InvestmentTransaction" msprop:Generator_TableClassName="InvestmentTransactionDataTable" msprop:Generator_TableVarName="tableInvestmentTransaction" msprop:Generator_RowChangedName="InvestmentTransactionRowChanged" msprop:Generator_TablePropName="InvestmentTransaction" msprop:Generator_RowDeletingName="InvestmentTransactionRowDeleting" msprop:Generator_RowChangingName="InvestmentTransactionRowChanging" msprop:Generator_RowEvHandlerName="InvestmentTransactionRowChangeEventHandler" msprop:Generator_RowDeletedName="InvestmentTransactionRowDeleted" msprop:Generator_RowClassName="InvestmentTransactionRow" msprop:Generator_UserTableName="InvestmentTransaction" msprop:Generator_RowEvArgName="InvestmentTransactionRowChangeEvent">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
@@ -108,7 +108,7 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="MemorizedLineItem" msprop:Generator_TableClassName="MemorizedLineItemDataTable" msprop:Generator_TableVarName="tableMemorizedLineItem" msprop:Generator_TablePropName="MemorizedLineItem" msprop:Generator_RowDeletingName="MemorizedLineItemRowDeleting" msprop:Generator_RowChangingName="MemorizedLineItemRowChanging" msprop:Generator_RowEvHandlerName="MemorizedLineItemRowChangeEventHandler" msprop:Generator_RowDeletedName="MemorizedLineItemRowDeleted" msprop:Generator_UserTableName="MemorizedLineItem" msprop:Generator_RowChangedName="MemorizedLineItemRowChanged" msprop:Generator_RowEvArgName="MemorizedLineItemRowChangeEvent" msprop:Generator_RowClassName="MemorizedLineItemRow">
+        <xs:element name="MemorizedLineItem" msprop:Generator_TableClassName="MemorizedLineItemDataTable" msprop:Generator_TableVarName="tableMemorizedLineItem" msprop:Generator_RowChangedName="MemorizedLineItemRowChanged" msprop:Generator_TablePropName="MemorizedLineItem" msprop:Generator_RowDeletingName="MemorizedLineItemRowDeleting" msprop:Generator_RowChangingName="MemorizedLineItemRowChanging" msprop:Generator_RowEvHandlerName="MemorizedLineItemRowChangeEventHandler" msprop:Generator_RowDeletedName="MemorizedLineItemRowDeleted" msprop:Generator_RowClassName="MemorizedLineItemRow" msprop:Generator_UserTableName="MemorizedLineItem" msprop:Generator_RowEvArgName="MemorizedLineItemRowChangeEvent">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
@@ -121,7 +121,7 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="MemorizedPayee" msprop:Generator_TableClassName="MemorizedPayeeDataTable" msprop:Generator_TableVarName="tableMemorizedPayee" msprop:Generator_TablePropName="MemorizedPayee" msprop:Generator_RowDeletingName="MemorizedPayeeRowDeleting" msprop:Generator_RowChangingName="MemorizedPayeeRowChanging" msprop:Generator_RowEvHandlerName="MemorizedPayeeRowChangeEventHandler" msprop:Generator_RowDeletedName="MemorizedPayeeRowDeleted" msprop:Generator_UserTableName="MemorizedPayee" msprop:Generator_RowChangedName="MemorizedPayeeRowChanged" msprop:Generator_RowEvArgName="MemorizedPayeeRowChangeEvent" msprop:Generator_RowClassName="MemorizedPayeeRow">
+        <xs:element name="MemorizedPayee" msprop:Generator_TableClassName="MemorizedPayeeDataTable" msprop:Generator_TableVarName="tableMemorizedPayee" msprop:Generator_RowChangedName="MemorizedPayeeRowChanged" msprop:Generator_TablePropName="MemorizedPayee" msprop:Generator_RowDeletingName="MemorizedPayeeRowDeleting" msprop:Generator_RowChangingName="MemorizedPayeeRowChanging" msprop:Generator_RowEvHandlerName="MemorizedPayeeRowChangeEventHandler" msprop:Generator_RowDeletedName="MemorizedPayeeRowDeleted" msprop:Generator_RowClassName="MemorizedPayeeRow" msprop:Generator_UserTableName="MemorizedPayee" msprop:Generator_RowEvArgName="MemorizedPayeeRowChangeEvent">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
@@ -131,7 +131,7 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="ReconcileInfo" msprop:Generator_TableClassName="ReconcileInfoDataTable" msprop:Generator_TableVarName="tableReconcileInfo" msprop:Generator_RowChangedName="ReconcileInfoRowChanged" msprop:Generator_TablePropName="ReconcileInfo" msprop:Generator_RowDeletingName="ReconcileInfoRowDeleting" msprop:Generator_RowChangingName="ReconcileInfoRowChanging" msprop:Generator_RowEvHandlerName="ReconcileInfoRowChangeEventHandler" msprop:Generator_RowDeletedName="ReconcileInfoRowDeleted" msprop:Generator_RowClassName="ReconcileInfoRow" msprop:Generator_UserTableName="ReconcileInfo" msprop:Generator_RowEvArgName="ReconcileInfoRowChangeEvent">
+        <xs:element name="ReconcileInfo" msprop:Generator_TableClassName="ReconcileInfoDataTable" msprop:Generator_TableVarName="tableReconcileInfo" msprop:Generator_TablePropName="ReconcileInfo" msprop:Generator_RowDeletingName="ReconcileInfoRowDeleting" msprop:Generator_RowChangingName="ReconcileInfoRowChanging" msprop:Generator_RowEvHandlerName="ReconcileInfoRowChangeEventHandler" msprop:Generator_RowDeletedName="ReconcileInfoRowDeleted" msprop:Generator_UserTableName="ReconcileInfo" msprop:Generator_RowChangedName="ReconcileInfoRowChanged" msprop:Generator_RowEvArgName="ReconcileInfoRowChangeEvent" msprop:Generator_RowClassName="ReconcileInfoRow">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
@@ -144,7 +144,7 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="Checkpoint" msprop:Generator_TableClassName="CheckpointDataTable" msprop:Generator_TableVarName="tableCheckpoint" msprop:Generator_TablePropName="Checkpoint" msprop:Generator_RowDeletingName="CheckpointRowDeleting" msprop:Generator_RowChangingName="CheckpointRowChanging" msprop:Generator_RowEvHandlerName="CheckpointRowChangeEventHandler" msprop:Generator_RowDeletedName="CheckpointRowDeleted" msprop:Generator_UserTableName="Checkpoint" msprop:Generator_RowChangedName="CheckpointRowChanged" msprop:Generator_RowEvArgName="CheckpointRowChangeEvent" msprop:Generator_RowClassName="CheckpointRow">
+        <xs:element name="Checkpoint" msprop:Generator_TableClassName="CheckpointDataTable" msprop:Generator_TableVarName="tableCheckpoint" msprop:Generator_RowChangedName="CheckpointRowChanged" msprop:Generator_TablePropName="Checkpoint" msprop:Generator_RowDeletingName="CheckpointRowDeleting" msprop:Generator_RowChangingName="CheckpointRowChanging" msprop:Generator_RowEvHandlerName="CheckpointRowChangeEventHandler" msprop:Generator_RowDeletedName="CheckpointRowDeleted" msprop:Generator_RowClassName="CheckpointRow" msprop:Generator_UserTableName="Checkpoint" msprop:Generator_RowEvArgName="CheckpointRowChangeEvent">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ID" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
@@ -152,7 +152,7 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="SecurityReconcileInfo" msprop:Generator_TableClassName="SecurityReconcileInfoDataTable" msprop:Generator_TableVarName="tableSecurityReconcileInfo" msprop:Generator_RowChangedName="SecurityReconcileInfoRowChanged" msprop:Generator_TablePropName="SecurityReconcileInfo" msprop:Generator_RowDeletingName="SecurityReconcileInfoRowDeleting" msprop:Generator_RowChangingName="SecurityReconcileInfoRowChanging" msprop:Generator_RowEvHandlerName="SecurityReconcileInfoRowChangeEventHandler" msprop:Generator_RowDeletedName="SecurityReconcileInfoRowDeleted" msprop:Generator_RowClassName="SecurityReconcileInfoRow" msprop:Generator_UserTableName="SecurityReconcileInfo" msprop:Generator_RowEvArgName="SecurityReconcileInfoRowChangeEvent">
+        <xs:element name="SecurityReconcileInfo" msprop:Generator_TableClassName="SecurityReconcileInfoDataTable" msprop:Generator_TableVarName="tableSecurityReconcileInfo" msprop:Generator_TablePropName="SecurityReconcileInfo" msprop:Generator_RowDeletingName="SecurityReconcileInfoRowDeleting" msprop:Generator_RowChangingName="SecurityReconcileInfoRowChanging" msprop:Generator_RowEvHandlerName="SecurityReconcileInfoRowChangeEventHandler" msprop:Generator_RowDeletedName="SecurityReconcileInfoRowDeleted" msprop:Generator_UserTableName="SecurityReconcileInfo" msprop:Generator_RowChangedName="SecurityReconcileInfoRowChanged" msprop:Generator_RowEvArgName="SecurityReconcileInfoRowChangeEvent" msprop:Generator_RowClassName="SecurityReconcileInfoRow">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
@@ -162,7 +162,7 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="RebalanceTarget" msprop:Generator_TableClassName="RebalanceTargetDataTable" msprop:Generator_TableVarName="tableRebalanceTarget" msprop:Generator_RowChangedName="RebalanceTargetRowChanged" msprop:Generator_TablePropName="RebalanceTarget" msprop:Generator_RowDeletingName="RebalanceTargetRowDeleting" msprop:Generator_RowChangingName="RebalanceTargetRowChanging" msprop:Generator_RowEvHandlerName="RebalanceTargetRowChangeEventHandler" msprop:Generator_RowDeletedName="RebalanceTargetRowDeleted" msprop:Generator_RowClassName="RebalanceTargetRow" msprop:Generator_UserTableName="RebalanceTarget" msprop:Generator_RowEvArgName="RebalanceTargetRowChangeEvent">
+        <xs:element name="RebalanceTarget" msprop:Generator_TableClassName="RebalanceTargetDataTable" msprop:Generator_TableVarName="tableRebalanceTarget" msprop:Generator_TablePropName="RebalanceTarget" msprop:Generator_RowDeletingName="RebalanceTargetRowDeleting" msprop:Generator_RowChangingName="RebalanceTargetRowChanging" msprop:Generator_RowEvHandlerName="RebalanceTargetRowChangeEventHandler" msprop:Generator_RowDeletedName="RebalanceTargetRowDeleted" msprop:Generator_UserTableName="RebalanceTarget" msprop:Generator_RowChangedName="RebalanceTargetRowChanged" msprop:Generator_RowEvArgName="RebalanceTargetRowChangeEvent" msprop:Generator_RowClassName="RebalanceTargetRow">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
@@ -172,11 +172,22 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="Person" msprop:Generator_TableClassName="PersonDataTable" msprop:Generator_TableVarName="tablePerson" msprop:Generator_RowChangedName="PersonRowChanged" msprop:Generator_TablePropName="Person" msprop:Generator_RowDeletingName="PersonRowDeleting" msprop:Generator_RowChangingName="PersonRowChanging" msprop:Generator_RowEvHandlerName="PersonRowChangeEventHandler" msprop:Generator_RowDeletedName="PersonRowDeleted" msprop:Generator_RowClassName="PersonRow" msprop:Generator_UserTableName="Person" msprop:Generator_RowEvArgName="PersonRowChangeEvent">
+        <xs:element name="Person" msprop:Generator_TableClassName="PersonDataTable" msprop:Generator_TableVarName="tablePerson" msprop:Generator_TablePropName="Person" msprop:Generator_RowDeletingName="PersonRowDeleting" msprop:Generator_RowChangingName="PersonRowChanging" msprop:Generator_RowEvHandlerName="PersonRowChangeEventHandler" msprop:Generator_RowDeletedName="PersonRowDeleted" msprop:Generator_UserTableName="Person" msprop:Generator_RowChangedName="PersonRowChanged" msprop:Generator_RowEvArgName="PersonRowChangeEvent" msprop:Generator_RowClassName="PersonRow">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
               <xs:element name="Name" msprop:Generator_ColumnVarNameInTable="columnName" msprop:Generator_ColumnPropNameInRow="Name" msprop:Generator_ColumnPropNameInTable="NameColumn" msprop:Generator_UserColumnName="Name" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="TransactionReport" msprop:Generator_TableClassName="TransactionReportDataTable" msprop:Generator_TableVarName="tableTransactionReport" msprop:Generator_TablePropName="TransactionReport" msprop:Generator_RowDeletingName="TransactionReportRowDeleting" msprop:Generator_RowChangingName="TransactionReportRowChanging" msprop:Generator_RowEvHandlerName="TransactionReportRowChangeEventHandler" msprop:Generator_RowDeletedName="TransactionReportRowDeleted" msprop:Generator_UserTableName="TransactionReport" msprop:Generator_RowChangedName="TransactionReportRowChanged" msprop:Generator_RowEvArgName="TransactionReportRowChangeEvent" msprop:Generator_RowClassName="TransactionReportRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
+              <xs:element name="Name" msprop:Generator_ColumnVarNameInTable="columnName" msprop:Generator_ColumnPropNameInRow="Name" msprop:Generator_ColumnPropNameInTable="NameColumn" msprop:Generator_UserColumnName="Name" type="xs:string" />
+              <xs:element name="Description" msprop:Generator_ColumnVarNameInTable="columnDescription" msprop:Generator_ColumnPropNameInRow="Description" msprop:Generator_ColumnPropNameInTable="DescriptionColumn" msprop:Generator_UserColumnName="Description" type="xs:string" minOccurs="0" />
+              <xs:element name="StartDate" msprop:Generator_ColumnVarNameInTable="columnStartDate" msprop:Generator_ColumnPropNameInRow="StartDate" msprop:Generator_ColumnPropNameInTable="StartDateColumn" msprop:Generator_UserColumnName="StartDate" type="xs:dateTime" />
+              <xs:element name="EndDate" msprop:Generator_ColumnVarNameInTable="columnEndDate" msprop:Generator_ColumnPropNameInRow="EndDate" msprop:Generator_ColumnPropNameInTable="EndDateColumn" msprop:Generator_UserColumnName="EndDate" type="xs:dateTime" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>
@@ -254,73 +265,81 @@
       <xs:selector xpath=".//mstns:Person" />
       <xs:field xpath="mstns:Name" />
     </xs:unique>
-    <xs:keyref name="FK_Account_RebalanceTarget" refer="Constraint1" msprop:rel_Generator_UserChildTable="RebalanceTarget" msprop:rel_Generator_ChildPropName="GetRebalanceTargetRows" msprop:rel_Generator_UserRelationName="FK_Account_RebalanceTarget" msprop:rel_Generator_RelationVarName="relationFK_Account_RebalanceTarget" msprop:rel_Generator_UserParentTable="Account" msprop:rel_Generator_ParentPropName="AccountRow">
+    <xs:unique name="TransactionReport_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:TransactionReport" />
+      <xs:field xpath="mstns:ID" />
+    </xs:unique>
+    <xs:unique name="TransactionReport_Constraint2" msdata:ConstraintName="Constraint2">
+      <xs:selector xpath=".//mstns:TransactionReport" />
+      <xs:field xpath="mstns:Name" />
+    </xs:unique>
+    <xs:keyref name="FK_Security_RebalanceTarget" refer="SecuritiesKey1" msprop:rel_Generator_UserChildTable="RebalanceTarget" msprop:rel_Generator_ChildPropName="GetRebalanceTargetRows" msprop:rel_Generator_UserRelationName="FK_Security_RebalanceTarget" msprop:rel_Generator_ParentPropName="SecurityRow" msprop:rel_Generator_RelationVarName="relationFK_Security_RebalanceTarget" msprop:rel_Generator_UserParentTable="Security">
+      <xs:selector xpath=".//mstns:RebalanceTarget" />
+      <xs:field xpath="mstns:SecurityID" />
+    </xs:keyref>
+    <xs:keyref name="FK_Account_RebalanceTarget" refer="Constraint1" msprop:rel_Generator_UserChildTable="RebalanceTarget" msprop:rel_Generator_ChildPropName="GetRebalanceTargetRows" msprop:rel_Generator_UserRelationName="FK_Account_RebalanceTarget" msprop:rel_Generator_ParentPropName="AccountRow" msprop:rel_Generator_RelationVarName="relationFK_Account_RebalanceTarget" msprop:rel_Generator_UserParentTable="Account">
       <xs:selector xpath=".//mstns:RebalanceTarget" />
       <xs:field xpath="mstns:AccountID" />
     </xs:keyref>
-    <xs:keyref name="FK_Security_RebalanceTarget" refer="SecuritiesKey1" msprop:rel_Generator_UserChildTable="RebalanceTarget" msprop:rel_Generator_ChildPropName="GetRebalanceTargetRows" msprop:rel_Generator_UserRelationName="FK_Security_RebalanceTarget" msprop:rel_Generator_RelationVarName="relationFK_Security_RebalanceTarget" msprop:rel_Generator_UserParentTable="Security" msprop:rel_Generator_ParentPropName="SecurityRow">
-      <xs:selector xpath=".//mstns:RebalanceTarget" />
-      <xs:field xpath="mstns:SecurityID" />
-    </xs:keyref>
-    <xs:keyref name="FK_Security_SecurityReconcileInfo" refer="SecuritiesKey1" msprop:rel_Generator_UserChildTable="SecurityReconcileInfo" msprop:rel_Generator_ChildPropName="GetSecurityReconcileInfoRows" msprop:rel_Generator_UserRelationName="FK_Security_SecurityReconcileInfo" msprop:rel_Generator_ParentPropName="SecurityRow" msprop:rel_Generator_RelationVarName="relationFK_Security_SecurityReconcileInfo" msprop:rel_Generator_UserParentTable="Security">
-      <xs:selector xpath=".//mstns:SecurityReconcileInfo" />
-      <xs:field xpath="mstns:SecurityID" />
-    </xs:keyref>
-    <xs:keyref name="FK_ReconcileInfo_SecurityReconcileInfo" refer="ReconcileInfo_Constraint1" msprop:rel_Generator_UserChildTable="SecurityReconcileInfo" msprop:rel_Generator_ChildPropName="GetSecurityReconcileInfoRows" msprop:rel_Generator_UserRelationName="FK_ReconcileInfo_SecurityReconcileInfo" msprop:rel_Generator_RelationVarName="relationFK_ReconcileInfo_SecurityReconcileInfo" msprop:rel_Generator_UserParentTable="ReconcileInfo" msprop:rel_Generator_ParentPropName="ReconcileInfoRow">
+    <xs:keyref name="FK_ReconcileInfo_SecurityReconcileInfo" refer="ReconcileInfo_Constraint1" msprop:rel_Generator_UserChildTable="SecurityReconcileInfo" msprop:rel_Generator_ChildPropName="GetSecurityReconcileInfoRows" msprop:rel_Generator_UserRelationName="FK_ReconcileInfo_SecurityReconcileInfo" msprop:rel_Generator_ParentPropName="ReconcileInfoRow" msprop:rel_Generator_RelationVarName="relationFK_ReconcileInfo_SecurityReconcileInfo" msprop:rel_Generator_UserParentTable="ReconcileInfo">
       <xs:selector xpath=".//mstns:SecurityReconcileInfo" />
       <xs:field xpath="mstns:ReconcileInfoID" />
     </xs:keyref>
-    <xs:keyref name="FK_Account_ReconcileInfo" refer="Constraint1" msprop:rel_Generator_UserChildTable="ReconcileInfo" msprop:rel_Generator_ChildPropName="GetReconcileInfoRows" msprop:rel_Generator_UserRelationName="FK_Account_ReconcileInfo" msprop:rel_Generator_ParentPropName="AccountRow" msprop:rel_Generator_RelationVarName="relationFK_Account_ReconcileInfo" msprop:rel_Generator_UserParentTable="Account">
-      <xs:selector xpath=".//mstns:ReconcileInfo" />
-      <xs:field xpath="mstns:AccountID" />
+    <xs:keyref name="FK_Security_SecurityReconcileInfo" refer="SecuritiesKey1" msprop:rel_Generator_UserChildTable="SecurityReconcileInfo" msprop:rel_Generator_ChildPropName="GetSecurityReconcileInfoRows" msprop:rel_Generator_UserRelationName="FK_Security_SecurityReconcileInfo" msprop:rel_Generator_RelationVarName="relationFK_Security_SecurityReconcileInfo" msprop:rel_Generator_UserParentTable="Security" msprop:rel_Generator_ParentPropName="SecurityRow">
+      <xs:selector xpath=".//mstns:SecurityReconcileInfo" />
+      <xs:field xpath="mstns:SecurityID" />
     </xs:keyref>
-    <xs:keyref name="FK_Category_ReconcileInfo" refer="Category_Constraint1" msprop:rel_Generator_UserChildTable="ReconcileInfo" msprop:rel_Generator_ChildPropName="GetReconcileInfoRows" msprop:rel_Generator_UserRelationName="FK_Category_ReconcileInfo" msprop:rel_Generator_ParentPropName="CategoryRow" msprop:rel_Generator_RelationVarName="relationFK_Category_ReconcileInfo" msprop:rel_Generator_UserParentTable="Category" msdata:UpdateRule="None" msdata:DeleteRule="None">
+    <xs:keyref name="FK_Category_ReconcileInfo" refer="Category_Constraint1" msprop:rel_Generator_UserChildTable="ReconcileInfo" msprop:rel_Generator_ChildPropName="GetReconcileInfoRows" msprop:rel_Generator_UserRelationName="FK_Category_ReconcileInfo" msprop:rel_Generator_RelationVarName="relationFK_Category_ReconcileInfo" msprop:rel_Generator_UserParentTable="Category" msprop:rel_Generator_ParentPropName="CategoryRow" msdata:UpdateRule="None" msdata:DeleteRule="None">
       <xs:selector xpath=".//mstns:ReconcileInfo" />
       <xs:field xpath="mstns:InterestCategoryID" />
     </xs:keyref>
-    <xs:keyref name="FK_Category_MemorizedLineItem" refer="Category_Constraint1" msprop:rel_Generator_UserChildTable="MemorizedLineItem" msprop:rel_Generator_ChildPropName="GetMemorizedLineItemRows" msprop:rel_Generator_UserRelationName="FK_Category_MemorizedLineItem" msprop:rel_Generator_ParentPropName="CategoryRow" msprop:rel_Generator_RelationVarName="relationFK_Category_MemorizedLineItem" msprop:rel_Generator_UserParentTable="Category">
-      <xs:selector xpath=".//mstns:MemorizedLineItem" />
-      <xs:field xpath="mstns:CategoryID" />
+    <xs:keyref name="FK_Account_ReconcileInfo" refer="Constraint1" msprop:rel_Generator_UserChildTable="ReconcileInfo" msprop:rel_Generator_ChildPropName="GetReconcileInfoRows" msprop:rel_Generator_UserRelationName="FK_Account_ReconcileInfo" msprop:rel_Generator_RelationVarName="relationFK_Account_ReconcileInfo" msprop:rel_Generator_UserParentTable="Account" msprop:rel_Generator_ParentPropName="AccountRow">
+      <xs:selector xpath=".//mstns:ReconcileInfo" />
+      <xs:field xpath="mstns:AccountID" />
     </xs:keyref>
-    <xs:keyref name="FK_MemorizedPayee_MemorizedLineItem" refer="MemorizedPayee_Constraint1" msprop:rel_Generator_UserChildTable="MemorizedLineItem" msprop:rel_Generator_ChildPropName="GetMemorizedLineItemRows" msprop:rel_Generator_UserRelationName="FK_MemorizedPayee_MemorizedLineItem" msprop:rel_Generator_RelationVarName="relationFK_MemorizedPayee_MemorizedLineItem" msprop:rel_Generator_UserParentTable="MemorizedPayee" msprop:rel_Generator_ParentPropName="MemorizedPayeeRow">
+    <xs:keyref name="FK_Account_MemorizedLineItem" refer="Constraint1" msprop:rel_Generator_UserChildTable="MemorizedLineItem" msprop:rel_Generator_ChildPropName="GetMemorizedLineItemRows" msprop:rel_Generator_UserRelationName="FK_Account_MemorizedLineItem" msprop:rel_Generator_RelationVarName="relationFK_Account_MemorizedLineItem" msprop:rel_Generator_UserParentTable="Account" msprop:rel_Generator_ParentPropName="AccountRow">
+      <xs:selector xpath=".//mstns:MemorizedLineItem" />
+      <xs:field xpath="mstns:AccountID" />
+    </xs:keyref>
+    <xs:keyref name="FK_MemorizedPayee_MemorizedLineItem" refer="MemorizedPayee_Constraint1" msprop:rel_Generator_UserChildTable="MemorizedLineItem" msprop:rel_Generator_ChildPropName="GetMemorizedLineItemRows" msprop:rel_Generator_UserRelationName="FK_MemorizedPayee_MemorizedLineItem" msprop:rel_Generator_ParentPropName="MemorizedPayeeRow" msprop:rel_Generator_RelationVarName="relationFK_MemorizedPayee_MemorizedLineItem" msprop:rel_Generator_UserParentTable="MemorizedPayee">
       <xs:selector xpath=".//mstns:MemorizedLineItem" />
       <xs:field xpath="mstns:MemorizedPayeeID" />
     </xs:keyref>
-    <xs:keyref name="FK_Account_MemorizedLineItem" refer="Constraint1" msprop:rel_Generator_UserChildTable="MemorizedLineItem" msprop:rel_Generator_ChildPropName="GetMemorizedLineItemRows" msprop:rel_Generator_UserRelationName="FK_Account_MemorizedLineItem" msprop:rel_Generator_ParentPropName="AccountRow" msprop:rel_Generator_RelationVarName="relationFK_Account_MemorizedLineItem" msprop:rel_Generator_UserParentTable="Account">
+    <xs:keyref name="FK_Category_MemorizedLineItem" refer="Category_Constraint1" msprop:rel_Generator_UserChildTable="MemorizedLineItem" msprop:rel_Generator_ChildPropName="GetMemorizedLineItemRows" msprop:rel_Generator_UserRelationName="FK_Category_MemorizedLineItem" msprop:rel_Generator_RelationVarName="relationFK_Category_MemorizedLineItem" msprop:rel_Generator_UserParentTable="Category" msprop:rel_Generator_ParentPropName="CategoryRow">
       <xs:selector xpath=".//mstns:MemorizedLineItem" />
-      <xs:field xpath="mstns:AccountID" />
+      <xs:field xpath="mstns:CategoryID" />
     </xs:keyref>
-    <xs:keyref name="FK_Security_InvestmentTransaction" refer="SecuritiesKey1" msprop:rel_Generator_UserChildTable="InvestmentTransaction" msprop:rel_Generator_ChildPropName="GetInvestmentTransactionRows" msprop:rel_Generator_UserRelationName="FK_Security_InvestmentTransaction" msprop:rel_Generator_ParentPropName="SecurityRow" msprop:rel_Generator_RelationVarName="relationFK_Security_InvestmentTransaction" msprop:rel_Generator_UserParentTable="Security" msdata:UpdateRule="None" msdata:DeleteRule="None">
+    <xs:keyref name="FK_Transaction_InvestmentTransaction" refer="Transaction_Constraint1" msprop:rel_Generator_UserChildTable="InvestmentTransaction" msprop:rel_Generator_ChildPropName="GetInvestmentTransactionRows" msprop:rel_Generator_UserRelationName="FK_Transaction_InvestmentTransaction" msprop:rel_Generator_RelationVarName="relationFK_Transaction_InvestmentTransaction" msprop:rel_Generator_UserParentTable="Transaction" msprop:rel_Generator_ParentPropName="TransactionRow" msdata:AcceptRejectRule="Cascade">
+      <xs:selector xpath=".//mstns:InvestmentTransaction" />
+      <xs:field xpath="mstns:TransactionID" />
+    </xs:keyref>
+    <xs:keyref name="FK_Security_InvestmentTransaction" refer="SecuritiesKey1" msprop:rel_Generator_UserChildTable="InvestmentTransaction" msprop:rel_Generator_ChildPropName="GetInvestmentTransactionRows" msprop:rel_Generator_UserRelationName="FK_Security_InvestmentTransaction" msprop:rel_Generator_RelationVarName="relationFK_Security_InvestmentTransaction" msprop:rel_Generator_UserParentTable="Security" msprop:rel_Generator_ParentPropName="SecurityRow" msdata:UpdateRule="None" msdata:DeleteRule="None">
       <xs:selector xpath=".//mstns:InvestmentTransaction" />
       <xs:field xpath="mstns:SecurityID" />
     </xs:keyref>
-    <xs:keyref name="FK_Transaction_InvestmentTransaction" refer="Transaction_Constraint1" msprop:rel_Generator_UserChildTable="InvestmentTransaction" msprop:rel_Generator_ChildPropName="GetInvestmentTransactionRows" msprop:rel_Generator_UserRelationName="FK_Transaction_InvestmentTransaction" msprop:rel_Generator_ParentPropName="TransactionRow" msprop:rel_Generator_RelationVarName="relationFK_Transaction_InvestmentTransaction" msprop:rel_Generator_UserParentTable="Transaction" msdata:AcceptRejectRule="Cascade">
-      <xs:selector xpath=".//mstns:InvestmentTransaction" />
-      <xs:field xpath="mstns:TransactionID" />
-    </xs:keyref>
-    <xs:keyref name="FK_Transaction_BankTransaction" refer="Transaction_Constraint1" msprop:rel_Generator_UserChildTable="BankingTransaction" msprop:rel_Generator_ChildPropName="GetBankingTransactionRows" msprop:rel_Generator_UserRelationName="FK_Transaction_BankTransaction" msprop:rel_Generator_ParentPropName="TransactionRow" msprop:rel_Generator_RelationVarName="relationFK_Transaction_BankTransaction" msprop:rel_Generator_UserParentTable="Transaction">
+    <xs:keyref name="FK_Transaction_BankTransaction" refer="Transaction_Constraint1" msprop:rel_Generator_UserChildTable="BankingTransaction" msprop:rel_Generator_ChildPropName="GetBankingTransactionRows" msprop:rel_Generator_UserRelationName="FK_Transaction_BankTransaction" msprop:rel_Generator_RelationVarName="relationFK_Transaction_BankTransaction" msprop:rel_Generator_UserParentTable="Transaction" msprop:rel_Generator_ParentPropName="TransactionRow">
       <xs:selector xpath=".//mstns:BankingTransaction" />
       <xs:field xpath="mstns:TransactionID" />
     </xs:keyref>
-    <xs:keyref name="FK_Transaction_LineItem" refer="Transaction_Constraint1" msprop:rel_Generator_UserChildTable="LineItem" msprop:rel_Generator_ChildPropName="GetLineItemRows" msprop:rel_Generator_UserRelationName="FK_Transaction_LineItem" msprop:rel_Generator_ParentPropName="TransactionRow" msprop:rel_Generator_RelationVarName="relationFK_Transaction_LineItem" msprop:rel_Generator_UserParentTable="Transaction">
+    <xs:keyref name="FK_Transaction_LineItem" refer="Transaction_Constraint1" msprop:rel_Generator_UserChildTable="LineItem" msprop:rel_Generator_ChildPropName="GetLineItemRows" msprop:rel_Generator_UserRelationName="FK_Transaction_LineItem" msprop:rel_Generator_RelationVarName="relationFK_Transaction_LineItem" msprop:rel_Generator_UserParentTable="Transaction" msprop:rel_Generator_ParentPropName="TransactionRow">
       <xs:selector xpath=".//mstns:LineItem" />
       <xs:field xpath="mstns:TransactionID" />
     </xs:keyref>
-    <xs:keyref name="FK_Account_Transaction" refer="Constraint1" msprop:rel_Generator_UserChildTable="Transaction" msprop:rel_Generator_ChildPropName="GetTransactionRows" msprop:rel_Generator_UserRelationName="FK_Account_Transaction" msprop:rel_Generator_ParentPropName="AccountRow" msprop:rel_Generator_RelationVarName="relationFK_Account_Transaction" msprop:rel_Generator_UserParentTable="Account" msdata:DeleteRule="None">
+    <xs:keyref name="FK_Account_Transaction" refer="Constraint1" msprop:rel_Generator_UserChildTable="Transaction" msprop:rel_Generator_ChildPropName="GetTransactionRows" msprop:rel_Generator_UserRelationName="FK_Account_Transaction" msprop:rel_Generator_RelationVarName="relationFK_Account_Transaction" msprop:rel_Generator_UserParentTable="Account" msprop:rel_Generator_ParentPropName="AccountRow" msdata:DeleteRule="None">
       <xs:selector xpath=".//mstns:Transaction" />
       <xs:field xpath="mstns:AccountID" />
     </xs:keyref>
-    <xs:keyref name="FK_Security_SecurityPrice" refer="SecuritiesKey1" msprop:rel_Generator_UserChildTable="SecurityPrice" msprop:rel_Generator_ChildPropName="GetSecurityPriceRows" msprop:rel_Generator_UserRelationName="FK_Security_SecurityPrice" msprop:rel_Generator_ParentPropName="SecurityRow" msprop:rel_Generator_RelationVarName="relationFK_Security_SecurityPrice" msprop:rel_Generator_UserParentTable="Security">
+    <xs:keyref name="FK_Security_SecurityPrice" refer="SecuritiesKey1" msprop:rel_Generator_UserChildTable="SecurityPrice" msprop:rel_Generator_ChildPropName="GetSecurityPriceRows" msprop:rel_Generator_UserRelationName="FK_Security_SecurityPrice" msprop:rel_Generator_RelationVarName="relationFK_Security_SecurityPrice" msprop:rel_Generator_UserParentTable="Security" msprop:rel_Generator_ParentPropName="SecurityRow">
       <xs:selector xpath=".//mstns:SecurityPrice" />
       <xs:field xpath="mstns:SecurityID" />
     </xs:keyref>
   </xs:element>
   <xs:annotation>
     <xs:appinfo>
-      <msdata:Relationship name="Account_LineItem" msdata:parent="Account" msdata:child="LineItem" msdata:parentkey="ID" msdata:childkey="AccountID" msprop:Generator_UserChildTable="LineItem" msprop:Generator_ChildPropName="GetLineItemRows" msprop:Generator_UserRelationName="Account_LineItem" msprop:Generator_ParentPropName="AccountRow" msprop:Generator_RelationVarName="relationAccount_LineItem" msprop:Generator_UserParentTable="Account" />
-      <msdata:Relationship name="Category_LineItem" msdata:parent="Category" msdata:child="LineItem" msdata:parentkey="ID" msdata:childkey="CategoryID" msprop:Generator_UserChildTable="LineItem" msprop:Generator_ChildPropName="GetLineItemRows" msprop:Generator_UserRelationName="Category_LineItem" msprop:Generator_ParentPropName="CategoryRow" msprop:Generator_RelationVarName="relationCategory_LineItem" msprop:Generator_UserParentTable="Category" />
-      <msdata:Relationship name="Checkpoint_Transaction" msdata:parent="Checkpoint" msdata:child="Transaction" msdata:parentkey="ID" msdata:childkey="CheckpointID" msprop:Generator_UserChildTable="Transaction" msprop:Generator_ChildPropName="GetTransactionRows" msprop:Generator_UserRelationName="Checkpoint_Transaction" msprop:Generator_RelationVarName="relationCheckpoint_Transaction" msprop:Generator_UserParentTable="Checkpoint" msprop:Generator_ParentPropName="CheckpointRow" />
-      <msdata:Relationship name="Person_Account" msdata:parent="Person" msdata:child="Account" msdata:parentkey="ID" msdata:childkey="PersonID" msprop:Generator_UserChildTable="Account" msprop:Generator_ChildPropName="GetAccountRows" msprop:Generator_UserRelationName="Person_Account" msprop:Generator_ParentPropName="PersonRow" msprop:Generator_RelationVarName="relationPerson_Account" msprop:Generator_UserParentTable="Person" />
+      <msdata:Relationship name="Account_LineItem" msdata:parent="Account" msdata:child="LineItem" msdata:parentkey="ID" msdata:childkey="AccountID" msprop:Generator_UserChildTable="LineItem" msprop:Generator_ChildPropName="GetLineItemRows" msprop:Generator_UserRelationName="Account_LineItem" msprop:Generator_RelationVarName="relationAccount_LineItem" msprop:Generator_UserParentTable="Account" msprop:Generator_ParentPropName="AccountRow" />
+      <msdata:Relationship name="Category_LineItem" msdata:parent="Category" msdata:child="LineItem" msdata:parentkey="ID" msdata:childkey="CategoryID" msprop:Generator_UserChildTable="LineItem" msprop:Generator_ChildPropName="GetLineItemRows" msprop:Generator_UserRelationName="Category_LineItem" msprop:Generator_RelationVarName="relationCategory_LineItem" msprop:Generator_UserParentTable="Category" msprop:Generator_ParentPropName="CategoryRow" />
+      <msdata:Relationship name="Checkpoint_Transaction" msdata:parent="Checkpoint" msdata:child="Transaction" msdata:parentkey="ID" msdata:childkey="CheckpointID" msprop:Generator_UserChildTable="Transaction" msprop:Generator_ChildPropName="GetTransactionRows" msprop:Generator_UserRelationName="Checkpoint_Transaction" msprop:Generator_ParentPropName="CheckpointRow" msprop:Generator_RelationVarName="relationCheckpoint_Transaction" msprop:Generator_UserParentTable="Checkpoint" />
+      <msdata:Relationship name="Person_Account" msdata:parent="Person" msdata:child="Account" msdata:parentkey="ID" msdata:childkey="PersonID" msprop:Generator_UserChildTable="Account" msprop:Generator_ChildPropName="GetAccountRows" msprop:Generator_UserRelationName="Person_Account" msprop:Generator_RelationVarName="relationPerson_Account" msprop:Generator_UserParentTable="Person" msprop:Generator_ParentPropName="PersonRow" />
     </xs:appinfo>
   </xs:annotation>
 </xs:schema>
