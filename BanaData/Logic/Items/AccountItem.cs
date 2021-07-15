@@ -15,13 +15,13 @@ namespace BanaData.Logic.Items
     public class AccountItem
     {
         // Explicit constructor
-        public AccountItem(int id, string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind, bool hidden, string owner) =>
-            (ID, Name, Description, Type, CreditLimit, InvestmentKind, Hidden, Owner) = (id, name, description, type, creditLimit, kind, hidden, owner);
+        public AccountItem(Household.AccountRow accountsRow, string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind, bool hidden, string owner) =>
+            (AccountRow, Name, Description, Type, CreditLimit, InvestmentKind, Hidden, Owner) = (accountsRow, name, description, type, creditLimit, kind, hidden, owner);
 
-        // Clone with a new ID
-        public AccountItem(AccountItem src, int id) =>
-            (ID, Name, Description, Type, CreditLimit, InvestmentKind, Hidden, Owner) = 
-            (id, src.Name, src.Description, src.Type, src.CreditLimit, src.InvestmentKind, src.Hidden, src.Owner);
+        // Clone with a new accountRow
+        public AccountItem(AccountItem src, Household.AccountRow accountsRow) =>
+            (AccountRow, Name, Description, Type, CreditLimit, InvestmentKind, Hidden, Owner) = 
+            (accountsRow, src.Name, src.Description, src.Type, src.CreditLimit, src.InvestmentKind, src.Hidden, src.Owner);
 
         // Factory from DB row
         public static AccountItem CreateFromDB(Household.AccountRow accountsRow)
@@ -30,11 +30,13 @@ namespace BanaData.Logic.Items
             EInvestmentKind kind = accountsRow.IsIKindNull() ? EInvestmentKind.Invalid : accountsRow.Kind;
             string owner = accountsRow.IsPersonIDNull() ? null : accountsRow.PersonRow.Name;
 
-            return new AccountItem(accountsRow.ID, accountsRow.Name, desc, accountsRow.Type, accountsRow.CreditLimit, kind, accountsRow.Hidden, owner);
+            return new AccountItem(accountsRow, accountsRow.Name, desc, accountsRow.Type, accountsRow.CreditLimit, kind, accountsRow.Hidden, owner);
         }
 
-        public readonly int ID;
+        // Account row (null when not in DB)
+        public readonly Household.AccountRow AccountRow;
 
+        // Properties
         public string Name { get; }
         public string Description { get; }
         public EAccountType Type { get; }

@@ -70,7 +70,7 @@ namespace BanaData.Logic.Dialogs
         private void OnAddAccount()
         {
             // Create new account
-            var account = new AccountItem(-1, "", "", EAccountType.Bank, 0, EInvestmentKind.Invalid, false, null);
+            var account = new AccountItem(null, "", "", EAccountType.Bank, 0, EInvestmentKind.Invalid, false, null);
 
             var logic = new EditAccountLogic(mainWindowLogic, account, true);
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
@@ -119,8 +119,7 @@ namespace BanaData.Logic.Dialogs
             if (SelectedAccount != null)
             {
                 // Delete only if no transactions
-                var accountRow = mainWindowLogic.Household.Account.FindByID(SelectedAccount.ID);
-                if (accountRow.HasTransactions)
+                if (SelectedAccount.AccountRow.HasTransactions)
                 {
                     mainWindowLogic.ErrorMessage("This account cannot be deleted because it has transactions associated with it.");
                     return;
@@ -145,7 +144,7 @@ namespace BanaData.Logic.Dialogs
             mainWindowLogic.UpdateAll();
 
             // Note that a new ID is created automatically, so we need to update the account item with it
-            return new AccountItem(newAccount, newAccountRow.ID);
+            return new AccountItem(newAccount, newAccountRow);
         }
 
         private void UpdateAccountInDataSet(AccountItem newAccount)
@@ -154,7 +153,7 @@ namespace BanaData.Logic.Dialogs
 
             // Update the row
             household.Account.Update(
-                newAccount.ID, newAccount.Name, newAccount.Description, newAccount.Type, newAccount.CreditLimit, newAccount.InvestmentKind, newAccount.Hidden, FindPersonRow(newAccount.Owner));
+                newAccount.AccountRow, newAccount.Name, newAccount.Description, newAccount.Type, newAccount.CreditLimit, newAccount.InvestmentKind, newAccount.Hidden, FindPersonRow(newAccount.Owner));
 
             // Commit
             mainWindowLogic.CommitChanges();
@@ -163,10 +162,8 @@ namespace BanaData.Logic.Dialogs
 
         private void RemoveAccountFromDataSet(AccountItem account)
         {
-            var household = mainWindowLogic.Household;
-
             // Remove the account
-            household.Account.FindByID(account.ID).Delete();
+            account.AccountRow.Delete();
 
             mainWindowLogic.CommitChanges();
             mainWindowLogic.UpdateAll();

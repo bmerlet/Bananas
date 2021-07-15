@@ -98,7 +98,7 @@ namespace BanaData.Logic.Dialogs
 
         #region Result
 
-        public AccountItem NewAccountItem => new AccountItem(oldAccountItem.ID, Name, Description, type, CreditLimit, investmentKind, IsHidden == true, Owner == Owners[0] ? null : Owner); 
+        public AccountItem NewAccountItem => new AccountItem(oldAccountItem.AccountRow, Name, Description, type, CreditLimit, investmentKind, IsHidden == true, Owner == Owners[0] ? null : Owner); 
 
         #endregion
 
@@ -114,7 +114,7 @@ namespace BanaData.Logic.Dialogs
 
             foreach (Household.AccountRow acct in mainWindowLogic.Household.Account.Rows)
             {
-                if (acct.ID != oldAccountItem.ID && acct.Name == Name)
+                if (acct != oldAccountItem.AccountRow && acct.Name == Name)
                 {
                     mainWindowLogic.ErrorMessage("There is already an account with this name");
                     return null;

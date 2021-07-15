@@ -264,10 +264,8 @@ namespace BanaData.Database
                 return accRow;
             }
 
-            public AccountRow Update(int id, string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind, bool hidden, PersonRow personRow)
+            public AccountRow Update(AccountRow accRow, string name, string description, EAccountType type, decimal creditLimit, EInvestmentKind kind, bool hidden, PersonRow personRow)
             {
-                var accRow = FindByID(id);
-
                 UpdateAccount(accRow, name, description, type, creditLimit, kind, hidden, personRow);
 
                 return accRow;

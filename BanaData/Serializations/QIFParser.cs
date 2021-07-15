@@ -520,7 +520,7 @@ namespace BanaData.Serializations
             else
             {
                 // Updated account
-                household.Account.Update(accountRow.ID, name, description, type, creditLimit, kind, accountRow.Hidden, null);
+                household.Account.Update(accountRow, name, description, type, creditLimit, kind, accountRow.Hidden, null);
                 accountTracker.UpdatedIDs.Add(accountRow.ID);
             }
 

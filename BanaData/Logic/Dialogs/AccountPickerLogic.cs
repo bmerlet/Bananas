@@ -81,7 +81,7 @@ namespace BanaData.Logic.Dialogs
                 return null;
             }
 
-            PickedAccount = mainWindowLogic.Household.Account.FindByID(SelectedAccount.ID);
+            PickedAccount = SelectedAccount.AccountRow;
 
             return true;
         }
