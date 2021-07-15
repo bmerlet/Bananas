@@ -186,6 +186,7 @@
                 <ContextMenu x:Key="TransactionContextMenu">
                     <MenuItem Header="Delete" Command="{Binding DeleteTransaction}"/>
                     <MenuItem Header="Split..." Command="{Binding EditedTransaction.SplitTransaction}"/>
+                    <MenuItem Header="Move transaction to other account..." Command="{Binding MoveTransaction}"/>
                     <MenuItem Header="Go to other side of transfer" Command="{Binding EditedTransaction.GotoOtherSideOfTransfer}"/>
                 </ContextMenu>
 

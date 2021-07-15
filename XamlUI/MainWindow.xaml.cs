@@ -122,6 +122,10 @@ namespace XamlUI
             {
                 dialog = new AccountPicker(accountPickerLogic);
             }
+            else if (logic is AccountListPickerLogic accountListPickerLogic)
+            {
+                dialog = new AccountListPicker(accountListPickerLogic);
+            }
             else if (logic is EditCategoriesLogic editCategoriesLogic)
             {
                 dialog = new EditCategories(editCategoriesLogic);
@@ -271,7 +275,7 @@ namespace XamlUI
 
         public void KaChing()
         {
-            kaChing.Play();
+            Sound.Play();
         }
 
         public void Exit()
@@ -281,14 +285,16 @@ namespace XamlUI
 
         #endregion
 
-        static private class kaChing
+        #region Sound support
+
+        static private class Sound
         {
-            static private readonly SoundPlayer soundPlayer;
-            static kaChing()
+            static private readonly System.Media.SoundPlayer soundPlayer;
+            static Sound()
             {
                 // Embedded as "Resource" doesn't seem to work
                 //var sri = Application.GetResourceStream(new Uri("pack://application:,,,.Sounds.kaching.wav", UriKind.RelativeOrAbsolute));
-                soundPlayer = new SoundPlayer("Sounds/kaching.wav");
+                soundPlayer = new System.Media.SoundPlayer("Sounds/kaching.wav");
             }
 
             static public void Play()
@@ -296,5 +302,7 @@ namespace XamlUI
                 soundPlayer.Play();
             }
         }
+
+        #endregion
     }
 }

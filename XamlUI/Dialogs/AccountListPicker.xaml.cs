@@ -18,9 +18,9 @@ namespace XamlUI.Dialogs
     /// <summary>
     /// Interaction logic for AccountPicker.xaml
     /// </summary>
-    public partial class AccountPicker : Window
+    public partial class AccountListPicker : Window
     {
-        public AccountPicker(AccountPickerLogic logic)
+        public AccountListPicker(AccountListPickerLogic logic)
         {
             // Use the view model as data context
             this.DataContext = logic;
@@ -29,14 +29,6 @@ namespace XamlUI.Dialogs
             logic.CloseView = result => DialogResult = result;
 
             InitializeComponent();
-        }
-
-        private void OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            if (DataContext is AccountPickerLogic logic)
-            {
-                logic.CommitCommand.Execute();
-            }
         }
     }
 }

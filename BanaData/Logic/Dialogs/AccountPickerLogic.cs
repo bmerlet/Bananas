@@ -16,136 +16,74 @@ namespace BanaData.Logic.Dialogs
 {
     public class AccountPickerLogic : LogicDialogBase
     {
-        #region Private memebers
+        #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
-        private readonly IEnumerable<Household.AccountRow> oldPickedAccounts;
+        private readonly Household.AccountRow accountFrom;
 
         #endregion
 
         #region Constructor
 
-        public AccountPickerLogic(MainWindowLogic _mainWindowLogic, IEnumerable<Household.AccountRow> pickedAccounts)
+        public AccountPickerLogic(MainWindowLogic _mainWindowLogic, Household.AccountRow _accountFrom)
         {
-            (mainWindowLogic, oldPickedAccounts) = (_mainWindowLogic, pickedAccounts);
+            (mainWindowLogic, accountFrom) = (_mainWindowLogic, _accountFrom);
 
-            foreach (Household.AccountRow accountRow in mainWindowLogic.Household.Account)
+            accountsSource = new ObservableCollection<AccountItem>();
+
+            foreach (Household.AccountRow acct in mainWindowLogic.Household.Account.Rows)
             {
-                accounts.Add(new AccountPickerItem(accountRow, oldPickedAccounts.Contains(accountRow)));
+                // Skip hidden accounts if required
+                if (acct.Hidden && mainWindowLogic.UserSettings.HideClosedAccounts)
+                {
+                    continue;
+                }
+
+                // Banking to banking and investment to investment
+                if (accountFrom != null)
+                {
+                    if (acct == accountFrom ||
+                        (accountFrom.Type == EAccountType.Investment && acct.Type != EAccountType.Investment) ||
+                        (accountFrom.Type != EAccountType.Investment && acct.Type == EAccountType.Investment))
+                    {
+                        continue;
+                    }
+                }
+
+                accountsSource.Add(AccountItem.CreateFromDB(acct));
             }
 
-            // Setup account view
-            Accounts = (CollectionView)CollectionViewSource.GetDefaultView(accounts);
-            Accounts.SortDescriptions.Add(new SortDescription("AccountItem.Name", ListSortDirection.Ascending));
+            AccountsSource = (CollectionView)CollectionViewSource.GetDefaultView(accountsSource);
+            AccountsSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
+        }
 
-            // Setup commands
-            ClearAllCommand = new CommandBase(OnClearAllCommand);
-            SelectAllCommand = new CommandBase(OnSelectAllCommand);
-            SelectInvestmentCommand = new CommandBase(OnSelectInvestmentCommand);
-            SelectBankingCommand = new CommandBase(OnSelectBankingCommand);
-    }
-
-    #endregion
+        #endregion
 
         #region UI properties
 
-        //
-        // List of accounts
-        //
-        private readonly ObservableCollection<AccountPickerItem> accounts = new ObservableCollection<AccountPickerItem>();
-        public CollectionView Accounts { get; }
+        public AccountItem SelectedAccount { get; set; }
 
-        //
-        // Buttons
-        //
-        public CommandBase ClearAllCommand { get; }
-        public CommandBase SelectAllCommand { get; }
-        public CommandBase SelectInvestmentCommand { get; }
-        public CommandBase SelectBankingCommand { get; }
+        private readonly ObservableCollection<AccountItem> accountsSource;
+        public CollectionView AccountsSource { get; }
+
 
         #endregion
 
         #region Actions
 
-        // Result
-        public IEnumerable<Household.AccountRow> PickedAccounts;
+        public Household.AccountRow PickedAccount { get; private set; }
 
         protected override bool? Commit()
         {
-            var pickedAccounts = new List<Household.AccountRow>();
-            
-            foreach(var acct in accounts)
+            if (SelectedAccount == null)
             {
-                if (acct.IsSelected == true)
-                {
-                    pickedAccounts.Add(acct.AccountRow);
-                }
+                mainWindowLogic.ErrorMessage("Please select an account.");
+                return null;
             }
 
-            PickedAccounts = pickedAccounts;
+            PickedAccount = mainWindowLogic.Household.Account.FindByID(SelectedAccount.ID);
 
-            // Err on the side of caution
             return true;
-        }
-
-        private void OnClearAllCommand()
-        {
-            foreach(var acct in accounts)
-            {
-                acct.IsSelected = false;
-            }
-        }
-
-        private void OnSelectAllCommand()
-        {
-            foreach (var acct in accounts)
-            {
-                acct.IsSelected = true;
-            }
-        }
-
-        private void OnSelectInvestmentCommand()
-        {
-            foreach (var acct in accounts)
-            {
-                acct.IsSelected = acct.AccountRow.Type == EAccountType.Investment;
-            }
-        }
-
-        private void OnSelectBankingCommand()
-        {
-            foreach (var acct in accounts)
-            {
-                acct.IsSelected = acct.AccountRow.Type == EAccountType.Bank;
-            }
-        }
-
-        #endregion
-
-        #region Supporting class
-
-        public class AccountPickerItem : LogicBase
-        {
-            public AccountPickerItem(Household.AccountRow accountRow, bool selected) =>
-                (AccountRow, AccountItem, isSelected) = (accountRow, AccountItem.CreateFromDB(accountRow), selected);
-
-            public readonly Household.AccountRow AccountRow;
-
-            public AccountItem AccountItem { get; }
-
-            private bool ?isSelected;
-            public bool? IsSelected
-            {
-                get => isSelected;
-                set
-                {
-                    if (isSelected != value)
-                    {
-                        isSelected = value;
-                    }
-                    OnPropertyChanged(() => IsSelected);
-                }
-            }
         }
 
         #endregion

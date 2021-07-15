@@ -10,6 +10,7 @@ using BanaData.Collections;
 using BanaData.Database;
 using BanaData.Logic.Items;
 using System.ComponentModel;
+using BanaData.Logic.Dialogs;
 
 namespace BanaData.Logic.Main
 {
@@ -42,6 +43,7 @@ namespace BanaData.Logic.Main
 
             // Create commands
             DeleteTransaction = new CommandBase(OnDeleteTransaction);
+            MoveTransaction = new CommandBase(OnMoveTransaction);
         }
 
         #endregion
@@ -69,7 +71,8 @@ namespace BanaData.Logic.Main
         public bool DateFocus { get; protected set; }
 
         // Context menu commands
-        public CommandBase DeleteTransaction { get; protected set; }
+        public CommandBase DeleteTransaction { get; }
+        public CommandBase MoveTransaction { get; }
 
         #endregion
 
@@ -394,7 +397,7 @@ namespace BanaData.Logic.Main
 
         #endregion
 
-        #region Utilities for derived classes
+        #region Local actions
 
         private void OnDeleteTransaction(object arg)
         {
@@ -404,9 +407,10 @@ namespace BanaData.Logic.Main
                 return;
             }
 
-            if (atl.TransID < 0)
+            if (atl.TransID == AbstractTransactionLogic.TRANSID_NOT_COMMITTED ||
+                atl.TransID == AbstractTransactionLogic.TRANSID_TRANSFER_FILLIN)
             {
-                // Can't remove the empty transaction
+                // Can't remove the empty transaction or a transfer fill-in
                 return;
             }
 
@@ -432,6 +436,51 @@ namespace BanaData.Logic.Main
             logicIsChangingSelection = false;
         }
 
+        private void OnMoveTransaction()
+        {
+            var atl = SelectedTransaction;
+            if (atl == null)
+            {
+                return;
+            }
+
+            if (atl.TransID == AbstractTransactionLogic.TRANSID_NOT_COMMITTED ||
+                atl.TransID == AbstractTransactionLogic.TRANSID_TRANSFER_FILLIN)
+            {
+                // Can't remove the empty transaction or a transfer fill-in
+                return;
+            }
+
+            // Ask what account to move this transaction to
+            var logic = new AccountPickerLogic(mainWindowLogic, mainWindowLogic.Household.Account.FindByID(accountID));
+            if (mainWindowLogic.GuiServices.ShowDialog(logic))
+            {
+                // Cancel all changes
+                atl.CancelEdit();
+
+                // We want to select the next transaction afterwards
+                var transactionToSelect = GetNextTransaction(atl) as AbstractTransactionLogic;
+
+                // Do move the transaction in the DB
+                var household = mainWindowLogic.Household;
+                var transRow = household.Transaction.FindByID(atl.TransID);
+                transRow.AccountID = logic.PickedAccount.ID;
+                transRow.CheckpointID = household.Checkpoint.GetMostRecentCheckpointID();
+                mainWindowLogic.CommitChanges();
+
+                // Delete from list
+                transactions.Remove(atl);
+                Transactions.Refresh();
+
+                // Compute balances
+                RecomputeBalances();
+
+                // Re-select
+                logicIsChangingSelection = true;
+                SelectedTransaction = transactionToSelect;
+                logicIsChangingSelection = false;
+            }
+        }
 
         #endregion
 
@@ -494,8 +543,17 @@ namespace BanaData.Logic.Main
 
                 if (EditedTransaction != null)
                 {
+                    // Enable/disable context menu commands
+                    bool realTrans = 
+                        EditedTransaction.TransID != AbstractTransactionLogic.TRANSID_NOT_COMMITTED &&
+                        EditedTransaction.TransID != AbstractTransactionLogic.TRANSID_TRANSFER_FILLIN;
+                    DeleteTransaction.SetCanExecute(realTrans);
+                    MoveTransaction.SetCanExecute(realTrans);
+
+                    // Edit this transaction
                     EditedTransaction.BeginEdit();
 
+                    // Set focus on date field
                     DateFocus = false;
                     OnPropertyChanged(() => DateFocus);
 
@@ -508,6 +566,8 @@ namespace BanaData.Logic.Main
                 else
                 {
                     UpdateOverlayPosition = null;
+                    DeleteTransaction.SetCanExecute(false);
+                    MoveTransaction.SetCanExecute(false);
                 }
 
                 OnPropertyChanged(() => EditedTransaction);
@@ -531,10 +591,10 @@ namespace BanaData.Logic.Main
                     SelectedTransaction = emptyTransaction;
                     logicIsChangingSelection = false;
 
-                // Go to the bottom
-                //TransactionToScrollTo = emptyTransaction;
-                //OnPropertyChanged(() => TransactionToScrollTo);
-                OnPropertyChanged("ScrollToBottom");
+                    // Go to the bottom
+                    //TransactionToScrollTo = emptyTransaction;
+                    //OnPropertyChanged(() => TransactionToScrollTo);
+                    OnPropertyChanged("ScrollToBottom");
                 });
             }
         }

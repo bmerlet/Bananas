@@ -176,7 +176,6 @@ namespace BanaData.Logic.Main
         //
         // Category source
         //
-        private readonly CollectionViewSource categoriesCollectionViewSource = new CollectionViewSource();
         private readonly WpfObservableRangeCollection<CategoryItem> categories = new WpfObservableRangeCollection<CategoryItem>();
         private readonly WpfObservableRangeCollection<CategoryItem> transfers = new WpfObservableRangeCollection<CategoryItem>();
         public CollectionView CategoriesOrTransferView { get; private set; }

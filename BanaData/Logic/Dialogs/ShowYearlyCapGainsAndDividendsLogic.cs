@@ -411,7 +411,7 @@ namespace BanaData.Logic.Dialogs
 
         private void OnPickAccountsCommand()
         {
-            var logic = new AccountPickerLogic(mainWindowLogic, shownAccounts);
+            var logic = new AccountListPickerLogic(mainWindowLogic, shownAccounts);
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
             {
                 shownAccounts.Clear();

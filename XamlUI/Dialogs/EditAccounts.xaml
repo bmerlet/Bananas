@@ -21,8 +21,6 @@
         <!-- Main panel: Listview of accounts -->
         <ListView
             x:Name="listView"
-            Grid.ColumnSpan="3"
-            AlternationCount="2"
             SelectionMode="Single"
             ItemsSource="{Binding AccountsSource}"
             SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"

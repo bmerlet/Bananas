@@ -61,6 +61,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Dialogs\AccountListPicker.xaml.cs">
+      <DependentUpon>AccountListPicker.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\AccountPicker.xaml.cs">
       <DependentUpon>AccountPicker.xaml</DependentUpon>
     </Compile>
@@ -169,6 +172,10 @@
       <DependentUpon>SplitRegister.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\WatermarkTextBox.cs" />
+    <Page Include="Dialogs\AccountListPicker.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\AccountPicker.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

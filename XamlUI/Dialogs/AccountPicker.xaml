@@ -4,63 +4,43 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:XamlUI.Dialogs"
-        xmlns:w="clr-namespace:XamlUI.UserControls"
         mc:Ignorable="d"
-        Title="Account picker"        
+        xmlns:w="clr-namespace:XamlUI.UserControls" 
+        xmlns:dialogs="clr-namespace:BanaData.Logic.Dialogs;assembly=BanaData"
+        d:DataContext="{d:DesignInstance Type=dialogs:AccountPickerLogic}"
+        Title="Select an account"
         Icon="/XamlUI;component/Images/Bananas.ico"
-        ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
-        SizeToContent="WidthAndHeight">
+        SizeToContent="Width" Height="300">
     <DockPanel>
-
+    
         <!-- OK/Cancel panel -->
         <w:OKCancel DockPanel.Dock="Bottom"/>
 
-        <!-- Control panel -->
-        <Grid DockPanel.Dock="Top">
-            <Grid.Resources>
-                <Style TargetType="Button" BasedOn="{StaticResource FormButton}"/>
-            </Grid.Resources>
-
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Button Content="Clear all" Command="{Binding ClearAllCommand}"/>
-            <Button Content="Select all" Command="{Binding SelectAllCommand}" Grid.Column="1"/>
-            <Button Content="Select investment" Command="{Binding SelectInvestmentCommand}" Grid.Column="2"/>
-            <Button Content="Select banking" Command="{Binding SelectBankingCommand}" Grid.Column="3"/>
-
-        </Grid>
-
         <!-- Main panel: Listview of accounts -->
         <ListView
-            Height="300"
+            x:Name="listView"
+            AlternationCount="2"
             SelectionMode="Single"
-            ItemsSource="{Binding Accounts}">
+            ItemsSource="{Binding AccountsSource}"
+            SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"
+            MouseDoubleClick="OnMouseDoubleClick">
 
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Sel" Width="40">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Name" Width="200" DisplayMemberBinding="{Binding AccountItem.Name}"/>
-                    <GridViewColumn Header="Description" Width="200" DisplayMemberBinding="{Binding AccoutItem.Description}"/>
+                    <GridViewColumn Header="Name" Width="200" DisplayMemberBinding="{Binding Name}"/>
+                    <GridViewColumn Header="Description" Width="200" DisplayMemberBinding="{Binding Description}"/>
                     <GridViewColumn Header="Type" Width="85">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding AccountItem.TypeString}" Foreground="Blue" />
+                                <TextBlock Text="{Binding TypeString}" Foreground="Blue" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
+                    <GridViewColumn Header="Owner" Width="100" DisplayMemberBinding="{Binding Owner}"/>
                 </GridView>
             </ListView.View>
         </ListView>
+
     </DockPanel>
 </Window>
