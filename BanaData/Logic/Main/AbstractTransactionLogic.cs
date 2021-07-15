@@ -19,7 +19,7 @@ namespace BanaData.Logic.Main
         protected readonly MainWindowLogic mainWindowLogic;
 
         // Account this transaction is for
-        protected readonly int accountID;
+        protected readonly Household.AccountRow accountRow;
 
         // Transaction data
         protected readonly BaseTransactionData data;
@@ -35,9 +35,9 @@ namespace BanaData.Logic.Main
         #region Constructor
 
         protected AbstractTransactionLogic(
-            MainWindowLogic _mainWindowLogic, int _accountID, int _transID, BaseTransactionData _data)
+            MainWindowLogic _mainWindowLogic, Household.AccountRow _accountRow, int _transID, BaseTransactionData _data)
         {
-            (mainWindowLogic, accountID, TransID, data) = (_mainWindowLogic, _accountID, _transID, _data);
+            (mainWindowLogic, accountRow, TransID, data) = (_mainWindowLogic, _accountRow, _transID, _data);
 
             GotoOtherSideOfTransfer = new CommandBase(OnGotoOtherSideOfTransfer);
             GotoOtherSideOfTransfer.SetCanExecute(
@@ -356,7 +356,6 @@ namespace BanaData.Logic.Main
         {
             // Delete from dataset
             var household = mainWindowLogic.Household;
-            var accountRow = household.Account.FindByID(accountID);
             var transactionRow = household.Transaction.FindByID(transID);
 
             // Delete all line items

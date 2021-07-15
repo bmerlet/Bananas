@@ -27,8 +27,8 @@ namespace BanaData.Logic.Main
 
         #region Constructor
 
-        public BankingTransactionLogic(MainWindowLogic mainWindowLogic, BankRegisterLogic _bankRegisterLogic, int accountID, int transID, BankTransactionData data)
-            : base(mainWindowLogic, accountID, transID, data)
+        public BankingTransactionLogic(MainWindowLogic mainWindowLogic, BankRegisterLogic _bankRegisterLogic, Household.AccountRow accountRow, int transID, BankTransactionData data)
+            : base(mainWindowLogic, accountRow, transID, data)
         {
             (bankRegisterLogic, TransID) = (_bankRegisterLogic, transID);
 
@@ -37,8 +37,8 @@ namespace BanaData.Logic.Main
         }
 
         // To create new transactions (not in DB yet)
-        public BankingTransactionLogic(MainWindowLogic _mainWindowLogic, BankRegisterLogic _bankRegisterLogic, int _accountID)
-            : this(_mainWindowLogic, _bankRegisterLogic, _accountID, AbstractTransactionLogic.TRANSID_NOT_COMMITTED,
+        public BankingTransactionLogic(MainWindowLogic _mainWindowLogic, BankRegisterLogic _bankRegisterLogic, Household.AccountRow _accountRow)
+            : this(_mainWindowLogic, _bankRegisterLogic, _accountRow, AbstractTransactionLogic.TRANSID_NOT_COMMITTED,
                   new BankTransactionData(DateTime.Today, ETransactionMedium.None, 0, "", "", ETransactionStatus.Pending,
                       new LineItem[] { new LineItem(_mainWindowLogic, -1, "", -1, -1, "", 0, false) }))
         {
@@ -211,7 +211,6 @@ namespace BanaData.Logic.Main
         private void CommitTransactionToDataSet()
         {
             var household = mainWindowLogic.Household;
-            var accountRow = household.Account.FindByID(accountID);
 
             if (TransID == TRANSID_NOT_COMMITTED)
             {

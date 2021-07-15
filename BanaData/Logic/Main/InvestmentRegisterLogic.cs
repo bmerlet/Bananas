@@ -62,14 +62,14 @@ namespace BanaData.Logic.Main
                 investmentTransRow.IsSecurityQuantityNull() ? 0 : investmentTransRow.SecurityQuantity,
                 investmentTransRow.Commission);
 
-            var investmentTransaction = new InvestmentTransactionLogic(mainWindowLogic, accountID, transRow.ID, transactionData);
+            var investmentTransaction = new InvestmentTransactionLogic(mainWindowLogic, accountRow, transRow.ID, transactionData);
 
             return investmentTransaction;
         }
 
         protected override AbstractTransactionLogic CreateEmptyTransaction()
         {
-            return new InvestmentTransactionLogic(mainWindowLogic, accountID);
+            return new InvestmentTransactionLogic(mainWindowLogic, accountRow);
         }
 
         // Create a mirror pseudo-transaction for transfers
@@ -98,7 +98,7 @@ namespace BanaData.Logic.Main
                 lineItem.Amount > 0 ? EInvestmentTransactionType.TransferCashIn : EInvestmentTransactionType.TransferCashOut,
                 -1, 0, 0, 0);
 
-            var investmentTransaction = new InvestmentTransactionLogic(mainWindowLogic,  accountID, AbstractTransactionLogic.TRANSID_TRANSFER_FILLIN, transactionData);
+            var investmentTransaction = new InvestmentTransactionLogic(mainWindowLogic,  accountRow, AbstractTransactionLogic.TRANSID_TRANSFER_FILLIN, transactionData);
 
             return investmentTransaction;
         }

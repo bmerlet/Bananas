@@ -32,10 +32,10 @@ namespace BanaData.Logic.Main
 
         public InvestmentTransactionLogic(
             MainWindowLogic _mainWindowLogic,
-            int _accountID,
+             Household.AccountRow accountRow,
             int transID,
             InvestmentTransactionData _data)
-            : base(_mainWindowLogic, _accountID, transID, _data)
+            : base(_mainWindowLogic, accountRow, transID, _data)
         {
             data = _data;
 
@@ -59,10 +59,10 @@ namespace BanaData.Logic.Main
         }
 
         public InvestmentTransactionLogic(
-            MainWindowLogic _mainWindowLogic,
-            int _accountID)
-            : this(_mainWindowLogic, _accountID, TRANSID_NOT_COMMITTED,
-                  new InvestmentTransactionData(DateTime.Today, "", "", ETransactionStatus.Pending, new LineItem[] { new LineItem(_mainWindowLogic, -1, "", -1, -1, "", 0, false) },
+            MainWindowLogic mainWindowLogic,
+             Household.AccountRow accountRow)
+            : this(mainWindowLogic, accountRow, TRANSID_NOT_COMMITTED,
+                  new InvestmentTransactionData(DateTime.Today, "", "", ETransactionStatus.Pending, new LineItem[] { new LineItem(mainWindowLogic, -1, "", -1, -1, "", 0, false) },
                     EInvestmentTransactionType.Dividends, -1, 0, 0, 0)) { }
 
         #endregion
@@ -513,7 +513,6 @@ namespace BanaData.Logic.Main
             if (investmentTransactionType != null && investmentTransactionType.IsFilteringSecurity)
             {
                 var household = mainWindowLogic.Household;
-                var accountRow = household.Account.FindByID(accountID);
                 var portfolio = accountRow.GetPortfolio(data.Date);
                 securities.ReplaceRange(portfolio.GetSecurities().Select<int, SecurityItem>(sid => mainWindowLogic.Securities.First(s => s.ID == sid)));
             }
@@ -532,7 +531,6 @@ namespace BanaData.Logic.Main
         private void CommitTransactionToDataSet()
         {
             var household = mainWindowLogic.Household;
-            var accountRow = household.Account.FindByID(accountID);
 
             //
             // Remove irrelevant input based on type

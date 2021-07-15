@@ -22,7 +22,7 @@ namespace BanaData.Logic.Main
         protected readonly MainWindowLogic mainWindowLogic;
 
         // Account we are displaying
-        protected int accountID = -1;
+        protected Household.AccountRow accountRow = null;
 
         // Actual collection of transactions backing the Transactions collection view property
         protected readonly WpfObservableRangeCollection<AbstractTransactionLogic> transactions = new WpfObservableRangeCollection<AbstractTransactionLogic>();
@@ -79,30 +79,27 @@ namespace BanaData.Logic.Main
         #region Public Actions
 
         // Set the account to display
-        public void SetAccount(int _accountID, int transactionID, int lineItemID)
+        public void SetAccount(int accountID, int transactionID, int lineItemID)
         {
-            // Remember which account we are displaying 
-            accountID = _accountID;
-
             // Get the account details
             var household = mainWindowLogic.Household;
-            var account = household.Account.FindByID(accountID);
+            accountRow = household.Account.FindByID(accountID);
 
             // Derived class specific action 
-            OnNewAccount(account);
+            OnNewAccount();
 
             // Export account name
-            AccountName = account.Name;
+            AccountName = accountRow.Name;
             OnPropertyChanged(() => AccountName);
 
             // Find transactions and put them in a temp transaction list
             // (for performance)
             temporaryTransactionList.Clear();
 
-            foreach (Household.TransactionRow transRow in account.GetTransactionRows())
+            foreach (Household.TransactionRow transRow in accountRow.GetTransactionRows())
             {
                 var lineItems = GetLineItems(transRow);
-                var trans = CreateTransactionFromDB(account, transRow, lineItems);
+                var trans = CreateTransactionFromDB(accountRow, transRow, lineItems);
                 temporaryTransactionList.Add(trans);
             }
 
@@ -114,7 +111,7 @@ namespace BanaData.Logic.Main
                     var transferTransactionRow = lineItemRow.TransactionRow;
                     if (transferTransactionRow.AccountID != accountID)
                     {
-                        var trans = CreateMirrorTransaction(account, lineItemRow);
+                        var trans = CreateMirrorTransaction(accountRow, lineItemRow);
                         temporaryTransactionList.Add(trans);
                     }
                 }
@@ -170,11 +167,10 @@ namespace BanaData.Logic.Main
         public void AddTransaction(int transactionID)
         {
             var household = mainWindowLogic.Household;
-            var account = household.Account.FindByID(accountID);
             var transRow = household.Transaction.FindByID(transactionID);
             var lineItems = GetLineItems(transRow);
 
-            var trans = CreateTransactionFromDB(account, transRow, lineItems);
+            var trans = CreateTransactionFromDB(accountRow, transRow, lineItems);
             transactions.Add(trans);
 
             // Re-compute balances
@@ -185,7 +181,7 @@ namespace BanaData.Logic.Main
         public void UpdateAllTransactionStatus()
         {
             // Return if we are not active
-            if (accountID != mainWindowLogic.DisplayedAccountID)
+            if (accountRow.ID != mainWindowLogic.DisplayedAccountID)
             {
                 return;
             }
@@ -210,6 +206,22 @@ namespace BanaData.Logic.Main
                     // Update balance in transaction
                     atl.Balance = balance;
                 }
+            }
+
+            switch(accountRow.Type)
+            {
+                case EAccountType.Investment:
+                    mainWindowLogic.InvestmentAccountGroup.UpdateAccountsAndBalances();
+                    break;
+
+                case EAccountType.OtherAsset:
+                case EAccountType.OtherLiability:
+                    mainWindowLogic.AssetAccountGroup.UpdateAccountsAndBalances();
+                    break;
+
+                default:
+                    mainWindowLogic.BankAccountGroup.UpdateAccountsAndBalances();
+                    break;
             }
         }
 
@@ -452,7 +464,7 @@ namespace BanaData.Logic.Main
             }
 
             // Ask what account to move this transaction to
-            var logic = new AccountPickerLogic(mainWindowLogic, mainWindowLogic.Household.Account.FindByID(accountID));
+            var logic = new AccountPickerLogic(mainWindowLogic, accountRow);
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
             {
                 // Cancel all changes
@@ -604,7 +616,7 @@ namespace BanaData.Logic.Main
         #region Hooks provided by derived classes
 
         // Called by this class when a new account is set
-        protected virtual void OnNewAccount(Household.AccountRow accountRow) { }
+        protected virtual void OnNewAccount() { }
 
         // Create a transaction from DB info
         protected abstract AbstractTransactionLogic CreateTransactionFromDB(

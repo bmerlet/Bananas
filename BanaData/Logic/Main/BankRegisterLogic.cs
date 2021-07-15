@@ -63,7 +63,7 @@ namespace BanaData.Logic.Main
         #region Actions
 
         // Manage the visibility of the medium column when displaying a new account
-        protected override void OnNewAccount(Household.AccountRow accountRow) 
+        protected override void OnNewAccount() 
         {
             if (IsBank != (accountRow.Type == EAccountType.Bank))
             {
@@ -88,14 +88,14 @@ namespace BanaData.Logic.Main
                 transRow.Status,
                 lineItems);
 
-            var bankingTransaction = new BankingTransactionLogic(mainWindowLogic, this, accountID, transRow.ID, transactionData);
+            var bankingTransaction = new BankingTransactionLogic(mainWindowLogic, this, accountRow, transRow.ID, transactionData);
 
             return bankingTransaction;
         }
 
         protected override AbstractTransactionLogic CreateEmptyTransaction()
         {
-            return new BankingTransactionLogic(mainWindowLogic, this, accountID);
+            return new BankingTransactionLogic(mainWindowLogic, this, accountRow);
         }
 
         // Create a mirror pseudo-transaction for transfers
@@ -124,7 +124,7 @@ namespace BanaData.Logic.Main
                 otherLineItemRow.TransferStatus,
                 new LineItem[] { lineItem });
 
-            var bankingTransaction = new BankingTransactionLogic(mainWindowLogic, this, accountID, AbstractTransactionLogic.TRANSID_TRANSFER_FILLIN, transactionData);
+            var bankingTransaction = new BankingTransactionLogic(mainWindowLogic, this, accountRow, AbstractTransactionLogic.TRANSID_TRANSFER_FILLIN, transactionData);
 
             return bankingTransaction;
         }
