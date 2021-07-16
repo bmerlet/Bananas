@@ -10,7 +10,7 @@ namespace BanaData.Database
             public ETransactionReportFlag Flags
             {
                 get => (ETransactionReportFlag)IFlags;
-                set => IFlags = (int)Flags;
+                set => IFlags = (int)value;
             }
 
             public bool IsFilteringOnAccounts

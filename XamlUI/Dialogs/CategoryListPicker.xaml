@@ -1,0 +1,72 @@
+﻿<Window x:Class="XamlUI.Dialogs.CategoryListPicker"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:XamlUI.Dialogs"
+        xmlns:w="clr-namespace:XamlUI.UserControls" 
+        xmlns:dialogs="clr-namespace:BanaData.Logic.Dialogs;assembly=BanaData"
+        d:DataContext="{d:DesignInstance Type=dialogs:CategoryListPickerLogic}"
+        mc:Ignorable="d"
+        Title="Category picker"        
+        Icon="/XamlUI;component/Images/Bananas.ico"
+        WindowStartupLocation="CenterOwner"
+        SizeToContent="Width" Height="360">
+    <DockPanel>
+
+        <!-- OK/Cancel panel -->
+        <w:OKCancel DockPanel.Dock="Bottom"/>
+
+        <!-- Control panel -->
+        <Grid DockPanel.Dock="Top">
+            <Grid.Resources>
+                <Style TargetType="Button" BasedOn="{StaticResource FormButton}"/>
+            </Grid.Resources>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Content="Clear all" Command="{Binding ClearAllCommand}"/>
+            <Button Content="Select all" Command="{Binding SelectAllCommand}" Grid.Column="1"/>
+            <Button Content="Select income" Command="{Binding SelectIncomeCommand}" Grid.Column="2"/>
+            <Button Content="Select expense" Command="{Binding SelectExpenseCommand}" Grid.Column="3"/>
+
+        </Grid>
+
+        <!-- Main panel: Listview of categories -->
+        <ListView
+            SelectionMode="Single"
+            ItemsSource="{Binding Categories}">
+
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Sel" Width="40">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Name" Width="200">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding CategoryItem.IndentedName}" FontWeight="{Binding CategoryItem.FontWeight, Converter={StaticResource fontWeightConverter}}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Type" Width="70">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding CategoryItem.TypeString}" Foreground="Blue" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Description" Width="220" DisplayMemberBinding="{Binding CategoryItem.Description}"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </DockPanel>
+</Window>

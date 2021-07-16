@@ -635,9 +635,7 @@ namespace BanaData.Logic.Main
                 // Exclude internal categories (not used)
                 if (category.IsParentIDNull())
                 {
-                    var description = category.IsDescriptionNull() ? "" : category.Description;
-                    var taxInfo = category.IsTaxInfoNull() ? "" : category.TaxInfo;
-                    var categoryItem = new CategoryItem(category.ID, category.Name, description, category.IsIncome, taxInfo, null);
+                    var categoryItem = CategoryItem.CreateFromDB(category, Enumerable.Empty<CategoryItem>());
                     if (category.Name.StartsWith("_"))
                     {
                         HiddenCategories.Add(categoryItem);
@@ -662,22 +660,15 @@ namespace BanaData.Logic.Main
                     if (!category.IsParentIDNull())
                     {
                         // If this category is not in the list yet
-                        if (CategoriesAndTransfers.FirstOrDefault(c => c.ID == category.ID) == null)
+                        if (Categories.FirstOrDefault(c => c.ID == category.ID) == null)
                         {
                             categoryNotFound = true;
 
-                            // Find parent in list
-                            var parent = CategoriesAndTransfers.FirstOrDefault(c => c.ID == category.ParentID);
-                            if (parent != null)
-                            {
-                                // Create category
-                                var description = category.IsDescriptionNull() ? "" : category.Description;
-                                var taxInfo = category.IsTaxInfoNull() ? "" : category.TaxInfo;
-                                var categoryItem = new CategoryItem(category.ID, category.Name, description, category.IsIncome, taxInfo, parent);
+                            // Create category
+                            var categoryItem = CategoryItem.CreateFromDB(category, Categories);
 
-                                Categories.Add(categoryItem);
-                                CategoriesAndTransfers.Add(categoryItem);
-                            }
+                            Categories.Add(categoryItem);
+                            CategoriesAndTransfers.Add(categoryItem);
                         }                        
                     }
                 }

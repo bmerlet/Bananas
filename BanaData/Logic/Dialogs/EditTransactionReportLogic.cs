@@ -72,7 +72,7 @@ namespace BanaData.Logic.Dialogs
         public CommandBase PickAccounts { get; }
 
         // Payees
-        public ObservableCollection<string> PayeesSource { get; } = new ObservableCollection<string>();
+        public WpfObservableRangeCollection<string> PayeesSource { get; } = new WpfObservableRangeCollection<string>();
         private bool isFilteringOnPayees;
         public bool? IsFilteringOnPayees 
         {
@@ -82,7 +82,8 @@ namespace BanaData.Logic.Dialogs
         public CommandBase PickPayees { get; }
 
         // Categories
-        public ObservableCollection<string> CategoriesSource { get; } = new ObservableCollection<string>();
+        private readonly List<Household.CategoryRow> categories = new List<Household.CategoryRow>();
+        public WpfObservableRangeCollection<string> CategoriesSource { get; } = new WpfObservableRangeCollection<string>();
         private bool isFilteringOnCategories;
         public bool? IsFilteringOnCategories 
         {
@@ -92,7 +93,7 @@ namespace BanaData.Logic.Dialogs
         public CommandBase PickCategories { get; }
 
         // Columns
-        public ObservableCollection<string> ColumnsSource { get; } = new ObservableCollection<string>();
+        public WpfObservableRangeCollection<string> ColumnsSource { get; } = new WpfObservableRangeCollection<string>();
         public CommandBase PickColumns { get; }
 
         #endregion
@@ -112,7 +113,7 @@ namespace BanaData.Logic.Dialogs
             {
                 accounts.Clear();
                 accounts.AddRange(logic.PickedAccounts);
-                AccountsSource.ReplaceRange(logic.PickedAccounts.Select<Household.AccountRow, string>(a => a.Name));
+                AccountsSource.ReplaceRange(logic.PickedAccounts.Select(a => a.Name));
             }
         }
 
@@ -123,7 +124,13 @@ namespace BanaData.Logic.Dialogs
 
         private void OnPickCategories()
         {
-
+            var logic = new CategoryListPickerLogic(mainWindowLogic, categories);
+            if (mainWindowLogic.GuiServices.ShowDialog(logic))
+            {
+                categories.Clear();
+                categories.AddRange(logic.PickedCategories);
+                CategoriesSource.ReplaceRange(logic.PickedCategories.Select(a => a.FullName));
+            }
         }
 
         private void OnPickColumns()

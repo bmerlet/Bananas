@@ -67,6 +67,9 @@
     <Compile Include="Dialogs\AccountPicker.xaml.cs">
       <DependentUpon>AccountPicker.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\CategoryListPicker.xaml.cs">
+      <DependentUpon>CategoryListPicker.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\EditAccount.xaml.cs">
       <DependentUpon>EditAccount.xaml</DependentUpon>
     </Compile>
@@ -183,6 +186,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\AccountPicker.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\CategoryListPicker.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

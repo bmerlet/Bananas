@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BanaData.Database;
 
 namespace BanaData.Logic.Items
 {
@@ -29,6 +30,15 @@ namespace BanaData.Logic.Items
         public CategoryItem(CategoryItem src, int id) =>
             (ID, Name, Description, IsIncome, TaxInfo, Parent, FullName, AccountID) =
             (id, src.Name, src.Description, src.IsIncome, src.TaxInfo, src.Parent, src.FullName, -1);
+
+        // Build from DB
+        static public CategoryItem CreateFromDB(Household.CategoryRow categoryRow, IEnumerable<CategoryItem> categoryItems)
+        {
+            string description = categoryRow.IsDescriptionNull() ? "" : categoryRow.Description;
+            string taxInfo = categoryRow.IsTaxInfoNull() ? "" : categoryRow.TaxInfo;
+            CategoryItem parent = categoryRow.IsParentIDNull() ? null : categoryItems.FirstOrDefault(c => c.ID == categoryRow.ParentID);
+            return new CategoryItem(categoryRow.ID, categoryRow.Name, description, categoryRow.IsIncome, taxInfo, parent);
+        }
 
         // IDs
         public readonly int ID;

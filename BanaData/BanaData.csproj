@@ -71,6 +71,7 @@
     <Compile Include="Database\Transaction.cs" />
     <Compile Include="Logic\Dialogs\AccountListPickerLogic.cs" />
     <Compile Include="Logic\Dialogs\AccountPickerLogic.cs" />
+    <Compile Include="Logic\Dialogs\CategoryListPickerLogic.cs" />
     <Compile Include="Logic\Dialogs\EditPersonsLogic.cs" />
     <Compile Include="Logic\Dialogs\EditTransactionReportLogic.cs" />
     <Compile Include="Logic\Dialogs\EditTransactionReportsLogic.cs" />
