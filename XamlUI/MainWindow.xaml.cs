@@ -130,6 +130,10 @@ namespace XamlUI
             {
                 dialog = new CategoryListPicker(categoryListPickerLogic);
             }
+            else if (logic is PayeeListPickerLogic payeeListPickerLogic)
+            {
+                dialog = new PayeeListPicker(payeeListPickerLogic);
+            }
             else if (logic is EditCategoriesLogic editCategoriesLogic)
             {
                 dialog = new EditCategories(editCategoriesLogic);

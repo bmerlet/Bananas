@@ -61,7 +61,7 @@ namespace BanaData.Logic.Dialogs
         private void OnAddReport()
         {
             // Create new report
-            var report = new TransactionReportItem(null, "", "", DateTime.Today, DateTime.Today, false, false, false);
+            var report = TransactionReportItem.CreateEmpty();
 
             var logic = new EditTransactionReportLogic(mainWindowLogic, report);
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
@@ -136,6 +136,30 @@ namespace BanaData.Logic.Dialogs
 
             household.TransactionReport.AddTransactionReportRow(reportRow);
 
+            foreach (var account in newReport.Accounts)
+            {
+                var acctRow = household.TransactionReportAccount.NewTransactionReportAccountRow();
+                acctRow.TransactionReportID = reportRow.ID;
+                acctRow.AccountID = account.ID;
+                household.TransactionReportAccount.AddTransactionReportAccountRow(acctRow);
+            }
+
+            foreach(var payee in newReport.Payees)
+            {
+                var payeeRow = household.TransactionReportPayee.NewTransactionReportPayeeRow();
+                payeeRow.TransactionReportID = reportRow.ID;
+                payeeRow.Payee = payee;
+                household.TransactionReportPayee.AddTransactionReportPayeeRow(payeeRow);
+            }
+
+            foreach (var category in newReport.Categories)
+            {
+                var catRow = household.TransactionReportCategory.NewTransactionReportCategoryRow();
+                catRow.TransactionReportID = reportRow.ID;
+                catRow.CategoryID = category.ID;
+                household.TransactionReportCategory.AddTransactionReportCategoryRow(catRow);
+            }
+
             mainWindowLogic.CommitChanges();
 
             // Note that a new ID is created automatically, so we need to update the account item with it
@@ -160,6 +184,72 @@ namespace BanaData.Logic.Dialogs
             reportRow.IsFilteringOnAccounts = updatedReport.IsFilteringOnAccounts;
             reportRow.IsFilteringOnPayees = updatedReport.IsFilteringOnPayees;
             reportRow.IsFilteringOnCategories = updatedReport.IsFilteringOnCategories;
+
+            // Update existing report account rows
+            foreach (var existingReportAccountRow in reportRow.GetTransactionReportAccountRows())
+            {
+                // Remove accounts that are not present anymore
+                if (!updatedReport.Accounts.Contains(existingReportAccountRow.AccountRow))
+                {
+                    existingReportAccountRow.Delete();
+                }
+            }
+            foreach (var account in updatedReport.Accounts)
+            {
+                // Add accounts that are not present
+                if (reportRow.GetTransactionReportAccountRows().FirstOrDefault(trar => trar.AccountRow == account) == null)
+                {
+                    var household = mainWindowLogic.Household;
+                    var acctRow = household.TransactionReportAccount.NewTransactionReportAccountRow();
+                    acctRow.TransactionReportID = reportRow.ID;
+                    acctRow.AccountID = account.ID;
+                    household.TransactionReportAccount.AddTransactionReportAccountRow(acctRow);
+                }
+            }
+
+            // Update existing report payees
+            foreach (var existingReportPayeeRow in reportRow.GetTransactionReportPayeeRows())
+            {
+                // Remove payees that are not present anymore
+                if (!updatedReport.Payees.Contains(existingReportPayeeRow.Payee))
+                {
+                    existingReportPayeeRow.Delete();
+                }
+            }
+            foreach (var payee in updatedReport.Payees)
+            {
+                // Add payees that are not present
+                if (reportRow.GetTransactionReportPayeeRows().FirstOrDefault(trpr => trpr.Payee == payee) == null)
+                {
+                    var household = mainWindowLogic.Household;
+                    var payeeRow = household.TransactionReportPayee.NewTransactionReportPayeeRow();
+                    payeeRow.TransactionReportID = reportRow.ID;
+                    payeeRow.Payee = payee;
+                    household.TransactionReportPayee.AddTransactionReportPayeeRow(payeeRow);
+                }
+            }
+
+            // Update existing report category rows
+            foreach (var existingReportCategoryRow in reportRow.GetTransactionReportCategoryRows())
+            {
+                // Remove categories that are not present anymore
+                if (!updatedReport.Categories.Contains(existingReportCategoryRow.CategoryRow))
+                {
+                    existingReportCategoryRow.Delete();
+                }
+            }
+            foreach (var category in updatedReport.Categories)
+            {
+                // Add categories that are not present
+                if (reportRow.GetTransactionReportCategoryRows().FirstOrDefault(trcr => trcr.CategoryRow == category) == null)
+                {
+                    var household = mainWindowLogic.Household;
+                    var catRow = household.TransactionReportCategory.NewTransactionReportCategoryRow();
+                    catRow.TransactionReportID = reportRow.ID;
+                    catRow.CategoryID = category.ID;
+                    household.TransactionReportCategory.AddTransactionReportCategoryRow(catRow);
+                }
+            }
 
             // Commit
             mainWindowLogic.CommitChanges();

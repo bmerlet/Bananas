@@ -38,9 +38,18 @@ namespace BanaData.Logic.Dialogs
             Description = reportItem.Description;
             StartDate = reportItem.StartDate;
             EndDate = reportItem.EndDate;
+
             IsFilteringOnAccounts = reportItem.IsFilteringOnAccounts;
+            accounts.AddRange(reportItem.Accounts);
+            AccountsSource.ReplaceRange(reportItem.Accounts.Select(a => a.Name));
+
             IsFilteringOnPayees = reportItem.IsFilteringOnPayees;
+            payees.AddRange(reportItem.Payees);
+            PayeesSource.ReplaceRange(reportItem.Payees);
+
             IsFilteringOnCategories = reportItem.IsFilteringOnCategories;
+            categories.AddRange(reportItem.Categories);
+            CategoriesSource.ReplaceRange(reportItem.Categories.Select(c => c.FullName));
         }
 
         #endregion
@@ -72,6 +81,7 @@ namespace BanaData.Logic.Dialogs
         public CommandBase PickAccounts { get; }
 
         // Payees
+        private readonly List<string> payees = new List<string>();
         public WpfObservableRangeCollection<string> PayeesSource { get; } = new WpfObservableRangeCollection<string>();
         private bool isFilteringOnPayees;
         public bool? IsFilteringOnPayees 
@@ -119,7 +129,13 @@ namespace BanaData.Logic.Dialogs
 
         private void OnPickPayees()
         {
-
+            var logic = new PayeeListPickerLogic(mainWindowLogic, payees);
+            if (mainWindowLogic.GuiServices.ShowDialog(logic))
+            {
+                payees.Clear();
+                payees.AddRange(logic.PickedPayees);
+                PayeesSource.ReplaceRange(logic.PickedPayees);
+            }
         }
 
         private void OnPickCategories()
@@ -169,15 +185,19 @@ namespace BanaData.Logic.Dialogs
                 StartDate,
                 EndDate,
                 isFilteringOnAccounts,
+                accounts,
                 isFilteringOnPayees,
-                isFilteringOnCategories);
+                payees,
+                isFilteringOnCategories,
+                categories);
 
             bool change =
                 oldReportItem.Name != Name ||
                 oldReportItem.Description != Description ||
                 oldReportItem.IsFilteringOnAccounts != isFilteringOnAccounts ||
                 oldReportItem.IsFilteringOnPayees != isFilteringOnPayees ||
-                oldReportItem.IsFilteringOnCategories != isFilteringOnCategories;
+                oldReportItem.IsFilteringOnCategories != isFilteringOnCategories ||
+                !oldReportItem.Categories.SequenceEqual(categories);
 
             return change;
         }

@@ -76,6 +76,7 @@
     <Compile Include="Logic\Dialogs\EditTransactionReportLogic.cs" />
     <Compile Include="Logic\Dialogs\EditTransactionReportsLogic.cs" />
     <Compile Include="Logic\Dialogs\PasswordPromptLogic.cs" />
+    <Compile Include="Logic\Dialogs\PayeeListPickerLogic.cs" />
     <Compile Include="Logic\Dialogs\ReconcileGridLogic.cs" />
     <Compile Include="Logic\Dialogs\ReconcileInvestmentsLogic.cs" />
     <Compile Include="Logic\Dialogs\SearchResultLogic.cs" />

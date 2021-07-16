@@ -109,6 +109,9 @@
     <Compile Include="Dialogs\PasswordPrompt.xaml.cs">
       <DependentUpon>PasswordPrompt.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\PayeeListPicker.xaml.cs">
+      <DependentUpon>PayeeListPicker.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\Reconcile.xaml.cs">
       <DependentUpon>Reconcile.xaml</DependentUpon>
     </Compile>
@@ -242,6 +245,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\PasswordPrompt.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\PayeeListPicker.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

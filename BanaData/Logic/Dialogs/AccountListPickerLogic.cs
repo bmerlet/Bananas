@@ -142,8 +142,8 @@ namespace BanaData.Logic.Dialogs
                     if (isSelected != value)
                     {
                         isSelected = value;
+                        OnPropertyChanged(() => IsSelected);
                     }
-                    OnPropertyChanged(() => IsSelected);
                 }
             }
         }
