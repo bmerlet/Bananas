@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:XamlUI.Dialogs"
-        xmlns:w="clr-namespace:XamlUI.UserControls"
+        xmlns:w="clr-namespace:XamlUI.UserControls" xmlns:dialogs="clr-namespace:BanaData.Logic.Dialogs;assembly=BanaData" d:DataContext="{d:DesignInstance Type=dialogs:AccountListPickerLogic}"
         mc:Ignorable="d"
         Title="Account picker"        
         Icon="/XamlUI;component/Images/Bananas.ico"
@@ -51,7 +51,7 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                     <GridViewColumn Header="Name" Width="200" DisplayMemberBinding="{Binding AccountItem.Name}"/>
-                    <GridViewColumn Header="Description" Width="200" DisplayMemberBinding="{Binding AccoutItem.Description}"/>
+                    <GridViewColumn Header="Description" Width="200" DisplayMemberBinding="{Binding AccountItem.Description}"/>
                     <GridViewColumn Header="Type" Width="85">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>

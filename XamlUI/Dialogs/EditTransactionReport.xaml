@@ -11,13 +11,13 @@
         Title="Edit transaction report"
         Icon="/XamlUI;component/Images/Bananas.ico"
         WindowStartupLocation="CenterOwner"
-        SizeToContent="WidthAndHeight">
+        Height="350" Width="800">
     <Window.Resources>
 
         <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}"/>
         <Style TargetType="w:WatermarkTextBox" BasedOn="{StaticResource FormWatermarkTextBox}"/>
         <Style TargetType="w:DateBox" BasedOn="{StaticResource FormDateBox}"/>
-        <Style TargetType="ComboBox" BasedOn="{StaticResource FormComboBox}"/>
+        <Style TargetType="Button" BasedOn="{StaticResource FormButton}"/>
         <Style TargetType="CheckBox" BasedOn="{StaticResource FormCheckBox}"/>
 
     </Window.Resources>
@@ -33,6 +33,8 @@
                 <ColumnDefinition Width="200"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="140"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -46,68 +48,68 @@
             <w:DateBox Grid.Column="3" Date="{Binding StartDate, Mode=TwoWay, StringFormat=MM/dd/yyyy}"/>
             <TextBlock Grid.Row="1" Grid.Column="2" Text="End date:"/>
             <w:DateBox Grid.Row="1" Grid.Column="3" Date="{Binding EndDate, Mode=TwoWay, StringFormat=MM/dd/yyyy}"/>
+            <Button Grid.Column="5" Content="Generate report..." Command="{Binding GenerateReport}"/>
         </Grid>
         
         <!-- Main panel: Accounts, categories, payees, columns -->
         <Grid>
+            <Grid.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="BorderBrush" Value="LightGray"/>
+                    <Setter Property="BorderThickness" Value="1"/>
+                    <Setter Property="Margin" Value="5"/>
+                </Style>
+                <Style TargetType="ScrollViewer">
+                    <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+                </Style>
+            </Grid.Resources>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200"/>
-                <ColumnDefinition Width="200"/>
-                <ColumnDefinition Width="200"/>
-                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             
             <!-- Selected accounts -->
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="Accounts:"/>
-                <Button Grid.Column="2" Content="Pick..." Command="{Binding PickAccounts}" Width="70"/>
-            </Grid>
-            <ItemsControl Grid.Row="1" ItemsSource="{Binding AccountsSource}" Height="100" BorderThickness="1" BorderBrush="LightGray"/>
+            <CheckBox Content="Filter on accounts" IsChecked="{Binding IsFilteringOnAccounts}"/>
+            <Border Grid.Row="1">
+                <ScrollViewer>
+                    <ItemsControl ItemsSource="{Binding AccountsSource}" />
+                </ScrollViewer>
+            </Border>
+            <Button Grid.Row="2" Content="Pick accounts..." Command="{Binding PickAccounts}"/>
 
             <!-- Selected payees -->
-            <Grid Grid.Column="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="Payees:"/>
-                <Button Grid.Column="2" Content="Pick..." Command="{Binding PickPayees}" Width="70"/>
-            </Grid>
-            <ItemsControl Grid.Column="1" Grid.Row="1" ItemsSource="{Binding PayeesSource}" Height="100" BorderThickness="1" BorderBrush="LightGray"/>
+            <CheckBox Grid.Column="1" Content="Filter on payees" IsChecked="{Binding IsFilteringOnPayees}"/>
+            <Border Grid.Column="1" Grid.Row="1">
+                <ScrollViewer>
+                    <ItemsControl ItemsSource="{Binding PayeesSource}" />
+                </ScrollViewer>
+            </Border>
+            <Button Grid.Row="2" Grid.Column="1" Content="Pick payees..." Command="{Binding PickPayees}"/>
 
             <!-- Selected categories -->
-            <Grid Grid.Column="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="Categories:"/>
-                <Button Grid.Column="2" Content="Pick..." Command="{Binding PickCategories}" Width="70"/>
-            </Grid>
-            <ItemsControl Grid.Column="2" Grid.Row="1" ItemsSource="{Binding CategoriesSource}" Height="100" BorderThickness="1" BorderBrush="LightGray"/>
+            <CheckBox Grid.Column="2" Content="Filter on categories" IsChecked="{Binding IsFilteringOnCategories}"/>
+            <Border Grid.Column="2" Grid.Row="1">
+                <ScrollViewer>
+                    <ItemsControl ItemsSource="{Binding CategoriesSource}" />
+                </ScrollViewer>
+            </Border>
+            <Button Grid.Row="2" Grid.Column="2" Content="Pick categories..." Command="{Binding PickCategories}"/>
 
             <!-- Columns -->
-            <Grid Grid.Column="3">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="Columns:"/>
-                <Button Grid.Column="2" Content="Pick..." Command="{Binding PickColumns}" Width="70"/>
-            </Grid>
-            <ItemsControl Grid.Column="3" Grid.Row="1" ItemsSource="{Binding ColumnsSource}" Height="100" BorderThickness="1" BorderBrush="LightGray"/>
+            <TextBlock Grid.Column="3" Text="Columns:"/>
+            <Border Grid.Column="3" Grid.Row="1">
+                <ScrollViewer>
+                    <ItemsControl ItemsSource="{Binding ColumnsSource}" />
+                </ScrollViewer>
+            </Border>
+            <Button Grid.Row="2" Grid.Column="3" Content="Pick columns..." Command="{Binding PickColumns}"/>
         </Grid>
 
     </DockPanel>

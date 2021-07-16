@@ -61,7 +61,7 @@ namespace BanaData.Logic.Dialogs
         private void OnAddReport()
         {
             // Create new report
-            var report = new TransactionReportItem(null, "", "", DateTime.Today, DateTime.Today);
+            var report = new TransactionReportItem(null, "", "", DateTime.Today, DateTime.Today, false, false, false);
 
             var logic = new EditTransactionReportLogic(mainWindowLogic, report);
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
@@ -130,6 +130,9 @@ namespace BanaData.Logic.Dialogs
             }
             reportRow.StartDate = newReport.StartDate;
             reportRow.EndDate = newReport.EndDate;
+            reportRow.IsFilteringOnAccounts = newReport.IsFilteringOnAccounts;
+            reportRow.IsFilteringOnPayees = newReport.IsFilteringOnPayees;
+            reportRow.IsFilteringOnCategories = newReport.IsFilteringOnCategories;
 
             household.TransactionReport.AddTransactionReportRow(reportRow);
 
@@ -148,11 +151,15 @@ namespace BanaData.Logic.Dialogs
             {
                 reportRow.SetDescriptionNull();
             }
+            else
             {
                 reportRow.Description = updatedReport.Description;
             }
             reportRow.StartDate = updatedReport.StartDate;
             reportRow.EndDate = updatedReport.EndDate;
+            reportRow.IsFilteringOnAccounts = updatedReport.IsFilteringOnAccounts;
+            reportRow.IsFilteringOnPayees = updatedReport.IsFilteringOnPayees;
+            reportRow.IsFilteringOnCategories = updatedReport.IsFilteringOnCategories;
 
             // Commit
             mainWindowLogic.CommitChanges();

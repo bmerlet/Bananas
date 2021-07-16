@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BanaData.Collections;
 using BanaData.Database;
 using BanaData.Logic.Items;
 using BanaData.Logic.Main;
@@ -27,10 +28,19 @@ namespace BanaData.Logic.Dialogs
         {
             (mainWindowLogic, oldReportItem) = (_mainWindowLogic, reportItem);
 
+            PickAccounts = new CommandBase(OnPickAccounts);
+            PickPayees = new CommandBase(OnPickPayees);
+            PickCategories = new CommandBase(OnPickCategories);
+            PickColumns = new CommandBase(OnPickColumns);
+            GenerateReport = new CommandBase(OnGenerateReport);
+
             Name = reportItem.Name;
             Description = reportItem.Description;
             StartDate = reportItem.StartDate;
             EndDate = reportItem.EndDate;
+            IsFilteringOnAccounts = reportItem.IsFilteringOnAccounts;
+            IsFilteringOnPayees = reportItem.IsFilteringOnPayees;
+            IsFilteringOnCategories = reportItem.IsFilteringOnCategories;
         }
 
         #endregion
@@ -47,16 +57,42 @@ namespace BanaData.Logic.Dialogs
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
 
-        // Sources
-        public ObservableCollection<string> AccountsSource { get; } = new ObservableCollection<string>();
-        public ObservableCollection<string> PayeesSource { get; } = new ObservableCollection<string>();
-        public ObservableCollection<string> CategoriesSource { get; } = new ObservableCollection<string>();
-        public ObservableCollection<string> ColumnsSource { get; } = new ObservableCollection<string>();
+        // Generate the report
+        public CommandBase GenerateReport { get; }
 
-        // Pickers
+        // Accounts
+        private readonly List<Household.AccountRow> accounts = new List<Household.AccountRow>();
+        public WpfObservableRangeCollection<string> AccountsSource { get; } = new WpfObservableRangeCollection<string>();
+        private bool isFilteringOnAccounts;
+        public bool? IsFilteringOnAccounts 
+        {
+            get => isFilteringOnAccounts;
+            set { isFilteringOnAccounts = value == true; PickAccounts.SetCanExecute(isFilteringOnAccounts); }
+        }
         public CommandBase PickAccounts { get; }
+
+        // Payees
+        public ObservableCollection<string> PayeesSource { get; } = new ObservableCollection<string>();
+        private bool isFilteringOnPayees;
+        public bool? IsFilteringOnPayees 
+        {
+            get => isFilteringOnPayees;
+            set { isFilteringOnPayees = value == true; PickPayees.SetCanExecute(isFilteringOnPayees); }
+        }
         public CommandBase PickPayees { get; }
+
+        // Categories
+        public ObservableCollection<string> CategoriesSource { get; } = new ObservableCollection<string>();
+        private bool isFilteringOnCategories;
+        public bool? IsFilteringOnCategories 
+        {
+            get => isFilteringOnCategories;
+            set { isFilteringOnCategories = value == true; PickCategories.SetCanExecute(isFilteringOnCategories); }
+        }
         public CommandBase PickCategories { get; }
+
+        // Columns
+        public ObservableCollection<string> ColumnsSource { get; } = new ObservableCollection<string>();
         public CommandBase PickColumns { get; }
 
         #endregion
@@ -68,6 +104,37 @@ namespace BanaData.Logic.Dialogs
         #endregion
 
         #region Actions
+
+        private void OnPickAccounts()
+        {
+            var logic = new AccountListPickerLogic(mainWindowLogic, accounts);
+            if (mainWindowLogic.GuiServices.ShowDialog(logic))
+            {
+                accounts.Clear();
+                accounts.AddRange(logic.PickedAccounts);
+                AccountsSource.ReplaceRange(logic.PickedAccounts.Select<Household.AccountRow, string>(a => a.Name));
+            }
+        }
+
+        private void OnPickPayees()
+        {
+
+        }
+
+        private void OnPickCategories()
+        {
+
+        }
+
+        private void OnPickColumns()
+        {
+
+        }
+
+        private void OnGenerateReport()
+        {
+
+        }
 
         protected override bool? Commit()
         {
@@ -88,11 +155,22 @@ namespace BanaData.Logic.Dialogs
 
             // Verify start date before end date ZZZZZZ
 
-            NewTransactionReportItem = new TransactionReportItem(oldReportItem.TransactionReportRow, Name, Description, StartDate, EndDate);
+            NewTransactionReportItem = new TransactionReportItem(
+                oldReportItem.TransactionReportRow,
+                Name, 
+                Description,
+                StartDate,
+                EndDate,
+                isFilteringOnAccounts,
+                isFilteringOnPayees,
+                isFilteringOnCategories);
 
             bool change =
                 oldReportItem.Name != Name ||
-                oldReportItem.Description != Description;
+                oldReportItem.Description != Description ||
+                oldReportItem.IsFilteringOnAccounts != isFilteringOnAccounts ||
+                oldReportItem.IsFilteringOnPayees != isFilteringOnPayees ||
+                oldReportItem.IsFilteringOnCategories != isFilteringOnCategories;
 
             return change;
         }

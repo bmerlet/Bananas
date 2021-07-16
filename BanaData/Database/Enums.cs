@@ -196,4 +196,14 @@ namespace BanaData.Database
         NegativeAmount = 4
     }
 
+    // Transaction report flags
+    [Flags]
+    public enum ETransactionReportFlag
+    {
+        None = 0,
+        IsFilteringOnAccounts = 1,
+        IsFilteringOnPayees = 2,
+        IsFilteringOnCategories = 4,
+    }
+
 }

@@ -18,14 +18,14 @@ namespace BanaData.Database
             // Bridges to local enum types
             public EAccountType Type
             {
-                get { return (EAccountType)IType; }
-                set { IType = (int)value; }
+                get => (EAccountType)IType;
+                set => IType = (int)value;
             }
 
             public EInvestmentKind Kind
             {
-                get { return (EInvestmentKind)IKind; }
-                set { IKind = (int)value; }
+                get => (EInvestmentKind)IKind;
+                set => IKind = (int)value;
             }
 
             public void SetKindNull()
