@@ -11,16 +11,16 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using BanaData.Logic.Dialogs;
+using BanaData.Logic.Dialogs.Pickers;
 
-namespace XamlUI.Dialogs
+namespace XamlUI.Dialogs.Pickers
 {
     /// <summary>
-    /// Interaction logic for AccountPicker.xaml
+    /// Interaction logic for CategoryListPicker.xaml
     /// </summary>
-    public partial class AccountListPicker : Window
+    public partial class CategoryListPicker : Window
     {
-        public AccountListPicker(AccountListPickerLogic logic)
+        public CategoryListPicker(CategoryListPickerLogic logic)
         {
             // Use the view model as data context
             this.DataContext = logic;

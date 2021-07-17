@@ -13,6 +13,7 @@ using BanaData.Logic.Main;
 using BanaData.Collections;
 using BanaData.Database;
 using BanaData.Logic.Items;
+using BanaData.Logic.Dialogs.Pickers;
 
 namespace BanaData.Logic.Dialogs
 {

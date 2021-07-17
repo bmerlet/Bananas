@@ -6,13 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+
 using BanaData.Database;
 using BanaData.Logic.Items;
 using BanaData.Logic.Main;
 using Toolbox.UILogic;
 using Toolbox.UILogic.Dialogs;
 
-namespace BanaData.Logic.Dialogs
+namespace BanaData.Logic.Dialogs.Pickers
 {
     public class CategoryListPickerLogic : LogicDialogBase
     {

@@ -10,7 +10,7 @@ using BanaData.Collections;
 using BanaData.Database;
 using BanaData.Logic.Items;
 using System.ComponentModel;
-using BanaData.Logic.Dialogs;
+using BanaData.Logic.Dialogs.Pickers;
 
 namespace BanaData.Logic.Main
 {

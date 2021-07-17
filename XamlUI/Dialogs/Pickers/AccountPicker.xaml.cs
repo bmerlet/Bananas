@@ -11,16 +11,16 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using BanaData.Logic.Dialogs;
+using BanaData.Logic.Dialogs.Pickers;
 
-namespace XamlUI.Dialogs
+namespace XamlUI.Dialogs.Pickers
 {
     /// <summary>
-    /// Interaction logic for CategoryListPicker.xaml
+    /// Interaction logic for AccountPicker.xaml
     /// </summary>
-    public partial class CategoryListPicker : Window
+    public partial class AccountPicker : Window
     {
-        public CategoryListPicker(CategoryListPickerLogic logic)
+        public AccountPicker(AccountPickerLogic logic)
         {
             // Use the view model as data context
             this.DataContext = logic;
@@ -29,6 +29,14 @@ namespace XamlUI.Dialogs
             logic.CloseView = result => DialogResult = result;
 
             InitializeComponent();
+        }
+
+        private void OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (DataContext is AccountPickerLogic logic)
+            {
+                logic.CommitCommand.Execute();
+            }
         }
     }
 }

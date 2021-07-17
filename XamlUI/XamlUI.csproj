@@ -61,15 +61,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Dialogs\AccountListPicker.xaml.cs">
-      <DependentUpon>AccountListPicker.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\AccountPicker.xaml.cs">
-      <DependentUpon>AccountPicker.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\CategoryListPicker.xaml.cs">
-      <DependentUpon>CategoryListPicker.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Dialogs\EditAccount.xaml.cs">
       <DependentUpon>EditAccount.xaml</DependentUpon>
     </Compile>
@@ -109,7 +100,16 @@
     <Compile Include="Dialogs\PasswordPrompt.xaml.cs">
       <DependentUpon>PasswordPrompt.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\PayeeListPicker.xaml.cs">
+    <Compile Include="Dialogs\Pickers\AccountListPicker.xaml.cs">
+      <DependentUpon>AccountListPicker.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Pickers\AccountPicker.xaml.cs">
+      <DependentUpon>AccountPicker.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Pickers\CategoryListPicker.xaml.cs">
+      <DependentUpon>CategoryListPicker.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Pickers\PayeeListPicker.xaml.cs">
       <DependentUpon>PayeeListPicker.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Reconcile.xaml.cs">
@@ -184,18 +184,6 @@
       <DependentUpon>SplitRegister.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\WatermarkTextBox.cs" />
-    <Page Include="Dialogs\AccountListPicker.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialogs\AccountPicker.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialogs\CategoryListPicker.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Dialogs\EditAccount.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -248,7 +236,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\PayeeListPicker.xaml">
+    <Page Include="Dialogs\Pickers\AccountListPicker.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Pickers\AccountPicker.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Pickers\CategoryListPicker.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Pickers\PayeeListPicker.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

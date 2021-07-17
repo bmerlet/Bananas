@@ -4,8 +4,10 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using BanaData.Collections;
 using BanaData.Database;
+using BanaData.Logic.Dialogs.Pickers;
 using BanaData.Logic.Items;
 using BanaData.Logic.Main;
 using Toolbox.UILogic;

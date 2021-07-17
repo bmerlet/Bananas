@@ -20,6 +20,8 @@ using BanaData.Logic.Dialogs;
 using BanaData.Logic.Main;
 using XamlUI.Dialogs;
 using System.Media;
+using BanaData.Logic.Dialogs.Pickers;
+using XamlUI.Dialogs.Pickers;
 
 namespace XamlUI
 {
