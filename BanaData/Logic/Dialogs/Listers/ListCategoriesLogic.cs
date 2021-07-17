@@ -10,7 +10,7 @@ using System.Windows.Data;
 using Toolbox.UILogic;
 using BanaData.Logic.Main;
 using BanaData.Logic.Items;
-using BanaData.Database;
+using BanaData.Logic.Dialogs.Editors;
 
 namespace BanaData.Logic.Dialogs.Listers
 {

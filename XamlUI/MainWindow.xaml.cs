@@ -18,11 +18,13 @@ using Toolbox.UILogic;
 using BanaData.Logic;
 using BanaData.Logic.Dialogs;
 using BanaData.Logic.Main;
-using BanaData.Logic.Dialogs.Pickers;
+using BanaData.Logic.Dialogs.Editors;
 using BanaData.Logic.Dialogs.Listers;
+using BanaData.Logic.Dialogs.Pickers;
 using XamlUI.Dialogs;
-using XamlUI.Dialogs.Pickers;
+using XamlUI.Dialogs.Editors;
 using XamlUI.Dialogs.Listers;
+using XamlUI.Dialogs.Pickers;
 
 namespace XamlUI
 {

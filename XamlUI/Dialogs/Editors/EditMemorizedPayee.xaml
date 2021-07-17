@@ -1,4 +1,4 @@
-﻿<Window x:Class="XamlUI.Dialogs.EditMemorizedPayee"
+﻿<Window x:Class="XamlUI.Dialogs.Editors.EditMemorizedPayee"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,13 +6,15 @@
         xmlns:local="clr-namespace:XamlUI.Dialogs"
         xmlns:w="clr-namespace:XamlUI.UserControls"
         xmlns:t="clr-namespace:XamlUI.Tools"
+        xmlns:editors="clr-namespace:BanaData.Logic.Dialogs.Editors;assembly=BanaData"
+        d:DataContext="{d:DesignInstance Type=editors:EditMemorizedPayeeLogic}"
         mc:Ignorable="d"
-        Title="Edit Memorized Payee"
+        Title="Edit memorized payee"
         Icon="/XamlUI;component/Images/Bananas.ico"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
         SizeToContent="WidthAndHeight">
-    
+
     <Window.Resources>
 
         <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}"/>
@@ -67,7 +69,7 @@
 
             <!-- Row 4: Amount -->
             <TextBlock Text="Amount:" Grid.Row="4"/>
-                <w:AmountBox Amount="{Binding AbsoluteAmount, Mode=TwoWay}" IsEnabled="{Binding AbsoluteAmountEnabled}" Grid.Row="4" Grid.Column="1"/>
+            <w:AmountBox Amount="{Binding AbsoluteAmount, Mode=TwoWay}" IsEnabled="{Binding AbsoluteAmountEnabled}" Grid.Row="4" Grid.Column="1"/>
 
         </Grid>
     </DockPanel>

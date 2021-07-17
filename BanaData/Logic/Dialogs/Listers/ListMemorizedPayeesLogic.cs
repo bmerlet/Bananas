@@ -3,7 +3,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Data;
+
 using BanaData.Database;
+using BanaData.Logic.Dialogs.Editors;
 using BanaData.Logic.Items;
 using BanaData.Logic.Main;
 using Toolbox.UILogic;

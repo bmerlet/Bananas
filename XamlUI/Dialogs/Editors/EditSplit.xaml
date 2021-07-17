@@ -1,20 +1,19 @@
-﻿<Window x:Class="XamlUI.Dialogs.EditSplit"
+﻿<Window x:Class="XamlUI.Dialogs.Editors.EditSplit"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:XamlUI.Dialogs"
         xmlns:w="clr-namespace:XamlUI.UserControls"
-        xmlns:t="clr-namespace:XamlUI.Tools"
         mc:Ignorable="d"
-        Title="Edit Split"
+        Title="Edit split"
         Icon="/XamlUI;component/Images/Bananas.ico"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
         SizeToContent="WidthAndHeight"
         Loaded="OnWindowLoaded">
     <DockPanel>
-        
+
         <!-- OK/Cancel panel -->
         <w:OKCancel DockPanel.Dock="Bottom"/>
 

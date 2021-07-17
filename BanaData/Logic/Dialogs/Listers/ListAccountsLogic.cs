@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
 
 using Toolbox.UILogic;
 using BanaData.Logic.Main;
 using BanaData.Logic.Items;
 using BanaData.Database;
-using System.Collections.ObjectModel;
-using System.Windows.Data;
-using System.ComponentModel;
+using BanaData.Logic.Dialogs.Editors;
 
 namespace BanaData.Logic.Dialogs.Listers
 {

@@ -11,11 +11,17 @@ using BanaData.Logic.Main;
 using Toolbox.UILogic;
 using Toolbox.UILogic.Dialogs;
 
-namespace BanaData.Logic.Dialogs
+namespace BanaData.Logic.Dialogs.Editors
 {
     public class EditPersonsLogic : LogicDialogBase
     {
+        #region Private members
+
         private readonly MainWindowLogic mainWindowLogic;
+
+        #endregion
+
+        #region Constructor
 
         public EditPersonsLogic(MainWindowLogic _mainWindowLogic)
         {
@@ -39,8 +45,16 @@ namespace BanaData.Logic.Dialogs
             PersonsSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
         }
 
+        #endregion
+
+        #region UI properties
+
         private readonly ObservableCollection<PersonItem> persons = new ObservableCollection<PersonItem>();
         public CollectionView PersonsSource { get; }
+
+        #endregion
+
+        #region Actions
 
         private void OnNameChanged(object sender, EventArgs e)
         {
@@ -114,6 +128,10 @@ namespace BanaData.Logic.Dialogs
             return change;
         }
 
+        #endregion
+
+        #region PersonItem class
+
         public class PersonItem : LogicBase
         {
             public PersonItem(int id, string _name) => (ID, name) = (id, _name);
@@ -131,5 +149,7 @@ namespace BanaData.Logic.Dialogs
 
             public string Grouper => (ID < 0 && string.IsNullOrWhiteSpace(name)) ? "Z" : "A";
         }
+
+        #endregion
     }
 }

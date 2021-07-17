@@ -61,25 +61,25 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Dialogs\EditAccount.xaml.cs">
+    <Compile Include="Dialogs\Editors\EditAccount.xaml.cs">
       <DependentUpon>EditAccount.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\EditCategory.xaml.cs">
+    <Compile Include="Dialogs\Editors\EditCategory.xaml.cs">
       <DependentUpon>EditCategory.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\EditMemorizedPayee.xaml.cs">
+    <Compile Include="Dialogs\Editors\EditMemorizedPayee.xaml.cs">
       <DependentUpon>EditMemorizedPayee.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\EditPersons.xaml.cs">
+    <Compile Include="Dialogs\Editors\EditPersons.xaml.cs">
       <DependentUpon>EditPersons.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\EditSecurity.xaml.cs">
+    <Compile Include="Dialogs\Editors\EditSecurity.xaml.cs">
       <DependentUpon>EditSecurity.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\EditSplit.xaml.cs">
+    <Compile Include="Dialogs\Editors\EditSplit.xaml.cs">
       <DependentUpon>EditSplit.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\EditTransactionReport.xaml.cs">
+    <Compile Include="Dialogs\Editors\EditTransactionReport.xaml.cs">
       <DependentUpon>EditTransactionReport.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Listers\ListAccounts.xaml.cs">
@@ -184,31 +184,31 @@
       <DependentUpon>SplitRegister.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\WatermarkTextBox.cs" />
-    <Page Include="Dialogs\EditAccount.xaml">
+    <Page Include="Dialogs\Editors\EditAccount.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\EditCategory.xaml">
+    <Page Include="Dialogs\Editors\EditCategory.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\EditMemorizedPayee.xaml">
+    <Page Include="Dialogs\Editors\EditMemorizedPayee.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\EditPersons.xaml">
+    <Page Include="Dialogs\Editors\EditPersons.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\EditSecurity.xaml">
+    <Page Include="Dialogs\Editors\EditSecurity.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\EditSplit.xaml">
+    <Page Include="Dialogs\Editors\EditSplit.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\EditTransactionReport.xaml">
+    <Page Include="Dialogs\Editors\EditTransactionReport.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

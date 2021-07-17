@@ -11,17 +11,16 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using BanaData.Logic.Dialogs.Editors;
 
-using BanaData.Logic.Dialogs;
-
-namespace XamlUI.Dialogs
+namespace XamlUI.Dialogs.Editors
 {
     /// <summary>
-    /// Interaction logic for EditCategory.xaml
+    /// Interaction logic for EditSplit.xaml
     /// </summary>
-    public partial class EditCategory : Window
+    public partial class EditSplit : Window
     {
-        public EditCategory(EditCategoryLogic logic)
+        public EditSplit(EditSplitLogic logic)
         {
             // Use the view model as data context
             this.DataContext = logic;
@@ -30,6 +29,14 @@ namespace XamlUI.Dialogs
             logic.CloseView = result => DialogResult = result;
 
             InitializeComponent();
+        }
+
+        private void OnWindowLoaded(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is EditSplitLogic logic)
+            {
+                logic.Register.OnLoaded();
+            }
         }
     }
 }

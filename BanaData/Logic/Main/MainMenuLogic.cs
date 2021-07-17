@@ -9,6 +9,7 @@ using BanaData.Database;
 using BanaData.Logic.Dialogs;
 using BanaData.Logic.Dialogs.Listers;
 using BanaData.Web;
+using BanaData.Logic.Dialogs.Editors;
 
 namespace BanaData.Logic.Main
 {

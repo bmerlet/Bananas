@@ -4,13 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Toolbox.UILogic;
 using Toolbox.UILogic.Dialogs;
 using BanaData.Logic.Main;
-using BanaData.Database;
 using BanaData.Logic.Items;
-using Toolbox.UILogic;
 
-namespace BanaData.Logic.Dialogs
+namespace BanaData.Logic.Dialogs.Editors
 {
     /// <summary>
     /// Logic to edit a specific memorized payees

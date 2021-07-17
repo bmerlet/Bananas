@@ -12,6 +12,7 @@ using BanaData.Logic.Main;
 using BanaData.Logic.Items;
 using BanaData.Database;
 using BanaData.Collections;
+using BanaData.Logic.Dialogs.Editors;
 
 namespace BanaData.Logic.Dialogs.Listers
 {

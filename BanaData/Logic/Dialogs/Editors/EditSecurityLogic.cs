@@ -10,7 +10,7 @@ using BanaData.Logic.Items;
 using BanaData.Logic.Main;
 using BanaData.Database;
 
-namespace BanaData.Logic.Dialogs
+namespace BanaData.Logic.Dialogs.Editors
 {
     public class EditSecurityLogic : LogicDialogBase
     {
@@ -43,7 +43,7 @@ namespace BanaData.Logic.Dialogs
         public string Symbol { get; set; }
 
         // Type
-        private ESecurityType  type;
+        private ESecurityType type;
         public string Type
         {
             get => EnumDescriptionAttribute.GetDescription(type);

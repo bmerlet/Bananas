@@ -11,17 +11,16 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using BanaData.Logic.Dialogs.Editors;
 
-using BanaData.Logic.Dialogs;
-
-namespace XamlUI.Dialogs
+namespace XamlUI.Dialogs.Editors
 {
     /// <summary>
-    /// Interaction logic for EditAccount.xaml
+    /// Interaction logic for EditSecurity.xaml
     /// </summary>
-    public partial class EditAccount : Window
+    public partial class EditSecurity : Window
     {
-        public EditAccount(EditAccountLogic logic)
+        public EditSecurity(EditSecurityLogic logic)
         {
             // Use the view model as data context
             this.DataContext = logic;

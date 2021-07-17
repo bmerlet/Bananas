@@ -10,7 +10,7 @@ using BanaData.Logic.Main;
 using BanaData.Logic.Items;
 using BanaData.Database;
 
-namespace BanaData.Logic.Dialogs
+namespace BanaData.Logic.Dialogs.Editors
 {
     public class EditAccountLogic : LogicDialogBase
     {
@@ -53,7 +53,7 @@ namespace BanaData.Logic.Dialogs
 
         // Name
         public string Name { get; set; }
-        
+
         // Description
         public string Description { get; set; }
 
@@ -98,7 +98,7 @@ namespace BanaData.Logic.Dialogs
 
         #region Result
 
-        public AccountItem NewAccountItem => new AccountItem(oldAccountItem.AccountRow, Name, Description, type, CreditLimit, investmentKind, IsHidden == true, Owner == Owners[0] ? null : Owner); 
+        public AccountItem NewAccountItem => new AccountItem(oldAccountItem.AccountRow, Name, Description, type, CreditLimit, investmentKind, IsHidden == true, Owner == Owners[0] ? null : Owner);
 
         #endregion
 

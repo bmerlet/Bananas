@@ -13,7 +13,7 @@ using BanaData.Logic.Main;
 using Toolbox.UILogic;
 using Toolbox.UILogic.Dialogs;
 
-namespace BanaData.Logic.Dialogs
+namespace BanaData.Logic.Dialogs.Editors
 {
     public class EditTransactionReportLogic : LogicDialogBase
     {
@@ -75,7 +75,7 @@ namespace BanaData.Logic.Dialogs
         private readonly List<Household.AccountRow> accounts = new List<Household.AccountRow>();
         public WpfObservableRangeCollection<string> AccountsSource { get; } = new WpfObservableRangeCollection<string>();
         private bool isFilteringOnAccounts;
-        public bool? IsFilteringOnAccounts 
+        public bool? IsFilteringOnAccounts
         {
             get => isFilteringOnAccounts;
             set { isFilteringOnAccounts = value == true; PickAccounts.SetCanExecute(isFilteringOnAccounts); }
@@ -86,7 +86,7 @@ namespace BanaData.Logic.Dialogs
         private readonly List<string> payees = new List<string>();
         public WpfObservableRangeCollection<string> PayeesSource { get; } = new WpfObservableRangeCollection<string>();
         private bool isFilteringOnPayees;
-        public bool? IsFilteringOnPayees 
+        public bool? IsFilteringOnPayees
         {
             get => isFilteringOnPayees;
             set { isFilteringOnPayees = value == true; PickPayees.SetCanExecute(isFilteringOnPayees); }
@@ -97,7 +97,7 @@ namespace BanaData.Logic.Dialogs
         private readonly List<Household.CategoryRow> categories = new List<Household.CategoryRow>();
         public WpfObservableRangeCollection<string> CategoriesSource { get; } = new WpfObservableRangeCollection<string>();
         private bool isFilteringOnCategories;
-        public bool? IsFilteringOnCategories 
+        public bool? IsFilteringOnCategories
         {
             get => isFilteringOnCategories;
             set { isFilteringOnCategories = value == true; PickCategories.SetCanExecute(isFilteringOnCategories); }
@@ -182,7 +182,7 @@ namespace BanaData.Logic.Dialogs
 
             NewTransactionReportItem = new TransactionReportItem(
                 oldReportItem.TransactionReportRow,
-                Name, 
+                Name,
                 Description,
                 StartDate,
                 EndDate,

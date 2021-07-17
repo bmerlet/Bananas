@@ -69,8 +69,13 @@
     <Compile Include="Database\Security.cs" />
     <Compile Include="Database\SecurityPrice.cs" />
     <Compile Include="Database\Transaction.cs" />
-    <Compile Include="Logic\Dialogs\EditPersonsLogic.cs" />
-    <Compile Include="Logic\Dialogs\EditTransactionReportLogic.cs" />
+    <Compile Include="Logic\Dialogs\Editors\EditAccountLogic.cs" />
+    <Compile Include="Logic\Dialogs\Editors\EditCategoryLogic.cs" />
+    <Compile Include="Logic\Dialogs\Editors\EditMemorizedPayeeLogic.cs" />
+    <Compile Include="Logic\Dialogs\Editors\EditPersonsLogic.cs" />
+    <Compile Include="Logic\Dialogs\Editors\EditSecurityLogic.cs" />
+    <Compile Include="Logic\Dialogs\Editors\EditSplitLogic.cs" />
+    <Compile Include="Logic\Dialogs\Editors\EditTransactionReportLogic.cs" />
     <Compile Include="Logic\Dialogs\Listers\ListTransactionReportsLogic.cs" />
     <Compile Include="Logic\Dialogs\Listers\ListAccountsLogic.cs" />
     <Compile Include="Logic\Dialogs\Listers\ListCategoriesLogic.cs" />
@@ -85,11 +90,6 @@
     <Compile Include="Logic\Dialogs\ReconcileInvestmentsLogic.cs" />
     <Compile Include="Logic\Dialogs\SearchResultLogic.cs" />
     <Compile Include="Logic\Dialogs\ShowHoldingsLogic.cs" />
-    <Compile Include="Logic\Dialogs\EditAccountLogic.cs" />
-    <Compile Include="Logic\Dialogs\EditCategoryLogic.cs" />
-    <Compile Include="Logic\Dialogs\EditMemorizedPayeeLogic.cs" />
-    <Compile Include="Logic\Dialogs\EditSecurityLogic.cs" />
-    <Compile Include="Logic\Dialogs\EditSplitLogic.cs" />
     <Compile Include="Logic\Dialogs\ErrorLogic.cs" />
     <Compile Include="Logic\Dialogs\ReconcileInfoLogic.cs" />
     <Compile Include="Logic\Dialogs\ReconcileLogic.cs" />

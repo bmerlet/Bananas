@@ -9,7 +9,7 @@ using BanaData.Logic.Main;
 using BanaData.Logic.Items;
 using BanaData.Database;
 
-namespace BanaData.Logic.Dialogs
+namespace BanaData.Logic.Dialogs.Editors
 {
     public class EditCategoryLogic : LogicDialogBase
     {
@@ -66,7 +66,7 @@ namespace BanaData.Logic.Dialogs
 
         public CategoryItem NewCategoryItem =>
             new CategoryItem(
-                oldCategoryItem.ID, 
+                oldCategoryItem.ID,
                 Name,
                 Description,
                 Type == INCOME,

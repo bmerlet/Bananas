@@ -9,7 +9,7 @@ using Toolbox.UILogic;
 using Toolbox.Attributes;
 using BanaData.Database;
 using BanaData.Logic.Items;
-using BanaData.Logic.Dialogs;
+using BanaData.Logic.Dialogs.Editors;
 
 namespace BanaData.Logic.Main
 {

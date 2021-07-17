@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,19 +11,16 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using System.Windows.Threading;
-using BanaData.Logic.Dialogs;
+using BanaData.Logic.Dialogs.Editors;
 
-namespace XamlUI.Dialogs
+namespace XamlUI.Dialogs.Editors
 {
     /// <summary>
-    /// Interaction logic for EditSplitLV.xaml
+    /// Interaction logic for EditPersons.xaml
     /// </summary>
-    public partial class EditSplit : Window
+    public partial class EditPersons : Window
     {
-        #region Constructor
-
-        public EditSplit(EditSplitLogic logic)
+        public EditPersons(EditPersonsLogic logic)
         {
             // Use the view model as data context
             this.DataContext = logic;
@@ -34,15 +30,5 @@ namespace XamlUI.Dialogs
 
             InitializeComponent();
         }
-
-        private void OnWindowLoaded(object sender, RoutedEventArgs e)
-        {
-            if (DataContext is EditSplitLogic logic)
-            {
-                logic.Register.OnLoaded();
-            }
-        }
-
-        #endregion
     }
 }

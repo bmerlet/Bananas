@@ -12,7 +12,7 @@ using System.Collections.ObjectModel;
 using System.Windows.Data;
 using System.ComponentModel;
 
-namespace BanaData.Logic.Dialogs
+namespace BanaData.Logic.Dialogs.Editors
 {
     /// <summary>
     /// Logic to edit a split
