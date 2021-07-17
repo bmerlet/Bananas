@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:XamlUI"
         xmlns:tools="clr-namespace:XamlUI.Tools"
         xmlns:ucs="clr-namespace:XamlUI.UserControls"
+        xmlns:w="clr-namespace:XamlUI.Widgets"
         mc:Ignorable="d"
         Title="{Binding Title}" Icon="/XamlUI;component/Images/Bananas.ico" Height="450" Width="800">
     <Window.Resources>
@@ -67,13 +68,13 @@
 
             <!-- Search box -->
             <StackPanel Orientation="Horizontal" Grid.Column="1">
-                <ucs:WatermarkTextBox x:Name="searchTextBox" Style="{StaticResource FormWatermarkTextBox}" Watermark="Search string" Text="{Binding SearchText, Mode=TwoWay}" Width="80">
+                <w:WatermarkTextBox x:Name="searchTextBox" Style="{StaticResource FormWatermarkTextBox}" Watermark="Search string" Text="{Binding SearchText, Mode=TwoWay}" Width="80">
                     <TextBox.InputBindings>
                         <KeyBinding Key="Return" 
                             Command="{Binding Search, UpdateSourceTrigger=PropertyChanged}"
                             CommandParameter="{Binding ElementName=searchTextBox, Path=Text}"/>
                     </TextBox.InputBindings>
-                </ucs:WatermarkTextBox>
+                </w:WatermarkTextBox>
                 <Button Style="{StaticResource FormButton}" Content="Search" Command="{Binding Search}" CommandParameter="{Binding ElementName=searchTextBox, Path=Text}" Width="60"/>
             </StackPanel>
         </Grid>

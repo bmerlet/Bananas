@@ -17,7 +17,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 
 using BanaData.Logic.Main;
-using XamlUI.Tools;
+using XamlUI.Widgets;
 
 namespace XamlUI.UserControls
 {

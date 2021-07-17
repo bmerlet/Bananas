@@ -158,19 +158,15 @@
     <Compile Include="UserControls\AddEditDeletePanel.xaml.cs">
       <DependentUpon>AddEditDeletePanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UserControls\AmountBox.cs" />
-    <Compile Include="UserControls\AutoCompleteTextBox.cs" />
     <Compile Include="UserControls\BankRegister.xaml.cs">
       <DependentUpon>BankRegister.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UserControls\DateBox.cs" />
     <Compile Include="UserControls\DonePanel.xaml.cs">
       <DependentUpon>DonePanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\InvestmentRegister.xaml.cs">
       <DependentUpon>InvestmentRegister.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UserControls\ListviewWithOverlay.cs" />
     <Compile Include="UserControls\OKCancel.xaml.cs">
       <DependentUpon>OKCancel.xaml</DependentUpon>
     </Compile>
@@ -183,7 +179,11 @@
     <Compile Include="UserControls\SplitRegister.xaml.cs">
       <DependentUpon>SplitRegister.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UserControls\WatermarkTextBox.cs" />
+    <Compile Include="Widgets\AmountBox.cs" />
+    <Compile Include="Widgets\AutoCompleteTextBox.cs" />
+    <Compile Include="Widgets\DateBox.cs" />
+    <Compile Include="Widgets\ListviewWithOverlay.cs" />
+    <Compile Include="Widgets\WatermarkTextBox.cs" />
     <Page Include="Dialogs\Basics\PasswordPrompt.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -3,8 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:XamlUI.Dialogs"
-        xmlns:w="clr-namespace:XamlUI.UserControls"
+        xmlns:local="clr-namespace:XamlUI.Dialogs.Editors"
+        xmlns:ucs="clr-namespace:XamlUI.UserControls"
+        xmlns:w="clr-namespace:XamlUI.Widgets"
         xmlns:t="clr-namespace:XamlUI.Tools"
         mc:Ignorable="d"
         xmlns:dialogs="clr-namespace:BanaData.Logic.Dialogs.Editors;assembly=BanaData"
@@ -24,7 +25,7 @@
     </Window.Resources>
     <DockPanel>
         <!-- OK/Cancel panel -->
-        <w:OKCancel DockPanel.Dock="Bottom"/>
+        <ucs:OKCancel DockPanel.Dock="Bottom"/>
 
         <!-- Interest panel -->
         <Grid

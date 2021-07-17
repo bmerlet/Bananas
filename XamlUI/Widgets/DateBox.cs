@@ -7,14 +7,18 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace XamlUI.UserControls
+namespace XamlUI.Widgets
 {
     /// <summary>
     /// Textbox repurposed for date input
     /// </summary>
     class DateBox : TextBox
     {
+        #region Private members
+
         private bool internalDateUpdate;
+
+        #endregion
 
         #region Date Dependency Property
 

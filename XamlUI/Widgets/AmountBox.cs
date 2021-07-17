@@ -7,7 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace XamlUI.UserControls
+namespace XamlUI.Widgets
 {
     /// <summary>
     /// Widget to enter a decimal amount
@@ -210,7 +210,7 @@ namespace XamlUI.UserControls
                 return true;
             }
 
-            return decimal.TryParse(text, out val);            
+            return decimal.TryParse(text, out val);
         }
 
         // Update amount property when text changes

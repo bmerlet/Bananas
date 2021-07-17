@@ -10,7 +10,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 
-namespace XamlUI.UserControls
+namespace XamlUI.Widgets
 {
     //
     // TODO:
@@ -283,7 +283,7 @@ namespace XamlUI.UserControls
         private void OnEditorTextChanged(object sender, TextChangedEventArgs e)
         {
             // Update autocomplete list
-           RefreshSelector();
+            RefreshSelector();
         }
 
         //

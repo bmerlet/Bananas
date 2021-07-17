@@ -14,8 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-using XamlUI.Tools;
-using BanaData.Logic.Main;
+using XamlUI.Widgets;
 
 namespace XamlUI.UserControls
 {

@@ -13,7 +13,7 @@ using System.Windows.Threading;
 using BanaData.Logic.Main;
 using XamlUI.Tools;
 
-namespace XamlUI.UserControls
+namespace XamlUI.Widgets
 {
     public class ListviewWithOverlay : UserControl
     {
@@ -130,10 +130,10 @@ namespace XamlUI.UserControls
         {
             base.OnPreviewKeyDown(e);
 
-            if (DataContext is BaseRegisterLogic brl )
+            if (DataContext is BaseRegisterLogic brl)
             {
                 AutoCompleteTextBox AutoCompleteTextBoxWithPopupOpen = null;
-                if(e.OriginalSource is WatermarkTextBox wtb &&
+                if (e.OriginalSource is WatermarkTextBox wtb &&
                     wtb.TemplatedParent is AutoCompleteTextBox actb &&
                     actb.IsPopupOpen)
                 {

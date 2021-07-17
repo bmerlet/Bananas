@@ -3,8 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:XamlUI.Dialogs"
-        xmlns:w="clr-namespace:XamlUI.UserControls"
+        xmlns:local="clr-namespace:XamlUI.Dialogs.Reports"
+        xmlns:ucs="clr-namespace:XamlUI.UserControls"
+        xmlns:w="clr-namespace:XamlUI.Widgets"
         xmlns:l="clr-namespace:BanaData.Logic.Dialogs.Reports;assembly=BanaData"
         mc:Ignorable="d"
         Title="Holdings"
@@ -40,7 +41,7 @@
         </DockPanel.Resources>
 
         <!-- Done panel -->
-        <w:DonePanel DockPanel.Dock="Bottom"/>
+        <ucs:DonePanel DockPanel.Dock="Bottom"/>
 
         <!-- Date panel -->
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
