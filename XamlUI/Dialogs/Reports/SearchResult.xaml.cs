@@ -11,9 +11,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using BanaData.Logic.Dialogs;
+using BanaData.Logic.Dialogs.Reports;
 
-namespace XamlUI.Dialogs
+namespace XamlUI.Dialogs.Reports
 {
     /// <summary>
     /// Interaction logic for SearchResult.xaml
@@ -33,7 +33,6 @@ namespace XamlUI.Dialogs
             if (DataContext is SearchResultLogic logic && sender is ListView listView && listView.SelectedItem is SearchResultLogic.FoundItem item)
             {
                 DialogResult = true;
-                //Close();
                 logic.GoTo(item);
             }
         }

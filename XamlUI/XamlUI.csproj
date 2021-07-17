@@ -61,6 +61,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Dialogs\Basics\PasswordPrompt.xaml.cs">
+      <DependentUpon>PasswordPrompt.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\Editors\EditAccount.xaml.cs">
       <DependentUpon>EditAccount.xaml</DependentUpon>
     </Compile>
@@ -97,9 +100,6 @@
     <Compile Include="Dialogs\Listers\ListTransactionReports.xaml.cs">
       <DependentUpon>ListTransactionReports.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\PasswordPrompt.xaml.cs">
-      <DependentUpon>PasswordPrompt.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Dialogs\Pickers\AccountListPicker.xaml.cs">
       <DependentUpon>AccountListPicker.xaml</DependentUpon>
     </Compile>
@@ -121,23 +121,23 @@
     <Compile Include="Dialogs\ReconcileInvestments.xaml.cs">
       <DependentUpon>ReconcileInvestments.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\SearchResult.xaml.cs">
+    <Compile Include="Dialogs\Reports\SearchResult.xaml.cs">
       <DependentUpon>SearchResult.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\ShowCapitalGains.xaml.cs">
+    <Compile Include="Dialogs\Reports\ShowCapitalGains.xaml.cs">
       <DependentUpon>ShowCapitalGains.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\ShowHoldings.xaml.cs">
+    <Compile Include="Dialogs\Reports\ShowHoldings.xaml.cs">
       <DependentUpon>ShowHoldings.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\ShowHoldingsPerPerson.xaml.cs">
+    <Compile Include="Dialogs\Reports\ShowHoldingsPerPerson.xaml.cs">
       <DependentUpon>ShowHoldingsPerPerson.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\ShowRebalance.xaml.cs">
+    <Compile Include="Dialogs\Reports\ShowRebalance.xaml.cs">
       <DependentUpon>ShowRebalance.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\ShowYearlyCapGainsAndDividends.xaml.cs">
-      <DependentUpon>ShowYearlyCapGainsAndDividends.xaml</DependentUpon>
+    <Compile Include="Dialogs\Reports\ShowYearlyCGDivInt.xaml.cs">
+      <DependentUpon>ShowYearlyCGDivInt.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tools\AmountToColorConverter.cs" />
     <Compile Include="Tools\AmountToStringConverter.cs" />
@@ -184,6 +184,10 @@
       <DependentUpon>SplitRegister.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\WatermarkTextBox.cs" />
+    <Page Include="Dialogs\Basics\PasswordPrompt.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\Editors\EditAccount.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -232,10 +236,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\PasswordPrompt.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Dialogs\Pickers\AccountListPicker.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -264,27 +264,27 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\SearchResult.xaml">
+    <Page Include="Dialogs\Reports\SearchResult.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\ShowCapitalGains.xaml">
+    <Page Include="Dialogs\Reports\ShowCapitalGains.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\ShowHoldings.xaml">
+    <Page Include="Dialogs\Reports\ShowHoldings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\ShowHoldingsPerPerson.xaml">
+    <Page Include="Dialogs\Reports\ShowHoldingsPerPerson.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\ShowRebalance.xaml">
+    <Page Include="Dialogs\Reports\ShowRebalance.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\ShowYearlyCapGainsAndDividends.xaml">
+    <Page Include="Dialogs\Reports\ShowYearlyCGDivInt.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

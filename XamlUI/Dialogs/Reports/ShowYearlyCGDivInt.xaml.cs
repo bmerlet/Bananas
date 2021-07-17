@@ -13,17 +13,17 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-using BanaData.Logic.Dialogs;
+using BanaData.Logic.Dialogs.Reports;
 using XamlUI.Tools;
 
-namespace XamlUI.Dialogs
+namespace XamlUI.Dialogs.Reports
 {
     /// <summary>
-    /// Interaction logic for ShowYearlyCapGainsAndDividends.xaml
+    /// Interaction logic for ShowYearlyCGDivInt.xaml
     /// </summary>
-    public partial class ShowYearlyCapGainsAndDividends : Window
+    public partial class ShowYearlyCGDivInt : Window
     {
-        public ShowYearlyCapGainsAndDividends(ShowYearlyCapGainsAndDividendsLogic logic)
+        public ShowYearlyCGDivInt(ShowYearlyCGDivIntLogic logic)
         {
             DataContext = logic;
 
@@ -36,7 +36,7 @@ namespace XamlUI.Dialogs
 
         protected void OnColumnHeaderClicked(object sender, RoutedEventArgs e)
         {
-            if (DataContext is ShowYearlyCapGainsAndDividendsLogic brl)
+            if (DataContext is ShowYearlyCGDivIntLogic brl)
             {
                 // Get tag name from the source
                 var sd = brl.Transactions.SortDescriptions;

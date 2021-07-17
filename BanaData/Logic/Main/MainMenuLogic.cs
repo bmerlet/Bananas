@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 using Toolbox.UILogic;
 using BanaData.Database;
 using BanaData.Logic.Dialogs;
-using BanaData.Logic.Dialogs.Listers;
-using BanaData.Web;
+using BanaData.Logic.Dialogs.Basics;
 using BanaData.Logic.Dialogs.Editors;
+using BanaData.Logic.Dialogs.Listers;
+using BanaData.Logic.Dialogs.Reports;
+using BanaData.Web;
 
 namespace BanaData.Logic.Main
 {
@@ -379,7 +381,7 @@ namespace BanaData.Logic.Main
 
         private void OnShowYearlyCapGainsAndDividends()
         {
-            mainWindow.GuiServices.ShowDialog(new ShowYearlyCapGainsAndDividendsLogic(mainWindow));
+            mainWindow.GuiServices.ShowDialog(new ShowYearlyCGDivIntLogic(mainWindow));
         }
 
         //

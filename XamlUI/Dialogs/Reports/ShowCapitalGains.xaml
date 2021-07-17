@@ -1,17 +1,19 @@
-﻿<Window x:Class="XamlUI.Dialogs.ShowCapitalGains"
+﻿<Window x:Class="XamlUI.Dialogs.Reports.ShowCapitalGains"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:XamlUI.Dialogs"
         xmlns:w="clr-namespace:XamlUI.UserControls"
+        xmlns:reports="clr-namespace:BanaData.Logic.Dialogs.Reports;assembly=BanaData"
+        d:DataContext="{d:DesignInstance Type=reports:ShowCapitalGainsLogic}"
         Icon="/XamlUI;component/Images/Bananas.ico"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
         SizeToContent="Width"
         mc:Ignorable="d"
         Title="Capital gains" Height="350">
-    
+
     <Window.Resources>
 
         <DataTemplate x:Key="DateColumnTemplate">
@@ -38,7 +40,7 @@
 
         <!-- Description -->
         <TextBlock Text="{Binding Description}" DockPanel.Dock="Top" Style="{StaticResource FormTextBlock}"/>
-        
+
         <!-- Capital gains -->
         <Grid DockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
@@ -59,7 +61,7 @@
             <ListView 
                 Grid.ColumnSpan="3" Grid.Row="1" 
                 ItemsSource="{Binding LongTermLots}">
-                
+
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="Date" Width="90" CellTemplate="{StaticResource DateColumnTemplate}"/>
@@ -77,8 +79,8 @@
             <ListView 
                 Grid.ColumnSpan="3" Grid.Row="3" 
                 ItemsSource="{Binding ShortTermLots}">
-                
-                    <ListView.View>
+
+                <ListView.View>
                     <GridView>
                         <GridViewColumn Header="Date" Width="90" CellTemplate="{StaticResource DateColumnTemplate}"/>
                         <GridViewColumn Header="Quantity" Width="90" CellTemplate="{StaticResource TotalQuantityColumnTemplate}"/>

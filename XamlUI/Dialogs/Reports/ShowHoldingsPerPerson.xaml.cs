@@ -11,31 +11,21 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using BanaData.Logic.Dialogs;
+using BanaData.Logic.Dialogs.Reports;
 
-namespace XamlUI.Dialogs
+namespace XamlUI.Dialogs.Reports
 {
     /// <summary>
-    /// Interaction logic for PasswordPrompt.xaml
+    /// Interaction logic for ShowHoldingsPerPerson.xaml
     /// </summary>
-    public partial class PasswordPrompt : Window
+    public partial class ShowHoldingsPerPerson : Window
     {
-        public PasswordPrompt(PasswordPromptLogic logic)
+        public ShowHoldingsPerPerson(ShowHoldingsPerPersonLogic logic)
         {
             // Use the view model as data context
             this.DataContext = logic;
 
-            // Tell the view model how to close this dialog
-            logic.CloseView = result =>
-            {
-                logic.Password = passwordBox.Password;
-                DialogResult = result;
-            };
-
             InitializeComponent();
-
-            passwordBox.Password = logic.Password;
-            passwordBox.Focus();
         }
     }
 }

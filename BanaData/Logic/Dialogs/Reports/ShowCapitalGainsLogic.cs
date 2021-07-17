@@ -8,7 +8,7 @@ using Toolbox.UILogic;
 using BanaData.Logic.Main;
 using BanaData.Database;
 
-namespace BanaData.Logic.Dialogs
+namespace BanaData.Logic.Dialogs.Reports
 {
     public class ShowCapitalGainsLogic : LogicBase
     {

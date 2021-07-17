@@ -12,7 +12,7 @@ using BanaData.Web;
 using Toolbox.UILogic;
 using Toolbox.UILogic.Dialogs;
 
-namespace BanaData.Logic.Dialogs
+namespace BanaData.Logic.Dialogs.Reports
 {
     /// <summary>
     /// Shows a rebalance dashboard
@@ -34,7 +34,7 @@ namespace BanaData.Logic.Dialogs
             accountRow = mainWindowLogic.Household.Account.FindByID(accountID);
 
             var portfolio = accountRow.GetPortfolio(null);
-            foreach(var securityRow in portfolio.GetSecuritiesRows())
+            foreach (var securityRow in portfolio.GetSecuritiesRows())
             {
                 decimal securityQuantity = portfolio.Lots.Where(l => l.Security == securityRow).Sum(l => l.Quantity);
                 decimal securityPrice = securityRow.GetMostRecentPrice();
@@ -123,7 +123,7 @@ namespace BanaData.Logic.Dialogs
         private void OnUpdateQuotes()
         {
             var quote = new Quote();
-            foreach(var si in securityItems)
+            foreach (var si in securityItems)
             {
                 if (si.Symbol != Household.SecurityRow.SYMBOL_NONE)
                 {
@@ -142,7 +142,7 @@ namespace BanaData.Logic.Dialogs
         {
             // Look up in DB
             bool found = false;
-            foreach(var targetRow in accountRow.GetRebalanceTargetRows())
+            foreach (var targetRow in accountRow.GetRebalanceTargetRows())
             {
                 foreach (var si in securityItems)
                 {
@@ -175,7 +175,7 @@ namespace BanaData.Logic.Dialogs
         private void Recompute()
         {
             // Recompute values
-            foreach(var si in securityItems)
+            foreach (var si in securityItems)
             {
                 si.Valuation = si.SecurityQuantity * si.SecurityPrice;
             }
@@ -295,7 +295,7 @@ namespace BanaData.Logic.Dialogs
 
             // For logic
             public readonly Household.SecurityRow SecurityRow;
-                
+
             // Invoked when target changes
             public event EventHandler TargetChanged;
 

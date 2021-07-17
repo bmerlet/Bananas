@@ -11,7 +11,7 @@ using BanaData.Database;
 using BanaData.Logic.Main;
 using Toolbox.UILogic;
 
-namespace BanaData.Logic.Dialogs
+namespace BanaData.Logic.Dialogs.Reports
 {
     public class ShowHoldingsLogic : LogicBase
     {
@@ -92,7 +92,7 @@ namespace BanaData.Logic.Dialogs
 
         #endregion
 
-        #region Supporting classes
+        #region SecurityItem class
 
         // One security
         public class SecurityItem
@@ -104,7 +104,7 @@ namespace BanaData.Logic.Dialogs
                 Quantity = lots.Sum(l => l.Quantity);
                 Price = price;
 
-                foreach(var lot in lots)
+                foreach (var lot in lots)
                 {
                     lotItems.Add(new LotItem(lot.Date, lot.Quantity, lot.SecurityPrice));
                 }

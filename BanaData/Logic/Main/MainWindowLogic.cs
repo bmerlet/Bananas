@@ -16,6 +16,8 @@ using BanaData.Database;
 using BanaData.Serializations;
 using BanaData.Logic.Items;
 using BanaData.Logic.Dialogs;
+using BanaData.Logic.Dialogs.Reports;
+using BanaData.Logic.Dialogs.Basics;
 
 namespace BanaData.Logic.Main
 {

@@ -11,22 +11,19 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using BanaData.Logic.Dialogs;
+using BanaData.Logic.Dialogs.Reports;
 
-namespace XamlUI.Dialogs
+namespace XamlUI.Dialogs.Reports
 {
     /// <summary>
-    /// Interaction logic for ShowRebalance.xaml
+    /// Interaction logic for ShowCapitalGains.xaml
     /// </summary>
-    public partial class ShowRebalance : Window
+    public partial class ShowCapitalGains : Window
     {
-        public ShowRebalance(ShowRebalanceLogic logic)
+        public ShowCapitalGains(ShowCapitalGainsLogic logic)
         {
             // Use the view model as data context
             this.DataContext = logic;
-
-            // Tell the view model how to close this dialog
-            logic.CloseView = result => DialogResult = result;
 
             InitializeComponent();
         }

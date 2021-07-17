@@ -10,7 +10,7 @@ using BanaData.Database;
 using BanaData.Logic.Main;
 using Toolbox.UILogic;
 
-namespace BanaData.Logic.Dialogs
+namespace BanaData.Logic.Dialogs.Reports
 {
     public class ShowHoldingsPerPersonLogic : LogicBase
     {
@@ -18,7 +18,7 @@ namespace BanaData.Logic.Dialogs
         {
             var household = mainWindowLogic.Household;
 
-            foreach(Household.PersonRow personRow in household.Person.Rows)
+            foreach (Household.PersonRow personRow in household.Person.Rows)
             {
                 personItems.Add(new PersonItem(household, personRow));
             }

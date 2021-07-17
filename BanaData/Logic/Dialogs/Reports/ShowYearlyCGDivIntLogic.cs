@@ -15,9 +15,9 @@ using BanaData.Database;
 using BanaData.Logic.Items;
 using BanaData.Logic.Dialogs.Pickers;
 
-namespace BanaData.Logic.Dialogs
+namespace BanaData.Logic.Dialogs.Reports
 {
-    public class ShowYearlyCapGainsAndDividendsLogic : LogicBase
+    public class ShowYearlyCGDivIntLogic : LogicBase
     {
         #region Private members
 
@@ -29,7 +29,7 @@ namespace BanaData.Logic.Dialogs
 
         #region Constructor
 
-        public ShowYearlyCapGainsAndDividendsLogic(MainWindowLogic _mainWindowLogic)
+        public ShowYearlyCGDivIntLogic(MainWindowLogic _mainWindowLogic)
         {
             mainWindowLogic = _mainWindowLogic;
 
@@ -44,7 +44,7 @@ namespace BanaData.Logic.Dialogs
             SelectedYear = years[0];
 
             // Setup accounts - skip IRAs as they are not taxable
-            foreach(Household.AccountRow accountRow in mainWindowLogic.Household.Account.Rows)
+            foreach (Household.AccountRow accountRow in mainWindowLogic.Household.Account.Rows)
             {
                 if (!(accountRow.Type == EAccountType.Investment) || !(accountRow.Kind == EInvestmentKind.TraditionalIRA))
                 {
@@ -53,7 +53,7 @@ namespace BanaData.Logic.Dialogs
             }
 
             // Find the categories that hold interest income
-            foreach(Household.CategoryRow categoryRow in mainWindowLogic.Household.Category.Rows)
+            foreach (Household.CategoryRow categoryRow in mainWindowLogic.Household.Category.Rows)
             {
                 if (!categoryRow.IsTaxInfoNull() && CategoryItem.TaxInfoDictionary[categoryRow.TaxInfo].Contains("Interest income"))
                 {
@@ -308,7 +308,7 @@ namespace BanaData.Logic.Dialogs
                     foreach (var transactionRow in accountRow.GetTransactionRows().Where(tr => tr.Date.Year == selectedYear))
                     {
                         // Go through all the line items
-                        foreach(var li in transactionRow.GetLineItemRows())
+                        foreach (var li in transactionRow.GetLineItemRows())
                         {
                             if (!li.IsCategoryIDNull() && interestCategories.Contains(li.CategoryID))
                             {

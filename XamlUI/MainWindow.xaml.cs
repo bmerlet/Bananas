@@ -18,13 +18,17 @@ using Toolbox.UILogic;
 using BanaData.Logic;
 using BanaData.Logic.Dialogs;
 using BanaData.Logic.Main;
+using BanaData.Logic.Dialogs.Basics;
 using BanaData.Logic.Dialogs.Editors;
 using BanaData.Logic.Dialogs.Listers;
 using BanaData.Logic.Dialogs.Pickers;
+using BanaData.Logic.Dialogs.Reports;
 using XamlUI.Dialogs;
+using XamlUI.Dialogs.Basics;
 using XamlUI.Dialogs.Editors;
 using XamlUI.Dialogs.Listers;
 using XamlUI.Dialogs.Pickers;
+using XamlUI.Dialogs.Reports;
 
 namespace XamlUI
 {
@@ -207,9 +211,9 @@ namespace XamlUI
             {
                 dialog = new ShowCapitalGains(showCapitalGainsLogic);
             }
-            else if (logic is ShowYearlyCapGainsAndDividendsLogic showYearlyCapGainsAndDividendsLogic)
+            else if (logic is ShowYearlyCGDivIntLogic showYearlyCGDivIntLogic)
             {
-                dialog = new ShowYearlyCapGainsAndDividends(showYearlyCapGainsAndDividendsLogic);
+                dialog = new ShowYearlyCGDivInt(showYearlyCGDivIntLogic);
             }
             else if (logic is ShowRebalanceLogic showRebalanceLogic)
             {

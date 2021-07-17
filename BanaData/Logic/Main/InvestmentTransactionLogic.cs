@@ -4,14 +4,13 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
 
 using Toolbox.Attributes;
 using Toolbox.UILogic;
 using BanaData.Database;
 using BanaData.Logic.Items;
-using BanaData.Logic.Dialogs;
-using System.Collections.ObjectModel;
-using System.Windows.Data;
+using BanaData.Logic.Dialogs.Reports;
 using BanaData.Collections;
 
 namespace BanaData.Logic.Main

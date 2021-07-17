@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 using Toolbox.UILogic;
 
-namespace BanaData.Logic.Dialogs
+namespace BanaData.Logic.Dialogs.Basics
 {
     public class ErrorLogic : LogicBase
     {

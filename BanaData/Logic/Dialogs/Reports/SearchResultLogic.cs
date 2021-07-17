@@ -10,7 +10,7 @@ using BanaData.Database;
 using BanaData.Logic.Main;
 using Toolbox.UILogic;
 
-namespace BanaData.Logic.Dialogs
+namespace BanaData.Logic.Dialogs.Reports
 {
     public class SearchResultLogic : LogicBase
     {
@@ -19,7 +19,7 @@ namespace BanaData.Logic.Dialogs
         private readonly MainWindowLogic mainWindowLogic;
 
         #endregion
-        
+
         #region Constructor
 
         public SearchResultLogic(MainWindowLogic _mainWindowLogic, string searchText)

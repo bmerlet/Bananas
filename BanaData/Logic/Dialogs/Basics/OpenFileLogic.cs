@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 using Toolbox.UILogic;
 
-namespace BanaData.Logic.Dialogs
+namespace BanaData.Logic.Dialogs.Basics
 {
     public class OpenFileLogic : LogicBase
     {

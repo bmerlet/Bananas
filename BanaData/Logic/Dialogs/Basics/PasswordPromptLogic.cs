@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Toolbox.UILogic.Dialogs;
 
-namespace BanaData.Logic.Dialogs
+namespace BanaData.Logic.Dialogs.Basics
 {
     public class PasswordPromptLogic : LogicDialogBase
     {

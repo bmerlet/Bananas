@@ -11,16 +11,16 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using BanaData.Logic.Dialogs;
+using BanaData.Logic.Dialogs.Reports;
 
-namespace XamlUI.Dialogs
+namespace XamlUI.Dialogs.Reports
 {
     /// <summary>
-    /// Interaction logic for showCapitalGains.xaml
+    /// Interaction logic for ShowHoldings.xaml
     /// </summary>
-    public partial class ShowCapitalGains : Window
+    public partial class ShowHoldings : Window
     {
-        public ShowCapitalGains(ShowCapitalGainsLogic logic)
+        public ShowHoldings(ShowHoldingsLogic logic)
         {
             // Use the view model as data context
             this.DataContext = logic;
