@@ -12,8 +12,9 @@ using Toolbox.UILogic.Dialogs;
 using BanaData.Logic.Main;
 using BanaData.Database;
 using BanaData.Logic.Items;
+using BanaData.Logic.Controls;
 
-namespace BanaData.Logic.Dialogs
+namespace BanaData.Logic.Dialogs.Editors
 {
     public class ReconcileLogic : LogicDialogBase
     {
@@ -55,7 +56,7 @@ namespace BanaData.Logic.Dialogs
             UpdateBalances();
         }
 
-        private IEnumerable<TransactionToReconcile> BuildTransactionList(Household.ReconcileInfoRow reconcileInfoRow,  bool deposit)
+        private IEnumerable<TransactionToReconcile> BuildTransactionList(Household.ReconcileInfoRow reconcileInfoRow, bool deposit)
         {
             // Find all candidates
             var transactions = new List<TransactionToReconcile>();
@@ -295,7 +296,7 @@ namespace BanaData.Logic.Dialogs
             var transactionRow = household.Transaction.Add(accountRow, reconcileInfoRow.InterestDate, "Interest Earned", null, ETransactionStatus.Reconciled, household.Checkpoint.GetMostRecentCheckpointID());
 
             // Create new banking transaction row
-            household.BankingTransaction.Add(transactionRow,ETransactionMedium.None, 0);
+            household.BankingTransaction.Add(transactionRow, ETransactionMedium.None, 0);
 
             // Create the line items
             household.LineItem.Add(transactionRow, reconcileInfoRow.InterestCategoryID, -1, "", interestAmount, null);

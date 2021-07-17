@@ -12,7 +12,7 @@ using System.Collections.ObjectModel;
 using System.Windows.Data;
 using System.ComponentModel;
 
-namespace BanaData.Logic.Dialogs
+namespace BanaData.Logic.Dialogs.Editors
 {
     /// <summary>
     /// Logic for the dialog to query reconcilation information
@@ -93,7 +93,7 @@ namespace BanaData.Logic.Dialogs
                 // Copy security info if available
                 if (accountRow.Type == EAccountType.Investment)
                 {
-                    foreach(var sri in reconcileInfoRow.GetSecurityReconcileInfoRows())
+                    foreach (var sri in reconcileInfoRow.GetSecurityReconcileInfoRows())
                     {
                         var securityInfoItem = securityInfos.FirstOrDefault(sii => sii.Symbol == sri.SecurityRow.Symbol);
                         if (securityInfoItem != null)
@@ -108,7 +108,7 @@ namespace BanaData.Logic.Dialogs
 
                     // Adjust tab index in collection order
                     int tabIndex = 2;
-                    foreach(SecurityInfoItem sii in SecurityInfoSource)
+                    foreach (SecurityInfoItem sii in SecurityInfoSource)
                     {
                         sii.TabIndex = tabIndex++;
                     }

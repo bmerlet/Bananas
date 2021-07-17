@@ -1,10 +1,12 @@
-﻿<Window x:Class="XamlUI.Dialogs.Reconcile"
+﻿<Window x:Class="XamlUI.Dialogs.Editors.Reconcile"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:XamlUI.Dialogs"
-        xmlns:w="clr-namespace:XamlUI.UserControls"
+        xmlns:w="clr-namespace:XamlUI.UserControls" 
+        xmlns:editors="clr-namespace:BanaData.Logic.Dialogs.Editors;assembly=BanaData" 
+        d:DataContext="{d:DesignInstance Type=editors:ReconcileLogic}"
         mc:Ignorable="d"
         Title="Reconcile"
         Icon="/XamlUI;component/Images/Bananas.ico"
@@ -16,10 +18,10 @@
         <DockPanel.Resources>
             <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}"/>
         </DockPanel.Resources>
-        
+
         <!-- OK/Cancel panel -->
         <w:ReconcileCommandBar DockPanel.Dock="Bottom"/>
-        
+
         <!-- Main panel: left column for payments, right column for deposits and controls -->
         <Grid Height="600">
             <Grid.ColumnDefinitions>
@@ -55,13 +57,13 @@
                         Text="{Binding PriorStatementBalance, StringFormat=N2}"
                         Foreground="{Binding PriorStatementBalance, Converter={StaticResource amountToColorConverter}}"
                         HorizontalAlignment="Right" Grid.Column="1"/>
-                    
+
                     <TextBlock Text="Cleared balance:" Grid.Row="1"/>
                     <TextBlock
                         Text="{Binding ClearedBalance, StringFormat=N2}"
                         Foreground="{Binding ClearedBalance, Converter={StaticResource amountToColorConverter}}"
                         HorizontalAlignment="Right" Grid.Column="1" Grid.Row="1"/>
-                    
+
                     <TextBlock Text="Statement Balance:" Grid.Row="2"/>
                     <TextBlock
                         Text="{Binding StatementBalance, StringFormat=N2}" 

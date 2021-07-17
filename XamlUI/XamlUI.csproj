@@ -85,6 +85,15 @@
     <Compile Include="Dialogs\Editors\EditTransactionReport.xaml.cs">
       <DependentUpon>EditTransactionReport.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\Editors\Reconcile.xaml.cs">
+      <DependentUpon>Reconcile.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Editors\ReconcileInfo.xaml.cs">
+      <DependentUpon>ReconcileInfo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Editors\ReconcileInvestments.xaml.cs">
+      <DependentUpon>ReconcileInvestments.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\Listers\ListAccounts.xaml.cs">
       <DependentUpon>ListAccounts.xaml</DependentUpon>
     </Compile>
@@ -111,15 +120,6 @@
     </Compile>
     <Compile Include="Dialogs\Pickers\PayeeListPicker.xaml.cs">
       <DependentUpon>PayeeListPicker.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\Reconcile.xaml.cs">
-      <DependentUpon>Reconcile.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\ReconcileInfo.xaml.cs">
-      <DependentUpon>ReconcileInfo.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\ReconcileInvestments.xaml.cs">
-      <DependentUpon>ReconcileInvestments.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Reports\SearchResult.xaml.cs">
       <DependentUpon>SearchResult.xaml</DependentUpon>
@@ -216,6 +216,18 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Dialogs\Editors\Reconcile.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Editors\ReconcileInfo.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Editors\ReconcileInvestments.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\Listers\ListAccounts.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -249,18 +261,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\Pickers\PayeeListPicker.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialogs\Reconcile.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialogs\ReconcileInfo.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialogs\ReconcileInvestments.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

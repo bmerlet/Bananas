@@ -6,13 +6,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+
 using BanaData.Database;
+using BanaData.Logic.Controls;
 using BanaData.Logic.Items;
 using BanaData.Logic.Main;
 using Toolbox.UILogic;
 using Toolbox.UILogic.Dialogs;
 
-namespace BanaData.Logic.Dialogs
+namespace BanaData.Logic.Dialogs.Editors
 {
     public class ReconcileInvestmentsLogic : LogicDialogBase
     {
@@ -49,7 +51,7 @@ namespace BanaData.Logic.Dialogs
                 trackers.Add(new SecurityTracker(
                     securityReconcileInfo.SecurityRow.Name,
                     securityReconcileInfo.SecurityRow.Symbol,
-                    prioStatementQuantity, 0, 
+                    prioStatementQuantity, 0,
                     securityReconcileInfo.SecurityQuantity, 0, "N4"));
             }
 
@@ -155,7 +157,7 @@ namespace BanaData.Logic.Dialogs
 
         private void UpdateBalances()
         {
-            foreach(var tracker in trackers)
+            foreach (var tracker in trackers)
             {
                 if (tracker.Symbol == "Cash")
                 {
@@ -276,7 +278,7 @@ namespace BanaData.Logic.Dialogs
         #endregion
 
         #region Tracker class 
-        
+
         // Tracker for one security or cash
         public class SecurityTracker : LogicBase
         {
@@ -295,10 +297,10 @@ namespace BanaData.Logic.Dialogs
 
             // Cleared balance
             private decimal clearedBalance;
-            public decimal ClearedBalance 
-            { 
+            public decimal ClearedBalance
+            {
                 get => clearedBalance;
-                set { clearedBalance = value; OnPropertyChanged(() => ClearedBalance); } 
+                set { clearedBalance = value; OnPropertyChanged(() => ClearedBalance); }
             }
 
             // Statement balance

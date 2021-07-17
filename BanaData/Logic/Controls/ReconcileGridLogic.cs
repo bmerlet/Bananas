@@ -6,11 +6,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+
 using BanaData.Database;
 using BanaData.Logic.Items;
 using Toolbox.UILogic;
 
-namespace BanaData.Logic.Dialogs
+namespace BanaData.Logic.Controls
 {
     /// <summary>
     /// Logic for one reconcile grid
@@ -36,7 +37,7 @@ namespace BanaData.Logic.Dialogs
             Title = title;
 
             // Give the transactions to the UI
-            foreach(var transaction in _transactions)
+            foreach (var transaction in _transactions)
             {
                 transactions.Add(transaction);
                 transaction.TransactionCleared += OnTransactionCleared;

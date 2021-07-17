@@ -69,6 +69,7 @@
     <Compile Include="Database\Security.cs" />
     <Compile Include="Database\SecurityPrice.cs" />
     <Compile Include="Database\Transaction.cs" />
+    <Compile Include="Logic\Controls\ReconcileGridLogic.cs" />
     <Compile Include="Logic\Dialogs\Basics\ErrorLogic.cs" />
     <Compile Include="Logic\Dialogs\Basics\OpenFileLogic.cs" />
     <Compile Include="Logic\Dialogs\Basics\PasswordPromptLogic.cs" />
@@ -79,6 +80,9 @@
     <Compile Include="Logic\Dialogs\Editors\EditSecurityLogic.cs" />
     <Compile Include="Logic\Dialogs\Editors\EditSplitLogic.cs" />
     <Compile Include="Logic\Dialogs\Editors\EditTransactionReportLogic.cs" />
+    <Compile Include="Logic\Dialogs\Editors\ReconcileInfoLogic.cs" />
+    <Compile Include="Logic\Dialogs\Editors\ReconcileInvestmentsLogic.cs" />
+    <Compile Include="Logic\Dialogs\Editors\ReconcileLogic.cs" />
     <Compile Include="Logic\Dialogs\Listers\ListTransactionReportsLogic.cs" />
     <Compile Include="Logic\Dialogs\Listers\ListAccountsLogic.cs" />
     <Compile Include="Logic\Dialogs\Listers\ListCategoriesLogic.cs" />
@@ -88,13 +92,9 @@
     <Compile Include="Logic\Dialogs\Pickers\AccountPickerLogic.cs" />
     <Compile Include="Logic\Dialogs\Pickers\CategoryListPickerLogic.cs" />
     <Compile Include="Logic\Dialogs\Pickers\PayeeListPickerLogic.cs" />
-    <Compile Include="Logic\Dialogs\ReconcileGridLogic.cs" />
-    <Compile Include="Logic\Dialogs\ReconcileInvestmentsLogic.cs" />
     <Compile Include="Logic\Dialogs\Reports\SearchResultLogic.cs" />
     <Compile Include="Logic\Dialogs\Reports\ShowCapitalGainsLogic.cs" />
     <Compile Include="Logic\Dialogs\Reports\ShowHoldingsLogic.cs" />
-    <Compile Include="Logic\Dialogs\ReconcileInfoLogic.cs" />
-    <Compile Include="Logic\Dialogs\ReconcileLogic.cs" />
     <Compile Include="Logic\Dialogs\Reports\ShowHoldingsPerPersonLogic.cs" />
     <Compile Include="Logic\Dialogs\Reports\ShowRebalanceLogic.cs" />
     <Compile Include="Logic\Dialogs\Reports\ShowYearlyCGDivIntLogic.cs" />

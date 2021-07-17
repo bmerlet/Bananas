@@ -1,10 +1,10 @@
-﻿<Window x:Class="XamlUI.Dialogs.ReconcileInvestments"
+﻿<Window x:Class="XamlUI.Dialogs.Editors.ReconcileInvestments"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:XamlUI.Dialogs"
-        xmlns:w="clr-namespace:XamlUI.UserControls"
+        xmlns:w="clr-namespace:XamlUI.UserControls" xmlns:editors="clr-namespace:BanaData.Logic.Dialogs.Editors;assembly=BanaData" d:DataContext="{d:DesignInstance Type=editors:ReconcileInvestmentsLogic}"
         mc:Ignorable="d"
         Title="Reconcile"
         Icon="/XamlUI;component/Images/Bananas.ico"
@@ -15,7 +15,7 @@
 
         <!-- OK/Cancel panel -->
         <w:ReconcileCommandBar DockPanel.Dock="Bottom"/>
-        
+
         <!-- The listview tracking the cleared amounts and shares -->
         <ListView 
             DockPanel.Dock="Bottom"
@@ -87,7 +87,7 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                    </GridView.Columns>                    
+                    </GridView.Columns>
                 </GridView>
             </ListView.View>
         </ListView>

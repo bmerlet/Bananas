@@ -1,4 +1,4 @@
-﻿<Window x:Class="XamlUI.Dialogs.ReconcileInfo"
+﻿<Window x:Class="XamlUI.Dialogs.Editors.ReconcileInfo"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -7,7 +7,7 @@
         xmlns:w="clr-namespace:XamlUI.UserControls"
         xmlns:t="clr-namespace:XamlUI.Tools"
         mc:Ignorable="d"
-        xmlns:dialogs="clr-namespace:BanaData.Logic.Dialogs;assembly=BanaData"
+        xmlns:dialogs="clr-namespace:BanaData.Logic.Dialogs.Editors;assembly=BanaData"
         d:DataContext="{d:DesignInstance Type=dialogs:ReconcileInfoLogic}"
         Title="Reconcile Info"
         Icon="/XamlUI;component/Images/Bananas.ico"
@@ -20,12 +20,12 @@
         <Style TargetType="w:WatermarkTextBox" BasedOn="{StaticResource FormWatermarkTextBox}"/>
         <Style TargetType="w:AmountBox" BasedOn="{StaticResource FormAmountBox}"/>
         <Style TargetType="w:DateBox"  BasedOn="{StaticResource FormDateBox}"/>
-        
+
     </Window.Resources>
     <DockPanel>
         <!-- OK/Cancel panel -->
         <w:OKCancel DockPanel.Dock="Bottom"/>
-        
+
         <!-- Interest panel -->
         <Grid
             DockPanel.Dock="Bottom"

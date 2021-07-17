@@ -11,20 +11,19 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using BanaData.Logic.Dialogs.Editors;
 
-using BanaData.Logic.Dialogs;
-
-namespace XamlUI.Dialogs
+namespace XamlUI.Dialogs.Editors
 {
     /// <summary>
-    /// Interaction logic for ReconcileInfo.xaml
+    /// Interaction logic for Reconcile.xaml
     /// </summary>
-    public partial class ReconcileInfo : Window
+    public partial class Reconcile : Window
     {
-        public ReconcileInfo(ReconcileInfoLogic logic)
+        public Reconcile(ReconcileLogic logic)
         {
             // Use the view model as data context
-            DataContext = logic;
+            this.DataContext = logic;
 
             // Tell the view model how to close this dialog
             logic.CloseView = result => DialogResult = result;
