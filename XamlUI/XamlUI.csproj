@@ -64,26 +64,14 @@
     <Compile Include="Dialogs\EditAccount.xaml.cs">
       <DependentUpon>EditAccount.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\EditAccounts.xaml.cs">
-      <DependentUpon>EditAccounts.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\EditCategories.xaml.cs">
-      <DependentUpon>EditCategories.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Dialogs\EditCategory.xaml.cs">
       <DependentUpon>EditCategory.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\EditMemorizedPayee.xaml.cs">
       <DependentUpon>EditMemorizedPayee.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\EditMemorizedPayees.xaml.cs">
-      <DependentUpon>EditMemorizedPayees.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Dialogs\EditPersons.xaml.cs">
       <DependentUpon>EditPersons.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\EditSecurities.xaml.cs">
-      <DependentUpon>EditSecurities.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\EditSecurity.xaml.cs">
       <DependentUpon>EditSecurity.xaml</DependentUpon>
@@ -94,8 +82,20 @@
     <Compile Include="Dialogs\EditTransactionReport.xaml.cs">
       <DependentUpon>EditTransactionReport.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\EditTransactionReports.xaml.cs">
-      <DependentUpon>EditTransactionReports.xaml</DependentUpon>
+    <Compile Include="Dialogs\Listers\ListAccounts.xaml.cs">
+      <DependentUpon>ListAccounts.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Listers\ListCategories.xaml.cs">
+      <DependentUpon>ListCategories.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Listers\ListMemorizedPayees.xaml.cs">
+      <DependentUpon>ListMemorizedPayees.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Listers\ListSecurities.xaml.cs">
+      <DependentUpon>ListSecurities.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Listers\ListTransactionReports.xaml.cs">
+      <DependentUpon>ListTransactionReports.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\PasswordPrompt.xaml.cs">
       <DependentUpon>PasswordPrompt.xaml</DependentUpon>
@@ -188,14 +188,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\EditAccounts.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialogs\EditCategories.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Dialogs\EditCategory.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -204,15 +196,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\EditMemorizedPayees.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Dialogs\EditPersons.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialogs\EditSecurities.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -228,7 +212,23 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\EditTransactionReports.xaml">
+    <Page Include="Dialogs\Listers\ListAccounts.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Listers\ListCategories.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Listers\ListMemorizedPayees.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Listers\ListSecurities.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Listers\ListTransactionReports.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -386,5 +386,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

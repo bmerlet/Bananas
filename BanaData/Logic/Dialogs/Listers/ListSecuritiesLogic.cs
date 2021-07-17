@@ -13,9 +13,9 @@ using BanaData.Logic.Items;
 using BanaData.Database;
 using BanaData.Collections;
 
-namespace BanaData.Logic.Dialogs
+namespace BanaData.Logic.Dialogs.Listers
 {
-    public class EditSecuritiesLogic : LogicBase
+    public class ListSecuritiesLogic : LogicBase
     {
         #region Private members
 
@@ -25,7 +25,7 @@ namespace BanaData.Logic.Dialogs
 
         #region Constructor
 
-        public EditSecuritiesLogic(MainWindowLogic _mainWindowLogic)
+        public ListSecuritiesLogic(MainWindowLogic _mainWindowLogic)
         {
             mainWindowLogic = _mainWindowLogic;
 

@@ -45,9 +45,9 @@
                 <MenuItem Header="Edit">
                     <MenuItem Header="Accounts..." Command="{Binding EditAccounts}"/>
                     <MenuItem Header="Categories..." Command="{Binding EditCategories}"/>
-                    <MenuItem Header="Household members..." Command="{Binding EditPersons}"/>
-                    <MenuItem Header="Memorized payees..." Command="{Binding EditMemorizedPayees}"/>
                     <MenuItem Header="Securities..." Command="{Binding EditSecurities}"/>
+                    <MenuItem Header="Memorized payees..." Command="{Binding EditMemorizedPayees}"/>
+                    <MenuItem Header="Household members..." Command="{Binding EditPersons}"/>
                     <MenuItem Header="Transaction reports..." Command="{Binding EditTransactionReports}"/>
                 </MenuItem>
                 <MenuItem Header="Actions">

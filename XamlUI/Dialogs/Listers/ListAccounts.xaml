@@ -1,18 +1,19 @@
-﻿<Window x:Class="XamlUI.Dialogs.EditTransactionReports"
+﻿<Window x:Class="XamlUI.Dialogs.Listers.ListAccounts"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:XamlUI.Dialogs"
         xmlns:w="clr-namespace:XamlUI.UserControls"
-        xmlns:dialogs="clr-namespace:BanaData.Logic.Dialogs;assembly=BanaData"
-        d:DataContext="{d:DesignInstance Type=dialogs:EditTransactionReportsLogic}"
+        xmlns:dialogs="clr-namespace:BanaData.Logic.Dialogs.Listers;assembly=BanaData"
+        d:DataContext="{d:DesignInstance Type=dialogs:ListAccountsLogic}"
         mc:Ignorable="d"
-        Title="Edit transaction reports"
+        Title="Edit accounts"
         Icon="/XamlUI;component/Images/Bananas.ico"
         WindowStartupLocation="CenterOwner"
         SizeToContent="Width" Height="380">
     <DockPanel>
+
         <!-- Done panel -->
         <w:DonePanel DockPanel.Dock="Bottom"/>
 
@@ -23,14 +24,22 @@
         <ListView
             x:Name="listView"
             SelectionMode="Single"
-            ItemsSource="{Binding ReportsSource}"
-            SelectedItem="{Binding SelectedReport, Mode=TwoWay}"
+            ItemsSource="{Binding AccountsSource}"
+            SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"
             MouseDoubleClick="OnListviewDoubleClick">
 
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Name" Width="200" DisplayMemberBinding="{Binding Name}"/>
                     <GridViewColumn Header="Description" Width="200" DisplayMemberBinding="{Binding Description}"/>
+                    <GridViewColumn Header="Type" Width="85">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding TypeString}" Foreground="Blue" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Owner" Width="100" DisplayMemberBinding="{Binding Owner}"/>
                 </GridView>
             </ListView.View>
         </ListView>

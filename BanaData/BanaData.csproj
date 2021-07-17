@@ -71,7 +71,11 @@
     <Compile Include="Database\Transaction.cs" />
     <Compile Include="Logic\Dialogs\EditPersonsLogic.cs" />
     <Compile Include="Logic\Dialogs\EditTransactionReportLogic.cs" />
-    <Compile Include="Logic\Dialogs\EditTransactionReportsLogic.cs" />
+    <Compile Include="Logic\Dialogs\Listers\ListTransactionReportsLogic.cs" />
+    <Compile Include="Logic\Dialogs\Listers\ListAccountsLogic.cs" />
+    <Compile Include="Logic\Dialogs\Listers\ListCategoriesLogic.cs" />
+    <Compile Include="Logic\Dialogs\Listers\ListMemorizedPayeesLogic.cs" />
+    <Compile Include="Logic\Dialogs\Listers\ListSecuritiesLogic.cs" />
     <Compile Include="Logic\Dialogs\PasswordPromptLogic.cs" />
     <Compile Include="Logic\Dialogs\Pickers\AccountListPickerLogic.cs" />
     <Compile Include="Logic\Dialogs\Pickers\AccountPickerLogic.cs" />
@@ -82,13 +86,9 @@
     <Compile Include="Logic\Dialogs\SearchResultLogic.cs" />
     <Compile Include="Logic\Dialogs\ShowHoldingsLogic.cs" />
     <Compile Include="Logic\Dialogs\EditAccountLogic.cs" />
-    <Compile Include="Logic\Dialogs\EditAccountsLogic.cs" />
-    <Compile Include="Logic\Dialogs\EditCategoriesLogic.cs" />
     <Compile Include="Logic\Dialogs\EditCategoryLogic.cs" />
     <Compile Include="Logic\Dialogs\EditMemorizedPayeeLogic.cs" />
-    <Compile Include="Logic\Dialogs\EditMemorizedPayeesLogic.cs" />
     <Compile Include="Logic\Dialogs\EditSecurityLogic.cs" />
-    <Compile Include="Logic\Dialogs\EditSecuritiesLogic.cs" />
     <Compile Include="Logic\Dialogs\EditSplitLogic.cs" />
     <Compile Include="Logic\Dialogs\ErrorLogic.cs" />
     <Compile Include="Logic\Dialogs\ReconcileInfoLogic.cs" />

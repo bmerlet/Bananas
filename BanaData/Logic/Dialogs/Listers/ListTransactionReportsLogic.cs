@@ -11,9 +11,9 @@ using BanaData.Logic.Items;
 using BanaData.Logic.Main;
 using Toolbox.UILogic;
 
-namespace BanaData.Logic.Dialogs
+namespace BanaData.Logic.Dialogs.Listers
 {
-    public class EditTransactionReportsLogic : LogicBase
+    public class ListTransactionReportsLogic : LogicBase
     {
         #region Private members
 
@@ -23,7 +23,7 @@ namespace BanaData.Logic.Dialogs
 
         #region Constructor
 
-        public EditTransactionReportsLogic(MainWindowLogic _mainWindowLogic)
+        public ListTransactionReportsLogic(MainWindowLogic _mainWindowLogic)
         {
             mainWindowLogic = _mainWindowLogic;
 
@@ -144,7 +144,7 @@ namespace BanaData.Logic.Dialogs
                 household.TransactionReportAccount.AddTransactionReportAccountRow(acctRow);
             }
 
-            foreach(var payee in newReport.Payees)
+            foreach (var payee in newReport.Payees)
             {
                 var payeeRow = household.TransactionReportPayee.NewTransactionReportPayeeRow();
                 payeeRow.TransactionReportID = reportRow.ID;

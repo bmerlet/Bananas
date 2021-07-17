@@ -1,18 +1,20 @@
-﻿<Window x:Class="XamlUI.Dialogs.EditSecurities"
+﻿<Window x:Class="XamlUI.Dialogs.Listers.ListSecurities"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:XamlUI.Dialogs"
-        xmlns:w="clr-namespace:XamlUI.UserControls"
+        xmlns:w="clr-namespace:XamlUI.UserControls" 
+        xmlns:listers="clr-namespace:BanaData.Logic.Dialogs.Listers;assembly=BanaData"
+        d:DataContext="{d:DesignInstance Type=listers:ListSecuritiesLogic}"
         mc:Ignorable="d"
-        Title="Edit Securities"
+        Title="Edit securities"
         Icon="/XamlUI;component/Images/Bananas.ico"
         WindowStartupLocation="CenterOwner"
         SizeToContent="Width" Height="380">
 
     <DockPanel>
-        
+
         <!-- Done panel -->
         <w:DonePanel DockPanel.Dock="Bottom"/>
 

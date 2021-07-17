@@ -12,18 +12,17 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-
-using BanaData.Logic.Dialogs;
+using BanaData.Logic.Dialogs.Listers;
 using XamlUI.Tools;
 
-namespace XamlUI.Dialogs
+namespace XamlUI.Dialogs.Listers
 {
     /// <summary>
-    /// Interaction logic for EditSecurities.xaml
+    /// Interaction logic for ListSecurities.xaml
     /// </summary>
-    public partial class EditSecurities : Window
+    public partial class ListSecurities : Window
     {
-        public EditSecurities(EditSecuritiesLogic logic)
+        public ListSecurities(ListSecuritiesLogic logic)
         {
             // Use the view model as data context
             this.DataContext = logic;
@@ -36,7 +35,7 @@ namespace XamlUI.Dialogs
 
         private void OnLogicPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (DataContext is EditSecuritiesLogic logic)
+            if (DataContext is ListSecuritiesLogic logic)
             {
                 if (e.PropertyName == "SecurityToScrollTo")
                 {
@@ -47,7 +46,7 @@ namespace XamlUI.Dialogs
 
         private void OnListviewDoubleClick(object sender, EventArgs e)
         {
-            if (DataContext is EditSecuritiesLogic logic)
+            if (DataContext is ListSecuritiesLogic logic)
             {
                 logic.EditCommand.Execute();
             }
@@ -59,7 +58,7 @@ namespace XamlUI.Dialogs
 
         private void OnColumnHeaderClicked(object sender, RoutedEventArgs e)
         {
-            if (DataContext is EditSecuritiesLogic esl)
+            if (DataContext is ListSecuritiesLogic esl)
             {
                 // Get tag name from the source
                 var sd = esl.SecuritiesSource.SortDescriptions;
@@ -90,4 +89,3 @@ namespace XamlUI.Dialogs
         #endregion
     }
 }
-

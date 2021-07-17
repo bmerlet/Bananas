@@ -11,17 +11,16 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using BanaData.Logic.Dialogs.Listers;
 
-using BanaData.Logic.Dialogs;
-
-namespace XamlUI.Dialogs
+namespace XamlUI.Dialogs.Listers
 {
     /// <summary>
-    /// Interaction logic for EditCategories.xaml
+    /// Interaction logic for ListAccounts.xaml
     /// </summary>
-    public partial class EditCategories : Window
+    public partial class ListAccounts : Window
     {
-        public EditCategories(EditCategoriesLogic logic)
+        public ListAccounts(ListAccountsLogic logic)
         {
             // Use the view model as data context
             this.DataContext = logic;
@@ -34,18 +33,18 @@ namespace XamlUI.Dialogs
 
         private void OnLogicPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (DataContext is EditCategoriesLogic logic)
+            if (DataContext is ListAccountsLogic logic)
             {
-                if (e.PropertyName == "CategoryToScrollTo")
+                if (e.PropertyName == "AccountToScrollTo")
                 {
-                    listView.ScrollIntoView(logic.CategoryToScrollTo);
+                    listView.ScrollIntoView(logic.AccountToScrollTo);
                 }
             }
         }
 
         private void OnListviewDoubleClick(object sender, EventArgs e)
         {
-            if (DataContext is EditCategoriesLogic logic)
+            if (DataContext is ListAccountsLogic logic)
             {
                 logic.EditCommand.Execute();
             }

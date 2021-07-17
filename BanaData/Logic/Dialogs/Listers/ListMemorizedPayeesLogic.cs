@@ -1,24 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Data;
-
-using Toolbox.UILogic;
-using Toolbox.UILogic.Dialogs;
+using BanaData.Database;
 using BanaData.Logic.Items;
 using BanaData.Logic.Main;
-using BanaData.Database;
+using Toolbox.UILogic;
 
-namespace BanaData.Logic.Dialogs
+namespace BanaData.Logic.Dialogs.Listers
 {
     /// <summary>
     /// Logic to edit the list of memorized payees
     /// </summary>
-    public class EditMemorizedPayeesLogic : LogicBase
+    public class ListMemorizedPayeesLogic : LogicBase
     {
         #region Private members
 
@@ -28,7 +23,7 @@ namespace BanaData.Logic.Dialogs
 
         #region Constructor
 
-        public EditMemorizedPayeesLogic(MainWindowLogic _mainWindowLogic)
+        public ListMemorizedPayeesLogic(MainWindowLogic _mainWindowLogic)
         {
             mainWindowLogic = _mainWindowLogic;
 

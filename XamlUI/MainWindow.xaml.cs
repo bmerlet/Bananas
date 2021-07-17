@@ -18,10 +18,11 @@ using Toolbox.UILogic;
 using BanaData.Logic;
 using BanaData.Logic.Dialogs;
 using BanaData.Logic.Main;
-using XamlUI.Dialogs;
-using System.Media;
 using BanaData.Logic.Dialogs.Pickers;
+using BanaData.Logic.Dialogs.Listers;
+using XamlUI.Dialogs;
 using XamlUI.Dialogs.Pickers;
+using XamlUI.Dialogs.Listers;
 
 namespace XamlUI
 {
@@ -112,9 +113,9 @@ namespace XamlUI
             // Our own dialogs
             //
             Window dialog;
-            if (logic is EditAccountsLogic editAccountsLogic)
+            if (logic is ListAccountsLogic listAccountsLogic)
             {
-                dialog = new EditAccounts(editAccountsLogic);
+                dialog = new ListAccounts(listAccountsLogic);
             }
             else if (logic is EditAccountLogic editAccountLogic)
             {
@@ -136,17 +137,17 @@ namespace XamlUI
             {
                 dialog = new PayeeListPicker(payeeListPickerLogic);
             }
-            else if (logic is EditCategoriesLogic editCategoriesLogic)
+            else if (logic is ListCategoriesLogic listCategoriesLogic)
             {
-                dialog = new EditCategories(editCategoriesLogic);
+                dialog = new ListCategories(listCategoriesLogic);
             }
             else if (logic is EditCategoryLogic editCategoryLogic)
             {
                 dialog = new EditCategory(editCategoryLogic);
             }
-            else if (logic is EditMemorizedPayeesLogic editMemorizedPayeesLogic)
+            else if (logic is ListMemorizedPayeesLogic listMemorizedPayeesLogic)
             {
-                dialog = new EditMemorizedPayees(editMemorizedPayeesLogic);
+                dialog = new ListMemorizedPayees(listMemorizedPayeesLogic);
             }
             else if (logic is EditMemorizedPayeeLogic editMemorizedPayeeLogic)
             {
@@ -156,17 +157,17 @@ namespace XamlUI
             {
                 dialog = new EditPersons(editPersonsLogic);
             }
-            else if (logic is EditSecuritiesLogic editSecuritiesLogic)
+            else if (logic is ListSecuritiesLogic listSecuritiesLogic)
             {
-                dialog = new EditSecurities(editSecuritiesLogic);
+                dialog = new ListSecurities(listSecuritiesLogic);
             }
             else if (logic is EditSecurityLogic editSecurityLogic)
             {
                 dialog = new EditSecurity(editSecurityLogic);
             }
-            else if (logic is EditTransactionReportsLogic editTransactionReportsLogic)
+            else if (logic is ListTransactionReportsLogic listTransactionReportsLogic)
             {
-                dialog = new EditTransactionReports(editTransactionReportsLogic);
+                dialog = new ListTransactionReports(listTransactionReportsLogic);
             }
             else if (logic is EditTransactionReportLogic editTransactionReportLogic)
             {

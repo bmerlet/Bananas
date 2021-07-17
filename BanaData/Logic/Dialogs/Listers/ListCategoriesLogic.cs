@@ -12,9 +12,9 @@ using BanaData.Logic.Main;
 using BanaData.Logic.Items;
 using BanaData.Database;
 
-namespace BanaData.Logic.Dialogs
+namespace BanaData.Logic.Dialogs.Listers
 {
-    public class EditCategoriesLogic : LogicBase
+    public class ListCategoriesLogic : LogicBase
     {
         #region Private members
 
@@ -24,7 +24,7 @@ namespace BanaData.Logic.Dialogs
 
         #region Constructor
 
-        public EditCategoriesLogic(MainWindowLogic _mainWindowLogic)
+        public ListCategoriesLogic(MainWindowLogic _mainWindowLogic)
         {
             mainWindowLogic = _mainWindowLogic;
             var household = mainWindowLogic.Household;
@@ -87,7 +87,7 @@ namespace BanaData.Logic.Dialogs
         }
 
         private bool showHidden = false;
-        public bool? ShowHidden 
+        public bool? ShowHidden
         {
             get => showHidden;
             set { showHidden = value == true; CategoriesSource.Refresh(); }
@@ -235,7 +235,7 @@ namespace BanaData.Logic.Dialogs
         {
             var household = mainWindowLogic.Household;
 
-            var parentRow = category.Parent ==  null ? null : household.Category.FindByID(category.Parent.ID);
+            var parentRow = category.Parent == null ? null : household.Category.FindByID(category.Parent.ID);
             var catRow = household.Category.Add(category.Name, category.Description, parentRow, category.IsIncome, category.TaxInfo);
 
             mainWindowLogic.CommitChanges();
@@ -271,7 +271,7 @@ namespace BanaData.Logic.Dialogs
         // Category item plus the in-use info
         public class EditCategoryItem
         {
-            public EditCategoryItem(CategoryItem categoryItem, bool isInUse) => 
+            public EditCategoryItem(CategoryItem categoryItem, bool isInUse) =>
                 (CategoryItem, IsInUse) = (categoryItem, isInUse);
 
             public CategoryItem CategoryItem { get; }

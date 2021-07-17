@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Data;
 
 using Toolbox.UILogic;
-using BanaData.Database;
 using BanaData.Logic.Main;
 using BanaData.Logic.Items;
+using BanaData.Database;
+using System.Collections.ObjectModel;
+using System.Windows.Data;
+using System.ComponentModel;
 
-namespace BanaData.Logic.Dialogs
+namespace BanaData.Logic.Dialogs.Listers
 {
-    public class EditAccountsLogic : LogicBase
+    public class ListAccountsLogic : LogicBase
     {
         #region Private members
 
@@ -24,7 +24,7 @@ namespace BanaData.Logic.Dialogs
 
         #region Constructor
 
-        public EditAccountsLogic(MainWindowLogic _mainWindowLogic)
+        public ListAccountsLogic(MainWindowLogic _mainWindowLogic)
         {
             mainWindowLogic = _mainWindowLogic;
 

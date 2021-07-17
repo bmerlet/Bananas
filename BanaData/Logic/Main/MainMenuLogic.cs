@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Toolbox.UILogic;
 using BanaData.Database;
 using BanaData.Logic.Dialogs;
+using BanaData.Logic.Dialogs.Listers;
 using BanaData.Web;
 
 namespace BanaData.Logic.Main
@@ -194,7 +195,7 @@ namespace BanaData.Logic.Main
 
         private void OnEditAccounts()
         {
-            var logic = new EditAccountsLogic(mainWindow);
+            var logic = new ListAccountsLogic(mainWindow);
             mainWindow.GuiServices.ShowDialog(logic);
         }
 
@@ -205,7 +206,7 @@ namespace BanaData.Logic.Main
 
         private void OnEditCategories()
         {
-            var logic = new EditCategoriesLogic(mainWindow);
+            var logic = new ListCategoriesLogic(mainWindow);
             mainWindow.GuiServices.ShowDialog(logic);
         }
 
@@ -227,7 +228,7 @@ namespace BanaData.Logic.Main
 
         private void OnEditMemorizedPayees()
         {
-            var logic = new EditMemorizedPayeesLogic(mainWindow);
+            var logic = new ListMemorizedPayeesLogic(mainWindow);
             mainWindow.GuiServices.ShowDialog(logic);
         }
 
@@ -238,7 +239,7 @@ namespace BanaData.Logic.Main
 
         private void OnEditSecurities()
         {
-            var logic = new EditSecuritiesLogic(mainWindow);
+            var logic = new ListSecuritiesLogic(mainWindow);
             mainWindow.GuiServices.ShowDialog(logic);
         }
 
@@ -249,7 +250,7 @@ namespace BanaData.Logic.Main
 
         private void OnEditTransactionReports()
         {
-            var logic = new EditTransactionReportsLogic(mainWindow);
+            var logic = new ListTransactionReportsLogic(mainWindow);
             mainWindow.GuiServices.ShowDialog(logic);
         }
 
