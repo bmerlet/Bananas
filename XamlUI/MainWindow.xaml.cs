@@ -37,8 +37,7 @@ namespace XamlUI
     /// </summary>
     public partial class MainWindow : Window, IGuiServices
     {
-        // Logic for this window
-        private readonly MainWindowLogic logic;
+        #region Constructor
 
         public MainWindow()
         {
@@ -46,10 +45,7 @@ namespace XamlUI
             InitializeComponent();
 
             // Create main window logic
-            logic = new MainWindowLogic(this);
-
-            // Init subcomponents
-            //accountGroup.Init(logic);
+            var logic = new MainWindowLogic(this);
 
             // Set window to location specified by logic (if initialized)
             if (logic.Width > 40 && logic.Height > 40)
@@ -58,8 +54,6 @@ namespace XamlUI
                 Top = logic.TopY;
                 Width = logic.Width;
                 Height = logic.Height;
-                //ZZZZ splitContainerMain.SplitterDistance = logic.SplitterX;
-                //ZZZZ accountGroup.UpdateSize();
             }
 
             // Logic is the data context
@@ -86,6 +80,8 @@ namespace XamlUI
                 logic.SaveIfDirty();
             };
         }
+
+        #endregion
 
         #region Gui services implementation
 
@@ -218,6 +214,10 @@ namespace XamlUI
             else if (logic is ShowRebalanceLogic showRebalanceLogic)
             {
                 dialog = new ShowRebalance(showRebalanceLogic);
+            }
+            else if (logic is TransactionReportLogic transactionReportLogic)
+            {
+                dialog = new TransactionReport(transactionReportLogic);
             }
             else if (logic is PasswordPromptLogic passwordPromptLogic)
             {

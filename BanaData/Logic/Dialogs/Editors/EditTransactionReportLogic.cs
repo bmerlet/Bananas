@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using BanaData.Collections;
 using BanaData.Database;
 using BanaData.Logic.Dialogs.Pickers;
+using BanaData.Logic.Dialogs.Reports;
 using BanaData.Logic.Items;
 using BanaData.Logic.Main;
 using Toolbox.UILogic;
@@ -256,32 +257,12 @@ namespace BanaData.Logic.Dialogs.Editors
 
         private void OnGenerateReport()
         {
+            var logic = new TransactionReportLogic(mainWindowLogic, BuildTransactionReportItemFromControls());
+            mainWindowLogic.GuiServices.ShowDialog(logic);
         }
 
-        protected override bool? Commit()
+        private TransactionReportItem BuildTransactionReportItemFromControls()
         {
-            if (string.IsNullOrWhiteSpace(Name))
-            {
-                mainWindowLogic.ErrorMessage("Report name cannot be blank");
-                return null;
-            }
-
-            foreach (Household.TransactionReportRow report in mainWindowLogic.Household.TransactionReport.Rows)
-            {
-                if (report != oldReportItem.TransactionReportRow && report.Name == Name)
-                {
-                    mainWindowLogic.ErrorMessage("There is already a report with this name");
-                    return null;
-                }
-            }
-
-            // Verify start date before end date
-            if (StartDate.CompareTo(EndDate) > 0)
-            {
-                mainWindowLogic.ErrorMessage("Start date must be earlier than end date");
-                return null;
-            }
-
             // Build the flags
             ETransactionReportFlag flags = localFlags;
 
@@ -316,10 +297,10 @@ namespace BanaData.Logic.Dialogs.Editors
             }
             if (isFilteringOnCategories)
             {
-                flags |= ETransactionReportFlag.IsFilteringOnCategories; 
+                flags |= ETransactionReportFlag.IsFilteringOnCategories;
             }
 
-            NewTransactionReportItem = new TransactionReportItem(
+            return new TransactionReportItem(
                 oldReportItem.TransactionReportRow,
                 Name,
                 Description,
@@ -329,13 +310,41 @@ namespace BanaData.Logic.Dialogs.Editors
                 accounts,
                 payees,
                 categories);
+        }
+
+        protected override bool? Commit()
+        {
+            if (string.IsNullOrWhiteSpace(Name))
+            {
+                mainWindowLogic.ErrorMessage("Report name cannot be blank");
+                return null;
+            }
+
+            foreach (Household.TransactionReportRow report in mainWindowLogic.Household.TransactionReport.Rows)
+            {
+                if (report != oldReportItem.TransactionReportRow && report.Name == Name)
+                {
+                    mainWindowLogic.ErrorMessage("There is already a report with this name");
+                    return null;
+                }
+            }
+
+            // Verify start date before end date
+            if (StartDate.CompareTo(EndDate) > 0)
+            {
+                mainWindowLogic.ErrorMessage("Start date must be earlier than end date");
+                return null;
+            }
+
+            // Build the new report descriptor
+            NewTransactionReportItem = BuildTransactionReportItemFromControls();
 
             bool change =
                 oldReportItem.Name != Name ||
                 oldReportItem.Description != Description ||
                 oldReportItem.StartDate != StartDate ||
                 oldReportItem.EndDate != EndDate ||
-                oldReportItem.Flags != flags ||
+                oldReportItem.Flags != NewTransactionReportItem.Flags ||
                 !oldReportItem.Accounts.SequenceEqual(accounts) ||
                 !oldReportItem.Payees.SequenceEqual(payees) ||
                 !oldReportItem.Categories.SequenceEqual(categories);

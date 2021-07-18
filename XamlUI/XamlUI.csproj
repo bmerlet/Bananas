@@ -139,6 +139,9 @@
     <Compile Include="Dialogs\Reports\ShowYearlyCGDivInt.xaml.cs">
       <DependentUpon>ShowYearlyCGDivInt.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\Reports\TransactionReport.xaml.cs">
+      <DependentUpon>TransactionReport.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tools\AmountToColorConverter.cs" />
     <Compile Include="Tools\AmountToStringConverter.cs" />
     <Compile Include="Tools\BindingProxy.cs" />
@@ -285,6 +288,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\Reports\ShowYearlyCGDivInt.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Reports\TransactionReport.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
