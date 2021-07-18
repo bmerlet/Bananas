@@ -94,6 +94,12 @@ namespace BanaData.Logic.Dialogs.Reports
             // Sort according to grouping
             TransactionsSource.Sort();
 
+            // Remove all the transactions if showing only subtotals
+            if (!transactionReportItem.IsShowingTransactions)
+            {
+                TransactionsSource.RemoveAll(tr => !tr.IsSubtotal);
+            }
+
             // Now build the columns
             var accountColumn = new ColumnItem(120, "Account", "AccountName", null);
             var payeeColumn = new ColumnItem(200, "Payee", "Payee", null);
@@ -122,7 +128,7 @@ namespace BanaData.Logic.Dialogs.Reports
                 }
                 if (transactionReportItem.IsShowingDateColumn)
                 {
-                    Columns.Add(new ColumnItem(80, "Date", "Date", "MM/dd/yyy"));
+                    Columns.Add(new ColumnItem(80, "Date", "Date", null, true));
                 }
                 if (transactionReportItem.IsShowingPayeeColumn && !transactionReportItem.IsGroupingByPayee)
                 {
@@ -137,7 +143,7 @@ namespace BanaData.Logic.Dialogs.Reports
                     Columns.Add(categoryColumn);
                 }
             }
-            Columns.Add(new ColumnItem(90, "Amount", "Amount", "N2"));
+            Columns.Add(new ColumnItem(90, "Amount", "Amount", "N2", true));
 
             // ZZZZ Grand total
 
@@ -153,8 +159,8 @@ namespace BanaData.Logic.Dialogs.Reports
 
         public class ColumnItem
         {
-            public ColumnItem(double width, string header, string propertyPath, string format) =>
-                (Width, Header, PropertyPath, Format) = (width, header, propertyPath, format);
+            public ColumnItem(double width, string header, string propertyPath, string format, bool rightAligned = false) =>
+                (Width, Header, PropertyPath, Format, RightAligned) = (width, header, propertyPath, format, rightAligned);
 
             public double Width { get; }
             public string Header { get; }
@@ -182,7 +188,7 @@ namespace BanaData.Logic.Dialogs.Reports
                 //(_transactionRow, _lineItemRows, _transactionReportItem);
 
                 AccountName = transactionRow.AccountRow.Name;
-                Date = transactionRow.Date;
+                Date = transactionRow.Date.ToString("MM/dd/yyyy");
                 Payee = transactionRow.IsPayeeNull() ? "" : transactionRow.Payee;
                 Memo = transactionRow.IsMemoNull() ? "" : transactionRow.Memo;
                 Category =
@@ -196,6 +202,7 @@ namespace BanaData.Logic.Dialogs.Reports
             public TransactionItem(string item, decimal subtotal, TransactionReportItem _transactionReportItem)
             {
                 transactionReportItem = _transactionReportItem;
+                item += " subtotal";
                 if (transactionReportItem.IsGroupingByAccount)
                 {
                     AccountName = item;
@@ -214,7 +221,7 @@ namespace BanaData.Logic.Dialogs.Reports
             }
 
             public string AccountName { get; }
-            public DateTime Date { get; }
+            public string Date { get; }
             public string Payee { get; }
             public string Memo { get; }
             public string Category { get; }

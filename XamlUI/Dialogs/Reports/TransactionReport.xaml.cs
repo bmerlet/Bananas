@@ -32,21 +32,45 @@ namespace XamlUI.Dialogs.Reports
 
         private void BuildListView(TransactionReportLogic logic)
         {
-            GridView gridView = new GridView();
-            gridView.AllowsColumnReorder = true;
-
-            foreach(var col in logic.Columns)
+            GridView gridView = new GridView
             {
-                var binding = new Binding(col.PropertyPath)
+                AllowsColumnReorder = true
+            };
+
+            foreach (var col in logic.Columns)
+            {
+                var textBinding = new Binding(col.PropertyPath)
                 {
-                    StringFormat = col.Format
+                    StringFormat = col.Format,
+                };
+
+                var fontweightBinding = new Binding("IsSubtotal")
+                {
+                    Converter = new Tools.FontWeightConverter()
+                };
+
+                FrameworkElementFactory textBlockFactory = new FrameworkElementFactory(typeof(TextBlock))
+                {
+                    Name = "myTextBlockFactory"
+                };
+
+                textBlockFactory.SetBinding(TextBlock.TextProperty, textBinding);
+                textBlockFactory.SetBinding(TextBlock.FontWeightProperty, fontweightBinding);
+                if (col.RightAligned)
+                {
+                    textBlockFactory.SetValue(TextBlock.TextAlignmentProperty, TextAlignment.Right);
+                }
+
+                var dataTemplate = new DataTemplate
+                {
+                    VisualTree = textBlockFactory
                 };
 
                 var gcv = new GridViewColumn
                 {
                     Width = col.Width,
                     Header = col.Header,
-                    DisplayMemberBinding = binding
+                    CellTemplate = dataTemplate
                 };
 
                 gridView.Columns.Add(gcv);
