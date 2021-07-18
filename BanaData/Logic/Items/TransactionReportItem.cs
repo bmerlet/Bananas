@@ -8,6 +8,9 @@ using BanaData.Logic.Main;
 
 namespace BanaData.Logic.Items
 {
+    /// <summary>
+    /// Transaction report item, as shown by the UI
+    /// </summary>
     public class TransactionReportItem
     {
         public TransactionReportItem(
@@ -16,24 +19,23 @@ namespace BanaData.Logic.Items
             string description,
             DateTime startDate,
             DateTime endDate,
-            bool isFilteringOnAccounts,
+            ETransactionReportFlag flags,
             IEnumerable<Household.AccountRow> accounts,
-            bool isFilteringOnPayees,
             IEnumerable<string> payees,
-            bool isFilteringOnCategories,
             IEnumerable<Household.CategoryRow> categories)
         {
-            (TransactionReportRow, Name, Description, StartDate, EndDate, IsFilteringOnAccounts, Accounts, IsFilteringOnPayees, Payees, IsFilteringOnCategories, Categories) =
-                (transactionReportRow, name, description, startDate, endDate, isFilteringOnAccounts, accounts, isFilteringOnPayees, payees, isFilteringOnCategories, categories);
+            (TransactionReportRow, Name, Description, StartDate, EndDate) = (transactionReportRow, name, description, startDate, endDate);
+            (Flags, Accounts, Payees, Categories) = (flags, accounts, payees, categories);
         }
 
         static public TransactionReportItem CreateEmpty()
         {
             return new TransactionReportItem(
                 null, "", "", DateTime.Today, DateTime.Today,
-                false, Enumerable.Empty<Household.AccountRow>(),
-                false, Enumerable.Empty<string>(),
-                false, Enumerable.Empty<Household.CategoryRow>());
+                ETransactionReportFlag.ShowTransactions,
+                Enumerable.Empty<Household.AccountRow>(),
+                Enumerable.Empty<string>(),
+                Enumerable.Empty<Household.CategoryRow>());
         }
 
         static public TransactionReportItem CreateFromDB(Household.TransactionReportRow transactionReportRow)
@@ -46,11 +48,9 @@ namespace BanaData.Logic.Items
                 description,
                 transactionReportRow.StartDate,
                 transactionReportRow.EndDate,
-                transactionReportRow.IsFilteringOnAccounts,
+                transactionReportRow.Flags,
                 transactionReportRow.GetTransactionReportAccountRows().Select(trar => trar.AccountRow),
-                transactionReportRow.IsFilteringOnPayees,
                 transactionReportRow.GetTransactionReportPayeeRows().Select(trpr => trpr.Payee),
-                transactionReportRow.IsFilteringOnCategories,
                 transactionReportRow.GetTransactionReportCategoryRows().Select(trcr => trcr.CategoryRow));
         }
 
@@ -61,11 +61,28 @@ namespace BanaData.Logic.Items
         public DateTime StartDate { get; }
         public DateTime EndDate { get; }
 
-        public bool IsFilteringOnAccounts { get; }
+        public ETransactionReportFlag Flags { get; }
+
+        public bool IsShowingTransactions => Flags.HasFlag(ETransactionReportFlag.ShowTransactions);
+        public bool IsShowingSubtotals => Flags.HasFlag(ETransactionReportFlag.ShowSubtotals);
+
+        public bool IsGroupingByAccount => Flags.HasFlag(ETransactionReportFlag.GroupByAccount);
+        public bool IsGroupingByPayee => Flags.HasFlag(ETransactionReportFlag.GroupByPayee);
+        public bool IsGroupingByCategory => Flags.HasFlag(ETransactionReportFlag.GroupByCategory);
+
+        public bool IsShowingAccountColumn => Flags.HasFlag(ETransactionReportFlag.ShowAccountColumn);
+        public bool IsShowingDateColumn => Flags.HasFlag(ETransactionReportFlag.ShowDateColumn);
+        public bool IsShowingPayeeColumn => Flags.HasFlag(ETransactionReportFlag.ShowPayeeColumn);
+        public bool IsShowingMemoColumn => Flags.HasFlag(ETransactionReportFlag.ShowMemoColumn);
+        public bool IsShowingCategoryColumn => Flags.HasFlag(ETransactionReportFlag.ShowCategoryColumn);
+
+        public bool IsFilteringOnAccounts => Flags.HasFlag(ETransactionReportFlag.IsFilteringOnAccounts);
         public IEnumerable<Household.AccountRow> Accounts { get; }
-        public bool IsFilteringOnPayees { get; }
+
+        public bool IsFilteringOnPayees => Flags.HasFlag(ETransactionReportFlag.IsFilteringOnPayees);
         public IEnumerable<string> Payees { get; }
-        public bool IsFilteringOnCategories { get; }
+
+        public bool IsFilteringOnCategories => Flags.HasFlag(ETransactionReportFlag.IsFilteringOnCategories);
         public IEnumerable<Household.CategoryRow> Categories { get; }
     }
 }

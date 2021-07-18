@@ -20,6 +20,7 @@
         <Style TargetType="w:DateBox" BasedOn="{StaticResource FormDateBox}"/>
         <Style TargetType="Button" BasedOn="{StaticResource FormButton}"/>
         <Style TargetType="CheckBox" BasedOn="{StaticResource FormCheckBox}"/>
+        <Style TargetType="ComboBox" BasedOn="{StaticResource FormComboBox}"/>
 
     </Window.Resources>
     <DockPanel>
@@ -51,8 +52,26 @@
             <w:DateBox Grid.Row="1" Grid.Column="3" Date="{Binding EndDate, Mode=TwoWay, StringFormat=MM/dd/yyyy}"/>
             <Button Grid.Column="5" Content="Generate report..." Command="{Binding GenerateReport}"/>
         </Grid>
+        
+        <!-- Organization panel -->
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <TextBlock Text="Group transactions by:"/>
+            <ComboBox ItemsSource="{Binding GroupSource}" SelectedItem="{Binding Group, Mode=TwoWay}" Width="120"/>
+            <TextBlock Text="and show:"/>
+            <ComboBox ItemsSource="{Binding ShowSource}" SelectedItem="{Binding Show, Mode=TwoWay}" Width="170"/>
+        </StackPanel>
 
-        <!-- Main panel: Accounts, categories, payees, columns -->
+        <!-- Columns panel -->
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" IsEnabled="{Binding IsColumnPanelEnabled}">
+            <TextBlock Text="Show columns:"/>
+            <CheckBox Content="Account" IsChecked="{Binding ShowAccountColumn}" IsEnabled="{Binding IsAccountColumnEnabled}"/>
+            <CheckBox Content="Date" IsChecked="{Binding ShowDateColumn}"/>
+            <CheckBox Content="Payee" IsChecked="{Binding ShowPayeeColumn}" IsEnabled="{Binding IsPayeeColumnEnabled}"/>
+            <CheckBox Content="Memo" IsChecked="{Binding ShowMemoColumn}"/>
+            <CheckBox Content="Category" IsChecked="{Binding ShowCategoryColumn}" IsEnabled="{Binding IsCategoryColumnEnabled}"/>
+        </StackPanel>
+
+        <!-- Main panel: Accounts, categories, payees -->
         <Grid>
             <Grid.Resources>
                 <Style TargetType="Border">
@@ -65,7 +84,6 @@
                 </Style>
             </Grid.Resources>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
@@ -103,14 +121,6 @@
             </Border>
             <Button Grid.Row="2" Grid.Column="2" Content="Pick categories..." Command="{Binding PickCategories}"/>
 
-            <!-- Columns -->
-            <TextBlock Grid.Column="3" Text="Columns:"/>
-            <Border Grid.Column="3" Grid.Row="1">
-                <ScrollViewer>
-                    <ItemsControl ItemsSource="{Binding ColumnsSource}" />
-                </ScrollViewer>
-            </Border>
-            <Button Grid.Row="2" Grid.Column="3" Content="Pick columns..." Command="{Binding PickColumns}"/>
         </Grid>
 
     </DockPanel>

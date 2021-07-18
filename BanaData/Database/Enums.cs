@@ -201,9 +201,21 @@ namespace BanaData.Database
     public enum ETransactionReportFlag
     {
         None = 0,
-        IsFilteringOnAccounts = 1,
-        IsFilteringOnPayees = 2,
-        IsFilteringOnCategories = 4,
-    }
+        IsFilteringOnAccounts = 0x1,
+        IsFilteringOnPayees = 0x2,
+        IsFilteringOnCategories = 0x4,
 
+        ShowTransactions = 0x10,
+        ShowSubtotals = 0x20,
+
+        GroupByAccount = 0x100,
+        GroupByPayee = 0x200,
+        GroupByCategory = 0x400,
+
+        ShowAccountColumn = 0x1000,
+        ShowDateColumn = 0x2000,
+        ShowPayeeColumn = 0x4000,
+        ShowMemoColumn = 0x8000,
+        ShowCategoryColumn = 0x10000
+    }
 }

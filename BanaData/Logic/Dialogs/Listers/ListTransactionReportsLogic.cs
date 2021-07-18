@@ -132,9 +132,7 @@ namespace BanaData.Logic.Dialogs.Listers
             }
             reportRow.StartDate = newReport.StartDate;
             reportRow.EndDate = newReport.EndDate;
-            reportRow.IsFilteringOnAccounts = newReport.IsFilteringOnAccounts;
-            reportRow.IsFilteringOnPayees = newReport.IsFilteringOnPayees;
-            reportRow.IsFilteringOnCategories = newReport.IsFilteringOnCategories;
+            reportRow.Flags = newReport.Flags;
 
             household.TransactionReport.AddTransactionReportRow(reportRow);
 
@@ -183,9 +181,7 @@ namespace BanaData.Logic.Dialogs.Listers
             }
             reportRow.StartDate = updatedReport.StartDate;
             reportRow.EndDate = updatedReport.EndDate;
-            reportRow.IsFilteringOnAccounts = updatedReport.IsFilteringOnAccounts;
-            reportRow.IsFilteringOnPayees = updatedReport.IsFilteringOnPayees;
-            reportRow.IsFilteringOnCategories = updatedReport.IsFilteringOnCategories;
+            reportRow.Flags = updatedReport.Flags;
 
             // Update existing report account rows
             foreach (var existingReportAccountRow in reportRow.GetTransactionReportAccountRows())
