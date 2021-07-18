@@ -39,6 +39,7 @@ namespace BanaData.Logic.Dialogs.Listers
 
             AddCommand = new CommandBase(OnAddReport);
             EditCommand = new CommandBase(OnEditReport);
+            CloneCommand = new CommandBase(OnCloneCommand);
             DeleteCommand = new CommandBase(OnDeleteReport);
         }
 
@@ -54,6 +55,7 @@ namespace BanaData.Logic.Dialogs.Listers
 
         public CommandBase AddCommand { get; }
         public CommandBase EditCommand { get; }
+        public CommandBase CloneCommand { get; }
         public CommandBase DeleteCommand { get; }
 
         #endregion
@@ -68,7 +70,7 @@ namespace BanaData.Logic.Dialogs.Listers
             var logic = new EditTransactionReportLogic(mainWindowLogic, report);
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
             {
-                // Get new account
+                // Get new report
                 var newReport = logic.NewTransactionReportItem;
 
                 // Commit change
@@ -90,7 +92,7 @@ namespace BanaData.Logic.Dialogs.Listers
                 var logic = new EditTransactionReportLogic(mainWindowLogic, SelectedReport);
                 if (mainWindowLogic.GuiServices.ShowDialog(logic))
                 {
-                    // Get modified account
+                    // Get modified report
                     var newReport = logic.NewTransactionReportItem;
 
                     // Commit change
@@ -98,6 +100,40 @@ namespace BanaData.Logic.Dialogs.Listers
 
                     // Update UI
                     reportsSource.Remove(SelectedReport);
+                    reportsSource.Add(newReport);
+                    SelectedReport = newReport;
+                    ReportToScrollTo = newReport;
+                    OnPropertyChanged(() => SelectedReport);
+                    OnPropertyChanged(() => ReportToScrollTo);
+                }
+            }
+        }
+
+        private void OnCloneCommand()
+        {
+            if (SelectedReport != null)
+            {
+                var clonedItem = new TransactionReportItem(
+                    null,
+                    "Clone of " + SelectedReport.Name,
+                    SelectedReport.Description,
+                    SelectedReport.StartDate,
+                    SelectedReport.EndDate,
+                    SelectedReport.Flags,
+                    SelectedReport.Accounts,
+                    SelectedReport.Payees,
+                    SelectedReport.Categories);
+
+                var logic = new EditTransactionReportLogic(mainWindowLogic, clonedItem);
+                if (mainWindowLogic.GuiServices.ShowDialog(logic))
+                {
+                    // Get modified report
+                    var newReport = logic.NewTransactionReportItem;
+
+                    // Commit change
+                    newReport = AddReportToDataSet(newReport);
+
+                    // Update UI
                     reportsSource.Add(newReport);
                     SelectedReport = newReport;
                     ReportToScrollTo = newReport;

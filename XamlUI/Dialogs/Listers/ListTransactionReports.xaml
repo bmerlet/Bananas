@@ -17,7 +17,24 @@
         <w:DonePanel DockPanel.Dock="Bottom"/>
 
         <!-- Add/Edit/Delete panel -->
-        <w:AddEditDeletePanel DockPanel.Dock="Bottom"/>
+        <Grid DockPanel.Dock="Bottom">
+            <Grid.Resources>
+                <Style TargetType="Button">
+                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                    <Setter Property="Margin" Value="3"/>
+                </Style>
+            </Grid.Resources>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Content="Add..." Command="{Binding AddCommand}"/>
+            <Button Grid.Column="1" Content="Edit..." Command="{Binding EditCommand}"/>
+            <Button Grid.Column="2" Content="Clone..." Command="{Binding CloneCommand}"/>
+            <Button Grid.Column="3" Content="Delete" Command="{Binding DeleteCommand}"/>
+        </Grid>
 
         <!-- Main panel: Listview of accounts -->
         <ListView

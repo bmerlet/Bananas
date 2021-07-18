@@ -25,7 +25,7 @@ namespace BanaData.Logic.Items
             IEnumerable<Household.CategoryRow> categories)
         {
             (TransactionReportRow, Name, Description, StartDate, EndDate) = (transactionReportRow, name, description, startDate, endDate);
-            (Flags, Accounts, Payees, Categories) = (flags, accounts, payees, categories);
+            (Flags, Accounts, Payees, Categories) = (flags, accounts.ToArray(), payees.ToArray(), categories.ToArray());
         }
 
         static public TransactionReportItem CreateEmpty()

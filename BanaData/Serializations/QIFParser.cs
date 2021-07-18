@@ -2059,12 +2059,10 @@ namespace BanaData.Serializations
                     reconcileInfoRow.IsInterestDateNull() ? null : reconcileInfoRow.InterestDate as DateTime?,
                     reconcileInfoRow.IsInterestCategoryIDNull() ? null : reconcileInfoRow.CategoryRow.FullName);
 
-                foreach (var securityReconcileInfoRow in reconcileInfoRow.GetSecurityReconcileInfoRows())
-                {
-                    reconcileInfo.SecurityReconcileInfos.Add(
-                        new SupplementalInfo.ReconcileInfo.SecurityReconcileInfo(
-                            securityReconcileInfoRow.SecurityRow.Name, securityReconcileInfoRow.SecurityQuantity));
-                }
+                reconcileInfo.SecurityReconcileInfos.AddRange(
+                    reconcileInfoRow.GetSecurityReconcileInfoRows()
+                    .Select(srir => new SupplementalInfo.ReconcileInfo.SecurityReconcileInfo(
+                            srir.SecurityRow.Name, srir.SecurityQuantity)));
 
                 supplementalInfo.ReconcileInfos.Add(reconcileInfo);
             }
@@ -2075,6 +2073,23 @@ namespace BanaData.Serializations
                 supplementalInfo.RebalanceTargets.Add(
                     new SupplementalInfo.RebalanceTarget(
                         rebalanceTargetRow.AccountRow.Name, rebalanceTargetRow.SecurityRow.Name, rebalanceTargetRow.Target));
+            }
+
+            // TransactionReport table and related info
+            foreach (Household.TransactionReportRow transactionReportRow in household.TransactionReport)
+            {
+                var transactionReport = new SupplementalInfo.TransactionReport(
+                    transactionReportRow.Name,
+                    transactionReportRow.IsDescriptionNull() ? null : transactionReportRow.Description,
+                    transactionReportRow.StartDate,
+                    transactionReportRow.EndDate,
+                    transactionReportRow.Flags);
+
+                transactionReport.Accounts.AddRange(transactionReportRow.GetTransactionReportAccountRows().Select(a => a.AccountRow.Name));
+                transactionReport.Payees.AddRange(transactionReportRow.GetTransactionReportPayeeRows().Select(p => p.Payee));
+                transactionReport.Categories.AddRange(transactionReportRow.GetTransactionReportCategoryRows().Select(c => c.CategoryRow.Name));
+
+                supplementalInfo.TransactionReports.Add(transactionReport);
             }
 
             return supplementalInfo;
@@ -2170,6 +2185,52 @@ namespace BanaData.Serializations
                 }
             }
 
+            // Transaction reports
+            foreach(var transactionReport in supplementalInfo.TransactionReports)
+            {
+                var transactionReportRow = household.TransactionReport.NewTransactionReportRow();
+                transactionReportRow.Name = transactionReport.Name;
+                if (transactionReport.Description != null)
+                {
+                    transactionReportRow.Description = transactionReport.Description;
+                }
+                transactionReportRow.StartDate = transactionReport.StartDate;
+                transactionReportRow.EndDate = transactionReport.EndDate;
+                transactionReportRow.Flags = transactionReport.Flags;
+                household.TransactionReport.AddTransactionReportRow(transactionReportRow);
+
+                foreach(var accountName in transactionReport.Accounts)
+                {
+                    var accountRow = household.Account.GetByName(accountName);
+                    if (accountRow != null)
+                    {
+                        var transactionReportAccountRow = household.TransactionReportAccount.NewTransactionReportAccountRow();
+                        transactionReportAccountRow.TransactionReportID = transactionReportRow.ID;
+                        transactionReportAccountRow.AccountID = accountRow.ID;
+                        household.TransactionReportAccount.AddTransactionReportAccountRow(transactionReportAccountRow);
+                    }
+                }
+
+                foreach (var payeeName in transactionReport.Payees)
+                {
+                    var transactionReportPayeeRow = household.TransactionReportPayee.NewTransactionReportPayeeRow();
+                    transactionReportPayeeRow.TransactionReportID = transactionReportRow.ID;
+                    transactionReportPayeeRow.Payee = payeeName;
+                    household.TransactionReportPayee.AddTransactionReportPayeeRow(transactionReportPayeeRow);
+                }
+
+                foreach (var categoryFullName in transactionReport.Categories)
+                {
+                    var categoryRow = household.Category.GetByFullName(categoryFullName);
+                    if (categoryRow != null)
+                    {
+                        var transactionReportCategoryRow = household.TransactionReportCategory.NewTransactionReportCategoryRow();
+                        transactionReportCategoryRow.TransactionReportID = transactionReportRow.ID;
+                        transactionReportCategoryRow.CategoryID = categoryRow.ID;
+                        household.TransactionReportCategory.AddTransactionReportCategoryRow(transactionReportCategoryRow);
+                    }
+                }
+            }
         }
 
         private class SupplementalInfo
@@ -2224,6 +2285,24 @@ namespace BanaData.Serializations
                 public readonly string AccountName;
                 public readonly string SecurityName;
                 public readonly decimal Target;
+            }
+
+            // Transaction reports
+            public readonly List<TransactionReport> TransactionReports = new List<TransactionReport>();
+            public class TransactionReport
+            {
+                public TransactionReport(string name, string description, DateTime startDate, DateTime endDate, ETransactionReportFlag flags) =>
+                    (Name, Description, StartDate, EndDate, Flags) = (name, description, startDate, endDate, flags);
+
+                public readonly string Name;
+                public readonly string Description;
+                public readonly DateTime StartDate;
+                public readonly DateTime EndDate;
+                public readonly ETransactionReportFlag Flags;
+
+                public readonly List<string> Accounts = new List<string>();
+                public readonly List<string> Payees = new List<string>();
+                public readonly List<string> Categories = new List<string>();
             }
         }
 
