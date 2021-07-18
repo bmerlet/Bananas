@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
 
 using Toolbox.UILogic;
 using BanaData.Database;
-using BanaData.Logic.Dialogs;
 using BanaData.Logic.Dialogs.Basics;
 using BanaData.Logic.Dialogs.Editors;
 using BanaData.Logic.Dialogs.Listers;
 using BanaData.Logic.Dialogs.Reports;
 using BanaData.Web;
+using BanaData.Logic.Items;
+using BanaData.Collections;
 
 namespace BanaData.Logic.Main
 {
@@ -56,6 +59,10 @@ namespace BanaData.Logic.Main
             ShowHoldings.SetCanExecute(false);
             ShowRebalance = new CommandBase(OnShowRebalance);
             ShowRebalance.SetCanExecute(false);
+
+            TransactionReportsSource = (CollectionView)CollectionViewSource.GetDefaultView(transactionReports);
+            TransactionReportsSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
+            UpdateTransactionReports();
         }
 
         #endregion
@@ -255,6 +262,7 @@ namespace BanaData.Logic.Main
         {
             var logic = new ListTransactionReportsLogic(mainWindow);
             mainWindow.GuiServices.ShowDialog(logic);
+            UpdateTransactionReports();
         }
 
         #endregion
@@ -372,6 +380,48 @@ namespace BanaData.Logic.Main
         {
             get => mainWindow.UserSettings.PlayKaChingSound;
             set { mainWindow.UserSettings.PlayKaChingSound = value; mainWindow.SaveUserSettings(); }
+        }
+
+        //
+        // Transaction reports
+        //
+
+        private readonly WpfObservableRangeCollection<TransactionReportMenuItem> transactionReports = new WpfObservableRangeCollection<TransactionReportMenuItem>();
+        public CollectionView TransactionReportsSource { get; }
+
+        public void UpdateTransactionReports()
+        {
+            transactionReports.ReplaceRange(
+                mainWindow.Household.TransactionReport.Rows
+                .Cast<Household.TransactionReportRow>()
+                .Select(tr => TransactionReportItem.CreateFromDB(tr))
+                .Select(tr => new TransactionReportMenuItem(mainWindow, tr)));
+        }
+
+        public class TransactionReportMenuItem : LogicBase
+        {
+            public TransactionReportMenuItem(MainWindowLogic mainWindowLogic, TransactionReportItem transactionReportItem)
+            {
+                TransactionReportItem = transactionReportItem;
+                GenerateReport = new CommandBase(arg =>
+                {
+                    mainWindowLogic.GuiServices.ShowDialog(new TransactionReportLogic(mainWindowLogic, arg as TransactionReportItem));
+                });
+            }
+
+            public string Name => TransactionReportItem.Name;
+            public CommandBase GenerateReport { get; }
+            public TransactionReportItem TransactionReportItem { get; }
+
+            public override bool Equals(object obj)
+            {
+                return obj is TransactionReportMenuItem o && o.Name == Name;
+            }
+
+            public override int GetHashCode()
+            {
+                return base.GetHashCode();
+            }
         }
 
         //

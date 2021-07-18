@@ -411,6 +411,9 @@ namespace BanaData.Logic.Main
 
             // Compute the known securities
             BuildSecuritiesList();
+
+            // Update transaction reports in menu
+            MainMenuLogic.UpdateTransactionReports();
         }
 
         // Action after securities are changed
