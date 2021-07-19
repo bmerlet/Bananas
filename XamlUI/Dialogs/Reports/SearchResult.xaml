@@ -9,15 +9,12 @@
         mc:Ignorable="d"
         Title="Search results"
         Icon="/XamlUI;component/Images/Bananas.ico"
-        ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
+        Width="800" Height="340"
         SizeToContent="WidthAndHeight">
     <DockPanel>
 
-        <!-- Done panel -->
-        <ucs:DonePanel DockPanel.Dock="Bottom"/>
-
-        <!-- Other search -->
+        <!-- Controls search -->
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Right">
             <w:WatermarkTextBox x:Name="searchTextBox" Style="{StaticResource FormWatermarkTextBox}" 
                                 Watermark="Search text" Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="80">
@@ -26,22 +23,23 @@
                             Command="{Binding Search, UpdateSourceTrigger=PropertyChanged}"
                             CommandParameter="{Binding ElementName=searchTextBox, Path=Text}"/>
                 </TextBox.InputBindings>
-
             </w:WatermarkTextBox>
-            <Button Style="{StaticResource FormButton}" Content="Search" Width="60"
+
+            <Button Style="{StaticResource FormButton}" Content="Search" Width="75"
                     Command="{Binding Search}" CommandParameter="{Binding ElementName=searchTextBox, Path=Text}"/>
+            <Button Style="{StaticResource FormButton}" Content="Print..." Width="75" Click="OnPrintClick"/>
+            <Button Style="{StaticResource FormButton}" Content="Close" Width="75" IsCancel="True"/>
         </StackPanel>
 
         <!-- Main panel -->
         <ListView
-            Width="760" Height="300"
             SelectionMode="Single"
             MouseDoubleClick="OnListViewMouseDoubleClick"
             ItemsSource="{Binding FoundItemsSource}">
 
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Account" Width="100" DisplayMemberBinding="{Binding Account}"/>
+                    <GridViewColumn Header="Account" Width="140" DisplayMemberBinding="{Binding Account}"/>
                     <GridViewColumn Header="Date" Width="80" DisplayMemberBinding="{Binding Date, StringFormat=MM/dd/yyyy}"/>
                     <GridViewColumn Header="Payee" Width="180" DisplayMemberBinding="{Binding Payee}"/>
                     <GridViewColumn Header="Memo" Width="180" DisplayMemberBinding="{Binding Memo}"/>
