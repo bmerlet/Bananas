@@ -15,8 +15,14 @@ namespace BanaData.Logic.Dialogs.Reports
 {
     public class TransactionReportLogic : LogicBase
     {
+        #region Private members
+
         private readonly MainWindowLogic mainWindowLogic;
         private readonly TransactionReportItem transactionReportItem;
+
+        #endregion
+
+        #region Constructor
 
         public TransactionReportLogic(MainWindowLogic _mainWindowLogic, TransactionReportItem _transactionReportItem)
         {
@@ -149,11 +155,21 @@ namespace BanaData.Logic.Dialogs.Reports
 
         }
 
+        #endregion
+
+        #region UI properties
+
         public string Title => transactionReportItem.Name;
 
         public List<TransactionItem> TransactionsSource { get; } = new List<TransactionItem>();
 
         public ObservableCollection<ColumnItem> Columns { get; } = new ObservableCollection<ColumnItem>();
+
+        #endregion
+
+        #region Actions
+
+        #endregion
 
         #region Class describing a column
 

@@ -16,8 +16,16 @@
     <DockPanel>
 
         <!-- Done panel -->
-        <ucs:DonePanel DockPanel.Dock="Bottom"/>
+        <!--
+        <StackPanel DockPanel.Dock="Top" HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="0,5" >
+            <Button Width="75" Content="Edit..." Margin="0,0,10,0" Command="{Binding Edit}" Visibility.../>
+            <Button Width="75" Content="Print..." Margin="0,0,10,0" Click="OnPrint"/>
+            <Button Style="{StaticResource DoneButton}" Content="Close"/>
+        </StackPanel>
+        -->
 
+        <ucs:DonePanel DockPanel.Dock="Bottom"/>
+        
         <!-- Main listview -->
         <ListView 
             x:Name="listView"
