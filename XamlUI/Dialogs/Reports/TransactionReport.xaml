@@ -16,16 +16,17 @@
     <DockPanel>
 
         <!-- Done panel -->
-        <!--
         <StackPanel DockPanel.Dock="Top" HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="0,5" >
-            <Button Width="75" Content="Edit..." Margin="0,0,10,0" Command="{Binding Edit}" Visibility.../>
-            <Button Width="75" Content="Print..." Margin="0,0,10,0" Click="OnPrint"/>
-            <Button Style="{StaticResource DoneButton}" Content="Close"/>
+            <StackPanel.Resources>
+                <Style TargetType="Button" BasedOn="{StaticResource FormButton}">
+                    <Setter Property="Width" Value="75"/>
+                </Style>
+            </StackPanel.Resources>
+            <Button Content="Edit..." Command="{Binding Edit}" Visibility="{Binding IsEditVisible, Converter={StaticResource visibilityBoolConverter}}"/>
+            <Button Content="Print..." Click="OnPrint"/>
+            <Button Content="Close" IsCancel="True"/>
         </StackPanel>
-        -->
 
-        <ucs:DonePanel DockPanel.Dock="Bottom"/>
-        
         <!-- Main listview -->
         <ListView 
             x:Name="listView"

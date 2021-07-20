@@ -145,6 +145,7 @@
     </Compile>
     <Compile Include="Tools\AmountToColorConverter.cs" />
     <Compile Include="Tools\AmountToStringConverter.cs" />
+    <Compile Include="Tools\BindingEvaluator.cs" />
     <Compile Include="Tools\BindingProxy.cs" />
     <Compile Include="Tools\DataGridLengthConverter.cs" />
     <Compile Include="Tools\FocusAttachedProperty.cs" />

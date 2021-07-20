@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using BanaData.Logic.Dialogs.Reports;
+using XamlUI.Tools;
 
 namespace XamlUI.Dialogs.Reports
 {
@@ -77,6 +78,38 @@ namespace XamlUI.Dialogs.Reports
             }
 
             listView.View = gridView;
+        }
+
+        private void OnPrint(object sender, RoutedEventArgs e)
+        {
+            var logic = DataContext as TransactionReportLogic;
+
+            // Create the print helper
+            var ph = new PrintHelper
+            {
+                Title = $"Transaction report: '{logic.Title}'"
+            };
+
+            // Create the columns
+            foreach (var col in logic.Columns)
+            {
+                ph.AddColumn(col.Header, col.Width);
+            }
+
+            // Create the data
+            foreach (TransactionReportLogic.TransactionItem item in logic.TransactionsSource)
+            {
+                var cells = new List<PrintHelper.Cell>();
+                foreach(var col in logic.Columns)
+                {
+                    var text = BindingEvaluator.GetValue(item, col.PropertyPath) as string;
+                    cells.Add(new PrintHelper.Cell(text, col.RightAligned ? TextAlignment.Right : TextAlignment.Left));
+                }
+                ph.AddRow(cells);
+            }
+
+            // Print
+            ph.Print();
         }
     }
 }
