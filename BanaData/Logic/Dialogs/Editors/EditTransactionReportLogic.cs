@@ -257,7 +257,7 @@ namespace BanaData.Logic.Dialogs.Editors
 
         private void OnGenerateReport()
         {
-            var logic = new TransactionReportLogic(mainWindowLogic, BuildTransactionReportItemFromControls());
+            var logic = new TransactionReportLogic(mainWindowLogic, BuildTransactionReportItemFromControls(), false);
             mainWindowLogic.GuiServices.ShowDialog(logic);
         }
 

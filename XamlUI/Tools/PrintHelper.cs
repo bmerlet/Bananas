@@ -44,6 +44,7 @@ namespace XamlUI.Tools
             public string Text { get; }
             public TextAlignment TextAlignemnt { get; }
             public Color Color { get; set; } = Colors.Black;
+            public FontWeight FontWeight { get; set; } = FontWeights.Normal; 
         }
 
         public void Print()
@@ -79,7 +80,7 @@ namespace XamlUI.Tools
                 var tableRow = new TableRow();
                 foreach (var cell in row)
                 {
-                    var tableCell = new TableCell(new Paragraph(new Run(cell.Text)))
+                    var tableCell = new TableCell(new Paragraph(new Run(cell.Text)) {FontWeight=cell.FontWeight })
                     {
                         TextAlignment = cell.TextAlignemnt
                     };
@@ -96,6 +97,7 @@ namespace XamlUI.Tools
             {
                 table.Columns.Add(new TableColumn() { Width = new GridLength(col.Item2) });
             }
+            double totalWidth = columns.Sum(t => t.Item2);
 
             // Add the row groups
             table.RowGroups.Add(titleRowGroup);
@@ -112,7 +114,7 @@ namespace XamlUI.Tools
             var printDialog = new PrintDialog();
             if (printDialog.ShowDialog() == true)
             {
-                if (Landscape)
+                if (Landscape || totalWidth > printDialog.PrintableAreaWidth - 100)
                 {
                     printDialog.PrintTicket.PageOrientation = System.Printing.PageOrientation.Landscape;
                 }

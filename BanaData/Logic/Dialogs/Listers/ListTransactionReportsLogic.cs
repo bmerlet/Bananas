@@ -25,13 +25,18 @@ namespace BanaData.Logic.Dialogs.Listers
 
         #region Constructor
 
-        public ListTransactionReportsLogic(MainWindowLogic _mainWindowLogic)
+        public ListTransactionReportsLogic(MainWindowLogic _mainWindowLogic, TransactionReportItem initialItem)
         {
             mainWindowLogic = _mainWindowLogic;
 
             foreach (Household.TransactionReportRow reportRow in mainWindowLogic.Household.TransactionReport.Rows)
             {
                 reportsSource.Add(TransactionReportItem.CreateFromDB(reportRow));
+            }
+
+            if (initialItem != null)
+            {
+                SelectedReport = reportsSource.FirstOrDefault(tri => tri.Name == initialItem.Name);
             }
 
             ReportsSource = (CollectionView)CollectionViewSource.GetDefaultView(reportsSource);

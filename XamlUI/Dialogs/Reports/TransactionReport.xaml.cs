@@ -26,6 +26,9 @@ namespace XamlUI.Dialogs.Reports
             // Use the view model as data context
             this.DataContext = logic;
 
+            // Tell the view model how to close this dialog
+            logic.CloseView = result => DialogResult = result;
+
             InitializeComponent();
 
             BuildListView(logic);
@@ -45,7 +48,7 @@ namespace XamlUI.Dialogs.Reports
                     StringFormat = col.Format,
                 };
 
-                var fontweightBinding = new Binding("IsSubtotal")
+                var fontweightBinding = new Binding("IsBold")
                 {
                     Converter = new Tools.FontWeightConverter()
                 };
@@ -93,7 +96,7 @@ namespace XamlUI.Dialogs.Reports
             // Create the columns
             foreach (var col in logic.Columns)
             {
-                ph.AddColumn(col.Header, col.Width);
+                ph.AddColumn(col.Header, col.PrintWidth);
             }
 
             // Create the data
@@ -103,7 +106,11 @@ namespace XamlUI.Dialogs.Reports
                 foreach(var col in logic.Columns)
                 {
                     var text = BindingEvaluator.GetValue(item, col.PropertyPath) as string;
-                    cells.Add(new PrintHelper.Cell(text, col.RightAligned ? TextAlignment.Right : TextAlignment.Left));
+                    var cell = new PrintHelper.Cell(text, col.RightAligned ? TextAlignment.Right : TextAlignment.Left)
+                    {
+                        FontWeight = item.IsBold ? FontWeights.Bold : FontWeights.Normal
+                    };
+                    cells.Add(cell);
                 }
                 ph.AddRow(cells);
             }

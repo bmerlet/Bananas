@@ -258,9 +258,9 @@ namespace BanaData.Logic.Main
         //
         public CommandBase EditTransactionReports { get; }
 
-        private void OnEditTransactionReports()
+        private void OnEditTransactionReports(object arg)
         {
-            var logic = new ListTransactionReportsLogic(mainWindow);
+            var logic = new ListTransactionReportsLogic(mainWindow, arg as TransactionReportItem);
             mainWindow.GuiServices.ShowDialog(logic);
             UpdateTransactionReports();
         }
@@ -405,7 +405,7 @@ namespace BanaData.Logic.Main
                 TransactionReportItem = transactionReportItem;
                 GenerateReport = new CommandBase(arg =>
                 {
-                    mainWindowLogic.GuiServices.ShowDialog(new TransactionReportLogic(mainWindowLogic, arg as TransactionReportItem));
+                    mainWindowLogic.GuiServices.ShowDialog(new TransactionReportLogic(mainWindowLogic, arg as TransactionReportItem, true));
                 });
             }
 

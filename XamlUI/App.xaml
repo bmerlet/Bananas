@@ -18,6 +18,7 @@
         <t:AmountToColorConverter x:Key="amountToColorConverter"/>
         <t:ReconcileAmountMultiConverter x:Key="reconcileAmountMultiConverter"/>
         <t:PercentTostringConverter x:Key="percentTostringConverter"/>
+        <t:GridLengthConverter x:Key="gridLengthConverter"/>
 
 
         <!-- Default for amount box -->

@@ -10,23 +10,29 @@ using BanaData.Database;
 using BanaData.Logic.Items;
 using BanaData.Logic.Main;
 using Toolbox.UILogic;
+using Toolbox.UILogic.Dialogs;
 
 namespace BanaData.Logic.Dialogs.Reports
 {
-    public class TransactionReportLogic : LogicBase
+    public class TransactionReportLogic : LogicDialogBase
     {
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
         private readonly TransactionReportItem transactionReportItem;
+        private ETransactionReportFlag localFlags;
 
         #endregion
 
         #region Constructor
 
-        public TransactionReportLogic(MainWindowLogic _mainWindowLogic, TransactionReportItem _transactionReportItem)
+        public TransactionReportLogic(MainWindowLogic _mainWindowLogic, TransactionReportItem _transactionReportItem, bool fromMainMenu)
         {
-            (mainWindowLogic, transactionReportItem) = (_mainWindowLogic, _transactionReportItem);
+            (mainWindowLogic, transactionReportItem, IsEditVisible) = (_mainWindowLogic, _transactionReportItem, fromMainMenu);
+
+            localFlags = transactionReportItem.Flags;
+
+            Edit = new CommandBase(OnEdit);
 
             // Look for the transactions selected by this report
             var household = mainWindowLogic.Household;
@@ -65,51 +71,52 @@ namespace BanaData.Logic.Dialogs.Reports
                 }
 
                 // This transaction passes all the checks!
-                TransactionsSource.Add(new TransactionItem(transactionRow, lineItemRows, transactionReportItem));
+                transactions.Add(new TransactionItem(transactionRow, lineItemRows, transactionReportItem));
             }
+
+            // Compute grand total
+            decimal grandTotal = transactions.Sum(ti => ti.Amount);
 
             // Build subtotals
-            if (transactionReportItem.IsShowingSubtotals)
+            if (transactionReportItem.IsGroupingByAccount)
             {
-                if (transactionReportItem.IsGroupingByAccount)
+                foreach(string accountName in transactions.Select(tr => tr.AccountName).Distinct().ToArray())
                 {
-                    foreach(string accountName in TransactionsSource.Select(tr => tr.AccountName).Distinct().ToArray())
-                    {
-                        decimal subtotal = TransactionsSource.Where(tr => tr.AccountName == accountName).Sum(tr => tr.Amount);
-                        TransactionsSource.Add(new TransactionItem(accountName, subtotal, transactionReportItem));
-                    }
-                }
-                else if (transactionReportItem.IsGroupingByPayee)
-                {
-                    foreach (string payee in TransactionsSource.Select(tr => tr.Payee).Distinct().ToArray())
-                    {
-                        decimal subtotal = TransactionsSource.Where(tr => tr.Payee == payee).Sum(tr => tr.Amount);
-                        TransactionsSource.Add(new TransactionItem(payee, subtotal, transactionReportItem));
-                    }
-                }
-                else if (transactionReportItem.IsGroupingByCategory)
-                {
-                    foreach (string category in TransactionsSource.Select(tr => tr.Category).Distinct().ToArray())
-                    {
-                        decimal subtotal = TransactionsSource.Where(tr => tr.Category == category).Sum(tr => tr.Amount);
-                        TransactionsSource.Add(new TransactionItem(category, subtotal, transactionReportItem));
-                    }
+                    decimal subtotal = transactions.Where(tr => tr.AccountName == accountName).Sum(tr => tr.Amount);
+                    transactions.Add(new TransactionItem(accountName, subtotal, transactionReportItem));
                 }
             }
+            else if (transactionReportItem.IsGroupingByPayee)
+            {
+                foreach (string payee in transactions.Select(tr => tr.Payee).Distinct().ToArray())
+                {
+                    decimal subtotal = transactions.Where(tr => tr.Payee == payee).Sum(tr => tr.Amount);
+                    transactions.Add(new TransactionItem(payee, subtotal, transactionReportItem));
+                }
+            }
+            else if (transactionReportItem.IsGroupingByCategory)
+            {
+                foreach (string category in transactions.Select(tr => tr.Category).Distinct().ToArray())
+                {
+                    decimal subtotal = transactions.Where(tr => tr.Category == category).Sum(tr => tr.Amount);
+                    transactions.Add(new TransactionItem(category, subtotal, transactionReportItem));
+                }
+            }
+
+            // Build grand total
+            transactions.Add(new TransactionItem(grandTotal, transactionReportItem));
 
             // Sort according to grouping
-            TransactionsSource.Sort();
+            transactions.Sort();
 
-            // Remove all the transactions if showing only subtotals
-            if (!transactionReportItem.IsShowingTransactions)
-            {
-                TransactionsSource.RemoveAll(tr => !tr.IsSubtotal);
-            }
+            // Give its view to the UI
+            TransactionsSource = (CollectionView)CollectionViewSource.GetDefaultView(transactions);
+            TransactionsSource.Filter = TransactionsSourceFilter;
 
             // Now build the columns
-            var accountColumn = new ColumnItem(120, "Account", "AccountName", null);
-            var payeeColumn = new ColumnItem(200, "Payee", "Payee", null);
-            var categoryColumn = new ColumnItem(120, "Category", "Category", null);
+            var accountColumn = new ColumnItem(120, 145, "Account", "AccountName", null);
+            var payeeColumn = new ColumnItem(200, 145, "Payee", "Payee", null);
+            var categoryColumn = new ColumnItem(120, 145, "Category", "Category", null);
 
             // First column is the "group by" column
             if (transactionReportItem.IsGroupingByAccount)
@@ -134,7 +141,7 @@ namespace BanaData.Logic.Dialogs.Reports
                 }
                 if (transactionReportItem.IsShowingDateColumn)
                 {
-                    Columns.Add(new ColumnItem(80, "Date", "Date", null, true));
+                    Columns.Add(new ColumnItem(80, 66, "Date", "Date", null, true));
                 }
                 if (transactionReportItem.IsShowingPayeeColumn && !transactionReportItem.IsGroupingByPayee)
                 {
@@ -142,17 +149,15 @@ namespace BanaData.Logic.Dialogs.Reports
                 }
                 if (transactionReportItem.IsShowingMemoColumn)
                 {
-                    Columns.Add(new ColumnItem(200, "Memo", "Memo", null));
+                    Columns.Add(new ColumnItem(200, 145, "Memo", "Memo", null));
                 }
                 if (transactionReportItem.IsShowingCategoryColumn && !transactionReportItem.IsGroupingByCategory)
                 {
                     Columns.Add(categoryColumn);
                 }
             }
-            Columns.Add(new ColumnItem(90, "Amount", "Amount", "N2", true));
 
-            // ZZZZ Grand total
-
+            Columns.Add(new ColumnItem(90, 60, "Amount", "Amount", "N2", true));
         }
 
         #endregion
@@ -161,7 +166,11 @@ namespace BanaData.Logic.Dialogs.Reports
 
         public string Title => transactionReportItem.Name;
 
-        public List<TransactionItem> TransactionsSource { get; } = new List<TransactionItem>();
+        public CommandBase Edit { get; }
+        public bool IsEditVisible { get; }
+
+        private readonly List<TransactionItem> transactions = new List<TransactionItem>();
+        public CollectionView TransactionsSource { get; }
 
         public ObservableCollection<ColumnItem> Columns { get; } = new ObservableCollection<ColumnItem>();
 
@@ -169,16 +178,47 @@ namespace BanaData.Logic.Dialogs.Reports
 
         #region Actions
 
+        private void OnEdit()
+        {
+            // Close this view
+            CloseView.Invoke(false);
+
+            // Invoke edit of this transaction item through main menu
+            mainWindowLogic.MainMenuLogic.EditTransactionReports.Execute(transactionReportItem);
+        }
+
+        // Show transactions and/or subtotals depending on local settings
+        private bool TransactionsSourceFilter(object obj)
+        {
+            bool result = false;
+
+            if (obj is TransactionItem item)
+            {
+                result =
+                    localFlags.HasFlag(ETransactionReportFlag.ShowTransactions) && !item.IsSubtotal ||
+                    localFlags.HasFlag(ETransactionReportFlag.ShowSubtotals) && item.IsSubtotal;
+            }
+
+            return result;
+        }
+
+        // Not used, present so that we can use CloseView()
+        protected override bool? Commit()
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
         #region Class describing a column
 
         public class ColumnItem
         {
-            public ColumnItem(double width, string header, string propertyPath, string format, bool rightAligned = false) =>
-                (Width, Header, PropertyPath, Format, RightAligned) = (width, header, propertyPath, format, rightAligned);
+            public ColumnItem(double width, double printWidth, string header, string propertyPath, string format, bool rightAligned = false) =>
+                (Width, PrintWidth, Header, PropertyPath, Format, RightAligned) = (width, printWidth, header, propertyPath, format, rightAligned);
 
             public double Width { get; }
+            public double PrintWidth { get; }
             public string Header { get; }
             public string PropertyPath { get; }
             public string Format { get; }
@@ -236,6 +276,34 @@ namespace BanaData.Logic.Dialogs.Reports
                 IsSubtotal = true;
             }
 
+            // Build grand total
+            public TransactionItem(decimal grandTotal, TransactionReportItem _transactionReportItem)
+            {
+                transactionReportItem = _transactionReportItem;
+
+                string name = "Grand total";
+
+                if (transactionReportItem.IsGroupingByAccount)
+                {
+                    AccountName = name;
+                }
+                else if (transactionReportItem.IsGroupingByPayee)
+                {
+                    Payee = name;
+                }
+                else if (transactionReportItem.IsGroupingByCategory)
+                {
+                    Category = name;
+                }
+                else
+                {
+                    Date = name;
+                }
+                Amount = grandTotal;
+                IsGrandTotal = true;
+            }
+
+
             public string AccountName { get; }
             public string Date { get; }
             public string Payee { get; }
@@ -243,9 +311,20 @@ namespace BanaData.Logic.Dialogs.Reports
             public string Category { get; }
             public decimal Amount { get; }
             public bool IsSubtotal { get; }
+            public bool IsGrandTotal { get; }
+            public bool IsBold => IsSubtotal || IsGrandTotal;
 
             public int CompareTo(TransactionItem other)
             {
+                if (IsGrandTotal)
+                {
+                    return 1;
+                }
+                if (other.IsGrandTotal)
+                {
+                    return -1;
+                }
+
                 if (transactionReportItem.IsGroupingByAccount && AccountName != other.AccountName)
                 {
                     return AccountName.CompareTo(other.AccountName);
