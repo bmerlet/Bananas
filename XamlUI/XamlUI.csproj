@@ -152,6 +152,7 @@
     <Compile Include="Tools\GridLengthConverter.cs" />
     <Compile Include="Tools\ItemsControlExtensions.cs" />
     <Compile Include="Tools\PercentTostringConverter.cs" />
+    <Compile Include="Tools\PrintHelper.cs" />
     <Compile Include="Tools\ReconcileAmountMultiConverter.cs" />
     <Compile Include="Tools\SortAdorner.cs" />
     <Compile Include="Tools\TransactionStateToBrushConverter.cs" />

@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using BanaData.Logic.Dialogs.Reports;
+using XamlUI.Tools;
 
 namespace XamlUI.Dialogs.Reports
 {
@@ -47,78 +48,35 @@ namespace XamlUI.Dialogs.Reports
 
         private void DoPrint(SearchResultLogic logic)
         {
-            // Create the title row
-            var titleRow = new TableRow
+            // Create the print helper
+            var ph = new PrintHelper
             {
-                FontWeight = System.Windows.FontWeights.Bold
+                Title = $"Search for: '{logic.SearchText}'"
             };
-            titleRow.Cells.Add(new TableCell(new Paragraph(new Run($"Search for: '{logic.SearchText}'"))));
-            titleRow.Cells[0].ColumnSpan = 6;
-            var titleRowGroup = new TableRowGroup();
-            titleRowGroup.Rows.Add(titleRow);
-
-            // Create the column headers
-            var headerRow = new TableRow();
-            headerRow.Cells.Add(new TableCell(new Paragraph(new Run("Account"))));
-            headerRow.Cells.Add(new TableCell(new Paragraph(new Run("Date"))));
-            headerRow.Cells.Add(new TableCell(new Paragraph(new Run("Payee"))));
-            headerRow.Cells.Add(new TableCell(new Paragraph(new Run("Memo"))));
-            headerRow.Cells.Add(new TableCell(new Paragraph(new Run("Category"))));
-            headerRow.Cells.Add(new TableCell(new Paragraph(new Run("Amount"))));
-            var headerRowGroup = new TableRowGroup();
-            headerRowGroup.Rows.Add(headerRow);
-
-            // Create the data
-            var mainRowGroup = new TableRowGroup();
-            foreach (SearchResultLogic.FoundItem item in logic.FoundItemsSource)
-            {
-                var row = new TableRow();
-                row.Cells.Add(new TableCell(new Paragraph(new Run(item.Account))));
-                row.Cells.Add(new TableCell(new Paragraph(new Run(item.Date.ToString("MM/dd/yyyy")))));
-                row.Cells.Add(new TableCell(new Paragraph(new Run(item.Payee))));
-                row.Cells.Add(new TableCell(new Paragraph(new Run(item.Memo))));
-                row.Cells.Add(new TableCell(new Paragraph(new Run(item.Category))));
-                row.Cells.Add(new TableCell(new Paragraph(new Run(item.Amount.ToString("N2")))));
-                row.Cells[5].TextAlignment = TextAlignment.Right;
-                mainRowGroup.Rows.Add(row);
-            }
-
-            // Create the table
-            var table = new Table();
 
             // Create the columns
-            table.Columns.Add(new TableColumn() { Width = new GridLength(200) });
-            table.Columns.Add(new TableColumn() { Width = new GridLength(80) });
-            table.Columns.Add(new TableColumn() { Width = new GridLength(200) });
-            table.Columns.Add(new TableColumn() { Width = new GridLength(200) });
-            table.Columns.Add(new TableColumn() { Width = new GridLength(150) });
-            table.Columns.Add(new TableColumn() { Width = new GridLength(70) });
+            ph.AddColumn("Account", 145);
+            ph.AddColumn("Date",  66);
+            ph.AddColumn("Payee", 145);
+            ph.AddColumn("Memo", 145);
+            ph.AddColumn("Category", 145);
+            ph.AddColumn("Amount", 60);
 
-            // Add the row groups
-            table.RowGroups.Add(titleRowGroup);
-            table.RowGroups.Add(headerRowGroup);
-            table.RowGroups.Add(mainRowGroup);
-
-            // Create flow document and add the table
-            var flowDocument = new FlowDocument
+            // Create the data
+            foreach (SearchResultLogic.FoundItem item in logic.FoundItemsSource)
             {
-                FontSize = 11
-            };
-            flowDocument.Blocks.Add(table);
-
-            var printDialog = new PrintDialog();
-            if (printDialog.ShowDialog() == true)
-            {
-                printDialog.PrintTicket.PageOrientation = System.Printing.PageOrientation.Landscape;
-                flowDocument.PageHeight = printDialog.PrintableAreaHeight;
-                flowDocument.PageWidth = printDialog.PrintableAreaWidth;
-                flowDocument.PagePadding = new Thickness(50);
-                flowDocument.ColumnGap = 0;
-                flowDocument.ColumnWidth = printDialog.PrintableAreaWidth;
-                IDocumentPaginatorSource dps = flowDocument;
-                printDialog.PrintDocument(dps.DocumentPaginator, "Search result");
+                ph.AddRow(new PrintHelper.Cell[] {
+                    new PrintHelper.Cell(item.Account),
+                    new PrintHelper.Cell(item.Date.ToString("MM/dd/yyyy")),
+                    new PrintHelper.Cell(item.Payee),
+                    new PrintHelper.Cell(item.Memo),
+                    new PrintHelper.Cell(item.Category),
+                    new PrintHelper.Cell(item.Amount.ToString("N2"), TextAlignment.Right)
+                });
             }
-        }
 
+            // Print
+            ph.Print();
+        }
     }
 }
