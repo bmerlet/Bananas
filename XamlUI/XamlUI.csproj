@@ -35,7 +35,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Bananas.ico</ApplicationIcon>
+    <ApplicationIcon>Images\Bananas.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ReachFramework" />
@@ -385,9 +385,6 @@
     <Resource Include="Images\Bananas.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Bananas.ico" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Sounds\kaching.wav">
