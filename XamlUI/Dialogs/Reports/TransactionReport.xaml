@@ -41,6 +41,7 @@
         <!-- Main listview -->
         <ListView 
             x:Name="listView"
-            ItemsSource="{Binding TransactionsSource}"/>
+            ItemsSource="{Binding TransactionsSource}"
+            MouseDoubleClick="OnListViewMouseDoubleClick"/>
     </DockPanel>
 </Window>

@@ -242,6 +242,18 @@ namespace BanaData.Logic.Dialogs.Reports
             return result;
         }
 
+        public void GoTo(TransactionItem item)
+        {
+            if (item.TransactionRow != null)
+            {
+                CloseView.Invoke(false);
+                int accountID = mainWindowLogic.Household.Account.GetByName(item.AccountName).ID;
+                mainWindowLogic.GotoTransaction(accountID, item.TransactionRow.ID, -1);
+            }
+        }
+
+
+
         // Not used, present so that we can use CloseView()
         protected override bool? Commit()
         {
@@ -279,9 +291,7 @@ namespace BanaData.Logic.Dialogs.Reports
                 Household.LineItemRow[] lineItemRows,
                 TransactionReportItem _transactionReportItem)
             {
-                transactionReportItem = _transactionReportItem;
-                //(transactionRow, lineItemRows, transactionReportItem) =
-                //(_transactionRow, _lineItemRows, _transactionReportItem);
+                (TransactionRow, transactionReportItem) = (transactionRow, _transactionReportItem);
 
                 AccountName = transactionRow.AccountRow.Name;
                 Date = transactionRow.Date.ToString("MM/dd/yyyy");
@@ -343,6 +353,7 @@ namespace BanaData.Logic.Dialogs.Reports
                 IsGrandTotal = true;
             }
 
+            public readonly Household.TransactionRow TransactionRow;
 
             public string AccountName { get; }
             public string Date { get; }

@@ -83,6 +83,14 @@ namespace XamlUI.Dialogs.Reports
             listView.View = gridView;
         }
 
+        private void OnListViewMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (DataContext is TransactionReportLogic logic && sender is ListView listView && listView.SelectedItem is TransactionReportLogic.TransactionItem item)
+            {
+                logic.GoTo(item);
+            }
+        }
+
         private void OnPrint(object sender, RoutedEventArgs e)
         {
             var logic = DataContext as TransactionReportLogic;
