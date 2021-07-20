@@ -16,16 +16,27 @@
     <DockPanel>
 
         <!-- Done panel -->
-        <StackPanel DockPanel.Dock="Top" HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="0,5" >
-            <StackPanel.Resources>
+        <Grid DockPanel.Dock="Top">
+            <Grid.Resources>
                 <Style TargetType="Button" BasedOn="{StaticResource FormButton}">
                     <Setter Property="Width" Value="75"/>
                 </Style>
-            </StackPanel.Resources>
-            <Button Content="Edit..." Command="{Binding Edit}" Visibility="{Binding IsEditVisible, Converter={StaticResource visibilityBoolConverter}}"/>
-            <Button Content="Print..." Click="OnPrint"/>
-            <Button Content="Close" IsCancel="True"/>
-        </StackPanel>
+            </Grid.Resources>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="170"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Style="{StaticResource FormTextBlock}" Text="Show: "/>
+            <ComboBox Grid.Column="1" Style="{StaticResource FormComboBox}" ItemsSource="{Binding ShowSource}" SelectedItem="{Binding Show, Mode=TwoWay}"/>
+            <Button Grid.Column="3" Content="Edit..." Command="{Binding Edit}" 
+                    Visibility="{Binding IsEditVisible, Converter={StaticResource visibilityBoolConverter}}"/>
+            <Button Grid.Column="4" Content="Print..." Click="OnPrint"/>
+            <Button Grid.Column="5" Content="Close" IsCancel="True"/>
+        </Grid>
 
         <!-- Main listview -->
         <ListView 

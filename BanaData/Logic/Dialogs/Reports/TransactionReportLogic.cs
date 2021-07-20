@@ -30,8 +30,6 @@ namespace BanaData.Logic.Dialogs.Reports
         {
             (mainWindowLogic, transactionReportItem, IsEditVisible) = (_mainWindowLogic, _transactionReportItem, fromMainMenu);
 
-            localFlags = transactionReportItem.Flags;
-
             Edit = new CommandBase(OnEdit);
 
             // Look for the transactions selected by this report
@@ -113,6 +111,12 @@ namespace BanaData.Logic.Dialogs.Reports
             TransactionsSource = (CollectionView)CollectionViewSource.GetDefaultView(transactions);
             TransactionsSource.Filter = TransactionsSourceFilter;
 
+            // Setup what to show
+            localFlags = transactionReportItem.Flags;
+            SetShow(
+                transactionReportItem.IsShowingTransactions && transactionReportItem.IsShowingSubtotals ? SHOW_SUBTOTAL :
+                (transactionReportItem.IsShowingTransactions ? SHOW_TRANS : SHOW_SUBTOTALONLY));
+
             // Now build the columns
             var accountColumn = new ColumnItem(120, 145, "Account", "AccountName", null);
             var payeeColumn = new ColumnItem(200, 145, "Payee", "Payee", null);
@@ -164,14 +168,26 @@ namespace BanaData.Logic.Dialogs.Reports
 
         #region UI properties
 
+        // Title
         public string Title => transactionReportItem.Name;
 
+        // Edit button
         public CommandBase Edit { get; }
         public bool IsEditVisible { get; }
 
+        // Show transactions and/or subtotals
+        private const string SHOW_TRANS = "Transactions";
+        private const string SHOW_SUBTOTAL = "Transactions and subtotals";
+        private const string SHOW_SUBTOTALONLY = "Subtotals only";
+        public string[] ShowSource { get; } = new string[] { SHOW_TRANS, SHOW_SUBTOTAL, SHOW_SUBTOTALONLY };
+        private string show;
+        public string Show { get => show; set => SetShow(value); }
+
+        // Transactions
         private readonly List<TransactionItem> transactions = new List<TransactionItem>();
         public CollectionView TransactionsSource { get; }
 
+        // Columns
         public ObservableCollection<ColumnItem> Columns { get; } = new ObservableCollection<ColumnItem>();
 
         #endregion
@@ -185,6 +201,30 @@ namespace BanaData.Logic.Dialogs.Reports
 
             // Invoke edit of this transaction item through main menu
             mainWindowLogic.MainMenuLogic.EditTransactionReports.Execute(transactionReportItem);
+        }
+
+        private void SetShow(string value)
+        {
+            if (value != show)
+            {
+                show = value;
+                localFlags &= ~(ETransactionReportFlag.ShowTransactions | ETransactionReportFlag.ShowSubtotals);
+
+                switch (Show)
+                {
+                    case SHOW_TRANS:
+                        localFlags |= ETransactionReportFlag.ShowTransactions;
+                        break;
+                    case SHOW_SUBTOTAL:
+                        localFlags |= ETransactionReportFlag.ShowTransactions | ETransactionReportFlag.ShowSubtotals;
+                        break;
+                    case SHOW_SUBTOTALONLY:
+                        localFlags |= ETransactionReportFlag.ShowSubtotals;
+                        break;
+                }
+
+                TransactionsSource.Refresh();
+            }
         }
 
         // Show transactions and/or subtotals depending on local settings
