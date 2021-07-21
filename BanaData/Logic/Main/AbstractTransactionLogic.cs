@@ -389,12 +389,12 @@ namespace BanaData.Logic.Main
             {
                 var liRow = household.LineItem.FindByID(data.LineItems[0].ID);
                 var transRow = liRow.TransactionRow;
-                mainWindowLogic.GotoTransaction(transRow.AccountID, transRow.ID, data.LineItems[0].ID);
+                mainWindowLogic.GotoTransaction(transRow.AccountID, transRow.ID, int.MinValue);
             }
             else
             {
                 var li = data.LineItems.Find(l => l.CategoryAccountID >= 0);
-                mainWindowLogic.GotoTransaction(li.CategoryAccountID, TRANSID_TRANSFER_FILLIN, li.ID);
+                mainWindowLogic.GotoTransaction(li.CategoryAccountID, int.MinValue, li.ID);
             }
         }
 

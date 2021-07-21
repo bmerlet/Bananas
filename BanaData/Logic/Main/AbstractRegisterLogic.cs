@@ -121,16 +121,16 @@ namespace BanaData.Logic.Main
             transactions.ReplaceRange(temporaryTransactionList);
 
             // If asked to go to a specific transaction, go there
-            if (transactionID != int.MinValue && lineItemID != int.MinValue)
+            if (transactionID != int.MinValue || lineItemID != int.MinValue)
             {
                 // Add new empty transaction at the bottom but don't select it
-                AddEmptyTransactionAtBottom(true);
+                AddEmptyTransactionAtBottom(false);
 
                 // Find the transaction to select
                 AbstractTransactionLogic transToSelect;
-                if (transactionID == AbstractTransactionLogic.TRANSID_TRANSFER_FILLIN)
+                if (transactionID == int.MinValue)
                 {
-                    transToSelect = transactions.FirstOrDefault(t => t.TransID == transactionID && t.FillInLineItemID == lineItemID);
+                    transToSelect = transactions.FirstOrDefault(t => t.TransID == AbstractTransactionLogic.TRANSID_TRANSFER_FILLIN && t.FillInLineItemID == lineItemID);
                 }
                 else
                 {

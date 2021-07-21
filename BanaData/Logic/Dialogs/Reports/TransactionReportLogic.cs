@@ -69,8 +69,50 @@ namespace BanaData.Logic.Dialogs.Reports
                 }
 
                 // This transaction passes all the checks!
-                transactions.Add(new TransactionItem(transactionRow, lineItemRows, transactionReportItem));
+                transactions.Add(new TransactionItem(transactionRow, lineItemRows, -1, transactionReportItem));
             }
+
+            // Look for wrong-ended transfers
+            if (!transactionReportItem.IsFilteringOnPayees && !transactionReportItem.IsFilteringOnCategories)
+            {
+                foreach (Household.LineItemRow lineItemRow in household.LineItem.Where(li => !li.IsAccountIDNull() && li.AccountRow != li.TransactionRow.AccountRow))
+                {
+                    // Date check
+                    if (lineItemRow.TransactionRow.Date.CompareTo(transactionReportItem.StartDate) < 0 ||
+                        lineItemRow.TransactionRow.Date.CompareTo(transactionReportItem.EndDate) > 0)
+                    {
+                        continue;
+                    }
+
+                    // Account check
+                    if (transactionReportItem.IsFilteringOnAccounts &&
+                        !transactionReportItem.Accounts.Contains(lineItemRow.AccountRow))
+                    {
+                        continue;
+                    }
+
+                    // This transfer matches - create a transaction/line item for it
+                    var fillInTransactionRow = household.Transaction.NewTransactionRow();
+                    fillInTransactionRow.Date = lineItemRow.TransactionRow.Date;
+                    fillInTransactionRow.Status = lineItemRow.TransferStatus;
+                    fillInTransactionRow.AccountRow = lineItemRow.AccountRow;
+                    if (!lineItemRow.TransactionRow.IsMemoNull())
+                    {
+                        fillInTransactionRow.Memo = lineItemRow.TransactionRow.Memo;
+                    }
+
+                    var fillInLineITemRow = household.LineItem.NewLineItemRow();
+                    fillInLineITemRow.Amount = -lineItemRow.Amount;
+                    fillInLineITemRow.AccountRow = lineItemRow.TransactionRow.AccountRow;
+                    if (!lineItemRow.IsMemoNull())
+                    {
+                        fillInLineITemRow.Memo = lineItemRow.Memo;
+                    }
+                    transactions.Add(new TransactionItem(fillInTransactionRow,
+                        new Household.LineItemRow[] { fillInLineITemRow }, lineItemRow.ID, transactionReportItem));
+                }
+            }
+
 
             // Compute grand total
             decimal grandTotal = transactions.Sum(ti => ti.Amount);
@@ -247,8 +289,14 @@ namespace BanaData.Logic.Dialogs.Reports
             if (item.TransactionRow != null)
             {
                 CloseView.Invoke(false);
-                int accountID = mainWindowLogic.Household.Account.GetByName(item.AccountName).ID;
-                mainWindowLogic.GotoTransaction(accountID, item.TransactionRow.ID, -1);
+                if (item.TransferFillinID >= 0)
+                {
+                    mainWindowLogic.GotoTransaction(item.TransactionRow.AccountID, int.MinValue, item.TransferFillinID);
+                }
+                else
+                {
+                    mainWindowLogic.GotoTransaction(item.TransactionRow.AccountID, item.TransactionRow.ID, int.MinValue);
+                }
             }
         }
 
@@ -279,21 +327,25 @@ namespace BanaData.Logic.Dialogs.Reports
 
         #endregion
 
-        #region Class describing a transaction or a subtotal
+        #region Class describing a transaction or a subtotal or the grand total
 
         public class TransactionItem : IComparable<TransactionItem>
         {
             private readonly TransactionReportItem transactionReportItem;
+            private readonly DateTime date;
 
             // Build a transaction
             public TransactionItem(
                 Household.TransactionRow transactionRow,
                 Household.LineItemRow[] lineItemRows,
+                int transferFillinID,
                 TransactionReportItem _transactionReportItem)
             {
                 (TransactionRow, transactionReportItem) = (transactionRow, _transactionReportItem);
 
+                TransferFillinID = transferFillinID;
                 AccountName = transactionRow.AccountRow.Name;
+                date = transactionRow.Date;
                 Date = transactionRow.Date.ToString("MM/dd/yyyy");
                 Payee = transactionRow.IsPayeeNull() ? "" : transactionRow.Payee;
                 Memo = transactionRow.IsMemoNull() ? "" : transactionRow.Memo;
@@ -354,6 +406,7 @@ namespace BanaData.Logic.Dialogs.Reports
             }
 
             public readonly Household.TransactionRow TransactionRow;
+            public readonly int TransferFillinID = -1;
 
             public string AccountName { get; }
             public string Date { get; }
@@ -400,7 +453,7 @@ namespace BanaData.Logic.Dialogs.Reports
                     return -1;
                 }
 
-                return Date.CompareTo(other.Date);
+                return date.CompareTo(other.date);
             }
         }
 

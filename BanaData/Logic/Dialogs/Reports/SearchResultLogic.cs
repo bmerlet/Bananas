@@ -51,7 +51,7 @@ namespace BanaData.Logic.Dialogs.Reports
 
         public void GoTo(FoundItem item)
         {
-            mainWindowLogic.GotoTransaction(item.TransRow.AccountID, item.TransRow.ID, -1);
+            mainWindowLogic.GotoTransaction(item.TransRow.AccountID, item.TransRow.ID, int.MinValue);
         }
 
         private void OnSearch(object arg)
