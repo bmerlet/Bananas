@@ -2045,7 +2045,7 @@ namespace BanaData.Serializations
                         accountRow.Hidden,
                         accountRow.Type == EAccountType.Investment && accountRow.Kind == EInvestmentKind.TraditionalIRA,
                         accountRow.IsLastStatementDateNull() ? null : accountRow.LastStatementDate as DateTime?,
-                        accountRow.IsPersonIDNull() ? null : accountRow.Name));
+                        accountRow.Owner));
             }
 
             // ReconcileInfo table and SecurityReconcileInfo table

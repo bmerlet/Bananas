@@ -10,9 +10,11 @@ using System.Threading.Tasks;
 
 namespace BanaData.Database
 {
-    // Extensions to the account table
+
     public partial class Household
     {
+        #region Extensions to the Account Row
+
         partial class AccountRow
         {
             // Bridges to local enum types
@@ -37,6 +39,27 @@ namespace BanaData.Database
             {
                 return IsIKindNull();
             }
+
+            // Safe versions of columns that may be DB null
+            public string SDescription
+            {
+                get => IsDescriptionNull() ? "" : Description;
+                set
+                {
+                    if (string.IsNullOrWhiteSpace(value))
+                    {
+                        SetDescriptionNull();
+                    }
+                    else
+                    {
+                        Description = value;
+                    }
+                }
+            }
+
+            public EInvestmentKind SKind => IsIKindNull() ? EInvestmentKind.Invalid : Kind;
+
+            public string Owner => IsPersonIDNull() ? null : PersonRow.Name; 
 
             // Are there transactions associated with this account?
             public bool HasTransactions => GetTransactionRows().Length > 0;
@@ -210,6 +233,10 @@ namespace BanaData.Database
             }
         }
 
+        #endregion
+
+        #region Extensions to the Account table
+
         partial class AccountDataTable
         {
             // Get account by name
@@ -310,5 +337,7 @@ namespace BanaData.Database
                 }
             }
         }
+
+        #endregion
     }
 }

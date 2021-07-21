@@ -26,11 +26,15 @@ namespace BanaData.Logic.Items
         // Factory from DB row
         public static AccountItem CreateFromDB(Household.AccountRow accountsRow)
         {
-            var desc = accountsRow.IsDescriptionNull() ? "" : accountsRow.Description;
-            EInvestmentKind kind = accountsRow.IsIKindNull() ? EInvestmentKind.Invalid : accountsRow.Kind;
-            string owner = accountsRow.IsPersonIDNull() ? null : accountsRow.PersonRow.Name;
-
-            return new AccountItem(accountsRow, accountsRow.Name, desc, accountsRow.Type, accountsRow.CreditLimit, kind, accountsRow.Hidden, owner);
+            return new AccountItem(
+                accountsRow, 
+                accountsRow.Name, 
+                accountsRow.SDescription,
+                accountsRow.Type,
+                accountsRow.CreditLimit, 
+                accountsRow.SKind, 
+                accountsRow.Hidden,
+                accountsRow.Owner);
         }
 
         // Account row (null when not in DB)
