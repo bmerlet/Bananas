@@ -48,17 +48,6 @@ namespace BanaData.Database
 
         partial class MemorizedLineItemDataTable
         {
-            public MemorizedLineItemRow Add(MemorizedPayeeRow memorizedPayeesRow, bool transfer, DataRow AccountOrCategory, string memo, decimal amount)
-            {
-                var memorizedLineItemRow = NewMemorizedLineItemRow();
-
-                UpdateMemorizedLineItem(memorizedLineItemRow, memorizedPayeesRow, transfer, AccountOrCategory, memo, amount);
-
-                Rows.Add(memorizedLineItemRow);
-
-                return memorizedLineItemRow;
-            }
-
             public MemorizedLineItemRow Add(MemorizedPayeeRow memorizedPayeesRow, int categoryId, int categoryAccountId, string memo, decimal amount)
             {
                 var memorizedLineItemRow = NewMemorizedLineItemRow();
@@ -77,46 +66,10 @@ namespace BanaData.Database
                 return memorizedLineItemRow;
             }
 
-            private static MemorizedLineItemRow UpdateMemorizedLineItem(MemorizedLineItemRow memorizedLineItemsRow, MemorizedPayeeRow memorizedPayeesRow, bool transfer, DataRow AccountOrCategory, string memo, decimal amount)
-            {
-                memorizedLineItemsRow.MemorizedPayeeID = memorizedPayeesRow.ID;
-
-                memorizedLineItemsRow.IsTransfer = transfer;
-                if (AccountOrCategory == null)
-                {
-                    memorizedLineItemsRow.SetAccountIDNull();
-                    memorizedLineItemsRow.SetCategoryIDNull();
-                }
-                else if (transfer)
-                {
-                    memorizedLineItemsRow.AccountID = (int)AccountOrCategory["ID"];
-                    memorizedLineItemsRow.SetCategoryIDNull();
-                }
-                else
-                {
-                    memorizedLineItemsRow.SetAccountIDNull();
-                    memorizedLineItemsRow.CategoryID = (int)AccountOrCategory["ID"];
-                }
-
-                if (string.IsNullOrWhiteSpace(memo))
-                {
-                    memorizedLineItemsRow.SetMemoNull();
-                }
-                else
-                {
-                    memorizedLineItemsRow.Memo = memo;
-                }
-
-                memorizedLineItemsRow.Amount = amount;
-
-                return memorizedLineItemsRow;
-            }
-
             private static MemorizedLineItemRow UpdateMemorizedLineItem(MemorizedLineItemRow memorizedLineItemsRow, MemorizedPayeeRow memorizedPayeesRow, int categoryId, int categoryAccountId, string memo, decimal amount)
             {
                 memorizedLineItemsRow.MemorizedPayeeID = memorizedPayeesRow.ID;
 
-                memorizedLineItemsRow.IsTransfer = categoryAccountId >= 0;
                 if (categoryId >= 0)
                 {
                     memorizedLineItemsRow.SetAccountIDNull();
