@@ -328,15 +328,7 @@ namespace BanaData.Logic.Main
             }
             else if (li.CategoryAccountID != -1)
             {
-                var targetAccount = household.Account.FindByID(li.CategoryAccountID);
-
-                // Add transaction on "other side"
-                var otherSideTransactionRow = household.Transaction.Add(accountRow, data.Date, data.Payee, data.Memo, data.Status, household.Checkpoint.GetMostRecentCheckpointID());
-                var otherSideLiRow = household.LineItem.Add(otherSideTransactionRow, li.Memo, -li.Amount);
-
-                // Create the transfer line items
-                household.LineItemTransfer.AddLineItemTransferRow(liRow, targetAccount, otherSideTransactionRow);
-                household.LineItemTransfer.AddLineItemTransferRow(otherSideLiRow, accountRow, transactionRow);
+                CreatePeerTransaction(li.CategoryAccountID, transactionRow, liRow);
             }
         }
 
@@ -363,32 +355,31 @@ namespace BanaData.Logic.Main
                 if (liTransferRow == null)
                 {
                     // The line item was not a transfer: Make it one
-                    var targetAccount = household.Account.FindByID(li.CategoryAccountID);
-
-                    // Add transaction on "other side"
-                    var otherSideTransactionRow = household.Transaction.Add(accountRow, data.Date, data.Payee, data.Memo, data.Status, household.Checkpoint.GetMostRecentCheckpointID());
-                    var otherSideLiRow = household.LineItem.Add(otherSideTransactionRow, li.Memo, -li.Amount);
-
-                    // Create the transfer line items
-                    household.LineItemTransfer.AddLineItemTransferRow(liRow, targetAccount, otherSideTransactionRow);
-                    household.LineItemTransfer.AddLineItemTransferRow(otherSideLiRow, accountRow, transactionRow);
+                    CreatePeerTransaction(li.CategoryAccountID, transactionRow, liRow);
                 }
                 else
                 {
                     // The line item was a transfer. Update the account, amount and memo in peer transaction
-                    // We should get here if the peer has only ONE line item 
-                    // ZZREORG: Allow modification of tx only on split side if it is split
+                    // Note: this kind of breaks down if the peer transaction has several transfers to the same account,
+                    // which is why the split editor forbids it.
                     var otherSideTransactionRow = liTransferRow.TransactionRow;
                     otherSideTransactionRow.AccountID = liTransferRow.AccountID;
-                    var otherSideLineItemRow = otherSideTransactionRow.GetLineItemRows().Single();
-                    otherSideLineItemRow.Amount = -li.Amount;
-                    if (string.IsNullOrEmpty(li.Memo))
+                    foreach(var otherSideLineItemRow in otherSideTransactionRow.GetLineItemRows())
                     {
-                        otherSideLineItemRow.SetMemoNull();
-                    }
-                    else
-                    {
-                        otherSideLineItemRow.Memo = li.Memo;
+                        if (otherSideLineItemRow.GetLineItemTransferRow() is Household.LineItemTransferRow lineItemTransferRow &&
+                            lineItemTransferRow.AccountRow == accountRow)
+                        {
+                            otherSideLineItemRow.Amount = -li.Amount;
+                            if (string.IsNullOrEmpty(li.Memo))
+                            {
+                                otherSideLineItemRow.SetMemoNull();
+                            }
+                            else
+                            {
+                                otherSideLineItemRow.Memo = li.Memo;
+                            }
+                            break;
+                        }
                     }
                 }
             }
@@ -430,6 +421,34 @@ namespace BanaData.Logic.Main
             }
         }
 
+        private Household.TransactionRow CreatePeerTransaction(int targetAccountID, Household.TransactionRow transactionRow, Household.LineItemRow liRow)
+        {
+            var household = mainWindowLogic.Household;
+
+            var targetAccountRow = household.Account.FindByID(targetAccountID);
+
+            // Add transaction on "other side"
+            var peerTransactionRow = household.Transaction.Add(targetAccountRow, data.Date, "", data.Memo, ETransactionStatus.Pending, household.Checkpoint.GetMostRecentCheckpointID());
+            var peerLiRow = household.LineItem.Add(peerTransactionRow, null, -liRow.Amount);
+
+            // Create the investment/banking transactions
+            if (targetAccountRow.Type == EAccountType.Bank)
+            {
+                household.BankingTransaction.Add(peerTransactionRow, ETransactionMedium.None, 0);
+            }
+            else if (targetAccountRow.Type == EAccountType.Investment)
+            {
+                var type = peerLiRow.Amount >= 0 ? EInvestmentTransactionType.TransferCashIn : EInvestmentTransactionType.TransferCashOut;
+                household.InvestmentTransaction.Add(peerTransactionRow, type, null, 0, 0, 0);
+            }
+
+            // Create the transfer line items
+            household.LineItemTransfer.AddLineItemTransferRow(liRow, targetAccountRow, peerTransactionRow);
+            household.LineItemTransfer.AddLineItemTransferRow(peerLiRow, accountRow, transactionRow);
+
+            return peerTransactionRow;
+        }
+
         #endregion
 
         #region Actions
@@ -461,6 +480,16 @@ namespace BanaData.Logic.Main
             var lineItems = transactionRow.GetLineItemRows();
             foreach (var lineItem in lineItems)
             {
+                if (lineItem.GetLineItemCategoryRow() is Household.LineItemCategoryRow lineItemCategoryRow)
+                {
+                    lineItemCategoryRow.Delete();
+                }
+
+                if (lineItem.GetLineItemTransferRow() is Household.LineItemTransferRow lineItemTransferRow)
+                {
+                    lineItemTransferRow.Delete();
+                }
+
                 lineItem.Delete();
             }
 

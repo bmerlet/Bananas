@@ -237,7 +237,19 @@ namespace BanaData.Logic.Main
                 {
                     if (li.ID >= 0 && data.LineItems.FirstOrDefault(l => l.ID == li.ID) == null)
                     {
-                        household.LineItem.FindByID(li.ID).Delete();
+                        var lineItemRow = household.LineItem.FindByID(li.ID);
+
+                        if (lineItemRow.GetLineItemCategoryRow() is Household.LineItemCategoryRow lineItemCategoryRow)
+                        {
+                            lineItemCategoryRow.Delete();
+                        }
+
+                        if (lineItemRow.GetLineItemTransferRow() is Household.LineItemTransferRow lineItemTransferRow)
+                        {
+                            lineItemTransferRow.Delete();
+                        }
+
+                        lineItemRow.Delete();
                     }
                 }
 

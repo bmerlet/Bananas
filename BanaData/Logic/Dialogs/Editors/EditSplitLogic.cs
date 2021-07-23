@@ -100,6 +100,17 @@ namespace BanaData.Logic.Dialogs.Editors
                 newLineItems.Add(li);
             }
 
+            // Make sure there are no multiple transfers to the same account
+            foreach(var li in newLineItems)
+            {
+                if (li.CategoryAccountID != -1 &&
+                    newLineItems.Count(l => l.CategoryAccountID == li.CategoryAccountID) > 1)
+                {
+                    mainWindowLogic.ErrorMessage($"Entering multiple transfers to the same account ({mainWindowLogic.Household.Account.FindByID(li.CategoryAccountID).Name}) is not supported.");
+                    return null;
+                }
+            }
+
             // Publish them
             NewLineItems = newLineItems.ToArray();
 

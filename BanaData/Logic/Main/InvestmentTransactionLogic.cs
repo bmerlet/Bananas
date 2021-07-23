@@ -278,9 +278,6 @@ namespace BanaData.Logic.Main
                 // Check the changes
                 //
 
-                // Dead end of transfer
-                // ZZREORG
-
                 if (backup.Status == ETransactionStatus.Reconciled && data.Status != ETransactionStatus.Reconciled)
                 {
                     if (!mainWindowLogic.YesNoQuestion("Are you sure you want to un-reconcile this transaction"))
