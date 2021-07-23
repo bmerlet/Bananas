@@ -192,8 +192,7 @@ namespace BanaData.Database
     {
         Idle = 0,
         Reconciled = 1,
-        TransferFillIn = 2,
-        NegativeAmount = 4
+        NegativeAmount = 2
     }
 
     // Transaction report flags

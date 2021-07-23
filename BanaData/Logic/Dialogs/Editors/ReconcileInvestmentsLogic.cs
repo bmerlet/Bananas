@@ -99,29 +99,11 @@ namespace BanaData.Logic.Dialogs.Editors
                     null,
                     investmentTransactionRow.GetDescription(),
                     investmentTransactionRow.IsSecurityIDNull() ? null : investmentTransactionRow.SecurityRow.Symbol,
-                    amount,
-                    false);
+                    amount);
 
                 transactions.Add(transaction);
             }
 
-            // Process transfer fill-ins
-            foreach (Household.LineItemRow li in accountRow.GetUnreconciledTransfers())
-            {
-                decimal amount = -li.Amount;
-
-                var transaction = new TransactionToReconcile(
-                    li.ID,
-                    li.TransferStatus == ETransactionStatus.Cleared,
-                    li.TransactionRow.Date,
-                    null,
-                    "",
-                    null,
-                    amount,
-                    true);
-
-                transactions.Add(transaction);
-            }
             return transactions;
         }
 
@@ -169,7 +151,7 @@ namespace BanaData.Logic.Dialogs.Editors
                     decimal quantity = tracker.PriorStatementBalance;
                     foreach (TransactionToReconcile trans in Transactions.Transactions)
                     {
-                        if (trans.IsCleared == true && !trans.IsTransferFillIn)
+                        if (trans.IsCleared == true)
                         {
                             var tr = mainWindowLogic.Household.Transaction.FindByID(trans.ID);
                             var itr = tr.GetInvestmentTransaction();
@@ -260,18 +242,9 @@ namespace BanaData.Logic.Dialogs.Editors
 
             foreach (TransactionToReconcile tr in Transactions.Transactions)
             {
-                if (tr.IsTransferFillIn)
-                {
-                    var liRow = household.LineItem.FindByID(tr.ID);
-                    liRow.TransferStatus = tr.IsCleared == true ? newStatus : ETransactionStatus.Pending;
-                    liRow.TransactionRow.CheckpointID = latestCheckpoint;
-                }
-                else
-                {
-                    var transRow = household.Transaction.FindByID(tr.ID);
-                    transRow.Status = tr.IsCleared == true ? newStatus : ETransactionStatus.Pending;
-                    transRow.CheckpointID = latestCheckpoint;
-                }
+                var transRow = household.Transaction.FindByID(tr.ID);
+                transRow.Status = tr.IsCleared == true ? newStatus : ETransactionStatus.Pending;
+                transRow.CheckpointID = latestCheckpoint;
             }
         }
 

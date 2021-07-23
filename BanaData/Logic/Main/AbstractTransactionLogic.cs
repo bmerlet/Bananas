@@ -28,7 +28,6 @@ namespace BanaData.Logic.Main
         protected BaseTransactionData backup;
 
         public const int TRANSID_NOT_COMMITTED = -1;
-        public const int TRANSID_TRANSFER_FILLIN = -2;
  
         #endregion
 
@@ -40,9 +39,7 @@ namespace BanaData.Logic.Main
             (mainWindowLogic, accountRow, TransID, data) = (_mainWindowLogic, _accountRow, _transID, _data);
 
             GotoOtherSideOfTransfer = new CommandBase(OnGotoOtherSideOfTransfer);
-            GotoOtherSideOfTransfer.SetCanExecute(
-                TransID == TRANSID_TRANSFER_FILLIN ||
-                data.LineItems.Find(li => li.CategoryAccountID >= 0) != null);
+            GotoOtherSideOfTransfer.SetCanExecute(data.LineItems.Find(li => li.CategoryAccountID >= 0) != null);
         }
 
         #endregion
@@ -51,9 +48,6 @@ namespace BanaData.Logic.Main
 
         // Transaction id, -1 if not in DB yet, -2 if transfer fill-in
         public int TransID;
-
-        // For fill-in transactions, line item ID
-        public int FillInLineItemID => (TransID == TRANSID_TRANSFER_FILLIN) ? data.LineItems[0].ID : -1;
 
         // Amount to use for cash balance computation
         public abstract decimal AmountForCashBalance { get; }
@@ -213,8 +207,7 @@ namespace BanaData.Logic.Main
 
         // Composite transaction status, for the forecolor of the transaction
         public ETransactionState TransactionState =>
-            (data.Status == ETransactionStatus.Reconciled ? ETransactionState.Reconciled : ETransactionState.Idle) |
-            (TransID == TRANSID_TRANSFER_FILLIN ? ETransactionState.TransferFillIn : ETransactionState.Idle);
+            (data.Status == ETransactionStatus.Reconciled ? ETransactionState.Reconciled : ETransactionState.Idle);
 
         // Composite transaction status, for the forecolor of the amount
         public ETransactionState AmountState => TransactionState | (data.Amount < 0 ? ETransactionState.NegativeAmount : ETransactionState.Idle);
@@ -322,6 +315,121 @@ namespace BanaData.Logic.Main
             }
         }
 
+        protected void CreateLineItemInDB(LineItem li, Household.TransactionRow transactionRow)
+        {
+            var household = mainWindowLogic.Household;
+
+            var liRow = household.LineItem.Add(transactionRow, li.Memo, li.Amount);
+            li.ID = liRow.ID;
+
+            if (li.CategoryID != -1)
+            {
+                household.LineItemCategory.AddLineItemCategoryRow(liRow, household.Category.FindByID(li.CategoryID));
+            }
+            else if (li.CategoryAccountID != -1)
+            {
+                var targetAccount = household.Account.FindByID(li.CategoryAccountID);
+
+                // Add transaction on "other side"
+                var otherSideTransactionRow = household.Transaction.Add(accountRow, data.Date, data.Payee, data.Memo, data.Status, household.Checkpoint.GetMostRecentCheckpointID());
+                var otherSideLiRow = household.LineItem.Add(otherSideTransactionRow, li.Memo, -li.Amount);
+
+                // Create the transfer line items
+                household.LineItemTransfer.AddLineItemTransferRow(liRow, targetAccount, otherSideTransactionRow);
+                household.LineItemTransfer.AddLineItemTransferRow(otherSideLiRow, accountRow, transactionRow);
+            }
+        }
+
+        protected void UpdateLineItemInDB(LineItem li, Household.TransactionRow transactionRow)
+        {
+            var household = mainWindowLogic.Household;
+
+            var liRow = household.LineItem.FindByID(li.ID);
+            var liCategoryRow = liRow.GetLineItemCategoryRow();
+            var liTransferRow = liRow.GetLineItemTransferRow();
+
+            // Update the line item
+            household.LineItem.Update(liRow, transactionRow, li.Memo, li.Amount);
+
+            // See if the updated transaction is a transfer.
+            if (li.CategoryAccountID != -1)
+            {
+                // Delete former category row if it existed
+                if (liCategoryRow != null)
+                {
+                    liCategoryRow.Delete();
+                }
+
+                if (liTransferRow == null)
+                {
+                    // The line item was not a transfer: Make it one
+                    var targetAccount = household.Account.FindByID(li.CategoryAccountID);
+
+                    // Add transaction on "other side"
+                    var otherSideTransactionRow = household.Transaction.Add(accountRow, data.Date, data.Payee, data.Memo, data.Status, household.Checkpoint.GetMostRecentCheckpointID());
+                    var otherSideLiRow = household.LineItem.Add(otherSideTransactionRow, li.Memo, -li.Amount);
+
+                    // Create the transfer line items
+                    household.LineItemTransfer.AddLineItemTransferRow(liRow, targetAccount, otherSideTransactionRow);
+                    household.LineItemTransfer.AddLineItemTransferRow(otherSideLiRow, accountRow, transactionRow);
+                }
+                else
+                {
+                    // The line item was a transfer. Update the account, amount and memo in peer transaction
+                    // We should get here if the peer has only ONE line item 
+                    // ZZREORG: Allow modification of tx only on split side if it is split
+                    var otherSideTransactionRow = liTransferRow.TransactionRow;
+                    otherSideTransactionRow.AccountID = liTransferRow.AccountID;
+                    var otherSideLineItemRow = otherSideTransactionRow.GetLineItemRows().Single();
+                    otherSideLineItemRow.Amount = -li.Amount;
+                    if (string.IsNullOrEmpty(li.Memo))
+                    {
+                        otherSideLineItemRow.SetMemoNull();
+                    }
+                    else
+                    {
+                        otherSideLineItemRow.Memo = li.Memo;
+                    }
+                }
+            }
+            else if (li.CategoryID != -1)
+            {
+                // The updated transaction uses a regular category
+                if (liTransferRow != null)
+                {
+                    // The transaction used to be a transfer: Delete the peer transaction
+                    liTransferRow.TransactionRow.Delete();
+                    liTransferRow.Delete();
+                }
+
+                if (liCategoryRow == null)
+                {
+                    // Create new category line item
+                    household.LineItemCategory.AddLineItemCategoryRow(liRow, household.Category.FindByID(li.CategoryID));
+                }
+                else
+                {
+                    // update category line item
+                    liCategoryRow.CategoryID = li.CategoryID;
+                }
+            }
+            else
+            {
+                // The updated transaction has no category and no transfer
+                if (liCategoryRow != null)
+                {
+                    liCategoryRow.Delete();
+                }
+
+                if (liTransferRow != null)
+                {
+                    // The transaction used to be a transfer: Delete the peer transaction
+                    liTransferRow.TransactionRow.Delete();
+                    liTransferRow.Delete();
+                }
+            }
+        }
+
         #endregion
 
         #region Actions
@@ -331,16 +439,7 @@ namespace BanaData.Logic.Main
         {
             var household = mainWindowLogic.Household;
 
-            if (TransID == TRANSID_TRANSFER_FILLIN)
-            {
-                var liRow = household.LineItem.FindByID(data.LineItems[0].ID);
-                if (data.Status != liRow.TransferStatus)
-                {
-                    data.Status = liRow.TransferStatus;
-                    OnPropertyChanged(() => Status);
-                }
-            }
-            else if (TransID != TRANSID_NOT_COMMITTED)
+            if (TransID != TRANSID_NOT_COMMITTED)
             {
                 var trRow = household.Transaction.FindByID(TransID);
 
@@ -384,17 +483,15 @@ namespace BanaData.Logic.Main
         private void OnGotoOtherSideOfTransfer()
         {
             var household = mainWindowLogic.Household;
+            var transRow = household.Transaction.FindByID(TransID);
 
-            if (TransID == TRANSID_TRANSFER_FILLIN)
+            foreach (var liRow in transRow.GetLineItemRows())
             {
-                var liRow = household.LineItem.FindByID(data.LineItems[0].ID);
-                var transRow = liRow.TransactionRow;
-                mainWindowLogic.GotoTransaction(transRow.AccountID, transRow.ID, int.MinValue);
-            }
-            else
-            {
-                var li = data.LineItems.Find(l => l.CategoryAccountID >= 0);
-                mainWindowLogic.GotoTransaction(li.CategoryAccountID, int.MinValue, li.ID);
+                if (liRow.GetLineItemTransferRow() is Household.LineItemTransferRow lineItemTransferRow)
+                {
+                    mainWindowLogic.GotoTransaction(lineItemTransferRow.AccountID, lineItemTransferRow.PeerTransID);
+                    break;
+                }
             }
         }
 

@@ -62,6 +62,10 @@ namespace BanaData.Database {
         
         private TransactionReportPayeeDataTable tableTransactionReportPayee;
         
+        private LineItemTransferDataTable tableLineItemTransfer;
+        
+        private LineItemCategoryDataTable tableLineItemCategory;
+        
         private global::System.Data.DataRelation relationFK_Security_SecurityPrice;
         
         private global::System.Data.DataRelation relationFK_Account_Transaction;
@@ -102,13 +106,19 @@ namespace BanaData.Database {
         
         private global::System.Data.DataRelation relationFK_TransactionReport_TransactionReportPayee;
         
-        private global::System.Data.DataRelation relationAccount_LineItem;
+        private global::System.Data.DataRelation relationFK_LineItem_LineItemAccount;
         
-        private global::System.Data.DataRelation relationCategory_LineItem;
+        private global::System.Data.DataRelation relationFK_Account_LineItemAccount;
+        
+        private global::System.Data.DataRelation relationFK_Category_LineItemCategory;
+        
+        private global::System.Data.DataRelation relationLineItem_LineItemCategory;
         
         private global::System.Data.DataRelation relationCheckpoint_Transaction;
         
         private global::System.Data.DataRelation relationPerson_Account;
+        
+        private global::System.Data.DataRelation relationTransaction_LineItemTransfer;
         
         private global::System.Data.SchemaSerializationMode _schemaSerializationMode = global::System.Data.SchemaSerializationMode.IncludeSchema;
         
@@ -194,6 +204,12 @@ namespace BanaData.Database {
                 }
                 if ((ds.Tables["TransactionReportPayee"] != null)) {
                     base.Tables.Add(new TransactionReportPayeeDataTable(ds.Tables["TransactionReportPayee"]));
+                }
+                if ((ds.Tables["LineItemTransfer"] != null)) {
+                    base.Tables.Add(new LineItemTransferDataTable(ds.Tables["LineItemTransfer"]));
+                }
+                if ((ds.Tables["LineItemCategory"] != null)) {
+                    base.Tables.Add(new LineItemCategoryDataTable(ds.Tables["LineItemCategory"]));
                 }
                 this.DataSetName = ds.DataSetName;
                 this.Prefix = ds.Prefix;
@@ -405,6 +421,26 @@ namespace BanaData.Database {
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+        [global::System.ComponentModel.Browsable(false)]
+        [global::System.ComponentModel.DesignerSerializationVisibility(global::System.ComponentModel.DesignerSerializationVisibility.Content)]
+        public LineItemTransferDataTable LineItemTransfer {
+            get {
+                return this.tableLineItemTransfer;
+            }
+        }
+        
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+        [global::System.ComponentModel.Browsable(false)]
+        [global::System.ComponentModel.DesignerSerializationVisibility(global::System.ComponentModel.DesignerSerializationVisibility.Content)]
+        public LineItemCategoryDataTable LineItemCategory {
+            get {
+                return this.tableLineItemCategory;
+            }
+        }
+        
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
         [global::System.ComponentModel.BrowsableAttribute(true)]
         [global::System.ComponentModel.DesignerSerializationVisibilityAttribute(global::System.ComponentModel.DesignerSerializationVisibility.Visible)]
         public override global::System.Data.SchemaSerializationMode SchemaSerializationMode {
@@ -526,6 +562,12 @@ namespace BanaData.Database {
                 }
                 if ((ds.Tables["TransactionReportPayee"] != null)) {
                     base.Tables.Add(new TransactionReportPayeeDataTable(ds.Tables["TransactionReportPayee"]));
+                }
+                if ((ds.Tables["LineItemTransfer"] != null)) {
+                    base.Tables.Add(new LineItemTransferDataTable(ds.Tables["LineItemTransfer"]));
+                }
+                if ((ds.Tables["LineItemCategory"] != null)) {
+                    base.Tables.Add(new LineItemCategoryDataTable(ds.Tables["LineItemCategory"]));
                 }
                 this.DataSetName = ds.DataSetName;
                 this.Prefix = ds.Prefix;
@@ -674,6 +716,18 @@ namespace BanaData.Database {
                     this.tableTransactionReportPayee.InitVars();
                 }
             }
+            this.tableLineItemTransfer = ((LineItemTransferDataTable)(base.Tables["LineItemTransfer"]));
+            if ((initTable == true)) {
+                if ((this.tableLineItemTransfer != null)) {
+                    this.tableLineItemTransfer.InitVars();
+                }
+            }
+            this.tableLineItemCategory = ((LineItemCategoryDataTable)(base.Tables["LineItemCategory"]));
+            if ((initTable == true)) {
+                if ((this.tableLineItemCategory != null)) {
+                    this.tableLineItemCategory.InitVars();
+                }
+            }
             this.relationFK_Security_SecurityPrice = this.Relations["FK_Security_SecurityPrice"];
             this.relationFK_Account_Transaction = this.Relations["FK_Account_Transaction"];
             this.relationFK_Transaction_LineItem = this.Relations["FK_Transaction_LineItem"];
@@ -694,10 +748,13 @@ namespace BanaData.Database {
             this.relationFK_TransactionReport_TransactionReportAccount = this.Relations["FK_TransactionReport_TransactionReportAccount"];
             this.relationFK_Account_TransactionReportAccount = this.Relations["FK_Account_TransactionReportAccount"];
             this.relationFK_TransactionReport_TransactionReportPayee = this.Relations["FK_TransactionReport_TransactionReportPayee"];
-            this.relationAccount_LineItem = this.Relations["Account_LineItem"];
-            this.relationCategory_LineItem = this.Relations["Category_LineItem"];
+            this.relationFK_LineItem_LineItemAccount = this.Relations["FK_LineItem_LineItemAccount"];
+            this.relationFK_Account_LineItemAccount = this.Relations["FK_Account_LineItemAccount"];
+            this.relationFK_Category_LineItemCategory = this.Relations["FK_Category_LineItemCategory"];
+            this.relationLineItem_LineItemCategory = this.Relations["LineItem_LineItemCategory"];
             this.relationCheckpoint_Transaction = this.Relations["Checkpoint_Transaction"];
             this.relationPerson_Account = this.Relations["Person_Account"];
+            this.relationTransaction_LineItemTransfer = this.Relations["Transaction_LineItemTransfer"];
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -746,6 +803,10 @@ namespace BanaData.Database {
             base.Tables.Add(this.tableTransactionReportAccount);
             this.tableTransactionReportPayee = new TransactionReportPayeeDataTable();
             base.Tables.Add(this.tableTransactionReportPayee);
+            this.tableLineItemTransfer = new LineItemTransferDataTable();
+            base.Tables.Add(this.tableLineItemTransfer);
+            this.tableLineItemCategory = new LineItemCategoryDataTable();
+            base.Tables.Add(this.tableLineItemCategory);
             global::System.Data.ForeignKeyConstraint fkc;
             fkc = new global::System.Data.ForeignKeyConstraint("FK_Security_SecurityPrice", new global::System.Data.DataColumn[] {
                         this.tableSecurity.IDColumn}, new global::System.Data.DataColumn[] {
@@ -887,6 +948,34 @@ namespace BanaData.Database {
             fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
             fkc.DeleteRule = global::System.Data.Rule.Cascade;
             fkc.UpdateRule = global::System.Data.Rule.Cascade;
+            fkc = new global::System.Data.ForeignKeyConstraint("FK_LineItem_LineItemAccount", new global::System.Data.DataColumn[] {
+                        this.tableLineItem.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableLineItemTransfer.LineItemIDColumn});
+            this.tableLineItemTransfer.Constraints.Add(fkc);
+            fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
+            fkc.DeleteRule = global::System.Data.Rule.Cascade;
+            fkc.UpdateRule = global::System.Data.Rule.Cascade;
+            fkc = new global::System.Data.ForeignKeyConstraint("FK_Account_LineItemAccount", new global::System.Data.DataColumn[] {
+                        this.tableAccount.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableLineItemTransfer.AccountIDColumn});
+            this.tableLineItemTransfer.Constraints.Add(fkc);
+            fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
+            fkc.DeleteRule = global::System.Data.Rule.Cascade;
+            fkc.UpdateRule = global::System.Data.Rule.Cascade;
+            fkc = new global::System.Data.ForeignKeyConstraint("FK_Category_LineItemCategory", new global::System.Data.DataColumn[] {
+                        this.tableCategory.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableLineItemCategory.CategoryIDColumn});
+            this.tableLineItemCategory.Constraints.Add(fkc);
+            fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
+            fkc.DeleteRule = global::System.Data.Rule.Cascade;
+            fkc.UpdateRule = global::System.Data.Rule.Cascade;
+            fkc = new global::System.Data.ForeignKeyConstraint("LineItem_LineItemCategory", new global::System.Data.DataColumn[] {
+                        this.tableLineItem.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableLineItemCategory.LineItemIDColumn});
+            this.tableLineItemCategory.Constraints.Add(fkc);
+            fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
+            fkc.DeleteRule = global::System.Data.Rule.None;
+            fkc.UpdateRule = global::System.Data.Rule.None;
             this.relationFK_Security_SecurityPrice = new global::System.Data.DataRelation("FK_Security_SecurityPrice", new global::System.Data.DataColumn[] {
                         this.tableSecurity.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableSecurityPrice.SecurityIDColumn}, false);
@@ -967,14 +1056,22 @@ namespace BanaData.Database {
                         this.tableTransactionReport.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableTransactionReportPayee.TransactionReportIDColumn}, false);
             this.Relations.Add(this.relationFK_TransactionReport_TransactionReportPayee);
-            this.relationAccount_LineItem = new global::System.Data.DataRelation("Account_LineItem", new global::System.Data.DataColumn[] {
+            this.relationFK_LineItem_LineItemAccount = new global::System.Data.DataRelation("FK_LineItem_LineItemAccount", new global::System.Data.DataColumn[] {
+                        this.tableLineItem.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableLineItemTransfer.LineItemIDColumn}, false);
+            this.Relations.Add(this.relationFK_LineItem_LineItemAccount);
+            this.relationFK_Account_LineItemAccount = new global::System.Data.DataRelation("FK_Account_LineItemAccount", new global::System.Data.DataColumn[] {
                         this.tableAccount.IDColumn}, new global::System.Data.DataColumn[] {
-                        this.tableLineItem.AccountIDColumn}, false);
-            this.Relations.Add(this.relationAccount_LineItem);
-            this.relationCategory_LineItem = new global::System.Data.DataRelation("Category_LineItem", new global::System.Data.DataColumn[] {
+                        this.tableLineItemTransfer.AccountIDColumn}, false);
+            this.Relations.Add(this.relationFK_Account_LineItemAccount);
+            this.relationFK_Category_LineItemCategory = new global::System.Data.DataRelation("FK_Category_LineItemCategory", new global::System.Data.DataColumn[] {
                         this.tableCategory.IDColumn}, new global::System.Data.DataColumn[] {
-                        this.tableLineItem.CategoryIDColumn}, false);
-            this.Relations.Add(this.relationCategory_LineItem);
+                        this.tableLineItemCategory.CategoryIDColumn}, false);
+            this.Relations.Add(this.relationFK_Category_LineItemCategory);
+            this.relationLineItem_LineItemCategory = new global::System.Data.DataRelation("LineItem_LineItemCategory", new global::System.Data.DataColumn[] {
+                        this.tableLineItem.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableLineItemCategory.LineItemIDColumn}, false);
+            this.Relations.Add(this.relationLineItem_LineItemCategory);
             this.relationCheckpoint_Transaction = new global::System.Data.DataRelation("Checkpoint_Transaction", new global::System.Data.DataColumn[] {
                         this.tableCheckpoint.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableTransaction.CheckpointIDColumn}, false);
@@ -983,6 +1080,10 @@ namespace BanaData.Database {
                         this.tablePerson.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableAccount.PersonIDColumn}, false);
             this.Relations.Add(this.relationPerson_Account);
+            this.relationTransaction_LineItemTransfer = new global::System.Data.DataRelation("Transaction_LineItemTransfer", new global::System.Data.DataColumn[] {
+                        this.tableTransaction.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableLineItemTransfer.PeerTransIDColumn}, false);
+            this.Relations.Add(this.relationTransaction_LineItemTransfer);
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1101,6 +1202,18 @@ namespace BanaData.Database {
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+        private bool ShouldSerializeLineItemTransfer() {
+            return false;
+        }
+        
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+        private bool ShouldSerializeLineItemCategory() {
+            return false;
+        }
+        
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
         private void SchemaChanged(object sender, global::System.ComponentModel.CollectionChangeEventArgs e) {
             if ((e.Action == global::System.ComponentModel.CollectionChangeAction.Remove)) {
                 this.InitVars();
@@ -1210,6 +1323,12 @@ namespace BanaData.Database {
         
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
         public delegate void TransactionReportPayeeRowChangeEventHandler(object sender, TransactionReportPayeeRowChangeEvent e);
+        
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+        public delegate void LineItemTransferRowChangeEventHandler(object sender, LineItemTransferRowChangeEvent e);
+        
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+        public delegate void LineItemCategoryRowChangeEventHandler(object sender, LineItemCategoryRowChangeEvent e);
         
         /// <summary>
         ///Represents the strongly named DataTable class.
@@ -2908,15 +3027,9 @@ namespace BanaData.Database {
             
             private global::System.Data.DataColumn columnTransactionID;
             
-            private global::System.Data.DataColumn columnAccountID;
-            
-            private global::System.Data.DataColumn columnCategoryID;
-            
             private global::System.Data.DataColumn columnMemo;
             
             private global::System.Data.DataColumn columnAmount;
-            
-            private global::System.Data.DataColumn columnITransferStatus;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
@@ -2969,22 +3082,6 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public global::System.Data.DataColumn AccountIDColumn {
-                get {
-                    return this.columnAccountID;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public global::System.Data.DataColumn CategoryIDColumn {
-                get {
-                    return this.columnCategoryID;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public global::System.Data.DataColumn MemoColumn {
                 get {
                     return this.columnMemo;
@@ -2996,14 +3093,6 @@ namespace BanaData.Database {
             public global::System.Data.DataColumn AmountColumn {
                 get {
                     return this.columnAmount;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public global::System.Data.DataColumn ITransferStatusColumn {
-                get {
-                    return this.columnITransferStatus;
                 }
             }
             
@@ -3044,24 +3133,15 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public LineItemRow AddLineItemRow(TransactionRow parentTransactionRowByFK_Transaction_LineItem, AccountRow parentAccountRowByAccount_LineItem, CategoryRow parentCategoryRowByCategory_LineItem, string Memo, decimal Amount, int ITransferStatus) {
+            public LineItemRow AddLineItemRow(TransactionRow parentTransactionRowByFK_Transaction_LineItem, string Memo, decimal Amount) {
                 LineItemRow rowLineItemRow = ((LineItemRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
                         null,
-                        null,
-                        null,
                         Memo,
-                        Amount,
-                        ITransferStatus};
+                        Amount};
                 if ((parentTransactionRowByFK_Transaction_LineItem != null)) {
                     columnValuesArray[1] = parentTransactionRowByFK_Transaction_LineItem[0];
-                }
-                if ((parentAccountRowByAccount_LineItem != null)) {
-                    columnValuesArray[2] = parentAccountRowByAccount_LineItem[0];
-                }
-                if ((parentCategoryRowByCategory_LineItem != null)) {
-                    columnValuesArray[3] = parentCategoryRowByCategory_LineItem[0];
                 }
                 rowLineItemRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowLineItemRow);
@@ -3094,11 +3174,8 @@ namespace BanaData.Database {
             internal void InitVars() {
                 this.columnID = base.Columns["ID"];
                 this.columnTransactionID = base.Columns["TransactionID"];
-                this.columnAccountID = base.Columns["AccountID"];
-                this.columnCategoryID = base.Columns["CategoryID"];
                 this.columnMemo = base.Columns["Memo"];
                 this.columnAmount = base.Columns["Amount"];
-                this.columnITransferStatus = base.Columns["ITransferStatus"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -3108,16 +3185,10 @@ namespace BanaData.Database {
                 base.Columns.Add(this.columnID);
                 this.columnTransactionID = new global::System.Data.DataColumn("TransactionID", typeof(int), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnTransactionID);
-                this.columnAccountID = new global::System.Data.DataColumn("AccountID", typeof(int), null, global::System.Data.MappingType.Element);
-                base.Columns.Add(this.columnAccountID);
-                this.columnCategoryID = new global::System.Data.DataColumn("CategoryID", typeof(int), null, global::System.Data.MappingType.Element);
-                base.Columns.Add(this.columnCategoryID);
                 this.columnMemo = new global::System.Data.DataColumn("Memo", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnMemo);
                 this.columnAmount = new global::System.Data.DataColumn("Amount", typeof(decimal), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnAmount);
-                this.columnITransferStatus = new global::System.Data.DataColumn("ITransferStatus", typeof(int), null, global::System.Data.MappingType.Element);
-                base.Columns.Add(this.columnITransferStatus);
                 this.Constraints.Add(new global::System.Data.UniqueConstraint("Constraint1", new global::System.Data.DataColumn[] {
                                 this.columnID}, true));
                 this.columnID.AutoIncrement = true;
@@ -7280,6 +7351,616 @@ namespace BanaData.Database {
         }
         
         /// <summary>
+        ///Represents the strongly named DataTable class.
+        ///</summary>
+        [global::System.Serializable()]
+        [global::System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedTableSchema")]
+        public partial class LineItemTransferDataTable : global::System.Data.TypedTableBase<LineItemTransferRow> {
+            
+            private global::System.Data.DataColumn columnID;
+            
+            private global::System.Data.DataColumn columnLineItemID;
+            
+            private global::System.Data.DataColumn columnAccountID;
+            
+            private global::System.Data.DataColumn columnPeerTransID;
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public LineItemTransferDataTable() {
+                this.TableName = "LineItemTransfer";
+                this.BeginInit();
+                this.InitClass();
+                this.EndInit();
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            internal LineItemTransferDataTable(global::System.Data.DataTable table) {
+                this.TableName = table.TableName;
+                if ((table.CaseSensitive != table.DataSet.CaseSensitive)) {
+                    this.CaseSensitive = table.CaseSensitive;
+                }
+                if ((table.Locale.ToString() != table.DataSet.Locale.ToString())) {
+                    this.Locale = table.Locale;
+                }
+                if ((table.Namespace != table.DataSet.Namespace)) {
+                    this.Namespace = table.Namespace;
+                }
+                this.Prefix = table.Prefix;
+                this.MinimumCapacity = table.MinimumCapacity;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            protected LineItemTransferDataTable(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context) : 
+                    base(info, context) {
+                this.InitVars();
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public global::System.Data.DataColumn IDColumn {
+                get {
+                    return this.columnID;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public global::System.Data.DataColumn LineItemIDColumn {
+                get {
+                    return this.columnLineItemID;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public global::System.Data.DataColumn AccountIDColumn {
+                get {
+                    return this.columnAccountID;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public global::System.Data.DataColumn PeerTransIDColumn {
+                get {
+                    return this.columnPeerTransID;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            [global::System.ComponentModel.Browsable(false)]
+            public int Count {
+                get {
+                    return this.Rows.Count;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public LineItemTransferRow this[int index] {
+                get {
+                    return ((LineItemTransferRow)(this.Rows[index]));
+                }
+            }
+            
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public event LineItemTransferRowChangeEventHandler LineItemTransferRowChanging;
+            
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public event LineItemTransferRowChangeEventHandler LineItemTransferRowChanged;
+            
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public event LineItemTransferRowChangeEventHandler LineItemTransferRowDeleting;
+            
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public event LineItemTransferRowChangeEventHandler LineItemTransferRowDeleted;
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public void AddLineItemTransferRow(LineItemTransferRow row) {
+                this.Rows.Add(row);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public LineItemTransferRow AddLineItemTransferRow(LineItemRow parentLineItemRowByFK_LineItem_LineItemAccount, AccountRow parentAccountRowByFK_Account_LineItemAccount, TransactionRow parentTransactionRowByTransaction_LineItemTransfer) {
+                LineItemTransferRow rowLineItemTransferRow = ((LineItemTransferRow)(this.NewRow()));
+                object[] columnValuesArray = new object[] {
+                        null,
+                        null,
+                        null,
+                        null};
+                if ((parentLineItemRowByFK_LineItem_LineItemAccount != null)) {
+                    columnValuesArray[1] = parentLineItemRowByFK_LineItem_LineItemAccount[0];
+                }
+                if ((parentAccountRowByFK_Account_LineItemAccount != null)) {
+                    columnValuesArray[2] = parentAccountRowByFK_Account_LineItemAccount[0];
+                }
+                if ((parentTransactionRowByTransaction_LineItemTransfer != null)) {
+                    columnValuesArray[3] = parentTransactionRowByTransaction_LineItemTransfer[0];
+                }
+                rowLineItemTransferRow.ItemArray = columnValuesArray;
+                this.Rows.Add(rowLineItemTransferRow);
+                return rowLineItemTransferRow;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public LineItemTransferRow FindByID(int ID) {
+                return ((LineItemTransferRow)(this.Rows.Find(new object[] {
+                            ID})));
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public override global::System.Data.DataTable Clone() {
+                LineItemTransferDataTable cln = ((LineItemTransferDataTable)(base.Clone()));
+                cln.InitVars();
+                return cln;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            protected override global::System.Data.DataTable CreateInstance() {
+                return new LineItemTransferDataTable();
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            internal void InitVars() {
+                this.columnID = base.Columns["ID"];
+                this.columnLineItemID = base.Columns["LineItemID"];
+                this.columnAccountID = base.Columns["AccountID"];
+                this.columnPeerTransID = base.Columns["PeerTransID"];
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            private void InitClass() {
+                this.columnID = new global::System.Data.DataColumn("ID", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnID);
+                this.columnLineItemID = new global::System.Data.DataColumn("LineItemID", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnLineItemID);
+                this.columnAccountID = new global::System.Data.DataColumn("AccountID", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnAccountID);
+                this.columnPeerTransID = new global::System.Data.DataColumn("PeerTransID", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnPeerTransID);
+                this.Constraints.Add(new global::System.Data.UniqueConstraint("Constraint1", new global::System.Data.DataColumn[] {
+                                this.columnID}, true));
+                this.columnID.AutoIncrement = true;
+                this.columnID.AllowDBNull = false;
+                this.columnID.ReadOnly = true;
+                this.columnID.Unique = true;
+                this.columnLineItemID.AllowDBNull = false;
+                this.columnAccountID.AllowDBNull = false;
+                this.columnPeerTransID.AllowDBNull = false;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public LineItemTransferRow NewLineItemTransferRow() {
+                return ((LineItemTransferRow)(this.NewRow()));
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            protected override global::System.Data.DataRow NewRowFromBuilder(global::System.Data.DataRowBuilder builder) {
+                return new LineItemTransferRow(builder);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            protected override global::System.Type GetRowType() {
+                return typeof(LineItemTransferRow);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            protected override void OnRowChanged(global::System.Data.DataRowChangeEventArgs e) {
+                base.OnRowChanged(e);
+                if ((this.LineItemTransferRowChanged != null)) {
+                    this.LineItemTransferRowChanged(this, new LineItemTransferRowChangeEvent(((LineItemTransferRow)(e.Row)), e.Action));
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            protected override void OnRowChanging(global::System.Data.DataRowChangeEventArgs e) {
+                base.OnRowChanging(e);
+                if ((this.LineItemTransferRowChanging != null)) {
+                    this.LineItemTransferRowChanging(this, new LineItemTransferRowChangeEvent(((LineItemTransferRow)(e.Row)), e.Action));
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            protected override void OnRowDeleted(global::System.Data.DataRowChangeEventArgs e) {
+                base.OnRowDeleted(e);
+                if ((this.LineItemTransferRowDeleted != null)) {
+                    this.LineItemTransferRowDeleted(this, new LineItemTransferRowChangeEvent(((LineItemTransferRow)(e.Row)), e.Action));
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            protected override void OnRowDeleting(global::System.Data.DataRowChangeEventArgs e) {
+                base.OnRowDeleting(e);
+                if ((this.LineItemTransferRowDeleting != null)) {
+                    this.LineItemTransferRowDeleting(this, new LineItemTransferRowChangeEvent(((LineItemTransferRow)(e.Row)), e.Action));
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public void RemoveLineItemTransferRow(LineItemTransferRow row) {
+                this.Rows.Remove(row);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public static global::System.Xml.Schema.XmlSchemaComplexType GetTypedTableSchema(global::System.Xml.Schema.XmlSchemaSet xs) {
+                global::System.Xml.Schema.XmlSchemaComplexType type = new global::System.Xml.Schema.XmlSchemaComplexType();
+                global::System.Xml.Schema.XmlSchemaSequence sequence = new global::System.Xml.Schema.XmlSchemaSequence();
+                Household ds = new Household();
+                global::System.Xml.Schema.XmlSchemaAny any1 = new global::System.Xml.Schema.XmlSchemaAny();
+                any1.Namespace = "http://www.w3.org/2001/XMLSchema";
+                any1.MinOccurs = new decimal(0);
+                any1.MaxOccurs = decimal.MaxValue;
+                any1.ProcessContents = global::System.Xml.Schema.XmlSchemaContentProcessing.Lax;
+                sequence.Items.Add(any1);
+                global::System.Xml.Schema.XmlSchemaAny any2 = new global::System.Xml.Schema.XmlSchemaAny();
+                any2.Namespace = "urn:schemas-microsoft-com:xml-diffgram-v1";
+                any2.MinOccurs = new decimal(1);
+                any2.ProcessContents = global::System.Xml.Schema.XmlSchemaContentProcessing.Lax;
+                sequence.Items.Add(any2);
+                global::System.Xml.Schema.XmlSchemaAttribute attribute1 = new global::System.Xml.Schema.XmlSchemaAttribute();
+                attribute1.Name = "namespace";
+                attribute1.FixedValue = ds.Namespace;
+                type.Attributes.Add(attribute1);
+                global::System.Xml.Schema.XmlSchemaAttribute attribute2 = new global::System.Xml.Schema.XmlSchemaAttribute();
+                attribute2.Name = "tableTypeName";
+                attribute2.FixedValue = "LineItemTransferDataTable";
+                type.Attributes.Add(attribute2);
+                type.Particle = sequence;
+                global::System.Xml.Schema.XmlSchema dsSchema = ds.GetSchemaSerializable();
+                if (xs.Contains(dsSchema.TargetNamespace)) {
+                    global::System.IO.MemoryStream s1 = new global::System.IO.MemoryStream();
+                    global::System.IO.MemoryStream s2 = new global::System.IO.MemoryStream();
+                    try {
+                        global::System.Xml.Schema.XmlSchema schema = null;
+                        dsSchema.Write(s1);
+                        for (global::System.Collections.IEnumerator schemas = xs.Schemas(dsSchema.TargetNamespace).GetEnumerator(); schemas.MoveNext(); ) {
+                            schema = ((global::System.Xml.Schema.XmlSchema)(schemas.Current));
+                            s2.SetLength(0);
+                            schema.Write(s2);
+                            if ((s1.Length == s2.Length)) {
+                                s1.Position = 0;
+                                s2.Position = 0;
+                                for (; ((s1.Position != s1.Length) 
+                                            && (s1.ReadByte() == s2.ReadByte())); ) {
+                                    ;
+                                }
+                                if ((s1.Position == s1.Length)) {
+                                    return type;
+                                }
+                            }
+                        }
+                    }
+                    finally {
+                        if ((s1 != null)) {
+                            s1.Close();
+                        }
+                        if ((s2 != null)) {
+                            s2.Close();
+                        }
+                    }
+                }
+                xs.Add(dsSchema);
+                return type;
+            }
+        }
+        
+        /// <summary>
+        ///Represents the strongly named DataTable class.
+        ///</summary>
+        [global::System.Serializable()]
+        [global::System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedTableSchema")]
+        public partial class LineItemCategoryDataTable : global::System.Data.TypedTableBase<LineItemCategoryRow> {
+            
+            private global::System.Data.DataColumn columnID;
+            
+            private global::System.Data.DataColumn columnLineItemID;
+            
+            private global::System.Data.DataColumn columnCategoryID;
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public LineItemCategoryDataTable() {
+                this.TableName = "LineItemCategory";
+                this.BeginInit();
+                this.InitClass();
+                this.EndInit();
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            internal LineItemCategoryDataTable(global::System.Data.DataTable table) {
+                this.TableName = table.TableName;
+                if ((table.CaseSensitive != table.DataSet.CaseSensitive)) {
+                    this.CaseSensitive = table.CaseSensitive;
+                }
+                if ((table.Locale.ToString() != table.DataSet.Locale.ToString())) {
+                    this.Locale = table.Locale;
+                }
+                if ((table.Namespace != table.DataSet.Namespace)) {
+                    this.Namespace = table.Namespace;
+                }
+                this.Prefix = table.Prefix;
+                this.MinimumCapacity = table.MinimumCapacity;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            protected LineItemCategoryDataTable(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context) : 
+                    base(info, context) {
+                this.InitVars();
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public global::System.Data.DataColumn IDColumn {
+                get {
+                    return this.columnID;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public global::System.Data.DataColumn LineItemIDColumn {
+                get {
+                    return this.columnLineItemID;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public global::System.Data.DataColumn CategoryIDColumn {
+                get {
+                    return this.columnCategoryID;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            [global::System.ComponentModel.Browsable(false)]
+            public int Count {
+                get {
+                    return this.Rows.Count;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public LineItemCategoryRow this[int index] {
+                get {
+                    return ((LineItemCategoryRow)(this.Rows[index]));
+                }
+            }
+            
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public event LineItemCategoryRowChangeEventHandler LineItemCategoryRowChanging;
+            
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public event LineItemCategoryRowChangeEventHandler LineItemCategoryRowChanged;
+            
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public event LineItemCategoryRowChangeEventHandler LineItemCategoryRowDeleting;
+            
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public event LineItemCategoryRowChangeEventHandler LineItemCategoryRowDeleted;
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public void AddLineItemCategoryRow(LineItemCategoryRow row) {
+                this.Rows.Add(row);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public LineItemCategoryRow AddLineItemCategoryRow(LineItemRow parentLineItemRowByLineItem_LineItemCategory, CategoryRow parentCategoryRowByFK_Category_LineItemCategory) {
+                LineItemCategoryRow rowLineItemCategoryRow = ((LineItemCategoryRow)(this.NewRow()));
+                object[] columnValuesArray = new object[] {
+                        null,
+                        null,
+                        null};
+                if ((parentLineItemRowByLineItem_LineItemCategory != null)) {
+                    columnValuesArray[1] = parentLineItemRowByLineItem_LineItemCategory[0];
+                }
+                if ((parentCategoryRowByFK_Category_LineItemCategory != null)) {
+                    columnValuesArray[2] = parentCategoryRowByFK_Category_LineItemCategory[0];
+                }
+                rowLineItemCategoryRow.ItemArray = columnValuesArray;
+                this.Rows.Add(rowLineItemCategoryRow);
+                return rowLineItemCategoryRow;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public LineItemCategoryRow FindByID(int ID) {
+                return ((LineItemCategoryRow)(this.Rows.Find(new object[] {
+                            ID})));
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public override global::System.Data.DataTable Clone() {
+                LineItemCategoryDataTable cln = ((LineItemCategoryDataTable)(base.Clone()));
+                cln.InitVars();
+                return cln;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            protected override global::System.Data.DataTable CreateInstance() {
+                return new LineItemCategoryDataTable();
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            internal void InitVars() {
+                this.columnID = base.Columns["ID"];
+                this.columnLineItemID = base.Columns["LineItemID"];
+                this.columnCategoryID = base.Columns["CategoryID"];
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            private void InitClass() {
+                this.columnID = new global::System.Data.DataColumn("ID", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnID);
+                this.columnLineItemID = new global::System.Data.DataColumn("LineItemID", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnLineItemID);
+                this.columnCategoryID = new global::System.Data.DataColumn("CategoryID", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnCategoryID);
+                this.Constraints.Add(new global::System.Data.UniqueConstraint("Constraint1", new global::System.Data.DataColumn[] {
+                                this.columnID}, true));
+                this.columnID.AutoIncrement = true;
+                this.columnID.AllowDBNull = false;
+                this.columnID.ReadOnly = true;
+                this.columnID.Unique = true;
+                this.columnLineItemID.AllowDBNull = false;
+                this.columnCategoryID.AllowDBNull = false;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public LineItemCategoryRow NewLineItemCategoryRow() {
+                return ((LineItemCategoryRow)(this.NewRow()));
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            protected override global::System.Data.DataRow NewRowFromBuilder(global::System.Data.DataRowBuilder builder) {
+                return new LineItemCategoryRow(builder);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            protected override global::System.Type GetRowType() {
+                return typeof(LineItemCategoryRow);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            protected override void OnRowChanged(global::System.Data.DataRowChangeEventArgs e) {
+                base.OnRowChanged(e);
+                if ((this.LineItemCategoryRowChanged != null)) {
+                    this.LineItemCategoryRowChanged(this, new LineItemCategoryRowChangeEvent(((LineItemCategoryRow)(e.Row)), e.Action));
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            protected override void OnRowChanging(global::System.Data.DataRowChangeEventArgs e) {
+                base.OnRowChanging(e);
+                if ((this.LineItemCategoryRowChanging != null)) {
+                    this.LineItemCategoryRowChanging(this, new LineItemCategoryRowChangeEvent(((LineItemCategoryRow)(e.Row)), e.Action));
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            protected override void OnRowDeleted(global::System.Data.DataRowChangeEventArgs e) {
+                base.OnRowDeleted(e);
+                if ((this.LineItemCategoryRowDeleted != null)) {
+                    this.LineItemCategoryRowDeleted(this, new LineItemCategoryRowChangeEvent(((LineItemCategoryRow)(e.Row)), e.Action));
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            protected override void OnRowDeleting(global::System.Data.DataRowChangeEventArgs e) {
+                base.OnRowDeleting(e);
+                if ((this.LineItemCategoryRowDeleting != null)) {
+                    this.LineItemCategoryRowDeleting(this, new LineItemCategoryRowChangeEvent(((LineItemCategoryRow)(e.Row)), e.Action));
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public void RemoveLineItemCategoryRow(LineItemCategoryRow row) {
+                this.Rows.Remove(row);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public static global::System.Xml.Schema.XmlSchemaComplexType GetTypedTableSchema(global::System.Xml.Schema.XmlSchemaSet xs) {
+                global::System.Xml.Schema.XmlSchemaComplexType type = new global::System.Xml.Schema.XmlSchemaComplexType();
+                global::System.Xml.Schema.XmlSchemaSequence sequence = new global::System.Xml.Schema.XmlSchemaSequence();
+                Household ds = new Household();
+                global::System.Xml.Schema.XmlSchemaAny any1 = new global::System.Xml.Schema.XmlSchemaAny();
+                any1.Namespace = "http://www.w3.org/2001/XMLSchema";
+                any1.MinOccurs = new decimal(0);
+                any1.MaxOccurs = decimal.MaxValue;
+                any1.ProcessContents = global::System.Xml.Schema.XmlSchemaContentProcessing.Lax;
+                sequence.Items.Add(any1);
+                global::System.Xml.Schema.XmlSchemaAny any2 = new global::System.Xml.Schema.XmlSchemaAny();
+                any2.Namespace = "urn:schemas-microsoft-com:xml-diffgram-v1";
+                any2.MinOccurs = new decimal(1);
+                any2.ProcessContents = global::System.Xml.Schema.XmlSchemaContentProcessing.Lax;
+                sequence.Items.Add(any2);
+                global::System.Xml.Schema.XmlSchemaAttribute attribute1 = new global::System.Xml.Schema.XmlSchemaAttribute();
+                attribute1.Name = "namespace";
+                attribute1.FixedValue = ds.Namespace;
+                type.Attributes.Add(attribute1);
+                global::System.Xml.Schema.XmlSchemaAttribute attribute2 = new global::System.Xml.Schema.XmlSchemaAttribute();
+                attribute2.Name = "tableTypeName";
+                attribute2.FixedValue = "LineItemCategoryDataTable";
+                type.Attributes.Add(attribute2);
+                type.Particle = sequence;
+                global::System.Xml.Schema.XmlSchema dsSchema = ds.GetSchemaSerializable();
+                if (xs.Contains(dsSchema.TargetNamespace)) {
+                    global::System.IO.MemoryStream s1 = new global::System.IO.MemoryStream();
+                    global::System.IO.MemoryStream s2 = new global::System.IO.MemoryStream();
+                    try {
+                        global::System.Xml.Schema.XmlSchema schema = null;
+                        dsSchema.Write(s1);
+                        for (global::System.Collections.IEnumerator schemas = xs.Schemas(dsSchema.TargetNamespace).GetEnumerator(); schemas.MoveNext(); ) {
+                            schema = ((global::System.Xml.Schema.XmlSchema)(schemas.Current));
+                            s2.SetLength(0);
+                            schema.Write(s2);
+                            if ((s1.Length == s2.Length)) {
+                                s1.Position = 0;
+                                s2.Position = 0;
+                                for (; ((s1.Position != s1.Length) 
+                                            && (s1.ReadByte() == s2.ReadByte())); ) {
+                                    ;
+                                }
+                                if ((s1.Position == s1.Length)) {
+                                    return type;
+                                }
+                            }
+                        }
+                    }
+                    finally {
+                        if ((s1 != null)) {
+                            s1.Close();
+                        }
+                        if ((s2 != null)) {
+                            s2.Close();
+                        }
+                    }
+                }
+                xs.Add(dsSchema);
+                return type;
+            }
+        }
+        
+        /// <summary>
         ///Represents strongly named DataRow class.
         ///</summary>
         public partial class AccountRow : global::System.Data.DataRow {
@@ -7473,6 +8154,17 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public LineItemTransferRow[] GetLineItemTransferRows() {
+                if ((this.Table.ChildRelations["FK_Account_LineItemAccount"] == null)) {
+                    return new LineItemTransferRow[0];
+                }
+                else {
+                    return ((LineItemTransferRow[])(base.GetChildRows(this.Table.ChildRelations["FK_Account_LineItemAccount"])));
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public TransactionReportAccountRow[] GetTransactionReportAccountRows() {
                 if ((this.Table.ChildRelations["FK_Account_TransactionReportAccount"] == null)) {
                     return new TransactionReportAccountRow[0];
@@ -7523,17 +8215,6 @@ namespace BanaData.Database {
                 }
                 else {
                     return ((TransactionRow[])(base.GetChildRows(this.Table.ChildRelations["FK_Account_Transaction"])));
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public LineItemRow[] GetLineItemRows() {
-                if ((this.Table.ChildRelations["Account_LineItem"] == null)) {
-                    return new LineItemRow[0];
-                }
-                else {
-                    return ((LineItemRow[])(base.GetChildRows(this.Table.ChildRelations["Account_LineItem"])));
                 }
             }
         }
@@ -7671,6 +8352,17 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public LineItemCategoryRow[] GetLineItemCategoryRows() {
+                if ((this.Table.ChildRelations["FK_Category_LineItemCategory"] == null)) {
+                    return new LineItemCategoryRow[0];
+                }
+                else {
+                    return ((LineItemCategoryRow[])(base.GetChildRows(this.Table.ChildRelations["FK_Category_LineItemCategory"])));
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public TransactionReportCategoryRow[] GetTransactionReportCategoryRows() {
                 if ((this.Table.ChildRelations["FK_Category_TransactionReportCategory"] == null)) {
                     return new TransactionReportCategoryRow[0];
@@ -7699,17 +8391,6 @@ namespace BanaData.Database {
                 }
                 else {
                     return ((MemorizedLineItemRow[])(base.GetChildRows(this.Table.ChildRelations["FK_Category_MemorizedLineItem"])));
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public LineItemRow[] GetLineItemRows() {
-                if ((this.Table.ChildRelations["Category_LineItem"] == null)) {
-                    return new LineItemRow[0];
-                }
-                else {
-                    return ((LineItemRow[])(base.GetChildRows(this.Table.ChildRelations["Category_LineItem"])));
                 }
             }
         }
@@ -8066,6 +8747,17 @@ namespace BanaData.Database {
                     return ((LineItemRow[])(base.GetChildRows(this.Table.ChildRelations["FK_Transaction_LineItem"])));
                 }
             }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public LineItemTransferRow[] GetLineItemTransferRows() {
+                if ((this.Table.ChildRelations["Transaction_LineItemTransfer"] == null)) {
+                    return new LineItemTransferRow[0];
+                }
+                else {
+                    return ((LineItemTransferRow[])(base.GetChildRows(this.Table.ChildRelations["Transaction_LineItemTransfer"])));
+                }
+            }
         }
         
         /// <summary>
@@ -8106,38 +8798,6 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public int AccountID {
-                get {
-                    try {
-                        return ((int)(this[this.tableLineItem.AccountIDColumn]));
-                    }
-                    catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'AccountID\' in table \'LineItem\' is DBNull.", e);
-                    }
-                }
-                set {
-                    this[this.tableLineItem.AccountIDColumn] = value;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public int CategoryID {
-                get {
-                    try {
-                        return ((int)(this[this.tableLineItem.CategoryIDColumn]));
-                    }
-                    catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'CategoryID\' in table \'LineItem\' is DBNull.", e);
-                    }
-                }
-                set {
-                    this[this.tableLineItem.CategoryIDColumn] = value;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public string Memo {
                 get {
                     try {
@@ -8165,22 +8825,6 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public int ITransferStatus {
-                get {
-                    try {
-                        return ((int)(this[this.tableLineItem.ITransferStatusColumn]));
-                    }
-                    catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'ITransferStatus\' in table \'LineItem\' is DBNull.", e);
-                    }
-                }
-                set {
-                    this[this.tableLineItem.ITransferStatusColumn] = value;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public TransactionRow TransactionRow {
                 get {
                     return ((TransactionRow)(this.GetParentRow(this.Table.ParentRelations["FK_Transaction_LineItem"])));
@@ -8188,52 +8832,6 @@ namespace BanaData.Database {
                 set {
                     this.SetParentRow(value, this.Table.ParentRelations["FK_Transaction_LineItem"]);
                 }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public AccountRow AccountRow {
-                get {
-                    return ((AccountRow)(this.GetParentRow(this.Table.ParentRelations["Account_LineItem"])));
-                }
-                set {
-                    this.SetParentRow(value, this.Table.ParentRelations["Account_LineItem"]);
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public CategoryRow CategoryRow {
-                get {
-                    return ((CategoryRow)(this.GetParentRow(this.Table.ParentRelations["Category_LineItem"])));
-                }
-                set {
-                    this.SetParentRow(value, this.Table.ParentRelations["Category_LineItem"]);
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public bool IsAccountIDNull() {
-                return this.IsNull(this.tableLineItem.AccountIDColumn);
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public void SetAccountIDNull() {
-                this[this.tableLineItem.AccountIDColumn] = global::System.Convert.DBNull;
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public bool IsCategoryIDNull() {
-                return this.IsNull(this.tableLineItem.CategoryIDColumn);
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public void SetCategoryIDNull() {
-                this[this.tableLineItem.CategoryIDColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -8250,14 +8848,24 @@ namespace BanaData.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public bool IsITransferStatusNull() {
-                return this.IsNull(this.tableLineItem.ITransferStatusColumn);
+            public LineItemCategoryRow[] GetLineItemCategoryRows() {
+                if ((this.Table.ChildRelations["LineItem_LineItemCategory"] == null)) {
+                    return new LineItemCategoryRow[0];
+                }
+                else {
+                    return ((LineItemCategoryRow[])(base.GetChildRows(this.Table.ChildRelations["LineItem_LineItemCategory"])));
+                }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public void SetITransferStatusNull() {
-                this[this.tableLineItem.ITransferStatusColumn] = global::System.Convert.DBNull;
+            public LineItemTransferRow[] GetLineItemTransferRows() {
+                if ((this.Table.ChildRelations["FK_LineItem_LineItemAccount"] == null)) {
+                    return new LineItemTransferRow[0];
+                }
+                else {
+                    return ((LineItemTransferRow[])(base.GetChildRows(this.Table.ChildRelations["FK_LineItem_LineItemAccount"])));
+                }
             }
         }
         
@@ -9531,6 +10139,168 @@ namespace BanaData.Database {
         }
         
         /// <summary>
+        ///Represents strongly named DataRow class.
+        ///</summary>
+        public partial class LineItemTransferRow : global::System.Data.DataRow {
+            
+            private LineItemTransferDataTable tableLineItemTransfer;
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            internal LineItemTransferRow(global::System.Data.DataRowBuilder rb) : 
+                    base(rb) {
+                this.tableLineItemTransfer = ((LineItemTransferDataTable)(this.Table));
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public int ID {
+                get {
+                    return ((int)(this[this.tableLineItemTransfer.IDColumn]));
+                }
+                set {
+                    this[this.tableLineItemTransfer.IDColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public int LineItemID {
+                get {
+                    return ((int)(this[this.tableLineItemTransfer.LineItemIDColumn]));
+                }
+                set {
+                    this[this.tableLineItemTransfer.LineItemIDColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public int AccountID {
+                get {
+                    return ((int)(this[this.tableLineItemTransfer.AccountIDColumn]));
+                }
+                set {
+                    this[this.tableLineItemTransfer.AccountIDColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public int PeerTransID {
+                get {
+                    return ((int)(this[this.tableLineItemTransfer.PeerTransIDColumn]));
+                }
+                set {
+                    this[this.tableLineItemTransfer.PeerTransIDColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public LineItemRow LineItemRow {
+                get {
+                    return ((LineItemRow)(this.GetParentRow(this.Table.ParentRelations["FK_LineItem_LineItemAccount"])));
+                }
+                set {
+                    this.SetParentRow(value, this.Table.ParentRelations["FK_LineItem_LineItemAccount"]);
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public AccountRow AccountRow {
+                get {
+                    return ((AccountRow)(this.GetParentRow(this.Table.ParentRelations["FK_Account_LineItemAccount"])));
+                }
+                set {
+                    this.SetParentRow(value, this.Table.ParentRelations["FK_Account_LineItemAccount"]);
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public TransactionRow TransactionRow {
+                get {
+                    return ((TransactionRow)(this.GetParentRow(this.Table.ParentRelations["Transaction_LineItemTransfer"])));
+                }
+                set {
+                    this.SetParentRow(value, this.Table.ParentRelations["Transaction_LineItemTransfer"]);
+                }
+            }
+        }
+        
+        /// <summary>
+        ///Represents strongly named DataRow class.
+        ///</summary>
+        public partial class LineItemCategoryRow : global::System.Data.DataRow {
+            
+            private LineItemCategoryDataTable tableLineItemCategory;
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            internal LineItemCategoryRow(global::System.Data.DataRowBuilder rb) : 
+                    base(rb) {
+                this.tableLineItemCategory = ((LineItemCategoryDataTable)(this.Table));
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public int ID {
+                get {
+                    return ((int)(this[this.tableLineItemCategory.IDColumn]));
+                }
+                set {
+                    this[this.tableLineItemCategory.IDColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public int LineItemID {
+                get {
+                    return ((int)(this[this.tableLineItemCategory.LineItemIDColumn]));
+                }
+                set {
+                    this[this.tableLineItemCategory.LineItemIDColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public int CategoryID {
+                get {
+                    return ((int)(this[this.tableLineItemCategory.CategoryIDColumn]));
+                }
+                set {
+                    this[this.tableLineItemCategory.CategoryIDColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public CategoryRow CategoryRow {
+                get {
+                    return ((CategoryRow)(this.GetParentRow(this.Table.ParentRelations["FK_Category_LineItemCategory"])));
+                }
+                set {
+                    this.SetParentRow(value, this.Table.ParentRelations["FK_Category_LineItemCategory"]);
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public LineItemRow LineItemRow {
+                get {
+                    return ((LineItemRow)(this.GetParentRow(this.Table.ParentRelations["LineItem_LineItemCategory"])));
+                }
+                set {
+                    this.SetParentRow(value, this.Table.ParentRelations["LineItem_LineItemCategory"]);
+                }
+            }
+        }
+        
+        /// <summary>
         ///Row event argument class
         ///</summary>
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
@@ -10162,6 +10932,74 @@ namespace BanaData.Database {
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public TransactionReportPayeeRow Row {
+                get {
+                    return this.eventRow;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public global::System.Data.DataRowAction Action {
+                get {
+                    return this.eventAction;
+                }
+            }
+        }
+        
+        /// <summary>
+        ///Row event argument class
+        ///</summary>
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+        public class LineItemTransferRowChangeEvent : global::System.EventArgs {
+            
+            private LineItemTransferRow eventRow;
+            
+            private global::System.Data.DataRowAction eventAction;
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public LineItemTransferRowChangeEvent(LineItemTransferRow row, global::System.Data.DataRowAction action) {
+                this.eventRow = row;
+                this.eventAction = action;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public LineItemTransferRow Row {
+                get {
+                    return this.eventRow;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public global::System.Data.DataRowAction Action {
+                get {
+                    return this.eventAction;
+                }
+            }
+        }
+        
+        /// <summary>
+        ///Row event argument class
+        ///</summary>
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+        public class LineItemCategoryRowChangeEvent : global::System.EventArgs {
+            
+            private LineItemCategoryRow eventRow;
+            
+            private global::System.Data.DataRowAction eventAction;
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public LineItemCategoryRowChangeEvent(LineItemCategoryRow row, global::System.Data.DataRowAction action) {
+                this.eventRow = row;
+                this.eventAction = action;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public LineItemCategoryRow Row {
                 get {
                     return this.eventRow;
                 }

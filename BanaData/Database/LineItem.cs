@@ -15,27 +15,18 @@ namespace BanaData.Database
     {
         partial class LineItemRow
         {
-            // Bridges to local enum types
-            public ETransactionStatus TransferStatus
+            public LineItemCategoryRow GetLineItemCategoryRow()
             {
-                get { return (ETransactionStatus)ITransferStatus; }
-                set { ITransferStatus = (int)value; }
+                return GetLineItemCategoryRows().SingleOrDefault();
             }
 
-            public bool HasSame(int categoryID, int categoryAccountID, string memo, decimal amount)
+            public LineItemTransferRow GetLineItemTransferRow()
             {
-                int rowCategoryID = IsCategoryIDNull() ? -1 : CategoryID;
-                if (rowCategoryID != categoryID)
-                {
-                    return false;
-                }
+                return GetLineItemTransferRows().SingleOrDefault();
+            }
 
-                int rowCategoryAccountID = IsAccountIDNull() ? -1 : AccountID;
-                if (rowCategoryAccountID != categoryAccountID)
-                {
-                    return false;
-                }
-
+            public bool HasSame(string memo, decimal amount)
+            {
                 if (IsMemoNull())
                 {
                     if (!string.IsNullOrWhiteSpace(memo))
@@ -59,20 +50,20 @@ namespace BanaData.Database
 
         partial class LineItemDataTable
         {
-            public LineItemRow Add(TransactionRow transactionRow, int categoryId, int categoryAccountId, string memo, decimal amount, ETransactionStatus? transferStatus)
+            public LineItemRow Add(TransactionRow transactionRow, string memo, decimal amount)
             {
                 var lineItemRow = NewLineItemRow();
 
-                UpdateLineItem(lineItemRow, transactionRow, categoryId, categoryAccountId, memo, amount, transferStatus);
+                UpdateLineItem(lineItemRow, transactionRow, memo, amount);
 
                 Rows.Add(lineItemRow);
 
                 return lineItemRow;
             }
 
-            public LineItemRow Update(LineItemRow lineItemRow, TransactionRow transactionRow, int categoryId, int categoryAccountId, string memo, decimal amount, ETransactionStatus? transferStatus)
+            public LineItemRow Update(LineItemRow lineItemRow, TransactionRow transactionRow, string memo, decimal amount)
             {
-                UpdateLineItem(lineItemRow, transactionRow, categoryId, categoryAccountId, memo, amount, transferStatus);
+                UpdateLineItem(lineItemRow, transactionRow,  memo, amount);
 
                 return lineItemRow;
             }
@@ -81,30 +72,10 @@ namespace BanaData.Database
             private static LineItemRow UpdateLineItem(
                 LineItemRow lineItemRow,
                 TransactionRow transactionRow,
-                int categoryId,
-                int categoryAccountId, 
                 string memo,
-                decimal amount, 
-                ETransactionStatus? transferStatus)
+                decimal amount)
             {
                 lineItemRow.TransactionID = transactionRow.ID;
-
-                if (categoryId >= 0)
-                {
-                    lineItemRow.SetAccountIDNull();
-                    lineItemRow.CategoryID = categoryId;
-                }
-                else if (categoryAccountId >= 0)
-                {
-                    lineItemRow.AccountID = categoryAccountId;
-                    lineItemRow.SetCategoryIDNull();
-                }
-                else
-                {
-                    lineItemRow.SetAccountIDNull();
-                    lineItemRow.SetCategoryIDNull();
-                }
-
                 if (string.IsNullOrWhiteSpace(memo))
                 {
                     lineItemRow.SetMemoNull();
@@ -115,15 +86,6 @@ namespace BanaData.Database
                 }
 
                 lineItemRow.Amount = amount;
-
-                if (transferStatus.HasValue)
-                {
-                    lineItemRow.TransferStatus = transferStatus.Value;
-                }
-                else
-                {
-                    lineItemRow.SetITransferStatusNull();
-                }
 
                 return lineItemRow;
             }

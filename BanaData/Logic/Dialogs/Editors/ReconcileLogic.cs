@@ -103,32 +103,7 @@ namespace BanaData.Logic.Dialogs.Editors
                     medium,
                     tr.IsPayeeNull() ? "" : tr.Payee,
                     null,
-                    deposit ? amount : -amount,
-                    false);
-
-                transactions.Add(transaction);
-            }
-
-            // Process transfer fill-ins
-            foreach (Household.LineItemRow li in accountRow.GetUnreconciledTransfers())
-            {
-                decimal amount = -li.Amount;
-
-                // We want only deposit or payments
-                if (amount >= 0 ^ deposit)
-                {
-                    continue;
-                }
-
-                var transaction = new TransactionToReconcile(
-                    li.ID,
-                    li.TransferStatus == ETransactionStatus.Cleared,
-                    li.TransactionRow.Date,
-                    "",
-                    "",
-                    null,
-                    deposit ? amount : -amount,
-                    true);
+                    deposit ? amount : -amount);
 
                 transactions.Add(transaction);
             }
@@ -272,18 +247,9 @@ namespace BanaData.Logic.Dialogs.Editors
             {
                 foreach (TransactionToReconcile tr in trList.Transactions)
                 {
-                    if (tr.IsTransferFillIn)
-                    {
-                        var liRow = household.LineItem.FindByID(tr.ID);
-                        liRow.TransferStatus = tr.IsCleared == true ? newStatus : ETransactionStatus.Pending;
-                        liRow.TransactionRow.CheckpointID = latestCheckpoint;
-                    }
-                    else
-                    {
-                        var transRow = household.Transaction.FindByID(tr.ID);
-                        transRow.Status = tr.IsCleared == true ? newStatus : ETransactionStatus.Pending;
-                        transRow.CheckpointID = latestCheckpoint;
-                    }
+                    var transRow = household.Transaction.FindByID(tr.ID);
+                    transRow.Status = tr.IsCleared == true ? newStatus : ETransactionStatus.Pending;
+                    transRow.CheckpointID = latestCheckpoint;
                 }
             }
         }
@@ -298,8 +264,11 @@ namespace BanaData.Logic.Dialogs.Editors
             // Create new banking transaction row
             household.BankingTransaction.Add(transactionRow, ETransactionMedium.None, 0);
 
-            // Create the line items
-            household.LineItem.Add(transactionRow, reconcileInfoRow.InterestCategoryID, -1, "", interestAmount, null);
+            // Create the line item
+            var liRow = household.LineItem.Add(transactionRow, null, interestAmount);
+
+            // Create the category line item
+            household.LineItemCategory.AddLineItemCategoryRow(liRow, household.Category.FindByID(reconcileInfoRow.InterestCategoryID));
 
             // Post newly created transaction ID
             InterestTransactionID = transactionRow.ID;

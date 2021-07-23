@@ -38,7 +38,7 @@ namespace BanaData.Logic.Dialogs.Listers
                     bool inUse = false;
 
                     // Find if this category is in use
-                    inUse = household.LineItem.FirstOrDefault(li => !li.IsCategoryIDNull() && li.CategoryID == cat.ID) != null;
+                    inUse = household.LineItemCategory.FirstOrDefault(li => li.CategoryID == cat.ID) != null;
                     inUse |= household.MemorizedLineItem.FirstOrDefault(li => !li.IsCategoryIDNull() && li.CategoryID == cat.ID) != null;
 
                     categoriesSource.Add(new EditCategoryItem(cat, inUse));

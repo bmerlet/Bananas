@@ -145,20 +145,6 @@ namespace BanaData.Logic.Main
                 Console.WriteLine($"End edit transaction date {Date.ToShortDateString()} Payee {Payee} amount {Payment}");
 
                 // Check the changes
-                if (TransID == TRANSID_TRANSFER_FILLIN)
-                {
-                    // We only allow changing the status, as it is stored in the transfer line item
-                    var tmpData = new BankTransactionData(data as BankTransactionData) { Status = backup.Status };
-
-                    if (!tmpData.Equals(backup))
-                    {
-                        mainWindowLogic.ErrorMessage("Cannot edit this end of the transfer - please edit the other end");
-                        CancelEdit();
-                        BeginEdit();
-                        return false;
-                    }
-                }
-
                 if (backup.Status == ETransactionStatus.Reconciled && data.Status != ETransactionStatus.Reconciled)
                 {
                     if (!mainWindowLogic.YesNoQuestion("Are you sure you want to un-reconcile this transaction"))
@@ -228,17 +214,8 @@ namespace BanaData.Logic.Main
                 // Create all line items
                 foreach(var li in data.LineItems)
                 {
-                    ETransactionStatus? transferStatus = (li.CategoryAccountID < 0) ? null : ETransactionStatus.Pending as ETransactionStatus?;
-                    var liRow = household.LineItem.Add(transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount, transferStatus);
-                    li.ID = liRow.ID;
+                    CreateLineItemInDB(li, transactionRow);
                 }
-            }
-            else if (TransID == TRANSID_TRANSFER_FILLIN)
-            {
-                // Modification of status for transfer pseudo-transaction
-                // The status for the transactionless end of the transfer is kept in the transfer line item row 
-                var liRow = household.LineItem.FindByID(data.LineItems[0].ID);
-                liRow.TransferStatus = data.Status;
             }
             else
             {
@@ -263,25 +240,24 @@ namespace BanaData.Logic.Main
                         household.LineItem.FindByID(li.ID).Delete();
                     }
                 }
+
                 // Second update or create the other ones
                 foreach (var li in data.LineItems)
                 {
-                    ETransactionStatus? transferStatus = (li.CategoryAccountID < 0) ? null : ETransactionStatus.Pending as ETransactionStatus?;
                     if (li.ID >= 0)
                     {
-                        var liRow = household.LineItem.FindByID(li.ID);
-                        household.LineItem.Update(liRow, transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount, transferStatus);
+                        UpdateLineItemInDB(li, transactionRow);
                     }
                     else
                     {
-                        var liRow = household.LineItem.Add(transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount, transferStatus);
-                        li.ID = liRow.ID;
+                        CreateLineItemInDB(li, transactionRow);
                     }
                 }
             }
 
             mainWindowLogic.CommitChanges();
         }
+
 
         #endregion
 

@@ -79,7 +79,7 @@ namespace BanaData.Logic.Main
         #region Public Actions
 
         // Set the account to display
-        public void SetAccount(int accountID, int transactionID, int lineItemID)
+        public void SetAccount(int accountID, int transactionID)
         {
             // Get the account details
             var household = mainWindowLogic.Household;
@@ -103,39 +103,17 @@ namespace BanaData.Logic.Main
                 temporaryTransactionList.Add(trans);
             }
 
-            // Now find all transfers to this account ID from a difffernet account and create placeholder transactions
-            foreach (Household.LineItemRow lineItemRow in household.LineItem.Rows)
-            {
-                if (!lineItemRow.IsAccountIDNull() && lineItemRow.AccountID == accountID)
-                {
-                    var transferTransactionRow = lineItemRow.TransactionRow;
-                    if (transferTransactionRow.AccountID != accountID)
-                    {
-                        var trans = CreateMirrorTransaction(accountRow, lineItemRow);
-                        temporaryTransactionList.Add(trans);
-                    }
-                }
-            }
-
             // Publish the transactions
             transactions.ReplaceRange(temporaryTransactionList);
 
             // If asked to go to a specific transaction, go there
-            if (transactionID != int.MinValue || lineItemID != int.MinValue)
+            if (transactionID != int.MinValue)
             {
                 // Add new empty transaction at the bottom but don't select it
                 AddEmptyTransactionAtBottom(false);
 
                 // Find the transaction to select
-                AbstractTransactionLogic transToSelect;
-                if (transactionID == int.MinValue)
-                {
-                    transToSelect = transactions.FirstOrDefault(t => t.TransID == AbstractTransactionLogic.TRANSID_TRANSFER_FILLIN && t.FillInLineItemID == lineItemID);
-                }
-                else
-                {
-                    transToSelect = transactions.FirstOrDefault(t => t.TransID == transactionID);
-                }
+                AbstractTransactionLogic transToSelect = transactions.FirstOrDefault(t => t.TransID == transactionID);
 
                 if (transToSelect != null)
                 {
@@ -150,7 +128,6 @@ namespace BanaData.Logic.Main
                     });
 
                 }
-
             }
             else
             {
@@ -419,10 +396,9 @@ namespace BanaData.Logic.Main
                 return;
             }
 
-            if (atl.TransID == AbstractTransactionLogic.TRANSID_NOT_COMMITTED ||
-                atl.TransID == AbstractTransactionLogic.TRANSID_TRANSFER_FILLIN)
+            if (atl.TransID == AbstractTransactionLogic.TRANSID_NOT_COMMITTED)
             {
-                // Can't remove the empty transaction or a transfer fill-in
+                // Can't remove the empty transaction
                 return;
             }
 
@@ -456,10 +432,9 @@ namespace BanaData.Logic.Main
                 return;
             }
 
-            if (atl.TransID == AbstractTransactionLogic.TRANSID_NOT_COMMITTED ||
-                atl.TransID == AbstractTransactionLogic.TRANSID_TRANSFER_FILLIN)
+            if (atl.TransID == AbstractTransactionLogic.TRANSID_NOT_COMMITTED)
             {
-                // Can't remove the empty transaction or a transfer fill-in
+                // Can't remove the empty transaction
                 return;
             }
 
@@ -509,15 +484,15 @@ namespace BanaData.Logic.Main
                 int catID = -1;
                 int catAccntID = -1;
                 string category = "";
-                if (!dbli.IsAccountIDNull())
+                if (dbli.GetLineItemTransferRow() is Household.LineItemTransferRow lineItemTransferRow)
                 {
-                    category = "[" + dbli.AccountRow.Name + "]";
-                    catAccntID = dbli.AccountID;
+                    category = "[" + lineItemTransferRow.AccountRow.Name + "]";
+                    catAccntID = lineItemTransferRow.AccountID;
                 }
-                else if (!dbli.IsCategoryIDNull())
+                else if (dbli.GetLineItemCategoryRow() is Household.LineItemCategoryRow lineItemCategoryRow)
                 {
-                    category = dbli.CategoryRow.FullName;
-                    catID = dbli.CategoryID;
+                    category = lineItemCategoryRow.CategoryRow.FullName;
+                    catID = lineItemCategoryRow.CategoryID;
                 }
                 string memo = dbli.IsMemoNull() ? "" : dbli.Memo;
 
@@ -556,9 +531,7 @@ namespace BanaData.Logic.Main
                 if (EditedTransaction != null)
                 {
                     // Enable/disable context menu commands
-                    bool realTrans = 
-                        EditedTransaction.TransID != AbstractTransactionLogic.TRANSID_NOT_COMMITTED &&
-                        EditedTransaction.TransID != AbstractTransactionLogic.TRANSID_TRANSFER_FILLIN;
+                    bool realTrans = EditedTransaction.TransID != AbstractTransactionLogic.TRANSID_NOT_COMMITTED;
                     DeleteTransaction.SetCanExecute(realTrans);
                     MoveTransaction.SetCanExecute(realTrans);
 
@@ -623,11 +596,6 @@ namespace BanaData.Logic.Main
             Household.AccountRow account,
             Household.TransactionRow transRow,
             List<LineItem> lineItems);
-
-        // Create a mirror pseudo-transaction for transfers
-        protected abstract AbstractTransactionLogic CreateMirrorTransaction(
-            Household.AccountRow account,
-            Household.LineItemRow lineItem);
 
         // Creaste an empty transaction
         protected abstract AbstractTransactionLogic CreateEmptyTransaction();

@@ -279,18 +279,7 @@ namespace BanaData.Logic.Main
                 //
 
                 // Dead end of transfer
-                if (TransID == TRANSID_TRANSFER_FILLIN)
-                {
-                    // We only allow changing the status, as it is stored in the transfer line item
-                    var tmpData = new InvestmentTransactionData(data) { Status = backup.Status };
-                    if (!tmpData.Equals(backup))
-                    {
-                        mainWindowLogic.ErrorMessage("Cannot edit this end of the transfer - please edit the other end");
-                        CancelEdit();
-                        BeginEdit();
-                        return false;
-                    }
-                }
+                // ZZREORG
 
                 if (backup.Status == ETransactionStatus.Reconciled && data.Status != ETransactionStatus.Reconciled)
                 {
@@ -551,21 +540,7 @@ namespace BanaData.Logic.Main
                 household.InvestmentTransaction.Add(transactionRow, data.Type, securityRow, data.SecurityPrice, data.SecurityQuantity, data.Commission);
 
                 // Create the line item
-                var li = data.LineItems[0];
-                ETransactionStatus? transferStatus = (li.CategoryAccountID < 0) ? null : ETransactionStatus.Pending as ETransactionStatus?;
-                var liRow = household.LineItem.Add(transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount, transferStatus);
-                if (li.CategoryAccountID >= 0)
-                {
-                    liRow.TransferStatus = ETransactionStatus.Pending;
-                }
-                li.ID = liRow.ID;
-            }
-            else if (TransID == TRANSID_TRANSFER_FILLIN)
-            {
-                // Modification of status for transfer pseudo-transaction
-                // The status for the transactionless end of the transfer is kept in the transfer line item row 
-                var liRow = household.LineItem.FindByID(data.LineItems[0].ID);
-                liRow.TransferStatus = data.Status;
+                CreateLineItemInDB(data.LineItems[0], transactionRow);
             }
             else
             {
@@ -576,10 +551,7 @@ namespace BanaData.Logic.Main
                 household.InvestmentTransaction.Update(transactionRow, data.Type, securityRow, data.SecurityPrice, data.SecurityQuantity, data.Commission);
 
                 // Update the line item
-                var li = data.LineItems[0];
-                var liRow = household.LineItem.FindByID(li.ID);
-                ETransactionStatus? transferStatus = (li.CategoryAccountID < 0) ? null : ETransactionStatus.Pending as ETransactionStatus?;
-                household.LineItem.Update(liRow, transactionRow, li.CategoryID, li.CategoryAccountID, li.Memo, li.Amount, transferStatus);
+                UpdateLineItemInDB(data.LineItems[0], transactionRow);
             }
 
             mainWindowLogic.CommitChanges();

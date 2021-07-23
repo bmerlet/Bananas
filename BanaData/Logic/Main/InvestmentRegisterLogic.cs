@@ -72,37 +72,6 @@ namespace BanaData.Logic.Main
             return new InvestmentTransactionLogic(mainWindowLogic, accountRow);
         }
 
-        // Create a mirror pseudo-transaction for transfers
-        protected override AbstractTransactionLogic CreateMirrorTransaction(
-            Household.AccountRow accountRow,
-            Household.LineItemRow otherLineItemRow)
-        {
-            var otherTransRow = otherLineItemRow.TransactionRow;
-            var otherAccountRow = otherTransRow.AccountRow;
-
-            var lineItem = new LineItem(
-                mainWindowLogic,
-                otherLineItemRow.ID,        // A bit confusing, but we store the transfer line item ID here to be able to modify the TransferStatus
-                "[" + otherAccountRow.Name + "]",
-                -1,
-                otherAccountRow.ID,
-                otherLineItemRow.IsMemoNull() ? "" : otherLineItemRow.Memo,
-                -otherLineItemRow.Amount, false);
-
-            var transactionData = new InvestmentTransactionLogic.InvestmentTransactionData(
-                otherTransRow.Date,
-                "",
-                otherTransRow.IsMemoNull() ? "" : otherTransRow.Memo,
-                otherLineItemRow.TransferStatus,
-                new LineItem[] { lineItem },
-                lineItem.Amount > 0 ? EInvestmentTransactionType.TransferCashIn : EInvestmentTransactionType.TransferCashOut,
-                -1, 0, 0, 0);
-
-            var investmentTransaction = new InvestmentTransactionLogic(mainWindowLogic,  accountRow, AbstractTransactionLogic.TRANSID_TRANSFER_FILLIN, transactionData);
-
-            return investmentTransaction;
-        }
-
         // Override to compute share balances in addition to cash balance
         public override void RecomputeBalances()
         {

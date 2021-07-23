@@ -310,7 +310,7 @@ namespace BanaData.Logic.Dialogs.Reports
                         // Go through all the line items
                         foreach (var li in transactionRow.GetLineItemRows())
                         {
-                            if (!li.IsCategoryIDNull() && interestCategories.Contains(li.CategoryID))
+                            if (li.GetLineItemCategoryRow() is Household.LineItemCategoryRow lineItemCategoryRow && interestCategories.Contains(lineItemCategoryRow.CategoryID))
                             {
                                 string description = transactionRow.IsPayeeNull() ? "Interest" : transactionRow.Payee;
                                 tempTransList.Add(new TransactionItem(transactionRow.Date, accountName, "", description, 0, 0, 0, li.Amount));

@@ -13,13 +13,12 @@ namespace BanaData.Logic.Items
     public class TransactionToReconcile : LogicBase
     {
         // Constructor
-        public TransactionToReconcile(int id, bool _isCleared, DateTime date, string medium, string description, string symbol, decimal amount, bool isTransferFillIn) =>
-            (ID, isCleared, Date, Medium, Description, Symbol, Amount, IsTransferFillIn) =
-            (id, _isCleared, date, medium, description, symbol, amount, isTransferFillIn);
+        public TransactionToReconcile(int id, bool _isCleared, DateTime date, string medium, string description, string symbol, decimal amount) =>
+            (ID, isCleared, Date, Medium, Description, Symbol, Amount) =
+            (id, _isCleared, date, medium, description, symbol, amount);
 
         // Identifier - transaction ID
         public readonly int ID;
-        public bool IsTransferFillIn;
 
         // Event
         public event EventHandler TransactionCleared;

@@ -231,37 +231,6 @@ namespace BanaData.Serializations
 
                     sw.WriteLine("^");
                 }
-
-                // Now find all transfers that have this account as destination
-                foreach(var lineItemRow in household.LineItem.Where(li => !li.IsAccountIDNull() && li.AccountID == accountRow.ID))
-                {
-                    var transactionRow = lineItemRow.TransactionRow;
-
-                    // If filtering on checkpoint, skip transactions that do not match
-                    if (checkpointID >= 0 && transactionRow.CheckpointID != checkpointID)
-                    {
-                        continue;
-                    }
-
-                    // Skip transfers to self
-                    if (transactionRow.AccountID == accountRow.ID)
-                    {
-                        continue;
-                    }
-
-                    ExportDate(sw, transactionRow.Date);
-
-                    if (accountRow.Type == EAccountType.Investment)
-                    {
-                        ExportInvestmentFillIn(sw, transactionRow, lineItemRow);
-                    }
-                    else
-                    {
-                        ExportBankingFillIn(sw, transactionRow, lineItemRow);
-                    }
-
-                    sw.WriteLine("^");
-                }
             }
         }
 
@@ -326,22 +295,6 @@ namespace BanaData.Serializations
                 }
             }
         }
-
-        private void ExportBankingFillIn(StreamWriter sw, Household.TransactionRow transactionRow, Household.LineItemRow lineItemRow)
-        {
-            decimal amount = -lineItemRow.Amount;
-            sw.WriteLine($"U{amount:N2}");
-            sw.WriteLine($"T{amount:N2}");
-            ExportTransactionStatus(sw, lineItemRow.TransferStatus, false);
-
-            if (!transactionRow.IsMemoNull())
-            {
-                sw.WriteLine($"M{transactionRow.Memo}");
-            }
-
-            sw.WriteLine("L" + mainWindowLogic.CategoriesAndTransfers.Find(c => c.AccountID == transactionRow.AccountID).FullName);
-        }
-
 
         private void ExportInvestmentTransaction(StreamWriter sw, Household.TransactionRow transactionRow)
         {
@@ -505,27 +458,6 @@ namespace BanaData.Serializations
             }
         }
 
-        private void ExportInvestmentFillIn(StreamWriter sw, Household.TransactionRow transactionRow, Household.LineItemRow lineItemRow)
-        {
-            decimal amount = -lineItemRow.Amount;
-
-            sw.WriteLine("N" + (amount > 0 ? "XIn" : "XOut"));
-
-            ExportTransactionStatus(sw, lineItemRow.TransferStatus, false);
-
-            sw.WriteLine($"U{Math.Abs(amount):N2}");
-            sw.WriteLine($"T{Math.Abs(amount):N2}");
-
-            if (!transactionRow.IsMemoNull())
-            {
-                sw.WriteLine($"M{transactionRow.Memo}");
-            }
-
-            sw.WriteLine("L" + mainWindowLogic.CategoriesAndTransfers.Find(c => c.AccountID == transactionRow.AccountID).FullName);
-
-            sw.WriteLine($"${Math.Abs(amount):N2}");
-        }
-
         private void ExportTransactionStatus(StreamWriter sw, ETransactionStatus status, bool investment)
         {
             switch(status)
@@ -545,13 +477,13 @@ namespace BanaData.Serializations
         private void ExportCategory(StreamWriter sw, Household.LineItemRow lineItemRow, bool forSplit)
         {
             string letter = forSplit ? "S" : "L";
-            if (!lineItemRow.IsCategoryIDNull())
+            if (lineItemRow.GetLineItemCategoryRow() is Household.LineItemCategoryRow lineItemCategoryRow)
             {
-                sw.WriteLine(letter + mainWindowLogic.CategoriesAndTransfers.Find(c => c.ID == lineItemRow.CategoryID).FullName);
+                sw.WriteLine(letter + mainWindowLogic.Categories.Find(c => c.ID == lineItemCategoryRow.CategoryID).FullName);
             }
-            else if (!lineItemRow.IsAccountIDNull())
+            else if (lineItemRow.GetLineItemTransferRow() is Household.LineItemTransferRow lineItemTransferRow)
             {
-                sw.WriteLine(letter + mainWindowLogic.CategoriesAndTransfers.Find(c => c.AccountID == lineItemRow.AccountID).FullName);
+                sw.WriteLine(letter + mainWindowLogic.Transfers.Find(t => t.AccountID == lineItemTransferRow.AccountID).FullName);
             }
         }
 

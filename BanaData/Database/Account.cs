@@ -101,19 +101,6 @@ namespace BanaData.Database
                     }
                 }
 
-                // Add tansfers to/from that account
-                foreach (var lineItemRow in GetLineItemRows())
-                {
-                    var transRow = lineItemRow.TransactionRow;
-                    if (transRow.AccountID != ID)
-                    {
-                        if (!filter || lineItemRow.TransferStatus == statusToFilterOn)
-                        {
-                            balance -= lineItemRow.Amount;
-                        }
-                    }
-                }
-
                 return balance;
             }
 
@@ -121,14 +108,6 @@ namespace BanaData.Database
             public IEnumerable<TransactionRow> GetUnreconciledTransactions()
             {
                 return GetTransactionRows().Where(tr => tr.Status != ETransactionStatus.Reconciled);
-            }
-
-            // Get the unreconciled transfer to a banking account
-            public IEnumerable<LineItemRow> GetUnreconciledTransfers()
-            {
-                return GetLineItemRows()
-                    .Where(li => li.TransactionRow.AccountID != ID)
-                    .Where(li => li.TransferStatus != ETransactionStatus.Reconciled);
             }
 
             // Get the balance of an investment account
@@ -139,15 +118,6 @@ namespace BanaData.Database
                 foreach (var transRow in GetTransactionRows())
                 {
                     portfolio.ApplyTransaction(transRow);
-                }
-
-                // Add tansfers to/from that account
-                foreach (var lineItemRow in GetLineItemRows())
-                {
-                    if (lineItemRow.TransactionRow.AccountID != ID)
-                    {
-                        portfolio.ApplyTransfer(lineItemRow);
-                    }
                 }
 
                 // Get latest price for the securities in the portfolio

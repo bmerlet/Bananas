@@ -51,7 +51,7 @@ namespace BanaData.Logic.Dialogs.Reports
 
         public void GoTo(FoundItem item)
         {
-            mainWindowLogic.GotoTransaction(item.TransRow.AccountID, item.TransRow.ID, int.MinValue);
+            mainWindowLogic.GotoTransaction(item.TransRow.AccountID, item.TransRow.ID);
         }
 
         private void OnSearch(object arg)
@@ -110,11 +110,13 @@ namespace BanaData.Logic.Dialogs.Reports
                             {
                                 addIt = true;
                             }
-                            else if (!liRow.IsCategoryIDNull() && liRow.CategoryRow.FullName.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0)
+                            else if (liRow.GetLineItemCategoryRow() is Household.LineItemCategoryRow lineItemCategoryRow &&
+                                     lineItemCategoryRow.CategoryRow.FullName.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0)
                             {
                                 addIt = true;
                             }
-                            else if (!liRow.IsAccountIDNull() && liRow.AccountRow.Name.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0)
+                            else if (liRow.GetLineItemTransferRow() is Household.LineItemTransferRow lineItemTransferRow &&
+                                    lineItemTransferRow.AccountRow.Name.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0)
                             {
                                 addIt = true;
                             }
@@ -176,8 +178,8 @@ namespace BanaData.Logic.Dialogs.Reports
             public string Payee => TransRow.IsPayeeNull() ? "" : TransRow.Payee;
             public string Memo => TransRow.IsMemoNull() ? "" : TransRow.Memo;
             public string Category => TransRow.GetLineItemRows().Length > 1 ? "<Split>" :
-                (!TransRow.GetLineItemRows().Single().IsCategoryIDNull() ? TransRow.GetLineItemRows().Single().CategoryRow.FullName :
-                (!TransRow.GetLineItemRows().Single().IsAccountIDNull() ? TransRow.GetLineItemRows().Single().AccountRow.Name : ""));
+                (TransRow.GetLineItemRows().Single().GetLineItemCategoryRow() != null ? TransRow.GetLineItemRows().Single().GetLineItemCategoryRow().CategoryRow.FullName :
+                (TransRow.GetLineItemRows().Single().GetLineItemTransferRow() != null ? TransRow.GetLineItemRows().Single().GetLineItemTransferRow().AccountRow.Name : ""));
             public decimal Amount => TransRow.GetLineItemRows().Sum(li => li.Amount);
         }
 

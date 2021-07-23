@@ -450,9 +450,9 @@ namespace BanaData.Logic.Main
             OnBankAccountClicked(accountID);
         }
 
-        private void OnBankAccountClicked(int accountID, int transactionID = int.MinValue, int lineItemID = int.MinValue)
+        private void OnBankAccountClicked(int accountID, int transactionID = int.MinValue)
         { 
-            BankRegister.SetAccount(accountID, transactionID, lineItemID);
+            BankRegister.SetAccount(accountID, transactionID);
             DisplayedAccountID = accountID;
             MainMenuLogic.Reconcile.SetCanExecute(accountID >= 0);
             MainMenuLogic.ShowHoldings.SetCanExecute(false);
@@ -463,12 +463,12 @@ namespace BanaData.Logic.Main
             OnPropertyChanged(() => IsBankRegisterVisible);
         }
 
-        public void OnInvestmentAccountClicked(int accountID, int transactionID = int.MinValue, int lineItemID = int.MinValue)
+        public void OnInvestmentAccountClicked(int accountID, int transactionID = int.MinValue)
         {
             BankAccountGroup.SelectedAccount = null;
             AssetAccountGroup.SelectedAccount = null;
 
-            InvestmentRegister.SetAccount(accountID, transactionID, lineItemID);
+            InvestmentRegister.SetAccount(accountID, transactionID);
             DisplayedAccountID = accountID;
             MainMenuLogic.Reconcile.SetCanExecute(accountID >= 0);
             MainMenuLogic.ShowHoldings.SetCanExecute(accountID >= 0);
@@ -479,7 +479,7 @@ namespace BanaData.Logic.Main
             OnPropertyChanged(() => IsBankRegisterVisible);
         }
 
-        public void GotoTransaction(int accountID, int transactionID, int lineItemID)
+        public void GotoTransaction(int accountID, int transactionID)
         {
             BankAccountGroup.SelectedAccount = null;
             AssetAccountGroup.SelectedAccount = null;
@@ -488,11 +488,11 @@ namespace BanaData.Logic.Main
             var accountRow = Household.Account.FindByID(accountID);
             if (accountRow.Type == EAccountType.Investment)
             {
-                OnInvestmentAccountClicked(accountID, transactionID, lineItemID);
+                OnInvestmentAccountClicked(accountID, transactionID);
             }
             else
             {
-                OnBankAccountClicked(accountID, transactionID, lineItemID);
+                OnBankAccountClicked(accountID, transactionID);
             }
         }
 

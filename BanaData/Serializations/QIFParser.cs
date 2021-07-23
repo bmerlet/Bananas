@@ -852,10 +852,29 @@ namespace BanaData.Serializations
                 bool lineItemsMatch = true;
                 for (int i = 0; i < lineItemRows.Length; i++)
                 {
-                    if (!lineItemRows[i].HasSame(lineItemHolders[i].CategoryID, lineItemHolders[i].AccountID, lineItemHolders[i].Memo, lineItemHolders[i].Amount))
+                    if (!lineItemRows[i].HasSame(lineItemHolders[i].Memo, lineItemHolders[i].Amount))
                     {
                         lineItemsMatch = false;
                         break;
+                    }
+
+                    if (lineItemHolders[i].CategoryID != -1)
+                    {
+                        var lineItemCategoryRow = lineItemRows[i].GetLineItemCategoryRow();
+                        if (lineItemCategoryRow == null || lineItemCategoryRow.CategoryID != lineItemHolders[i].CategoryID)
+                        {
+                            lineItemsMatch = false;
+                            break;
+                        }
+                    }
+                    else if (lineItemHolders[i].AccountID != -1)
+                    {
+                        var lineItemTransferRow = lineItemRows[i].GetLineItemTransferRow();
+                        if (lineItemTransferRow == null || lineItemTransferRow.AccountID != lineItemHolders[i].AccountID)
+                        {
+                            lineItemsMatch = false;
+                            break;
+                        }
                     }
                 }
 
@@ -883,26 +902,6 @@ namespace BanaData.Serializations
                 return;
             }
 
-            // This may be the end of a transfer that was deleted by the pairing algorithm
-            if (lineItemHolders.Count == 1 && lineItemHolders[0].AccountID >= 0)
-            {
-                foreach(Household.LineItemRow li in household.LineItem.Rows)
-                {
-                    if (!li.IsAccountIDNull() && li.AccountID == accountRow.ID &&
-                        !li.IsITransferStatusNull() &&
-                        li.Amount == -lineItemHolders[0].Amount)
-                    {
-                        // Verify this transaction took place in the account targetted by our line item
-                        if (li.TransactionRow.AccountID == lineItemHolders[0].AccountID)
-                        {
-                            // Found you
-                            bankTransactionTracker.FoundIDs.Add(li.ID); // ZZZ ???
-                            return;
-                        }
-                    }
-                }
-            }
-
             // Let's see if this is one of the transfers that are incorrect in the QIF
             // and that were modified to have an undefined category
             if (transAlmostTheSame.Count == 1 && lineItemHolders.Count == 1)
@@ -910,7 +909,9 @@ namespace BanaData.Serializations
                 var transRow = transAlmostTheSame[0];
                 var lineItemRows = transRow.GetLineItemRows();
                 if (lineItemRows.Length == 1 &&
-                    lineItemRows[0].HasSame(lineItemHolders[0].CategoryID, -1, lineItemHolders[0].Memo, lineItemHolders[0].Amount))
+                    lineItemRows[0].HasSame(lineItemHolders[0].Memo, lineItemHolders[0].Amount) &&
+                    lineItemRows[0].GetLineItemCategoryRow() == null &&
+                    lineItemRows[0].GetLineItemTransferRow() == null)
                 {
                     // Yeah, that's it
                     bankTransactionTracker.FoundIDs.Add(transRow.ID);
@@ -945,13 +946,23 @@ namespace BanaData.Serializations
             // Add the line item(s)
             foreach (var lih in lineItemHolders)
             {
-                household.LineItem.Add(
-                    transRow,
-                    lih.CategoryID,
-                    lih.AccountID,
-                    lih.Memo,
-                    lih.Amount,
-                    null);
+                var li = household.LineItem.Add(transRow, lih.Memo, lih.Amount);
+
+                if (lih.CategoryID != -1)
+                {
+                    var lineItemCategoryRow = household.LineItemCategory.NewLineItemCategoryRow();
+                    lineItemCategoryRow.LineItemID = li.ID;
+                    lineItemCategoryRow.CategoryID = lih.CategoryID;
+                    household.LineItemCategory.AddLineItemCategoryRow(lineItemCategoryRow);
+                }
+                else if (lih.AccountID != -1)
+                {
+                    var lineItemTransferRow = household.LineItemTransfer.NewLineItemTransferRow();
+                    lineItemTransferRow.LineItemID = li.ID;
+                    lineItemTransferRow.AccountID = lih.AccountID;
+                    lineItemTransferRow.PeerTransID = -1;
+                    household.LineItemTransfer.AddLineItemTransferRow(lineItemTransferRow);
+                }
             }
 
             return transRow;
@@ -1175,12 +1186,25 @@ namespace BanaData.Serializations
 
                 // Compare the line items
                 var liRow = lineItemRows[0];
-                if (!liRow.HasSame(categoryID, categoryAccountID, null, amount))
+                if (!liRow.HasSame(null, amount))
                 {
-                    // May be an edited one? see pair transfer algorithm
-                    if (categoryAccountID < 0 || !liRow.HasSame(categoryID, -1, null, amount))
+                    continue;
+                }
+                if (categoryID != -1)
+                {
+                    var lineItemCategoryRow = liRow.GetLineItemCategoryRow();
+                    if (lineItemCategoryRow == null || lineItemCategoryRow.CategoryID != categoryID)
                     {
-                        // Not the same
+                        continue;
+                    }
+                }
+                else if (categoryAccountID != -1)
+                {
+                    var lineItemTransferRow = liRow.GetLineItemTransferRow();
+
+                    // We accept non-transfer, it may have been edited by the transfer matching algorithm
+                    if (lineItemTransferRow != null && lineItemTransferRow.AccountID != categoryAccountID)
+                    {
                         continue;
                     }
                 }
@@ -1188,26 +1212,6 @@ namespace BanaData.Serializations
                 // Miracle! we found the exact same transaction
                 investmentTransactionTracker.FoundIDs.Add(transRow.ID);
                 return;
-            }
-
-            // This may be the end of a transfer that was deleted by the pairing algorithm
-            if (categoryAccountID >= 0)
-            {
-                foreach (Household.LineItemRow li in household.LineItem.Rows)
-                {
-                    if (!li.IsAccountIDNull() && li.AccountID == accountRow.ID &&
-                        !li.IsITransferStatusNull() &&
-                        li.Amount == -amount)
-                    {
-                        // Verify this transaction took place in the account targetted by our line item
-                        if (li.TransactionRow.AccountID == categoryAccountID)
-                        {
-                            // Found you
-                            investmentTransactionTracker.FoundIDs.Add(li.ID); // ZZZ ???
-                            return;
-                        }
-                    }
-                }
             }
 
             // Create a new transaction, the user can delete the extra ones
@@ -1231,8 +1235,23 @@ namespace BanaData.Serializations
             decimal commission)
         {
             var transRow = household.Transaction.Add(accountRow, date, payee, memo, status, checkpointID);
-            household.LineItem.Add(transRow, categoryID, categoryAccountID, null, amount, null);
             household.InvestmentTransaction.Add(transRow, type, securityRow, securityPrice, securityQuantity, commission);
+            var li = household.LineItem.Add(transRow, null, amount);
+            if (categoryID != -1)
+            {
+                var lineItemCategoryRow = household.LineItemCategory.NewLineItemCategoryRow();
+                lineItemCategoryRow.LineItemID = li.ID;
+                lineItemCategoryRow.CategoryID = categoryID;
+                household.LineItemCategory.AddLineItemCategoryRow(lineItemCategoryRow);
+            }
+            else if (categoryAccountID != -1)
+            {
+                var lineItemTransferRow = household.LineItemTransfer.NewLineItemTransferRow();
+                lineItemTransferRow.LineItemID = li.ID;
+                lineItemTransferRow.AccountID = categoryAccountID;
+                lineItemTransferRow.PeerTransID = -1;
+                household.LineItemTransfer.AddLineItemTransferRow(lineItemTransferRow);
+            }
 
             return transRow;
         }
@@ -1838,188 +1857,85 @@ namespace BanaData.Serializations
 
         private void PairTransfers()
         {
-            var pairs = new List<Tuple<int, int>>();
+            int pairCounter = 0;
+            var lineItemTransfersToDelete = new List<Household.LineItemTransferRow>();
 
             //
-            // Go over all line items
+            // Go over all transfer line items
             //
-            foreach(Household.LineItemRow sourceLineItemRow in household.LineItem.Rows)
+            foreach(Household.LineItemTransferRow sourceLineItemTransferRow in household.LineItemTransfer.Rows)
             {
-                // Find transfers
-                if (!sourceLineItemRow.IsAccountIDNull())
+                // Verify we don't know about it already
+                if (sourceLineItemTransferRow.PeerTransID != -1)
                 {
-                    // Found one. Verify we don't know about it already
-                    if (pairs.Find(p => p.Item2 == sourceLineItemRow.ID) != null)
-                    {
-                        // Already in
-                        continue;
-                    }
+                    // Already in
+                    continue;
+                }
 
-                    var sourceTransactionRow = sourceLineItemRow.TransactionRow;
-                    int targetAccountID = sourceLineItemRow.AccountID;
+                var sourceTransactionRow = sourceLineItemTransferRow.LineItemRow.TransactionRow;
+                int sourceAccountID = sourceTransactionRow.AccountID;
+                int targetAccountID = sourceLineItemTransferRow.AccountID;
 
-                    // Skip transfers to self
-                    if (targetAccountID == sourceTransactionRow.AccountID)
-                    {
-                        continue;
-                    }
+                // Skip transfers to self
+                if (targetAccountID == sourceAccountID)
+                {
+                    sourceLineItemTransferRow.PeerTransID = sourceTransactionRow.ID;
+                    continue;
+                }
 
+                // if merging, only consider added transactions
+                if (merging &&
+                    !bankTransactionTracker.AddedIDs.Contains(sourceTransactionRow.ID) &&
+                    !investmentTransactionTracker.AddedIDs.Contains(sourceTransactionRow.ID))
+                {
+                    continue;
+                }
+
+                // Look for transfers of the opposite amount on the target account
+                foreach (Household.LineItemTransferRow targetLineItemTransferRow in household.LineItemTransfer.Rows)
+                {
                     // if merging, only consider added transactions
                     if (merging &&
-                        !bankTransactionTracker.AddedIDs.Contains(sourceTransactionRow.ID) &&
-                        !investmentTransactionTracker.AddedIDs.Contains(sourceTransactionRow.ID))
+                        !bankTransactionTracker.AddedIDs.Contains(targetLineItemTransferRow.LineItemRow.TransactionID) &&
+                        !investmentTransactionTracker.AddedIDs.Contains(targetLineItemTransferRow.LineItemRow.TransactionID))
                     {
                         continue;
                     }
 
-                    Tuple<int, int> tuple = null;
-
-                    // Look for transactions on the same date in the target account
-                    foreach (Household.TransactionRow targetTransactionRow in household.Transaction.Rows)
+                    if (targetLineItemTransferRow.AccountID == sourceAccountID &&
+                        sourceLineItemTransferRow.LineItemRow.Amount == -targetLineItemTransferRow.LineItemRow.Amount)
                     {
-                        // if merging, only consider added transactions
-                        if (merging &&
-                            !bankTransactionTracker.AddedIDs.Contains(targetTransactionRow.ID) &&
-                            !investmentTransactionTracker.AddedIDs.Contains(targetTransactionRow.ID))
-                        {
-                            continue;
-                        }
+                        // Check date close enough
+                        var targetTransactionRow = targetLineItemTransferRow.LineItemRow.TransactionRow;
 
                         var diffDate = sourceTransactionRow.Date.Subtract(targetTransactionRow.Date);
 
-                        if (Math.Abs(diffDate.Days) <= 2 &&
-                            targetTransactionRow.AccountID == targetAccountID)
+                        if (Math.Abs(diffDate.Days) <= 2)
                         {
-                            // Look in line item of the same amount that are transfer to the source account
-                            foreach (Household.LineItemRow targetLineItemRow in targetTransactionRow.GetLineItemRows())
-                            {
-                                if (!targetLineItemRow.IsAccountIDNull() &&
-                                    targetLineItemRow.AccountID == sourceTransactionRow.AccountID &&
-                                    Math.Abs(targetLineItemRow.Amount) == Math.Abs(sourceLineItemRow.Amount) && // Refine abs ZZZ
-                                    pairs.Find(p => p.Item2 == targetLineItemRow.ID) == null) // Not used already
-                                {
-                                    // Found pair!
-                                    tuple = new Tuple<int, int>(sourceLineItemRow.ID, targetLineItemRow.ID);
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (tuple != null)
-                        {
+                            // Found pair!
+                            sourceLineItemTransferRow.PeerTransID = targetTransactionRow.ID;
+                            targetLineItemTransferRow.PeerTransID = sourceTransactionRow.ID;
+                            pairCounter += 1;
                             break;
                         }
                     }
+                }
 
-                    if (tuple == null)
-                    {
-                        var targetAccountRow = household.Account.FindByID(targetAccountID);
-                        Log += $"Warning: Could not pair transaction on account {sourceTransactionRow.AccountRow.Name}" + eol+
-                            $"to/from account {targetAccountRow.Name} on {sourceTransactionRow.Date} for ${sourceLineItemRow.Amount};" + eol;
-                        Log += "Changing category to <none>." + eol;
+                if (sourceLineItemTransferRow.PeerTransID == -1)
+                {
+                    var targetAccountRow = household.Account.FindByID(targetAccountID);
+                    Log += $"Warning: Could not pair transaction on account {sourceTransactionRow.AccountRow.Name}" + eol+
+                        $"to/from account {targetAccountRow.Name} on {sourceTransactionRow.Date} for ${sourceLineItemTransferRow.LineItemRow.Amount};" + eol;
+                    Log += "Changing category to <none>." + eol;
 
-                        sourceLineItemRow.SetAccountIDNull();
-                    }
-                    else
-                    {
-                        pairs.Add(tuple);
-                    }
+                    lineItemTransfersToDelete.Add(sourceLineItemTransferRow);
                 }
             }
 
-            Log += eol + $"Paired {pairs.Count} transfers." + eol;
+            // Remove "bad" transfer line items
+            lineItemTransfersToDelete.ForEach(t => t.Delete());
 
-            //
-            // Remove one end of the pair
-            //
-            foreach (var pair in pairs)
-            {
-                var lineItemRow1 = household.LineItem.FindByID(pair.Item1);
-                var transactionRow1 = lineItemRow1.TransactionRow;
-                var lineItemsRow1 =  transactionRow1.GetLineItemRows();
-
-                var lineItemRow2 = household.LineItem.FindByID(pair.Item2);
-                var transactionRow2 = lineItemRow2.TransactionRow;
-                var lineItemsRow2 = transactionRow2.GetLineItemRows();
-
-                Household.TransactionRow transactionToDelete = null;
-                Household.LineItemRow lineItemToDelete = null;
-                Household.LineItemRow lineItemToKeep = null;
-
-                // If one of the transaction is a split, delete the other
-                if (lineItemsRow1.Length > 1)
-                {
-                    transactionToDelete = transactionRow2;
-                    lineItemToDelete = lineItemRow2;
-                    lineItemToKeep = lineItemRow1;
-                }
-                else if (lineItemsRow2.Length > 1)
-                {
-                    transactionToDelete = transactionRow1;
-                    lineItemToDelete = lineItemRow1;
-                    lineItemToKeep = lineItemRow2;
-                }
-                else
-                {
-                    // If one of the transactions is an investment transaction involving securities, delete the other
-                    var accountRow1 = transactionRow1.AccountRow;
-                    var accountRow2 = transactionRow2.AccountRow;
-
-                    if (accountRow1.Type == EAccountType.Investment &&
-                        transactionRow1.GetInvestmentTransaction() is Household.InvestmentTransactionRow investmentTransactionRow1 &&
-                        investmentTransactionRow1.Type != EInvestmentTransactionType.TransferCashIn &&
-                        investmentTransactionRow1.Type != EInvestmentTransactionType.TransferCashOut)
-                    {
-                        transactionToDelete = transactionRow2;
-                        lineItemToDelete = lineItemRow2;
-                        lineItemToKeep = lineItemRow1;
-                    }
-                    else if (accountRow2.Type == EAccountType.Investment &&
-                        transactionRow2.GetInvestmentTransaction() is Household.InvestmentTransactionRow investmentTransactionRow2 &&
-                        investmentTransactionRow2.Type != EInvestmentTransactionType.TransferCashIn &&
-                        investmentTransactionRow2.Type != EInvestmentTransactionType.TransferCashOut)
-                    {
-                        transactionToDelete = transactionRow1;
-                        lineItemToDelete = lineItemRow1;
-                        lineItemToKeep = lineItemRow2;
-                    }
-                    else
-                    {
-                        // Arbitrarily delete the destination (where the funds go to)
-                        if (lineItemRow1.Amount < 0)
-                        {
-                            // No 1 is the source
-                            transactionToDelete = transactionRow2;
-                            lineItemToDelete = lineItemRow2;
-                            lineItemToKeep = lineItemRow1;
-                        }
-                        else
-                        {
-                            // No 2 is the source
-                            transactionToDelete = transactionRow2;
-                            lineItemToDelete = lineItemRow2;
-                            lineItemToKeep = lineItemRow1;
-                        }
-                    }
-                }
-
-                // Memorize the status of the transaction we are about to delete
-                lineItemToKeep.TransferStatus = transactionToDelete.Status;
-
-                // Delete line item
-                lineItemToDelete.Delete();
-
-                // Delete transaction
-                if (transactionToDelete.AccountRow.Type == EAccountType.Investment)
-                {
-                    transactionToDelete.GetInvestmentTransaction().Delete();
-                }
-                else if (transactionToDelete.AccountRow.Type == EAccountType.Bank)
-                {
-                    transactionToDelete.GetBankingTransaction().Delete();
-                }
-                transactionToDelete.Delete();
-            }
+            Log += eol + $"Paired {pairCounter} transfers." + eol;
         }
 
         #endregion
