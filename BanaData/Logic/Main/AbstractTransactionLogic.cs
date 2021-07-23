@@ -487,6 +487,8 @@ namespace BanaData.Logic.Main
 
                 if (lineItem.GetLineItemTransferRow() is Household.LineItemTransferRow lineItemTransferRow)
                 {
+                    // Also delete peer transaction or peer line item
+                    DeletePeerTransaction(lineItemTransferRow);
                     lineItemTransferRow.Delete();
                 }
 
@@ -507,6 +509,38 @@ namespace BanaData.Logic.Main
             transactionRow.Delete();
 
             mainWindowLogic.CommitChanges();
+        }
+
+        private void DeletePeerTransaction(Household.LineItemTransferRow lineItemTransferRow)
+        {
+            var peerTransactionRow = lineItemTransferRow.TransactionRow;
+            var peerLineItemRows = peerTransactionRow.GetLineItemRows();
+
+            foreach (var peerLineItemRow in peerLineItemRows)
+            {
+                // Find and delete the peer line item
+                if (peerLineItemRow.GetLineItemTransferRow() is Household.LineItemTransferRow peerLineItemTransferRow  &&
+                    lineItemTransferRow.AccountRow == accountRow)
+                {
+                    peerLineItemTransferRow.Delete();
+                    peerLineItemRow.Delete();
+                    break;
+                }
+            }
+
+            // Also delete the transaction if only one line item
+            if (peerLineItemRows.Length == 1)
+            {
+                if (peerTransactionRow.AccountRow.Type == EAccountType.Bank)
+                {
+                    peerTransactionRow.GetBankingTransaction().Delete();
+                }
+                else if (peerTransactionRow.AccountRow.Type == EAccountType.Investment)
+                {
+                    peerTransactionRow.GetInvestmentTransaction().Delete();
+                }
+                peerTransactionRow.Delete();
+            }
         }
 
         private void OnGotoOtherSideOfTransfer()
