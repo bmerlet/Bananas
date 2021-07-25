@@ -540,10 +540,11 @@ namespace BanaData.Logic.Main
                 TransID = transactionRow.ID;
 
                 // Create new investment transaction row
-                household.InvestmentTransaction.Add(transactionRow, data.Type, securityRow, data.SecurityPrice, data.SecurityQuantity, data.Commission);
+                var investmentTransactionRow = household.InvestmentTransaction.Add(transactionRow, data.Type, securityRow, data.SecurityPrice, data.SecurityQuantity, data.Commission);
 
                 // Create the line item
-                CreateLineItemInDB(data.LineItems[0], transactionRow, impactedAccounts);
+                decimal peerAmount = investmentTransactionRow.IsTransferOut ? data.LineItems[0].Amount : -data.LineItems[0].Amount;
+                CreateLineItemInDB(data.LineItems[0], transactionRow, peerAmount, impactedAccounts);
             }
             else
             {
@@ -551,10 +552,11 @@ namespace BanaData.Logic.Main
                 var transactionRow = household.Transaction.Update(TransID, accountRow, data.Date, data.Memo, data.Payee, data.Status, household.Checkpoint.GetMostRecentCheckpointID());
 
                 // Update investment transaction
-                household.InvestmentTransaction.Update(transactionRow, data.Type, securityRow, data.SecurityPrice, data.SecurityQuantity, data.Commission);
+                var investmentTransactionRow = household.InvestmentTransaction.Update(transactionRow, data.Type, securityRow, data.SecurityPrice, data.SecurityQuantity, data.Commission);
 
                 // Update the line item
-                UpdateLineItemInDB(data.LineItems[0], transactionRow, impactedAccounts);
+                decimal peerAmount = investmentTransactionRow.IsTransferOut ? data.LineItems[0].Amount : -data.LineItems[0].Amount;
+                UpdateLineItemInDB(data.LineItems[0], transactionRow, peerAmount, impactedAccounts);
             }
 
             mainWindowLogic.CommitChanges();

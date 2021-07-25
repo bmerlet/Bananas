@@ -318,7 +318,7 @@ namespace BanaData.Logic.Main
             GotoOtherSideOfTransfer.SetCanExecute(data.LineItems.Find(li => li.CategoryAccountID >= 0) != null);
         }
 
-        protected void CreateLineItemInDB(LineItem li, Household.TransactionRow transactionRow, List<int> impactedAccounts)
+        protected void CreateLineItemInDB(LineItem li, Household.TransactionRow transactionRow, decimal peerAmount, List<int> impactedAccounts)
         {
             var household = mainWindowLogic.Household;
 
@@ -332,11 +332,11 @@ namespace BanaData.Logic.Main
             else if (li.CategoryAccountID != -1)
             {
                 impactedAccounts.Add(li.CategoryAccountID);
-                CreatePeerTransaction(li.CategoryAccountID, transactionRow, liRow);
+                CreatePeerTransaction(li.CategoryAccountID, transactionRow, liRow, peerAmount);
             }
         }
 
-        protected void UpdateLineItemInDB(LineItem li, Household.TransactionRow transactionRow, List<int> impactedAccounts)
+        protected void UpdateLineItemInDB(LineItem li, Household.TransactionRow transactionRow, decimal peerAmount, List<int> impactedAccounts)
         {
             var household = mainWindowLogic.Household;
 
@@ -361,7 +361,7 @@ namespace BanaData.Logic.Main
                 if (liTransferRow == null)
                 {
                     // The line item was not a transfer: Make it one
-                    CreatePeerTransaction(li.CategoryAccountID, transactionRow, liRow);
+                    CreatePeerTransaction(li.CategoryAccountID, transactionRow, liRow, peerAmount);
                 }
                 else
                 {
@@ -442,7 +442,7 @@ namespace BanaData.Logic.Main
             }
         }
 
-        private Household.TransactionRow CreatePeerTransaction(int targetAccountID, Household.TransactionRow transactionRow, Household.LineItemRow liRow)
+        private Household.TransactionRow CreatePeerTransaction(int targetAccountID, Household.TransactionRow transactionRow, Household.LineItemRow liRow, decimal peerAmount)
         {
             var household = mainWindowLogic.Household;
 
@@ -450,7 +450,7 @@ namespace BanaData.Logic.Main
 
             // Add transaction on "other side"
             var peerTransactionRow = household.Transaction.Add(targetAccountRow, data.Date, "", data.Memo, ETransactionStatus.Pending, household.Checkpoint.GetMostRecentCheckpointID());
-            var peerLiRow = household.LineItem.Add(peerTransactionRow, null, -liRow.Amount);
+            var peerLiRow = household.LineItem.Add(peerTransactionRow, null, peerAmount);
 
             // Create the investment/banking transactions
             if (targetAccountRow.Type == EAccountType.Bank)

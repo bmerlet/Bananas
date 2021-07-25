@@ -131,7 +131,7 @@ namespace BanaData.Database
 
                     case EInvestmentTransactionType.Sell:
                     case EInvestmentTransactionType.SellAndTransferCash:
-                        desc = $"Sold {quantity:N4} {symbol} @ ${price:C2}";
+                        desc = $"Sold {quantity:N4} {symbol} @ {price:C2}";
                         break;
 
                     case EInvestmentTransactionType.Dividends:

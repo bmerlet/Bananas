@@ -221,7 +221,7 @@ namespace BanaData.Logic.Main
                 // Create all line items
                 foreach(var li in data.LineItems)
                 {
-                    CreateLineItemInDB(li, transactionRow, impactedAccounts);
+                    CreateLineItemInDB(li, transactionRow, -li.Amount, impactedAccounts);
                 }
             }
             else
@@ -267,11 +267,11 @@ namespace BanaData.Logic.Main
                 {
                     if (li.ID >= 0)
                     {
-                        UpdateLineItemInDB(li, transactionRow, impactedAccounts);
+                        UpdateLineItemInDB(li, transactionRow, -li.Amount, impactedAccounts);
                     }
                     else
                     {
-                        CreateLineItemInDB(li, transactionRow, impactedAccounts);
+                        CreateLineItemInDB(li, transactionRow, -li.Amount, impactedAccounts);
                     }
                 }
             }
