@@ -159,6 +159,7 @@ namespace XamlUI.Widgets
                     if (AutoCompleteTextBoxWithPopupOpen != null)
                     {
                         AutoCompleteTextBoxWithPopupOpen.IsPopupOpen = false;
+                        AutoCompleteTextBoxWithPopupOpen.ProcessEnterOrTab();
                     }
                     brl.ProcessEnter();
                     e.Handled = true;

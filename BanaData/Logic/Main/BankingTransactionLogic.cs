@@ -88,6 +88,8 @@ namespace BanaData.Logic.Main
                     try
                     {
                         data.LineItems[0].Category = value;
+                        OnPropertyChanged(() => IsDepositTabStop);
+                        OnPropertyChanged(() => IsPaymentTabStop);
                     }
                     catch (ArgumentException e)
                     {
@@ -153,9 +155,15 @@ namespace BanaData.Logic.Main
             }
         }
 
-        // Derived from medium being a deposit or not
-        public bool IsDepositTabStop { get; private set; }
-        public bool IsPaymentTabStop => !IsDepositTabStop;
+        // Is the deposit box a tab stop
+        public bool IsDepositTabStop => 
+            data.Medium == ETransactionMedium.Deposit ||
+            data.LineItems.Any(li => li.CategoryID != -1 && mainWindowLogic.Household.Category.FindByID(li.CategoryID).IsIncome);
+
+        // Is the payment box a tab stop
+        public bool IsPaymentTabStop =>
+            data.Medium != ETransactionMedium.Deposit ||
+            data.LineItems.Any(li => li.CategoryID != -1 && !mainWindowLogic.Household.Category.FindByID(li.CategoryID).IsIncome);
 
         // Activated when a payee is selected from the drop down list
         public CommandBase PayeeSelected { get; }
@@ -323,7 +331,7 @@ namespace BanaData.Logic.Main
                 // Create all line items
                 foreach(var li in data.LineItems)
                 {
-                    CreateLineItemInDB(li, transactionRow, -li.Amount, impactedAccounts);
+                    CreateLineItemInDB(li, transactionRow, impactedAccounts);
                 }
             }
             else
@@ -370,11 +378,11 @@ namespace BanaData.Logic.Main
                 {
                     if (li.ID >= 0)
                     {
-                        UpdateLineItemInDB(li, transactionRow, -li.Amount, impactedAccounts);
+                        UpdateLineItemInDB(li, transactionRow, impactedAccounts);
                     }
                     else
                     {
-                        CreateLineItemInDB(li, transactionRow, -li.Amount, impactedAccounts);
+                        CreateLineItemInDB(li, transactionRow, impactedAccounts);
                     }
                 }
             }
@@ -489,7 +497,6 @@ namespace BanaData.Logic.Main
                 }
             }
 
-            IsDepositTabStop = _data.Medium == ETransactionMedium.Deposit;
             OnPropertyChanged(() => IsDepositTabStop);
             OnPropertyChanged(() => IsPaymentTabStop);
         }

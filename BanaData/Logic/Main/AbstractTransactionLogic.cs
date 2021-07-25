@@ -204,7 +204,7 @@ namespace BanaData.Logic.Main
             }
         }
 
-        protected void CreateLineItemInDB(LineItem li, Household.TransactionRow transactionRow, decimal peerAmount, List<int> impactedAccounts)
+        protected void CreateLineItemInDB(LineItem li, Household.TransactionRow transactionRow, List<int> impactedAccounts)
         {
             var household = mainWindowLogic.Household;
 
@@ -218,11 +218,11 @@ namespace BanaData.Logic.Main
             else if (li.CategoryAccountID != -1)
             {
                 impactedAccounts.Add(li.CategoryAccountID);
-                CreatePeerTransaction(li.CategoryAccountID, transactionRow, liRow, peerAmount);
+                CreatePeerTransaction(li.CategoryAccountID, transactionRow, liRow, -li.Amount);
             }
         }
 
-        protected void UpdateLineItemInDB(LineItem li, Household.TransactionRow transactionRow, decimal peerAmount, List<int> impactedAccounts)
+        protected void UpdateLineItemInDB(LineItem li, Household.TransactionRow transactionRow, List<int> impactedAccounts)
         {
             var household = mainWindowLogic.Household;
 
@@ -247,7 +247,7 @@ namespace BanaData.Logic.Main
                 if (liTransferRow == null)
                 {
                     // The line item was not a transfer: Make it one
-                    CreatePeerTransaction(li.CategoryAccountID, transactionRow, liRow, peerAmount);
+                    CreatePeerTransaction(li.CategoryAccountID, transactionRow, liRow, -li.Amount);
                 }
                 else
                 {

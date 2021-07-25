@@ -299,7 +299,6 @@ namespace XamlUI.Widgets
                     if (IsPopupOpen)
                     {
                         IsPopupOpen = false;
-                        //editor.Focus(); ZZZZ Probably not needed
 
                         // Set handled ONLY if we closed the popup,
                         // so that the transaction can be cancelled via another Esc
@@ -309,36 +308,12 @@ namespace XamlUI.Widgets
 
                 case Key.Enter:
                 case Key.Tab:
-                    // Autocomplete text if possible
-                    if (selector.Items.Count == 1)
-                    {
-                        // Only one choice left
-                        selector.SelectedIndex = 0;
-                    }
-                    else if (IsTextFromItemsSourceOnly && selector.SelectedItem == null)
-                    {
-                        // Gotta select something
-                        if (selector.Items.Count > 0)
-                        {
-                            selector.SelectedIndex = 0;
-                        }
-                        else
-                        {
-                            // Nothing matching, consume the tab event so that the user
-                            // stays on this box
-                            e.Handled = true;
-                            return;
-                        }
-                    }
 
-                    // Publish selection
-                    PublishSelection();
-
-                    // ZZZZ Doesn't work
-                    //if (e.Key == Key.Tab)
-                    //{
-                    //    editor.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
-                    //}
+                    if (!ProcessEnterOrTab())
+                    {
+                        // Consume the event in case of error so that the user stays on this box
+                        e.Handled = true;
+                    }
                     break;
 
                 case Key.Down:
@@ -377,6 +352,35 @@ namespace XamlUI.Widgets
                     }
                     break;
             }
+        }
+
+        // Called by list view with overlay, which sees the enter event first.
+        public bool ProcessEnterOrTab()
+        {
+            // Autocomplete text if possible
+            if (selector.Items.Count == 1)
+            {
+                // Only one choice left
+                selector.SelectedIndex = 0;
+            }
+            else if (IsTextFromItemsSourceOnly && selector.SelectedItem == null)
+            {
+                // Gotta select something
+                if (selector.Items.Count > 0)
+                {
+                    selector.SelectedIndex = 0;
+                }
+                else
+                {
+                    // Nothing matching, indicate failure
+                    return false;
+                }
+            }
+
+            // Publish selection
+            PublishSelection();
+
+            return true;
         }
 
         //

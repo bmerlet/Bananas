@@ -226,18 +226,21 @@ namespace BanaData.Logic.Main
 
         public void OpenFile(string file)
         {
-            if (file.EndsWith(".BAN", StringComparison.InvariantCultureIgnoreCase))
+            for (bool retry = true; retry;)
             {
-                // Ask for password
-                var logic = new PasswordPromptLogic(password, "Open file");
-                if (!GuiServices.ShowDialog(logic))
+                if (file.EndsWith(".BAN", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    return;
+                    // Ask for password
+                    var logic = new PasswordPromptLogic(password, "Open file");
+                    if (!GuiServices.ShowDialog(logic))
+                    {
+                        return;
+                    }
+                    password = logic.Password;
                 }
-                password = logic.Password;
-            }
 
-            ReadFromFile(file);
+                retry = ReadFromFile(file);
+            }
             UpdateAll();
         }
 
@@ -550,7 +553,7 @@ namespace BanaData.Logic.Main
             UpdateTitle();
         }
 
-        private void ReadFromFile(string file)
+        private bool ReadFromFile(string file)
         {
             try
             {
@@ -574,8 +577,16 @@ namespace BanaData.Logic.Main
             }
             catch (Exception e)
             {
+                string message = e.Message;
+
+                if (e is System.Security.Cryptography.CryptographicException && e.Message.StartsWith("Padding is invalid"))
+                {
+                    ErrorMessage($"Error reading file {System.IO.Path.GetFileName(file)}: Bad password");
+                    return true;
+                }
+
                 //DataRow[] rowErrors = Household.Accounts.GetErrors();
-                ErrorMessage($"Error reading file {System.IO.Path.GetFileName(file)}: {e.Message}");
+                ErrorMessage($"Error reading file {System.IO.Path.GetFileName(file)}: {message}");
             }
             finally
             {
@@ -585,6 +596,8 @@ namespace BanaData.Logic.Main
             UserSettings.LastFileOpened = file;
             Dirty = false;
             UpdateTitle();
+
+            return false;
         }
 
         // Save to disk every 5 minutes
