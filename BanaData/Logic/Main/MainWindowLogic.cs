@@ -395,11 +395,8 @@ namespace BanaData.Logic.Main
             OnPropertyChanged(() => IsInvestmentRegisterVisible);
             OnPropertyChanged(() => IsBankRegisterVisible);
 
-            // Update accounts
-            NetWorth = 0;
-            NetWorth += BankAccountGroup.UpdateAccountsAndBalances();
-            NetWorth += InvestmentAccountGroup.UpdateAccountsAndBalances();
-            NetWorth += AssetAccountGroup.UpdateAccountsAndBalances();
+            // Update all accounts
+            UpdateBalances(null);
 
             OnPropertyChanged(() => NetWorth);
 
@@ -494,6 +491,18 @@ namespace BanaData.Logic.Main
             {
                 OnBankAccountClicked(accountID, transactionID);
             }
+        }
+
+        // Update balances and net worth after a transaction is modified
+        public void UpdateBalances(IEnumerable<int> accountIDs)
+        {
+            NetWorth = 0;
+
+            NetWorth += BankAccountGroup.UpdateAccountsAndBalances(accountIDs);
+            NetWorth += InvestmentAccountGroup.UpdateAccountsAndBalances(accountIDs);
+            NetWorth += AssetAccountGroup.UpdateAccountsAndBalances(accountIDs);
+
+            OnPropertyChanged(() => NetWorth);
         }
 
         #endregion

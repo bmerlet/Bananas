@@ -99,66 +99,64 @@ namespace BanaData.Logic.Main
 
         #region Actions
 
-        public decimal UpdateAccountsAndBalances()
+        public decimal UpdateAccountsAndBalances(IEnumerable<int> accountIDs)
         {
             var household = mainWindow.Household;
-
-            // Get list of accounts from database
-            IEnumerable<Household.AccountRow> accounts =  Enumerable.Empty<Household.AccountRow>();
-            switch(type)
-            {
-                case EType.Banking:
-                    accounts = household.Account.GetBankingAccounts();
-                    break;
-                case EType.Investment:
-                    accounts = household.Account.GetInvestmentAccounts();
-                    break;
-                case EType.Asset:
-                    accounts = household.Account.GetAssetAccounts();
-                    break;
-            }
-
-            int ix = 0;
             decimal totalBalance = 0;
-            foreach(var acct in accounts)
+
+            if (accountIDs == null)
             {
-                // Skip closed accounts if required
-                if (acct.Hidden && mainWindow.UserSettings.HideClosedAccounts)
+                // Recreate the list from scratch
+                AccountsAndBalances.Clear();
+                Household.AccountRow[] accounts = null;
+
+                switch (type)
                 {
-                    continue;
+                    case EType.Banking:
+                        accounts = household.Account.GetBankingAccounts();
+                        break;
+                    case EType.Investment:
+                        accounts = household.Account.GetInvestmentAccounts();
+                        break;
+                    case EType.Asset:
+                        accounts = household.Account.GetAssetAccounts();
+                        break;
                 }
 
-                decimal balance =
-                    type == EType.Investment ?
-                    acct.GetInvestmentValue() :
-                    acct.GetBalance();
-
-                if (AccountsAndBalances.Count <= ix ||
-                    AccountsAndBalances[ix].AccountID != acct.ID ||
-                    AccountsAndBalances[ix].AccountName != acct.Name ||
-                    AccountsAndBalances[ix].Balance != balance)
+                foreach (var account in accounts)
                 {
-                    var aab = new AccountAndBalance(acct.ID, acct.Name, balance);
-                    if (ix < AccountsAndBalances.Count)
+                    // Skip closed accounts if required
+                    if (account.Hidden && mainWindow.UserSettings.HideClosedAccounts)
                     {
-                        AccountsAndBalances[ix] = aab;
+                        continue;
                     }
-                    else
+
+                    decimal balance = type == EType.Investment ? account.GetInvestmentValue() : account.GetBalance();
+
+                    AccountsAndBalances.Add(new AccountAndBalance(account.ID, account.Name, balance));
+
+                    totalBalance += balance;
+                }
+            }
+            else
+            {
+                // Update balance for given IDs
+                foreach (var id in accountIDs)
+                {
+                    var accountAndBalance = AccountsAndBalances.FirstOrDefault(aab => aab.AccountID == id);
+                    if (accountAndBalance != null)
                     {
-                        AccountsAndBalances.Add(aab);
+                        var account = household.Account.FindByID(id);
+                        decimal balance = type == EType.Investment ? account.GetInvestmentValue() : account.GetBalance();
+                        if (accountAndBalance.Balance != balance)
+                        {
+                            accountAndBalance.UpdateBalance(balance);
+                        }
                     }
                 }
 
-                totalBalance += balance;
-                ix++;
+                totalBalance = AccountsAndBalances.Sum(aab => aab.Balance);
             }
-
-            // Truncate
-            while(AccountsAndBalances.Count > ix)
-            {
-                AccountsAndBalances.RemoveAt(ix);
-            }
-
 
             if (totalBalance != Balance)
             {
@@ -173,7 +171,7 @@ namespace BanaData.Logic.Main
 
         #region support classes
 
-        public class AccountAndBalance
+        public class AccountAndBalance : LogicBase
         {
             public AccountAndBalance(int accountID, string accountName, decimal balance) =>
                 (AccountID, AccountName, Balance) = (accountID, accountName, balance);
@@ -187,7 +185,13 @@ namespace BanaData.Logic.Main
             public string AccountName { get; }
 
             // Account balance
-            public decimal Balance { get; }
+            public decimal Balance { get; private set; }
+
+            public void UpdateBalance(decimal balance)
+            {
+                Balance = balance;
+                OnPropertyChanged(() => Balance);
+            }
         }
 
         #endregion

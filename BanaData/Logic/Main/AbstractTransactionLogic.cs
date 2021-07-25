@@ -313,9 +313,12 @@ namespace BanaData.Logic.Main
             {
                 mainWindowLogic.GuiServices.KaChing();
             }
+
+            // Update goto context menu status
+            GotoOtherSideOfTransfer.SetCanExecute(data.LineItems.Find(li => li.CategoryAccountID >= 0) != null);
         }
 
-        protected void CreateLineItemInDB(LineItem li, Household.TransactionRow transactionRow)
+        protected void CreateLineItemInDB(LineItem li, Household.TransactionRow transactionRow, List<int> impactedAccounts)
         {
             var household = mainWindowLogic.Household;
 
@@ -328,11 +331,12 @@ namespace BanaData.Logic.Main
             }
             else if (li.CategoryAccountID != -1)
             {
+                impactedAccounts.Add(li.CategoryAccountID);
                 CreatePeerTransaction(li.CategoryAccountID, transactionRow, liRow);
             }
         }
 
-        protected void UpdateLineItemInDB(LineItem li, Household.TransactionRow transactionRow)
+        protected void UpdateLineItemInDB(LineItem li, Household.TransactionRow transactionRow, List<int> impactedAccounts)
         {
             var household = mainWindowLogic.Household;
 
@@ -346,6 +350,8 @@ namespace BanaData.Logic.Main
             // See if the updated transaction is a transfer.
             if (li.CategoryAccountID != -1)
             {
+                impactedAccounts.Add(li.CategoryAccountID);
+
                 // Delete former category row if it existed
                 if (liCategoryRow != null)
                 {
@@ -362,21 +368,34 @@ namespace BanaData.Logic.Main
                     // The line item was a transfer. Update the account, amount and memo in peer transaction
                     // Note: this kind of breaks down if the peer transaction has several transfers to the same account,
                     // which is why the split editor forbids it.
-                    var otherSideTransactionRow = liTransferRow.TransactionRow;
-                    otherSideTransactionRow.AccountID = liTransferRow.AccountID;
-                    foreach(var otherSideLineItemRow in otherSideTransactionRow.GetLineItemRows())
+                    var peerTransactionRow = liTransferRow.TransactionRow;
+                    if (liTransferRow.AccountID != peerTransactionRow.AccountID)
                     {
-                        if (otherSideLineItemRow.GetLineItemTransferRow() is Household.LineItemTransferRow lineItemTransferRow &&
+                        impactedAccounts.Add(liTransferRow.TransactionRow.AccountID);
+                        peerTransactionRow.AccountID = liTransferRow.AccountID;
+                    }
+                    if (string.IsNullOrWhiteSpace(data.Memo))
+                    {
+                        peerTransactionRow.SetMemoNull();
+                    }
+                    else
+                    {
+                        peerTransactionRow.Memo = data.Memo;
+                    }
+
+                    foreach(var peerLineItemRow in peerTransactionRow.GetLineItemRows())
+                    {
+                        if (peerLineItemRow.GetLineItemTransferRow() is Household.LineItemTransferRow lineItemTransferRow &&
                             lineItemTransferRow.AccountRow == accountRow)
                         {
-                            otherSideLineItemRow.Amount = -li.Amount;
+                            peerLineItemRow.Amount = -li.Amount;
                             if (string.IsNullOrEmpty(li.Memo))
                             {
-                                otherSideLineItemRow.SetMemoNull();
+                                peerLineItemRow.SetMemoNull();
                             }
                             else
                             {
-                                otherSideLineItemRow.Memo = li.Memo;
+                                peerLineItemRow.Memo = li.Memo;
                             }
                             break;
                         }
@@ -389,7 +408,8 @@ namespace BanaData.Logic.Main
                 if (liTransferRow != null)
                 {
                     // The transaction used to be a transfer: Delete the peer transaction
-                    liTransferRow.TransactionRow.Delete();
+                    impactedAccounts.Add(liTransferRow.AccountID);
+                    DeletePeerTransaction(liTransferRow);
                     liTransferRow.Delete();
                 }
 
@@ -415,7 +435,8 @@ namespace BanaData.Logic.Main
                 if (liTransferRow != null)
                 {
                     // The transaction used to be a transfer: Delete the peer transaction
-                    liTransferRow.TransactionRow.Delete();
+                    impactedAccounts.Add(liTransferRow.AccountID);
+                    DeletePeerTransaction(liTransferRow);
                     liTransferRow.Delete();
                 }
             }
@@ -472,6 +493,12 @@ namespace BanaData.Logic.Main
 
         public void DeleteTransactionFromDataset(int transID)
         {
+            // Remember impacted accounts
+            var impactedAccounts = new List<int>
+            {
+                accountRow.ID
+            };
+
             // Delete from dataset
             var household = mainWindowLogic.Household;
             var transactionRow = household.Transaction.FindByID(transID);
@@ -487,6 +514,9 @@ namespace BanaData.Logic.Main
 
                 if (lineItem.GetLineItemTransferRow() is Household.LineItemTransferRow lineItemTransferRow)
                 {
+                    // Remeber the target account is impacted
+                    impactedAccounts.Add(lineItemTransferRow.AccountID);
+
                     // Also delete peer transaction or peer line item
                     DeletePeerTransaction(lineItemTransferRow);
                     lineItemTransferRow.Delete();
@@ -509,9 +539,11 @@ namespace BanaData.Logic.Main
             transactionRow.Delete();
 
             mainWindowLogic.CommitChanges();
+
+            mainWindowLogic.UpdateBalances(impactedAccounts);
         }
 
-        private void DeletePeerTransaction(Household.LineItemTransferRow lineItemTransferRow)
+        protected void DeletePeerTransaction(Household.LineItemTransferRow lineItemTransferRow)
         {
             var peerTransactionRow = lineItemTransferRow.TransactionRow;
             var peerLineItemRows = peerTransactionRow.GetLineItemRows();

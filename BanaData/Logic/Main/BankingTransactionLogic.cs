@@ -198,6 +198,13 @@ namespace BanaData.Logic.Main
         {
             var household = mainWindowLogic.Household;
 
+            // Remember impacted accounts
+            var impactedAccounts = new List<int>
+            {
+                accountRow.ID
+            };
+
+
             if (TransID == TRANSID_NOT_COMMITTED)
             {
                 // Create new transaction row
@@ -214,7 +221,7 @@ namespace BanaData.Logic.Main
                 // Create all line items
                 foreach(var li in data.LineItems)
                 {
-                    CreateLineItemInDB(li, transactionRow);
+                    CreateLineItemInDB(li, transactionRow, impactedAccounts);
                 }
             }
             else
@@ -246,6 +253,8 @@ namespace BanaData.Logic.Main
 
                         if (lineItemRow.GetLineItemTransferRow() is Household.LineItemTransferRow lineItemTransferRow)
                         {
+                            impactedAccounts.Add(lineItemTransferRow.AccountID);
+                            DeletePeerTransaction(lineItemTransferRow);
                             lineItemTransferRow.Delete();
                         }
 
@@ -258,16 +267,19 @@ namespace BanaData.Logic.Main
                 {
                     if (li.ID >= 0)
                     {
-                        UpdateLineItemInDB(li, transactionRow);
+                        UpdateLineItemInDB(li, transactionRow, impactedAccounts);
                     }
                     else
                     {
-                        CreateLineItemInDB(li, transactionRow);
+                        CreateLineItemInDB(li, transactionRow, impactedAccounts);
                     }
                 }
             }
 
             mainWindowLogic.CommitChanges();
+
+            // Update balances for accounts impacted by this transaction
+            mainWindowLogic.UpdateBalances(impactedAccounts);
         }
 
 

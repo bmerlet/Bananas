@@ -184,22 +184,6 @@ namespace BanaData.Logic.Main
                     atl.Balance = balance;
                 }
             }
-
-            switch(accountRow.Type)
-            {
-                case EAccountType.Investment:
-                    mainWindowLogic.InvestmentAccountGroup.UpdateAccountsAndBalances();
-                    break;
-
-                case EAccountType.OtherAsset:
-                case EAccountType.OtherLiability:
-                    mainWindowLogic.AssetAccountGroup.UpdateAccountsAndBalances();
-                    break;
-
-                default:
-                    mainWindowLogic.BankAccountGroup.UpdateAccountsAndBalances();
-                    break;
-            }
         }
 
         // User hit enter on the register

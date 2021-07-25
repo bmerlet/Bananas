@@ -517,6 +517,12 @@ namespace BanaData.Logic.Main
         {
             var household = mainWindowLogic.Household;
 
+            // Remember impacted accounts
+            var impactedAccounts = new List<int>
+            {
+                accountRow.ID
+            };
+
             //
             // Remove irrelevant input based on type
             //
@@ -537,7 +543,7 @@ namespace BanaData.Logic.Main
                 household.InvestmentTransaction.Add(transactionRow, data.Type, securityRow, data.SecurityPrice, data.SecurityQuantity, data.Commission);
 
                 // Create the line item
-                CreateLineItemInDB(data.LineItems[0], transactionRow);
+                CreateLineItemInDB(data.LineItems[0], transactionRow, impactedAccounts);
             }
             else
             {
@@ -548,10 +554,12 @@ namespace BanaData.Logic.Main
                 household.InvestmentTransaction.Update(transactionRow, data.Type, securityRow, data.SecurityPrice, data.SecurityQuantity, data.Commission);
 
                 // Update the line item
-                UpdateLineItemInDB(data.LineItems[0], transactionRow);
+                UpdateLineItemInDB(data.LineItems[0], transactionRow, impactedAccounts);
             }
 
             mainWindowLogic.CommitChanges();
+
+            mainWindowLogic.UpdateBalances(impactedAccounts);
         }
 
         private void OnShowCapitalGains()
