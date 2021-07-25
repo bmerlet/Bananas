@@ -322,6 +322,7 @@ namespace BanaData.Logic.Main
             var household = mainWindow.Household;
             var securities = new List<int>();
             var quoter = new Quote();
+            var investmentIDs = new List<int>();
 
             // Go through all investment accounts
             foreach(Household.AccountRow account in household.Account.Rows)
@@ -336,6 +337,8 @@ namespace BanaData.Logic.Main
                             securities.Add(security);
                         }
                     }
+
+                    investmentIDs.Add(account.ID);
                 }
             }
 
@@ -357,7 +360,7 @@ namespace BanaData.Logic.Main
             }
 
             mainWindow.CommitChanges();
-            mainWindow.UpdateAll();
+            mainWindow.UpdateAccountNamessAndBalances(investmentIDs);
         }
 
         #endregion
@@ -370,7 +373,7 @@ namespace BanaData.Logic.Main
         public bool ShowClosedAccounts
         {
             get => !mainWindow.UserSettings.HideClosedAccounts;
-            set { mainWindow.UserSettings.HideClosedAccounts = !value; mainWindow.UpdateAll(); }
+            set { mainWindow.UserSettings.HideClosedAccounts = !value; mainWindow.UpdateAccountNamessAndBalances(null); }
         }
 
         //

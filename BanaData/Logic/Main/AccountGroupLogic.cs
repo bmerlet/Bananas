@@ -152,6 +152,10 @@ namespace BanaData.Logic.Main
                         {
                             accountAndBalance.UpdateBalance(balance);
                         }
+                        if (accountAndBalance.AccountName != account.Name)
+                        {
+                            accountAndBalance.UpdateName(account.Name);
+                        }
                     }
                 }
 
@@ -182,7 +186,7 @@ namespace BanaData.Logic.Main
             // UI Properties
 
             // Account name
-            public string AccountName { get; }
+            public string AccountName { get; private set; }
 
             // Account balance
             public decimal Balance { get; private set; }
@@ -191,6 +195,12 @@ namespace BanaData.Logic.Main
             {
                 Balance = balance;
                 OnPropertyChanged(() => Balance);
+            }
+
+            public void UpdateName(string name)
+            {
+                AccountName = name;
+                OnPropertyChanged(() => AccountName);
             }
         }
 

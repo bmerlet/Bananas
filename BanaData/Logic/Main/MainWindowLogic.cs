@@ -399,7 +399,7 @@ namespace BanaData.Logic.Main
             OnPropertyChanged(() => IsBankRegisterVisible);
 
             // Update all accounts
-            UpdateBalances(null);
+            UpdateAccountNamessAndBalances(null);
 
             OnPropertyChanged(() => NetWorth);
 
@@ -433,6 +433,19 @@ namespace BanaData.Logic.Main
         {
             // Rebuild list
             BuildMemorizedPayeeList();
+        }
+
+        // Close a specific register
+        public void CloseRegisterIfOpen(int accountID)
+        {
+            if (DisplayedAccountID == accountID)
+            {
+                IsInvestmentRegisterVisible = false;
+                IsBankRegisterVisible = false;
+                OnPropertyChanged(() => IsInvestmentRegisterVisible);
+                OnPropertyChanged(() => IsBankRegisterVisible);
+                DisplayedAccountID = -1;
+            }
         }
 
         public void OnBankAccountClicked(AccountGroupLogic sender, int accountID)
@@ -497,7 +510,7 @@ namespace BanaData.Logic.Main
         }
 
         // Update balances and net worth after a transaction is modified
-        public void UpdateBalances(IEnumerable<int> accountIDs)
+        public void UpdateAccountNamessAndBalances(IEnumerable<int> accountIDs)
         {
             NetWorth = 0;
 

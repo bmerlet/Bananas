@@ -426,7 +426,7 @@ namespace BanaData.Logic.Main
 
             mainWindowLogic.CommitChanges();
 
-            mainWindowLogic.UpdateBalances(impactedAccounts);
+            mainWindowLogic.UpdateAccountNamessAndBalances(impactedAccounts);
         }
 
         protected void DeletePeerTransaction(Household.LineItemTransferRow lineItemTransferRow)

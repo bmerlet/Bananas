@@ -390,7 +390,7 @@ namespace BanaData.Logic.Main
             mainWindowLogic.CommitChanges();
 
             // Update balances for accounts impacted by this transaction
-            mainWindowLogic.UpdateBalances(impactedAccounts);
+            mainWindowLogic.UpdateAccountNamessAndBalances(impactedAccounts);
         }
 
 
