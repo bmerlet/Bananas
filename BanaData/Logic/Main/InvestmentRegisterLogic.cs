@@ -55,7 +55,7 @@ namespace BanaData.Logic.Main
                 transRow.IsPayeeNull() ? "" : transRow.Payee,
                 transRow.IsMemoNull() ? "" : transRow.Memo,
                 transRow.Status,
-                lineItems,
+                lineItems.Single(),
                 investmentTransRow.Type,
                 investmentTransRow.IsSecurityIDNull() ? -1 : investmentTransRow.SecurityID,
                 investmentTransRow.IsSecurityPriceNull() ?  0 : investmentTransRow.SecurityPrice,

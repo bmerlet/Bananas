@@ -55,13 +55,15 @@ namespace BanaData.Logic.Main
             // Be notified when categories change
             mainWindowLogic.CategoriesChanged += (s, e) => UpdateCategories();
             UpdateCategories();
+
+            GotoOtherSideOfTransfer.SetCanExecute(data.LineItem.CategoryAccountID != -1);
         }
 
         public InvestmentTransactionLogic(
             MainWindowLogic mainWindowLogic,
              Household.AccountRow accountRow)
             : this(mainWindowLogic, accountRow, TRANSID_NOT_COMMITTED,
-                  new InvestmentTransactionData(DateTime.Today, "", "", ETransactionStatus.Pending, new LineItem[] { new LineItem(mainWindowLogic, -1, "", -1, -1, "", 0, false) },
+                  new InvestmentTransactionData(DateTime.Today, "", "", ETransactionStatus.Pending, new LineItem(mainWindowLogic, -1, "", -1, -1, "", 0, false),
                     EInvestmentTransactionType.Dividends, -1, 0, 0, 0)) { }
 
         #endregion
@@ -76,7 +78,7 @@ namespace BanaData.Logic.Main
 
         public bool IsSecurityOut => Household.InvestmentTransactionRow.SecurityOut(data.Type);
 
-        public override decimal AmountForCashBalance => (IsCashIn || IsCashOut) ? data.Amount : 0;
+        public override decimal AmountForCashBalance => (IsCashIn || IsCashOut) ? data.LineItem.Amount : 0;
 
         // For register to compute share balances:
         public int SecurityID => data.SecurityID;
@@ -167,14 +169,44 @@ namespace BanaData.Logic.Main
         public string ShareBalanceString { get; private set; } = "";
 
         //
-        // Amount supplement
+        // Amount
         //
+        public override decimal Amount
+        {
+            get => data.PositiveAmount;
+            set
+            {
+                if (data.PositiveAmount != value)
+                {
+                    data.PositiveAmount = value;
+                    OnPropertyChanged(() => AmountState);
+                }
+                OnAmountChanged();
+            }
+        }
+    
         public int AmountTabIndex => investmentTransactionType.AmountTabIndex;
         public bool IsAmountVisible => investmentTransactionType.IsAmountVisible;
 
         //
-        // Category source
+        // Category
         //
+        public string Category
+        {
+            get => data.LineItem.Category;
+            set
+            {
+                try
+                {
+                    data.LineItem.Category = value;
+                }
+                catch (ArgumentException e)
+                {
+                    mainWindowLogic.ErrorMessage(e.Message);
+                }
+            }
+        }
+
         private readonly WpfObservableRangeCollection<CategoryItem> categories = new WpfObservableRangeCollection<CategoryItem>();
         private readonly WpfObservableRangeCollection<CategoryItem> transfers = new WpfObservableRangeCollection<CategoryItem>();
         public CollectionView CategoriesOrTransferView { get; private set; }
@@ -202,7 +234,7 @@ namespace BanaData.Logic.Main
                 backup = new InvestmentTransactionData(data);
             }
 
-            Console.WriteLine($"Begin edit transaction date {Date.ToShortDateString()} Type {Type} amount {Amount}");
+            Console.WriteLine($"Begin edit transaction date {Date.ToShortDateString()} Type {Type} amount {data.LineItem.Amount}");
 
             // Setup the boxes
             SetType(data.Type, true);
@@ -249,12 +281,16 @@ namespace BanaData.Logic.Main
 
                 OnPropertyChanged(() => Description);
 
+                data.LineItem = new LineItem(_backup.LineItem);
+                OnPropertyChanged(() => Amount);
+                OnPropertyChanged(() => Category);
+
                 //Console.WriteLine("backup = null from CANCEL");
                 //Console.WriteLine(System.Environment.StackTrace);
                 backup = null;
             }
 
-            Console.WriteLine($"Cancel edit transaction date {Date.ToShortDateString()} Type {Type} amount {Payment}");
+            Console.WriteLine($"Cancel edit transaction date {Date.ToShortDateString()} Type {Type} amount {Amount}");
         }
 
         // Is there a change to commit?
@@ -272,7 +308,7 @@ namespace BanaData.Logic.Main
                     return false;
                 }
 
-                Console.WriteLine($"End edit transaction date {Date.ToShortDateString()} Type {Type} amount {Payment}");
+                Console.WriteLine($"End edit transaction date {Date.ToShortDateString()} Type {Type} amount {Amount}");
 
                 //
                 // Check the changes
@@ -288,7 +324,8 @@ namespace BanaData.Logic.Main
                     }
                 }
 
-                if (backup.Status == ETransactionStatus.Reconciled && backup.Amount != data.Amount)
+                var _backup = backup as InvestmentTransactionData;
+                if (backup.Status == ETransactionStatus.Reconciled && _backup.LineItem.Amount != data.LineItem.Amount)
                 {
                     if (!mainWindowLogic.YesNoQuestion("Are you sure you want to change the amount of this reconciled transaction"))
                     {
@@ -298,7 +335,6 @@ namespace BanaData.Logic.Main
                     }
                 }
 
-                var _backup = backup as InvestmentTransactionData;
                 if (backup.Status == ETransactionStatus.Reconciled && _backup.SecurityQuantity != data.SecurityQuantity)
                 {
                     if (!mainWindowLogic.YesNoQuestion("Are you sure you want to change the number of shares of this reconciled transaction"))
@@ -317,6 +353,12 @@ namespace BanaData.Logic.Main
                         BeginEdit();
                         return false;
                     }
+                }
+
+                if (data.PositiveAmount < 0)
+                {
+                    mainWindowLogic.ErrorMessage("PLease enter a positive amount");
+                    return false;
                 }
 
                 // Check based on transaction type
@@ -366,6 +408,18 @@ namespace BanaData.Logic.Main
 
             OnPropertyChanged(() => Description);
 
+            if (data.LineItem.Category != _backup.LineItem.Category)
+            {
+                OnPropertyChanged(() => Category);
+            }
+
+            if (data.LineItem.Amount != _backup.LineItem.Amount)
+            {
+                OnPropertyChanged(() => Amount);
+            }
+
+            // Update context menu commands
+            GotoOtherSideOfTransfer.SetCanExecute(data.LineItem.CategoryAccountID != -1);
             ShowCapitalGains.SetCanExecute(data.Type == EInvestmentTransactionType.Sell || data.Type == EInvestmentTransactionType.SellAndTransferCash);
 
             // Clear the backup
@@ -385,7 +439,7 @@ namespace BanaData.Logic.Main
                 return "";
             }
 
-            return Household.InvestmentTransactionRow.GetDescription(data.Type, Amount, SecuritySymbol, SecurityQuantity, SecurityPrice);
+            return Household.InvestmentTransactionRow.GetDescription(data.Type, data.PositiveAmount, SecuritySymbol, SecurityQuantity, SecurityPrice);
         }
 
         private void SetType(EInvestmentTransactionType value, bool force)
@@ -399,13 +453,14 @@ namespace BanaData.Logic.Main
             investmentTransactionType = InvestmentTransactionType.GetInvestmentTransactionType(value);
 
             UpdateSecurities();
+            OnPropertyChanged(() => Amount);
 
             // If switching from transfers to categories or vice versa
             var newCategoriesOrTransferView = (CollectionView)CollectionViewSource.GetDefaultView(investmentTransactionType.IsTransfer ? transfers : categories);
             if (CategoriesOrTransferView != newCategoriesOrTransferView)
             {
                 CategoriesOrTransferView = newCategoriesOrTransferView;
-                data.LineItems[0].Category = "";
+                data.LineItem.Category = "";
                 OnPropertyChanged(() => Category);
             }
 
@@ -467,13 +522,13 @@ namespace BanaData.Logic.Main
                 data.Type == EInvestmentTransactionType.Sell || data.Type == EInvestmentTransactionType.SellAndTransferCash)
             {
                 // Compute amount
-                data.LineItems[0].Amount = data.SecurityQuantity * data.SecurityPrice - data.Commission;
+                data.PositiveAmount = data.SecurityQuantity * data.SecurityPrice - data.Commission;
                 OnPropertyChanged(() => Amount);
             }
         }
 
         // For reinvestment, recompute the share price every time the amount or number of shares is changed
-        protected override void OnAmountChanged()
+        private void OnAmountChanged()
         {
             if (data.Type == EInvestmentTransactionType.ReinvestDividends || data.Type == EInvestmentTransactionType.ReinvestShortTermCapitalGains ||
                 data.Type == EInvestmentTransactionType.ReinvestMediumTermCapitalGains || data.Type == EInvestmentTransactionType.ReinvestLongTermCapitalGains)
@@ -481,7 +536,7 @@ namespace BanaData.Logic.Main
                 // Compute share price
                 if (data.SecurityQuantity > 0)
                 {
-                    data.SecurityPrice = data.Amount / data.SecurityQuantity;
+                    data.SecurityPrice = data.PositiveAmount / data.SecurityQuantity;
                     OnPropertyChanged(() => SecurityPrice);
                 }
             }
@@ -543,8 +598,9 @@ namespace BanaData.Logic.Main
                 var investmentTransactionRow = household.InvestmentTransaction.Add(transactionRow, data.Type, securityRow, data.SecurityPrice, data.SecurityQuantity, data.Commission);
 
                 // Create the line item
-                decimal peerAmount = investmentTransactionRow.IsTransferOut ? data.LineItems[0].Amount : -data.LineItems[0].Amount;
-                CreateLineItemInDB(data.LineItems[0], transactionRow, peerAmount, impactedAccounts);
+                // decimal peerAmount = investmentTransactionRow.IsTransferOut ? data.LineItem.Amount : -data.LineItem.Amount;
+                decimal peerAmount =  -data.LineItem.Amount;
+                CreateLineItemInDB(data.LineItem, transactionRow, peerAmount, impactedAccounts);
             }
             else
             {
@@ -555,8 +611,9 @@ namespace BanaData.Logic.Main
                 var investmentTransactionRow = household.InvestmentTransaction.Update(transactionRow, data.Type, securityRow, data.SecurityPrice, data.SecurityQuantity, data.Commission);
 
                 // Update the line item
-                decimal peerAmount = investmentTransactionRow.IsTransferOut ? data.LineItems[0].Amount : -data.LineItems[0].Amount;
-                UpdateLineItemInDB(data.LineItems[0], transactionRow, peerAmount, impactedAccounts);
+                //decimal peerAmount = investmentTransactionRow.IsTransferOut ? data.LineItem.Amount : -data.LineItem.Amount;
+                decimal peerAmount = -data.LineItem.Amount;
+                UpdateLineItemInDB(data.LineItem, transactionRow, peerAmount, impactedAccounts);
             }
 
             mainWindowLogic.CommitChanges();
@@ -581,21 +638,21 @@ namespace BanaData.Logic.Main
                 string payee,
                 string memo,
                 ETransactionStatus status,
-                IEnumerable<LineItem> lineItems,
+                LineItem lineItem,
                 EInvestmentTransactionType type,
                 int securityID,
                 decimal securityPrice,
                 decimal securityQuantity,
                 decimal commission)
-                : base(date, payee, memo, status, lineItems) =>
-                (Type, SecurityID, SecurityPrice, SecurityQuantity, Commission) =
-                    (type, securityID, securityPrice, securityQuantity, commission);
+                : base(date, payee, memo, status) =>
+                (LineItem, Type, SecurityID, SecurityPrice, SecurityQuantity, Commission) =
+                    (lineItem, type, securityID, securityPrice, securityQuantity, commission);
 
             // Clone
             public InvestmentTransactionData(InvestmentTransactionData src)
                 : base(src) =>
-                (Type, SecurityID, SecurityPrice, SecurityQuantity, Commission) =
-                    (src.Type, src.SecurityID, src.SecurityPrice, src.SecurityQuantity, src.Commission);
+                (Type, SecurityID, SecurityPrice, SecurityQuantity, Commission, LineItem) =
+                    (src.Type, src.SecurityID, src.SecurityPrice, src.SecurityQuantity, src.Commission, new LineItem(src.LineItem));
 
             // Properties
             public EInvestmentTransactionType Type;
@@ -603,6 +660,27 @@ namespace BanaData.Logic.Main
             public decimal SecurityPrice;
             public decimal SecurityQuantity;
             public decimal Commission;
+
+            public LineItem LineItem;
+
+            // The amount corrected for sign - we show only positive values in the investment register
+            public decimal PositiveAmount
+            {
+                get => LineItem.Amount * AmountSign;
+                set => LineItem.Amount = value * AmountSign;
+            }
+
+            // transaction types that have negative amounts in the line item
+            private decimal AmountSign =>
+                Type == EInvestmentTransactionType.CashOut ||
+                Type == EInvestmentTransactionType.TransferCashOut ||
+                Type == EInvestmentTransactionType.SellAndTransferCash ||
+                Type == EInvestmentTransactionType.Buy ||
+                Type == EInvestmentTransactionType.Exercise ||
+                Type == EInvestmentTransactionType.TransferDividends ||
+                Type == EInvestmentTransactionType.TransferLongTermCapitalGains ||
+                Type == EInvestmentTransactionType.TransferShortTermCapitalGains
+                ? -1 : 1;
 
             public override bool Equals(object obj)
             {
@@ -613,7 +691,8 @@ namespace BanaData.Logic.Main
                     o.SecurityID == SecurityID &&
                     o.SecurityPrice == SecurityPrice &&
                     o.SecurityQuantity == SecurityQuantity &&
-                    o.Commission == Commission;
+                    o.Commission == Commission &&
+                    o.LineItem.Equals(LineItem);
             }
 
 

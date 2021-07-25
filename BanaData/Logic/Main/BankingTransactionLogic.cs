@@ -22,18 +22,21 @@ namespace BanaData.Logic.Main
 
         // Parent logic
         private readonly BankRegisterLogic bankRegisterLogic;
+        private new readonly BankTransactionData data;
 
         #endregion
 
         #region Constructor
 
-        public BankingTransactionLogic(MainWindowLogic mainWindowLogic, BankRegisterLogic _bankRegisterLogic, Household.AccountRow accountRow, int transID, BankTransactionData data)
-            : base(mainWindowLogic, accountRow, transID, data)
+        public BankingTransactionLogic(MainWindowLogic mainWindowLogic, BankRegisterLogic _bankRegisterLogic, Household.AccountRow accountRow, int transID, BankTransactionData _data)
+            : base(mainWindowLogic, accountRow, transID, _data)
         {
-            (bankRegisterLogic, TransID) = (_bankRegisterLogic, transID);
+            (bankRegisterLogic, data) = (_bankRegisterLogic, _data);
 
             PayeeSelected = new CommandBase(OnPayeeSelected);
             SplitTransaction = new CommandBase(OnSplitTransaction);
+
+            GotoOtherSideOfTransfer.SetCanExecute(data.LineItems.Find(li => li.CategoryAccountID >= 0) != null);
         }
 
         // To create new transactions (not in DB yet)
@@ -74,6 +77,82 @@ namespace BanaData.Logic.Main
             MEDIUM_NEXTCHECKNUM, MEDIUM_ATM, MEDIUM_DEPOSIT, MEDIUM_DIVIDEND, MEDIUM_EFT, MEDIUM_TRANSFER
         };
 
+        // Category
+        public string Category
+        {
+            get => data.Category;
+            set
+            {
+                if (data.LineItems.Count == 1)
+                {
+                    try
+                    {
+                        data.LineItems[0].Category = value;
+                    }
+                    catch (ArgumentException e)
+                    {
+                        mainWindowLogic.ErrorMessage(e.Message);
+                    }
+                }
+                else
+                {
+                    mainWindowLogic.ErrorMessage("Cannot set category for split transaction");
+                }
+            }
+        }
+
+        // Amount (used to recompute balance)
+        public override decimal Amount
+        {
+            get => data.Amount;
+            set => throw new InvalidOperationException();
+        }
+
+        // Payment
+        public decimal Payment
+        {
+            get => -data.Amount;
+            set
+            {
+                if (data.Amount != -value)
+                {
+                    if (data.LineItems.Count == 1)
+                    {
+                        data.LineItems[0].Amount = -value;
+                        OnPropertyChanged(() => Deposit);
+                        OnPropertyChanged(() => Amount);
+                        OnPropertyChanged(() => AmountState);
+                    }
+                    else
+                    {
+                        mainWindowLogic.ErrorMessage("Cannot set amount on split transactions");
+                    }
+                }
+            }
+        }
+
+        // Deposit
+        public decimal Deposit
+        {
+            get => data.Amount;
+            set
+            {
+                if (data.Amount != value)
+                {
+                    if (data.LineItems.Count == 1)
+                    {
+                        data.LineItems[0].Amount = value;
+                        OnPropertyChanged(() => Payment);
+                        OnPropertyChanged(() => Amount);
+                    }
+                    else
+                    {
+                        mainWindowLogic.ErrorMessage("Cannot set amount on split transactions");
+                    }
+                }
+            }
+        }
+
         // Derived from medium being a deposit or not
         public bool IsDepositTabStop { get; private set; }
         public bool IsPaymentTabStop => !IsDepositTabStop;
@@ -106,20 +185,27 @@ namespace BanaData.Logic.Main
             // Restore data
             if (backup != null)
             {
-                var _data = data as BankTransactionData;
                 var _backup = backup as BankTransactionData;
 
-                if (_data.Medium != _backup.Medium)
+                if (data.Medium != _backup.Medium)
                 {
-                    _data.Medium = _backup.Medium;
+                    data.Medium = _backup.Medium;
                     OnPropertyChanged(() => Medium);
                 }
 
-                if (_data.CheckNumber != _backup.CheckNumber)
+                if (data.CheckNumber != _backup.CheckNumber)
                 {
-                    _data.CheckNumber = _backup.CheckNumber;
+                    data.CheckNumber = _backup.CheckNumber;
                     OnPropertyChanged(() => Medium);
                 }
+
+                data.LineItems.Clear();
+                _backup.LineItems.ForEach(li => data.LineItems.Add(new LineItem(li)));
+
+                OnPropertyChanged(() => Amount);
+                OnPropertyChanged(() => Category);
+                OnPropertyChanged(() => Payment);
+                OnPropertyChanged(() => Deposit);
 
                 backup = null;
             }
@@ -155,7 +241,8 @@ namespace BanaData.Logic.Main
                     }
                 }
 
-                if (backup.Status == ETransactionStatus.Reconciled && backup.Amount != data.Amount)
+                var _backup = backup as BankTransactionData;
+                if (backup.Status == ETransactionStatus.Reconciled && _backup.Amount != data.Amount)
                 {
                     if (!mainWindowLogic.YesNoQuestion("Are you sure you want to change the amount of this reconciled transaction"))
                     {
@@ -189,6 +276,21 @@ namespace BanaData.Logic.Main
             {
                 OnPropertyChanged(() => Medium);
             }
+
+            if (data.Category != _backup.Category)
+            {
+                OnPropertyChanged(() => Category);
+            }
+
+            if (data.Amount != _backup.Amount)
+            {
+                OnPropertyChanged(() => Amount);
+                OnPropertyChanged(() => Payment);
+                OnPropertyChanged(() => Deposit);
+            }
+
+            // Update goto context menu status
+            GotoOtherSideOfTransfer.SetCanExecute(data.LineItems.Find(li => li.CategoryAccountID >= 0) != null);
 
             // Clear the backup
             backup = null;
@@ -240,7 +342,8 @@ namespace BanaData.Logic.Main
                 // Update the line items
                 //
                 // First find deleted line items and delete them in the DB
-                foreach (var li in backup.LineItems)
+                var _backup = backup as BankTransactionData;
+                foreach (var li in _backup.LineItems)
                 {
                     if (li.ID >= 0 && data.LineItems.FirstOrDefault(l => l.ID == li.ID) == null)
                     {
@@ -421,23 +524,54 @@ namespace BanaData.Logic.Main
                 string memo,
                 ETransactionStatus status,
                 IEnumerable<LineItem> lineItems)
-                : base(date, payee, memo, status, lineItems) => (Medium, CheckNumber) = (medium, checkNumber);
+                : base(date, payee, memo, status)
+            {
+                (Medium, CheckNumber) = (medium, checkNumber);
+
+                LineItems.AddRange(lineItems);
+            }
 
             // Clone
             public BankTransactionData(BankTransactionData src)
-                : base(src) => (Medium, CheckNumber) = (src.Medium, src.CheckNumber);
+                : base(src)
+            {
+                (Medium, CheckNumber) = (src.Medium, src.CheckNumber);
+
+                src.LineItems.ForEach(li => LineItems.Add(new LineItem(li)));
+            }
 
             // Properties
             public ETransactionMedium Medium;
             public uint CheckNumber;
 
+            public readonly List<LineItem> LineItems = new List<LineItem>();
+
+            // Show either the first line item when no split or a summary
+            public string Category => LineItems.Count == 1 ? LineItems[0].Category : "<Split>";
+
+            public decimal Amount => LineItems.Sum(li => li.Amount);
+
             public override bool Equals(object obj)
             {
-                return
-                    obj is BankTransactionData o &&
-                    base.Equals(o) &&
+                bool equ = false;
+                if (obj is BankTransactionData o)
+                {
+                    equ = base.Equals(o) &&
+                    o.Amount == Amount &&
                     o.Medium == Medium &&
-                    o.CheckNumber == CheckNumber;
+                    o.CheckNumber == CheckNumber &&
+                    o.LineItems.Count == LineItems.Count;
+
+                    if (equ)
+                    {
+                        for (int i = 0; i < LineItems.Count; i++)
+                        {
+                            equ &= o.LineItems[i].Equals(LineItems[i]);
+                        }
+                    }
+                }
+
+                return equ;
             }
 
             public override int GetHashCode()

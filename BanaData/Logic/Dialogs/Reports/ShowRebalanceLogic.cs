@@ -155,7 +155,7 @@ namespace BanaData.Logic.Dialogs.Reports
             }
 
             // Not in DB: do quick and dirty computation based on current values
-            if (!found)
+            if (!found && securityItems.Count >= 2)
             {
                 TotalValue = securityItems.Sum(si => si.SecurityQuantity * si.SecurityPrice);
                 foreach (var si in securityItems)

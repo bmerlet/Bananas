@@ -147,12 +147,12 @@ namespace BanaData.Logic.Main
 
         public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {
-            if (data.Amount == 0)
+            if (data.LineItem.Amount == 0)
             {
                 return "Please enter an amount.";
             }
 
-            if (string.IsNullOrWhiteSpace(data.Category))
+            if (string.IsNullOrWhiteSpace(data.LineItem.Category))
             {
                 return "Please choose a category.";
             }
@@ -180,7 +180,7 @@ namespace BanaData.Logic.Main
 
         public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {
-            if (string.IsNullOrWhiteSpace(data.Category))
+            if (string.IsNullOrWhiteSpace(data.LineItem.Category))
             {
                 return "Please choose a category";
             }
@@ -200,12 +200,12 @@ namespace BanaData.Logic.Main
 
         public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {
-            if (data.Amount == 0)
+            if (data.LineItem.Amount == 0)
             {
                 return "Please enter an amount.";
             }
 
-            if (string.IsNullOrWhiteSpace(data.Category))
+            if (string.IsNullOrWhiteSpace(data.LineItem.Category))
             {
                 return "Please choose a transfer account";
             }
@@ -255,8 +255,8 @@ namespace BanaData.Logic.Main
         public override void CleanupData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {
             data.Commission = 0;
-            data.LineItems[0].Amount = 0;
-            data.LineItems[0].Category = "";
+            data.LineItem.Amount = 0;
+            data.LineItem.Category = "";
         }
     }
 
@@ -289,8 +289,8 @@ namespace BanaData.Logic.Main
         {
             data.SecurityPrice = 0;
             data.Commission = 0;
-            data.LineItems[0].Amount = 0;
-            data.LineItems[0].Category = "";
+            data.LineItem.Amount = 0;
+            data.LineItem.Category = "";
         }
     }
 
@@ -331,12 +331,12 @@ namespace BanaData.Logic.Main
 
             // Check amount
             decimal expectedAmount = data.SecurityQuantity * data.SecurityPrice - data.Commission;
-            if (data.LineItems[0].Amount != expectedAmount)
+            if (data.PositiveAmount != expectedAmount)
             {
                 return
                     "The amount should be the number of shares times the share price minus commission" + Environment.NewLine +
                     $"But {data.SecurityQuantity:N4} * {data.SecurityPrice:N4} - {data.Commission:N2} = {expectedAmount:N2}" + Environment.NewLine +
-                    $"While the amount is {data.LineItems[0].Amount:N2}";
+                    $"While the amount is {data.LineItem.Amount:N2}";
             }
 
             return null;
@@ -344,7 +344,7 @@ namespace BanaData.Logic.Main
 
         public override void CleanupData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {
-            data.LineItems[0].Category = "";
+            data.LineItem.Category = "";
         }
     }
 
@@ -361,7 +361,7 @@ namespace BanaData.Logic.Main
 
         public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
         {
-            if (string.IsNullOrWhiteSpace(data.Category))
+            if (string.IsNullOrWhiteSpace(data.LineItem.Category))
             {
                 return "Please choose a transfer account";
             }
@@ -391,7 +391,7 @@ namespace BanaData.Logic.Main
                 return "Please enter a security symbol.";
             }
 
-            if (data.Amount == 0)
+            if (data.LineItem.Amount == 0)
             {
                 return "Please enter an amount.";
             }
@@ -404,7 +404,7 @@ namespace BanaData.Logic.Main
             data.SecurityPrice = 0;
             data.SecurityQuantity = 0;
             data.Commission = 0;
-            data.LineItems[0].Category = "";
+            data.LineItem.Category = "";
         }
     }
 
@@ -426,12 +426,12 @@ namespace BanaData.Logic.Main
                 return "Please enter a security symbol.";
             }
 
-            if (data.Amount == 0)
+            if (data.LineItem.Amount == 0)
             {
                 return "Please enter an amount.";
             }
 
-            if (string.IsNullOrWhiteSpace(data.Category))
+            if (string.IsNullOrWhiteSpace(data.LineItem.Category))
             {
                 return "Please choose a transfer account";
             }
@@ -467,7 +467,7 @@ namespace BanaData.Logic.Main
                 return "Please choose a security symbol.";
             }
 
-            if (data.Amount == 0)
+            if (data.LineItem.Amount == 0)
             {
                 return "Please enter an amount.";
             }
@@ -477,12 +477,12 @@ namespace BanaData.Logic.Main
                 return "Please enter a number of shares.";
             }
 
-            decimal expectedSecurityPrice = data.Amount / data.SecurityQuantity;
+            decimal expectedSecurityPrice = data.LineItem.Amount / data.SecurityQuantity;
             if (data.SecurityPrice != Math.Round(expectedSecurityPrice, 4))
             {
                 return
                     "The share price should be the dividend amount divided by the number of shares" + Environment.NewLine +
-                    $"But {data.Amount:N2} * {data.SecurityQuantity:N4} = {expectedSecurityPrice:N4}" + Environment.NewLine +
+                    $"But {data.LineItem.Amount:N2} * {data.SecurityQuantity:N4} = {expectedSecurityPrice:N4}" + Environment.NewLine +
                     $"While the share price is {data.SecurityPrice:N4}";
             }
 
@@ -508,8 +508,8 @@ namespace BanaData.Logic.Main
             data.SecurityPrice = 0;
             data.SecurityQuantity = 0;
             data.Commission = 0;
-            data.LineItems[0].Amount = 0;
-            data.LineItems[0].Category = "";
+            data.LineItem.Amount = 0;
+            data.LineItem.Category = "";
         }
     }
 

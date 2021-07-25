@@ -39,7 +39,6 @@ namespace BanaData.Logic.Main
             (mainWindowLogic, accountRow, TransID, data) = (_mainWindowLogic, _accountRow, _transID, _data);
 
             GotoOtherSideOfTransfer = new CommandBase(OnGotoOtherSideOfTransfer);
-            GotoOtherSideOfTransfer.SetCanExecute(data.LineItems.Find(li => li.CategoryAccountID >= 0) != null);
         }
 
         #endregion
@@ -77,107 +76,17 @@ namespace BanaData.Logic.Main
             set => data.Memo = value;
         }
 
-        // Category
-        public string Category
-        {
-            get => data.Category;
-            set
-            {
-                if (data.LineItems.Count == 1)
-                {
-                    try
-                    {
-                        data.LineItems[0].Category = value;
-                    }
-                    catch(ArgumentException e)
-                    {
-                        mainWindowLogic.ErrorMessage(e.Message);
-                    }
-                }
-                else
-                {
-                    mainWindowLogic.ErrorMessage("Cannot set category for split transaction");
-                }
-            }
-        }
-
-        // Amount (UI property for investments, and also used to recompute balance)
-        public decimal Amount
-        {
-            get => data.Amount;
-            set
-            {
-                if (data.Amount != value)
-                {
-                    if (data.LineItems.Count == 1)
-                    {
-                        data.LineItems[0].Amount = value;
-                        OnPropertyChanged(() => Payment);
-                        OnPropertyChanged(() => Deposit);
-                        OnPropertyChanged(() => AmountState);
-                        OnAmountChanged();
-                    }
-                    else
-                    {
-                        mainWindowLogic.ErrorMessage("Cannot set amount on split transactions");
-                    }
-                }
-            }
-        }
-
-        // Payment
-        public decimal Payment
-        {
-            get => -data.Amount;
-            set
-            {
-                if (data.Amount != -value)
-                {
-                    if (data.LineItems.Count == 1)
-                    {
-                        data.LineItems[0].Amount = -value;
-                        OnPropertyChanged(() => Deposit);
-                        OnPropertyChanged(() => Amount);
-                        OnPropertyChanged(() => AmountState);
-                    }
-                    else
-                    {
-                        mainWindowLogic.ErrorMessage("Cannot set amount on split transactions");
-                    }
-                }
-            }
-        }
-
-
+        // Status
         public string Status
         {
             get => GetStatusString();
             set => ParseStatusString(value);
         }
 
-        public string[] StatusSource { get; } = new string[] { "", "c", "R" };
+        // Amount, as implemented by derived classes
+        public abstract decimal Amount { get; set; }
 
-        // Deposit
-        public decimal Deposit
-        {
-            get => data.Amount;
-            set
-            {
-                if (data.Amount != value)
-                {
-                    if (data.LineItems.Count == 1)
-                    {
-                        data.LineItems[0].Amount = value;
-                        OnPropertyChanged(() => Payment);
-                        OnPropertyChanged(() => Amount);
-                    }
-                    else
-                    {
-                        mainWindowLogic.ErrorMessage("Cannot set amount on split transactions");
-                    }
-                }
-            }
-        }
+        public string[] StatusSource { get; } = new string[] { "", "c", "R" };
 
         // Balance
         // BalanceString is the UI property, Balance is updated by the logic
@@ -210,7 +119,7 @@ namespace BanaData.Logic.Main
             (data.Status == ETransactionStatus.Reconciled ? ETransactionState.Reconciled : ETransactionState.Idle);
 
         // Composite transaction status, for the forecolor of the amount
-        public ETransactionState AmountState => TransactionState | (data.Amount < 0 ? ETransactionState.NegativeAmount : ETransactionState.Idle);
+        public ETransactionState AmountState => TransactionState | (Amount < 0 ? ETransactionState.NegativeAmount : ETransactionState.Idle);
 
         // Composite transaction status, for the forecolor of the balance
         public ETransactionState BalanceState => TransactionState | (balance < 0 ? ETransactionState.NegativeAmount : ETransactionState.Idle);
@@ -252,14 +161,6 @@ namespace BanaData.Logic.Main
                     data.Status = backup.Status;
                     OnPropertyChanged(() => Status);
                 }
-
-                data.LineItems.Clear();
-                backup.LineItems.ForEach(li => data.LineItems.Add(new LineItem(li)));
-
-                OnPropertyChanged(() => Amount);
-                OnPropertyChanged(() => Category);
-                OnPropertyChanged(() => Payment);
-                OnPropertyChanged(() => Deposit);
             }
         }
 
@@ -292,30 +193,15 @@ namespace BanaData.Logic.Main
                 OnPropertyChanged(() => Memo);
             }
 
-            if (data.Category != backup.Category)
-            {
-                OnPropertyChanged(() => Category);
-            }
-
             if (data.Status != backup.Status)
             {
                 OnPropertyChanged(() => Status);
-            }
-
-            if (data.Amount != backup.Amount)
-            {
-                OnPropertyChanged(() => Amount);
-                OnPropertyChanged(() => Payment);
-                OnPropertyChanged(() => Deposit);
             }
 
             if (mainWindowLogic.UserSettings.PlayKaChingSound)
             {
                 mainWindowLogic.GuiServices.KaChing();
             }
-
-            // Update goto context menu status
-            GotoOtherSideOfTransfer.SetCanExecute(data.LineItems.Find(li => li.CategoryAccountID >= 0) != null);
         }
 
         protected void CreateLineItemInDB(LineItem li, Household.TransactionRow transactionRow, decimal peerAmount, List<int> impactedAccounts)
@@ -628,7 +514,6 @@ namespace BanaData.Logic.Main
         }
 
         // Used in investment derived class
-        protected virtual void OnAmountChanged() { }
         protected virtual void OnDateChanged() { }
 
         #endregion
@@ -642,22 +527,15 @@ namespace BanaData.Logic.Main
                 DateTime date,
                 string payee,
                 string memo,
-                ETransactionStatus status,
-                IEnumerable<LineItem> lineItems)
-            {
+                ETransactionStatus status) =>
                 (Date, Payee, Memo, Status) =
                     (date, payee, memo, status);
-
-                LineItems.AddRange(lineItems);
-            }
 
             // Clone
             protected BaseTransactionData(BaseTransactionData src)
             {
                 (Date, Payee, Memo, Status) =
                     (src.Date, src.Payee, src.Memo, src.Status);
-
-                src.LineItems.ForEach(li => LineItems.Add(new LineItem(li)));
             }
 
             // Properties
@@ -665,36 +543,15 @@ namespace BanaData.Logic.Main
             public string Payee;
             public string Memo;
             public ETransactionStatus Status;
-            public readonly List<LineItem> LineItems = new List<LineItem>();
-
-            // Show either the first line item when no split or a summary
-            public string Category => LineItems.Count == 1 ? LineItems[0].Category : "<Split>";
-
-            public decimal Amount => LineItems.Sum(li => li.Amount);
 
             public override bool Equals(object obj)
             {
-                bool equ = false;
-                if (obj is BaseTransactionData o)
-                {
-                    equ =
+                return
+                    obj is BaseTransactionData o &&
                         o.Date.Equals(Date) &&
                         o.Payee == Payee &&
-                        o.Amount == Amount &&
                         o.Memo == Memo &&
-                        o.Status == Status &&
-                        o.LineItems.Count == LineItems.Count;
-
-                    if (equ)
-                    {
-                        for (int i = 0; i < LineItems.Count; i++)
-                        {
-                            equ &= o.LineItems[i].Equals(LineItems[i]);
-                        }
-                    }
-                }
-
-                return equ;
+                        o.Status == Status;
             }
 
             public override int GetHashCode()
