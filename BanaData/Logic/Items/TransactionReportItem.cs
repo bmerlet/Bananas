@@ -75,6 +75,7 @@ namespace BanaData.Logic.Items
         public bool IsShowingPayeeColumn => Flags.HasFlag(ETransactionReportFlag.ShowPayeeColumn);
         public bool IsShowingMemoColumn => Flags.HasFlag(ETransactionReportFlag.ShowMemoColumn);
         public bool IsShowingCategoryColumn => Flags.HasFlag(ETransactionReportFlag.ShowCategoryColumn);
+        public bool IsShowingStatusColumn => Flags.HasFlag(ETransactionReportFlag.ShowStatusColumn);
 
         public bool IsFilteringOnAccounts => Flags.HasFlag(ETransactionReportFlag.IsFilteringOnAccounts);
         public IEnumerable<Household.AccountRow> Accounts { get; }

@@ -69,6 +69,7 @@
             <CheckBox Content="Payee" IsChecked="{Binding ShowPayeeColumn}" IsEnabled="{Binding IsPayeeColumnEnabled}"/>
             <CheckBox Content="Memo" IsChecked="{Binding ShowMemoColumn}"/>
             <CheckBox Content="Category" IsChecked="{Binding ShowCategoryColumn}" IsEnabled="{Binding IsCategoryColumnEnabled}"/>
+            <CheckBox Content="Status" IsChecked="{Binding ShowStatusColumn}"/>
         </StackPanel>
 
         <!-- Main panel: Accounts, categories, payees -->

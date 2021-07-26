@@ -47,6 +47,7 @@ namespace BanaData.Logic.Dialogs.Editors
             ShowPayeeColumn = reportItem.IsShowingPayeeColumn;
             ShowMemoColumn = reportItem.IsShowingMemoColumn;
             ShowCategoryColumn = reportItem.IsShowingCategoryColumn;
+            ShowStatusColumn = reportItem.IsShowingStatusColumn;
 
             SetGroup(
                 reportItem.IsGroupingByAccount ? GROUP_ACCOUNT :
@@ -113,6 +114,7 @@ namespace BanaData.Logic.Dialogs.Editors
         public bool? IsPayeeColumnEnabled { get; private set; }
         public bool? ShowMemoColumn { get; set; }
         public bool? ShowCategoryColumn { get; set; }
+        public bool? ShowStatusColumn { get; set; }
         public bool? IsCategoryColumnEnabled { get; private set; }
 
 
@@ -285,6 +287,10 @@ namespace BanaData.Logic.Dialogs.Editors
             if (ShowCategoryColumn == true)
             {
                 flags |= ETransactionReportFlag.ShowCategoryColumn;
+            }
+            if (ShowStatusColumn == true)
+            {
+                flags |= ETransactionReportFlag.ShowStatusColumn;
             }
 
             if (isFilteringOnAccounts)

@@ -162,6 +162,10 @@ namespace BanaData.Logic.Dialogs.Reports
                 {
                     Columns.Add(categoryColumn);
                 }
+                if (transactionReportItem.IsShowingStatusColumn)
+                {
+                    Columns.Add(new ColumnItem(30, 30, "Sts", "Status", null));
+                }
             }
 
             Columns.Add(new ColumnItem(90, 60, "Amount", "Amount", "N2", true));
@@ -306,6 +310,7 @@ namespace BanaData.Logic.Dialogs.Reports
                     (lineItemRows[0].GetLineItemCategoryRow() != null ? lineItemRows[0].GetLineItemCategoryRow().CategoryRow.FullName :
                     (lineItemRows[0].GetLineItemTransferRow() != null ? $"[{lineItemRows[0].GetLineItemTransferRow().AccountRow.Name}]" : ""));
                 Amount = lineItemRows.Sum(li => li.Amount);
+                Status = transactionRow.Status == ETransactionStatus.Pending ? "" : (transactionRow.Status == ETransactionStatus.Cleared ? "c" : "R");
             }
 
             // Build a subtotal
@@ -365,6 +370,7 @@ namespace BanaData.Logic.Dialogs.Reports
             public string Memo { get; }
             public string Category { get; }
             public decimal Amount { get; }
+            public string Status { get; }
             public bool IsSubtotal { get; }
             public bool IsGrandTotal { get; }
             public bool IsBold => IsSubtotal || IsGrandTotal;

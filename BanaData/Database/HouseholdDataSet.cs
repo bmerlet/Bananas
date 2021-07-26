@@ -90,6 +90,12 @@ namespace BanaData.Database
                 get => Flags.HasFlag(ETransactionReportFlag.ShowCategoryColumn);
                 set { if (value) Flags |= ETransactionReportFlag.ShowCategoryColumn; else Flags &= ~ETransactionReportFlag.ShowCategoryColumn; }
             }
+
+            public bool IsShowingStatusColumn
+            {
+                get => Flags.HasFlag(ETransactionReportFlag.ShowStatusColumn);
+                set { if (value) Flags |= ETransactionReportFlag.ShowStatusColumn; else Flags &= ~ETransactionReportFlag.ShowStatusColumn; }
+            }
         }
 
         partial class CheckpointDataTable

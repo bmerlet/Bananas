@@ -215,6 +215,7 @@ namespace BanaData.Database
         ShowDateColumn = 0x2000,
         ShowPayeeColumn = 0x4000,
         ShowMemoColumn = 0x8000,
-        ShowCategoryColumn = 0x10000
+        ShowCategoryColumn = 0x10000,
+        ShowStatusColumn = 0x20000
     }
 }
