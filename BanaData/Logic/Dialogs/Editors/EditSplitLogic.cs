@@ -85,6 +85,12 @@ namespace BanaData.Logic.Dialogs.Editors
 
             foreach (GridViewLineItem gvli in Register.Transactions)
             {
+                // Skip uncommitted with amount of 0
+                if (gvli.ID == -1 && gvli.Amount == 0 && string.IsNullOrWhiteSpace(gvli.Memo))
+                {
+                    continue;
+                }
+
                 decimal amount = Type == DEPOSIT ? gvli.Amount : -gvli.Amount;
                 LineItem li;
                 try

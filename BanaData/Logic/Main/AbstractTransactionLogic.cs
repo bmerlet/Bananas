@@ -252,13 +252,36 @@ namespace BanaData.Logic.Main
                 else
                 {
                     // The line item was a transfer. Update the account, amount and memo in peer transaction
-                    // Note: this kind of breaks down if the peer transaction has several transfers to the same account,
-                    // which is why the split editor forbids it.
                     var peerTransactionRow = liTransferRow.TransactionRow;
-                    if (liTransferRow.AccountID != peerTransactionRow.AccountID)
+                    if (li.CategoryAccountID != liTransferRow.AccountID)
                     {
-                        impactedAccounts.Add(liTransferRow.TransactionRow.AccountID);
-                        peerTransactionRow.AccountID = liTransferRow.AccountID;
+                        impactedAccounts.Add(liTransferRow.AccountID);
+
+                        // The transfer was moved to a different account. We need to take care of the
+                        // banking/investment transactions
+                        var formerTransferAccountRow = liTransferRow.AccountRow;
+                        var newTransferAccountRow = household.Account.FindByID(li.CategoryAccountID);
+                        
+                        if (formerTransferAccountRow.Type == EAccountType.Bank && newTransferAccountRow.Type != EAccountType.Bank)
+                        {
+                            peerTransactionRow.GetBankingTransaction().Delete();
+                        }
+                        if (formerTransferAccountRow.Type == EAccountType.Investment && newTransferAccountRow.Type != EAccountType.Investment)
+                        {
+                            peerTransactionRow.GetInvestmentTransaction().Delete();
+                        }
+                        if (formerTransferAccountRow.Type != EAccountType.Bank && newTransferAccountRow.Type == EAccountType.Bank)
+                        {
+                            household.BankingTransaction.Add(peerTransactionRow, ETransactionMedium.None, 0);
+                        }
+                        if (formerTransferAccountRow.Type != EAccountType.Investment && newTransferAccountRow.Type == EAccountType.Investment)
+                        {
+                            var type = li.Amount < 0 ? EInvestmentTransactionType.TransferCashIn : EInvestmentTransactionType.TransferCashOut;
+                            household.InvestmentTransaction.Add(peerTransactionRow, type, null, 0, 0, 0);
+                        }
+
+                        liTransferRow.AccountID = li.CategoryAccountID;
+                        peerTransactionRow.AccountID = li.CategoryAccountID;
                     }
                     if (string.IsNullOrWhiteSpace(data.Memo))
                     {
@@ -269,7 +292,10 @@ namespace BanaData.Logic.Main
                         peerTransactionRow.Memo = data.Memo;
                     }
 
-                    foreach(var peerLineItemRow in peerTransactionRow.GetLineItemRows())
+                    // Update amount and line item memo in the peer line item 
+                    // Note: this kind of breaks down if the peer transaction has several transfers to the same account,
+                    // which is why the split editor forbids it.
+                    foreach (var peerLineItemRow in peerTransactionRow.GetLineItemRows())
                     {
                         if (peerLineItemRow.GetLineItemTransferRow() is Household.LineItemTransferRow lineItemTransferRow &&
                             lineItemTransferRow.AccountRow == accountRow)
@@ -438,7 +464,7 @@ namespace BanaData.Logic.Main
             {
                 // Find and delete the peer line item
                 if (peerLineItemRow.GetLineItemTransferRow() is Household.LineItemTransferRow peerLineItemTransferRow  &&
-                    lineItemTransferRow.AccountRow == accountRow)
+                    peerLineItemTransferRow.AccountRow == accountRow)
                 {
                     peerLineItemTransferRow.Delete();
                     peerLineItemRow.Delete();
