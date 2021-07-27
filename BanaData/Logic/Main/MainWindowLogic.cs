@@ -261,20 +261,20 @@ namespace BanaData.Logic.Main
         //
         public void OpenFile(string file)
         {
+            // Try to open the file
+            try
+            {
+                fileStream = new FileStream(file, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
+            }
+            catch (Exception e)
+            {
+                ErrorMessage("Cannot open file: " + e.Message);
+                return;
+            }
+
             for (bool retry = true; retry;)
             {
                 retry = false;
-
-                // Try to open the file
-                try
-                {
-                    fileStream = new FileStream(file, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
-                }
-                catch (Exception e)
-                {
-                    ErrorMessage("Cannot open file: " + e.Message);
-                    return;
-                }
 
                 // Ask for password if the file is encrypted
                 if (file.EndsWith(".BAN", StringComparison.InvariantCultureIgnoreCase))

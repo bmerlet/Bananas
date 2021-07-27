@@ -212,7 +212,7 @@ namespace BanaData.Logic.Main
             string file =
                 lastFile == null ?
                 System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Bananas.QIF") :
-                lastFile.Substring(0, lastFile.LastIndexOf('.')) + "QIF";
+                lastFile.Substring(0, lastFile.LastIndexOf('.')) + ".QIF";
 
             return file;
         }
