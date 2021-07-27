@@ -18,6 +18,7 @@ using BanaData.Logic.Items;
 using BanaData.Logic.Dialogs;
 using BanaData.Logic.Dialogs.Reports;
 using BanaData.Logic.Dialogs.Basics;
+using System.IO;
 
 namespace BanaData.Logic.Main
 {
@@ -37,6 +38,11 @@ namespace BanaData.Logic.Main
         // Save timer and lock
         private readonly Timer saveTimer = new Timer(300 * 1000);
         private readonly object householdLock = new object();
+
+        // Currently open file
+        private FileStream fileStream;
+        private enum EFileFormat { Ban, XBan};
+        private EFileFormat fileFormat;
 
         // Password used for the current file
         private string password;
@@ -224,13 +230,55 @@ namespace BanaData.Logic.Main
 
         #region File services
 
+        //
+        // Open a new file
+        //
+        public void NewFile()
+        {
+            // Save the existing file
+            SaveFile();
+
+            // Close the existing file
+            if (fileStream != null)
+            {
+                fileStream.Close();
+                fileStream = null;
+            }
+
+            // Zap the DB
+            Household.Clear();
+            Household.AcceptChanges();
+
+            // Setup new file
+            UserSettings.LastFileOpened = null;
+            Dirty = false;
+            UpdateTitle();
+            UpdateAll();
+        }
+
+        //
+        // Open a bananas file
+        //
         public void OpenFile(string file)
         {
             for (bool retry = true; retry;)
             {
+                retry = false;
+
+                // Try to open the file
+                try
+                {
+                    fileStream = new FileStream(file, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
+                }
+                catch (Exception e)
+                {
+                    ErrorMessage("Cannot open file: " + e.Message);
+                    return;
+                }
+
+                // Ask for password if the file is encrypted
                 if (file.EndsWith(".BAN", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    // Ask for password
                     var logic = new PasswordPromptLogic(password, "Open file");
                     if (!GuiServices.ShowDialog(logic))
                     {
@@ -239,17 +287,97 @@ namespace BanaData.Logic.Main
                     password = logic.Password;
                 }
 
-                retry = ReadFromFile(file);
+                // Read the file
+                try
+                {
+                    GuiServices.SetCursor(true);
+
+                    if (file.EndsWith(".BAN", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        fileFormat = EFileFormat.Ban;
+                        var serializer = new BANSerializer(Household);
+                        serializer.Read(fileStream, password);
+                    }
+                    else if (file.EndsWith(".XBAN", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        fileFormat = EFileFormat.XBan;
+                        Household.Clear();
+                        Household.AcceptChanges();
+                        Household.ReadXml(fileStream);
+                    }
+                    else
+                    {
+                        ErrorMessage("File extension not supported");
+                        return;
+                    }
+                }
+                catch (Exception e)
+                {
+                    string message = e.Message;
+
+                    if (e is System.Security.Cryptography.CryptographicException && e.Message.StartsWith("Padding is invalid"))
+                    {
+                        ErrorMessage($"Error reading file {Path.GetFileName(file)}: Bad password");
+                        retry = true;
+                        continue;
+                    }
+                    else
+                    {
+                        ErrorMessage($"Error reading file {Path.GetFileName(file)}: {message}");
+                    }
+                }
+                finally
+                {
+                    GuiServices.SetCursor(false);
+                }
+
             }
+
+            UserSettings.LastFileOpened = file;
+            Dirty = false;
+
+            UpdateTitle();
             UpdateAll();
         }
 
-        public void SaveFile(string file)
+        public void SaveFile()
         {
-            SaveToFile(file);
+            if (fileStream == null)
+            {
+                SaveAsFile();
+            }
+            else
+            {
+                SaveToFile();
+            }
+        }
 
-            UserSettings.LastFileOpened = file;
-            UpdateTitle();
+        public void SaveAsFile()
+        {
+            SaveFileLogic logic = new SaveFileLogic(
+                UserSettings.LastFileOpened,
+                "Banana files (*.ban)|*.ban|Banana XML files (*.xban)|*.xban|Any file (*.*)|*.*", "Save file");
+                if (GuiServices.ShowDialog(logic))
+            {
+                var file = logic.File;
+                try
+                {
+                    fileStream = new FileStream(file, FileMode.Create, FileAccess.ReadWrite, FileShare.Read);
+                }
+                catch(Exception e)
+                {
+                    ErrorMessage($"Cannot open file {Path.GetFileName(file)}: {e.Message}");
+                    return;
+                }
+
+                fileFormat = file.EndsWith(".BAN", StringComparison.InvariantCultureIgnoreCase) ? EFileFormat.Ban : EFileFormat.XBan;
+
+                SaveToFile();
+                UserSettings.LastFileOpened = file;
+                UpdateTitle();
+            }
+
+
         }
 
         public void SetPassword()
@@ -258,13 +386,16 @@ namespace BanaData.Logic.Main
             if (GuiServices.ShowDialog(logic))
             {
                 password = logic.Password;
-                SaveToFile(UserSettings.LastFileOpened);
+                SaveToFile();
                 UpdateTitle();
             }
         }
 
         public void ImportQIF(string file)
         {
+            // Act as if we got a new file
+            NewFile();
+
             GuiServices.SetCursor(true);
 
             var parser = new QIFParser(this);
@@ -277,11 +408,6 @@ namespace BanaData.Logic.Main
                 ErrorMessage(parser.Log, "Import results");
             }
 
-            // Save to a .BAN (ZZZ Revisit later)
-            file = file.Substring(0, file.Length - 3) + "BAN";
-            UserSettings.LastFileOpened = file;
-
-            SaveToFile(file);
             UpdateAll();
         }
 
@@ -328,13 +454,8 @@ namespace BanaData.Logic.Main
         {
             if (Dirty)
             {
-                Save();
+                SaveFile();
             }
-        }
-
-        public void Save()
-        {
-            SaveToFile(UserSettings.LastFileOpened);
         }
 
         public void SaveUserSettings()
@@ -543,74 +664,32 @@ namespace BanaData.Logic.Main
         }
 
         // Save dataset to file in XML, encrypted or not
-        private void SaveToFile(string file)
+        private void SaveToFile()
         {
-            lock (householdLock)
+            if (fileStream != null)
             {
-                GuiServices.SetCursor(true);
-
-                if (file.EndsWith(".BAN", StringComparison.InvariantCultureIgnoreCase))
+                lock (householdLock)
                 {
-                    var serializer = new BANSerializer(Household);
-                    serializer.Write(file, password);
-                }
-                else if (file.EndsWith(".XBAN", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    Household.WriteXml(file);
+                    GuiServices.SetCursor(true);
+
+                    if (fileFormat == EFileFormat.Ban)
+                    {
+                        var serializer = new BANSerializer(Household);
+                        serializer.Write(fileStream, password);
+                    }
+                    else
+                    {
+                        fileStream.SetLength(0);
+                        Household.WriteXml(fileStream);
+                        fileStream.Flush();
+                    }
+
+                    GuiServices.SetCursor(false);
+                    Dirty = false;
                 }
 
-                GuiServices.SetCursor(false);
-                Dirty = false;
+                UpdateTitle();
             }
-
-            UpdateTitle();
-        }
-
-        private bool ReadFromFile(string file)
-        {
-            try
-            {
-                GuiServices.SetCursor(true);
-
-                if (file.EndsWith(".BAN", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    var serializer = new BANSerializer(Household);
-                    serializer.Read(file, password);
-                }
-                else if (file.EndsWith(".XBAN", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    Household.Clear();
-                    Household.AcceptChanges();
-                    Household.ReadXml(file);
-                }
-                else
-                {
-                    throw new InvalidOperationException("File extension not supported");
-                }
-            }
-            catch (Exception e)
-            {
-                string message = e.Message;
-
-                if (e is System.Security.Cryptography.CryptographicException && e.Message.StartsWith("Padding is invalid"))
-                {
-                    ErrorMessage($"Error reading file {System.IO.Path.GetFileName(file)}: Bad password");
-                    return true;
-                }
-
-                //DataRow[] rowErrors = Household.Accounts.GetErrors();
-                ErrorMessage($"Error reading file {System.IO.Path.GetFileName(file)}: {message}");
-            }
-            finally
-            {
-                GuiServices.SetCursor(false);
-            }
-
-            UserSettings.LastFileOpened = file;
-            Dirty = false;
-            UpdateTitle();
-
-            return false;
         }
 
         // Save to disk every 5 minutes

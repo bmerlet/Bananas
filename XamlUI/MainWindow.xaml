@@ -6,7 +6,9 @@
         xmlns:local="clr-namespace:XamlUI"
         xmlns:tools="clr-namespace:XamlUI.Tools"
         xmlns:ucs="clr-namespace:XamlUI.UserControls"
-        xmlns:w="clr-namespace:XamlUI.Widgets"
+        xmlns:w="clr-namespace:XamlUI.Widgets" 
+        xmlns:main="clr-namespace:BanaData.Logic.Main;assembly=BanaData" 
+        d:DataContext="{d:DesignInstance Type=main:MainWindowLogic}"
         mc:Ignorable="d"
         Title="{Binding Title}" Icon="/XamlUI;component/Images/Bananas.ico" Height="450" Width="800">
     <Window.Resources>
@@ -15,9 +17,11 @@
     
     <!-- Key bindings-->
     <Window.InputBindings>
+        <KeyBinding Modifiers="Ctrl" Key="N" Command="{Binding MainMenuLogic.New}" />
         <KeyBinding Modifiers="Ctrl" Key="O" Command="{Binding MainMenuLogic.Open}" />
-        <KeyBinding Modifiers="Ctrl" Key="R" Command="{Binding MainMenuLogic.Reconcile}" />
         <KeyBinding Modifiers="Ctrl" Key="S" Command="{Binding MainMenuLogic.Save}" />
+        <KeyBinding Modifiers="Ctrl" Key="B" Command="{Binding MainMenuLogic.Backup}" />
+        <KeyBinding Modifiers="Ctrl" Key="R" Command="{Binding MainMenuLogic.Reconcile}" />
     </Window.InputBindings>
 
     <DockPanel>
@@ -31,9 +35,11 @@
             <!-- Main menu -->
             <Menu DockPanel.Dock="Top" DataContext="{Binding MainMenuLogic}">
                 <MenuItem Header="File">
+                    <MenuItem Header="New" Command="{Binding New}" InputGestureText="^N"/>
                     <MenuItem Header="Open..." Command="{Binding Open}" InputGestureText="^O"/>
                     <MenuItem Header="Save" Command="{Binding Save}" InputGestureText="^S"/>
                     <MenuItem Header="Save as..." Command="{Binding SaveAs}"/>
+                    <MenuItem Header="Backup..." Command="{Binding Backup}" InputGestureText="^B"/>
                     <MenuItem Header="Set password..." Command="{Binding SetPassword}"/>
                     <Separator/>
                     <MenuItem Header="Merge..." Command="{Binding Merge}"/>

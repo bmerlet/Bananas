@@ -18,25 +18,24 @@ namespace BanaData.Serializations
 
         public BANSerializer(Household _household) => household = _household;
 
-        public void Write(string file, string password)
+        public void Write(FileStream fileStream, string password)
         {
             using (var aes = AesManaged.Create())
             {
                 (byte[] key, byte[] iv) = GetKeyFromPassword(password);
                 var encryptor = aes.CreateEncryptor(key, iv);
 
-                using (var fileStream = new FileStream(file, FileMode.Create, FileAccess.Write))
+                fileStream.SetLength(0);
+                using (var encryptStream = new CryptoStream(fileStream, encryptor, CryptoStreamMode.Write, true))
                 {
-                    using (var encryptStream = new CryptoStream(fileStream, encryptor, CryptoStreamMode.Write))
-                    {
-                        household.WriteXml(encryptStream);
-                        encryptStream.FlushFinalBlock();
-                    }
+                    household.WriteXml(encryptStream);
+                    encryptStream.FlushFinalBlock();
                 }
+                fileStream.Flush();
             }
         }
 
-        public void Read(string file, string password)
+        public void Read(FileStream fileStream, string password)
         {
             household.Clear();
             household.AcceptChanges();
@@ -46,12 +45,10 @@ namespace BanaData.Serializations
                 (byte[] key, byte[] iv) = GetKeyFromPassword(password);
                 var decryptor = aes.CreateDecryptor(key, iv);
 
-                using (var fileStream = new FileStream(file, FileMode.Open, FileAccess.Read))
+                fileStream.Position = 0;
+                using (var decryptStream = new CryptoStream(fileStream, decryptor, CryptoStreamMode.Read, true))
                 {
-                    using (var decryptStream = new CryptoStream(fileStream, decryptor, CryptoStreamMode.Read))
-                    {
-                        household.ReadXml(decryptStream);
-                    }
+                    household.ReadXml(decryptStream);
                 }
             }
 
