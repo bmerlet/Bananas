@@ -13,7 +13,10 @@ namespace BanaData.Logic.Dialogs.Basics
     {
         public OpenFileLogic(string lastFile, string filter, string title)
         {
-            InitialDirectory = Path.GetDirectoryName(lastFile);
+            InitialDirectory = 
+                string.IsNullOrWhiteSpace(lastFile) ?
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) :
+                Path.GetDirectoryName(lastFile);
             File = Path.GetFileName(lastFile);
             Filter = filter;
             Title = title;
@@ -29,7 +32,10 @@ namespace BanaData.Logic.Dialogs.Basics
     {
         public SaveFileLogic(string lastFile, string filter, string title)
         {
-            InitialDirectory = Path.GetDirectoryName(lastFile);
+            InitialDirectory =
+                string.IsNullOrWhiteSpace(lastFile) ?
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) :
+                Path.GetDirectoryName(lastFile);
             File = Path.GetFileName(lastFile);
             Filter = filter;
             Title = title;

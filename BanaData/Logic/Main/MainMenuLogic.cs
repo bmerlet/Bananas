@@ -124,7 +124,13 @@ namespace BanaData.Logic.Main
 
         private void OnBackup()
         {
-
+            SaveFileLogic logic = new SaveFileLogic(
+                mainWindow.UserSettings.LastBackupFile,
+                "Banana files (*.ban)|*.ban|Banana XML files (*.xban)|*.xban|Any file (*.*)|*.*", "Backup to file");
+            if (mainWindow.GuiServices.ShowDialog(logic))
+            {
+                mainWindow.BackupFile(logic.File);
+            }
         }
 
         //

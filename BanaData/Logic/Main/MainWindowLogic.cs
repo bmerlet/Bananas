@@ -95,7 +95,12 @@ namespace BanaData.Logic.Main
 
             GuiServices.ExecuteAsync((Action)delegate ()
             {
-                if (UserSettings.LastFileOpened != null)
+                var args = Environment.GetCommandLineArgs();
+                if (args.Length == 2 && args[1].EndsWith(".BAN", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    OpenFile(args[1]);
+                }
+                else if (UserSettings.LastFileOpened != null)
                 {
                     OpenFile(UserSettings.LastFileOpened);
                 }
@@ -376,8 +381,41 @@ namespace BanaData.Logic.Main
                 UserSettings.LastFileOpened = file;
                 UpdateTitle();
             }
+        }
 
+        public void BackupFile(string file)
+        {
+            FileStream backupStream;
+            try
+            {
+                using (backupStream = new FileStream(file, FileMode.Create, FileAccess.ReadWrite, FileShare.None))
+                {
+                    lock (householdLock)
+                    {
+                        GuiServices.SetCursor(true);
 
+                        if (file.EndsWith(".BAN", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            var serializer = new BANSerializer(Household);
+                            serializer.Write(backupStream, password);
+                        }
+                        else
+                        {
+                            backupStream.SetLength(0);
+                            Household.WriteXml(backupStream);
+                        }
+
+                        GuiServices.SetCursor(false);
+
+                        UserSettings.LastBackupFile = file;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                ErrorMessage($"Error while backing up to file {Path.GetFileName(file)}: {e.Message}");
+                return;
+            }
         }
 
         public void SetPassword()

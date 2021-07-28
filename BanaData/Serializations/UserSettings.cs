@@ -24,6 +24,9 @@ namespace BanaData.Serializations
         // Last file opened
         public string LastFileOpened;
 
+        // Last backup file
+        public string LastBackupFile;
+
         // Play Ka-Ching sound
         public bool PlayKaChingSound;
 
