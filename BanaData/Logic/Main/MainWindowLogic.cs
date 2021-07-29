@@ -527,6 +527,13 @@ namespace BanaData.Logic.Main
         {
             lock (householdLock)
             {
+                if (Household.SanityCheck() is string error)
+                {
+                    ErrorMessage("DB sanity check error: " + error);
+                    Household.RejectChanges();
+                    return;
+                }
+
                 Household.AcceptChanges();
                 if (Household.HasErrors)
                 {

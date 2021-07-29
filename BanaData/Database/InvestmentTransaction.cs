@@ -38,14 +38,14 @@ namespace BanaData.Database
                 type == EInvestmentTransactionType.CashIn ||
                 type == EInvestmentTransactionType.TransferCashIn ||
                 type == EInvestmentTransactionType.ReturnOnCapital ||
-                type == EInvestmentTransactionType.Sell;
+                type == EInvestmentTransactionType.Sell ||
+                type == EInvestmentTransactionType.Exercise;
 
             // Transactions that remove from the cash balance
             static public bool CashOut(EInvestmentTransactionType type) =>
                 type == EInvestmentTransactionType.CashOut ||
                 type == EInvestmentTransactionType.TransferCashOut ||
-                type == EInvestmentTransactionType.Buy ||
-                type == EInvestmentTransactionType.Exercise;
+                type == EInvestmentTransactionType.Buy;
 
             // Transactions that transfer cash into the account 
             static public bool TransferIn(EInvestmentTransactionType type) =>

@@ -669,7 +669,6 @@ namespace BanaData.Logic.Main
                 Type == EInvestmentTransactionType.TransferCashOut ||
                 Type == EInvestmentTransactionType.SellAndTransferCash ||
                 Type == EInvestmentTransactionType.Buy ||
-                Type == EInvestmentTransactionType.Exercise ||
                 Type == EInvestmentTransactionType.TransferDividends ||
                 Type == EInvestmentTransactionType.TransferLongTermCapitalGains ||
                 Type == EInvestmentTransactionType.TransferShortTermCapitalGains
