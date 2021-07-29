@@ -415,6 +415,8 @@ namespace BanaData.Logic.Main
                     data.LineItems.Add(unsealedLineItem);
                 }
 
+                data.Memo = memorizedPayee.Memo;
+
                 OnPropertyChanged(() => Memo);
                 OnPropertyChanged(() => Category);
                 OnPropertyChanged(() => Payment);

@@ -1584,6 +1584,7 @@ namespace BanaData.Serializations
                     status = ETransactionStatus.Reconciled;
                     break;
                 case "c":
+                case "*":
                     status = ETransactionStatus.Cleared;
                     break;
                 default:
