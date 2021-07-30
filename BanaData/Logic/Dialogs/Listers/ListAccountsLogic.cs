@@ -142,7 +142,7 @@ namespace BanaData.Logic.Dialogs.Listers
                 newAccount.Name, newAccount.Description, newAccount.Type, newAccount.CreditLimit, newAccount.InvestmentKind, newAccount.Hidden, FindPersonRow(newAccount.Owner));
 
             mainWindowLogic.CommitChanges();
-            mainWindowLogic.UpdateAccountNamessAndBalances(null);
+            mainWindowLogic.UpdateAccountNamesAndBalances(null);
 
             // Note that a new ID is created automatically, so we need to update the account item with it
             return new AccountItem(newAccount, newAccountRow);
@@ -158,7 +158,7 @@ namespace BanaData.Logic.Dialogs.Listers
 
             // Commit
             mainWindowLogic.CommitChanges();
-            mainWindowLogic.UpdateAccountNamessAndBalances(new int[] { newAccount.AccountRow.ID });
+            mainWindowLogic.UpdateAccountNamesAndBalances(new int[] { newAccount.AccountRow.ID });
             mainWindowLogic.CloseRegisterIfOpen(newAccount.AccountRow.ID);
         }
 
@@ -169,7 +169,7 @@ namespace BanaData.Logic.Dialogs.Listers
             account.AccountRow.Delete();
 
             mainWindowLogic.CommitChanges();
-            mainWindowLogic.UpdateAccountNamessAndBalances(null);
+            mainWindowLogic.UpdateAccountNamesAndBalances(null);
             mainWindowLogic.CloseRegisterIfOpen(id);
         }
 

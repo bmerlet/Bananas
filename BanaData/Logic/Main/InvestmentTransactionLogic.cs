@@ -611,7 +611,7 @@ namespace BanaData.Logic.Main
 
             mainWindowLogic.CommitChanges();
 
-            mainWindowLogic.UpdateAccountNamessAndBalances(impactedAccounts);
+            mainWindowLogic.UpdateAccountNamesAndBalances(impactedAccounts);
         }
 
         private void OnShowCapitalGains()

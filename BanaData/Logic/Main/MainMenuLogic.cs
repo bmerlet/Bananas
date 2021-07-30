@@ -388,7 +388,7 @@ namespace BanaData.Logic.Main
             }
 
             mainWindow.CommitChanges();
-            mainWindow.UpdateAccountNamessAndBalances(investmentIDs);
+            mainWindow.UpdateAccountNamesAndBalances(investmentIDs);
         }
 
         #endregion
@@ -401,7 +401,7 @@ namespace BanaData.Logic.Main
         public bool ShowClosedAccounts
         {
             get => !mainWindow.UserSettings.HideClosedAccounts;
-            set { mainWindow.UserSettings.HideClosedAccounts = !value; mainWindow.UpdateAccountNamessAndBalances(null); }
+            set { mainWindow.UserSettings.HideClosedAccounts = !value; mainWindow.UpdateAccountNamesAndBalances(null); }
         }
 
         //

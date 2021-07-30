@@ -19,7 +19,32 @@
         <w:DonePanel DockPanel.Dock="Bottom"/>
 
         <!-- Add/Edit/Delete panel -->
-        <w:AddEditDeletePanel DockPanel.Dock="Bottom"/>
+        <Grid DockPanel.Dock="Bottom">
+            <Grid.Resources>
+                <Style TargetType="Button">
+                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                    <Setter Property="Margin" Value="3"/>
+                </Style>
+            </Grid.Resources>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button
+                Grid.Column="0"
+                Content="Add..." Command="{Binding AddCommand}"/>
+            <Button
+                Grid.Column="1"
+                Content="Edit..." Command="{Binding EditCommand}"/>
+            <Button
+                Grid.Column="2"
+                Content="Delete" Command="{Binding DeleteCommand}"/>
+            <Button
+                Grid.Column="3"
+                Content="Price history..." Command="{Binding PriceHistoryCommand}"/>
+        </Grid>
 
         <!-- Main panel -->
         <!-- Main panel: Listbox of securitiess -->

@@ -107,6 +107,9 @@
     <Compile Include="Dialogs\Listers\ListSecurities.xaml.cs">
       <DependentUpon>ListSecurities.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\Listers\ListSecurityPrices.xaml.cs">
+      <DependentUpon>ListSecurityPrices.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\Listers\ListTransactionReports.xaml.cs">
       <DependentUpon>ListTransactionReports.xaml</DependentUpon>
     </Compile>
@@ -247,6 +250,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\Listers\ListSecurities.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Listers\ListSecurityPrices.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

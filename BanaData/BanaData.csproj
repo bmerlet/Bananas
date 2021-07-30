@@ -83,6 +83,7 @@
     <Compile Include="Logic\Dialogs\Editors\ReconcileInfoLogic.cs" />
     <Compile Include="Logic\Dialogs\Editors\ReconcileInvestmentsLogic.cs" />
     <Compile Include="Logic\Dialogs\Editors\ReconcileLogic.cs" />
+    <Compile Include="Logic\Dialogs\Listers\ListSecurityPricesLogic.cs" />
     <Compile Include="Logic\Dialogs\Listers\ListTransactionReportsLogic.cs" />
     <Compile Include="Logic\Dialogs\Listers\ListAccountsLogic.cs" />
     <Compile Include="Logic\Dialogs\Listers\ListCategoriesLogic.cs" />

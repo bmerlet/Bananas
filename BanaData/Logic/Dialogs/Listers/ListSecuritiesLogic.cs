@@ -39,6 +39,7 @@ namespace BanaData.Logic.Dialogs.Listers
             AddCommand = new CommandBase(OnAddSecurity);
             EditCommand = new CommandBase(OnEditSecurity);
             DeleteCommand = new CommandBase(OnDeleteSecurity);
+            PriceHistoryCommand = new CommandBase(OnPriceHistoryCommand);
         }
 
         #endregion
@@ -54,6 +55,7 @@ namespace BanaData.Logic.Dialogs.Listers
         public CommandBase AddCommand { get; }
         public CommandBase EditCommand { get; }
         public CommandBase DeleteCommand { get; }
+        public CommandBase PriceHistoryCommand { get; }
 
         #endregion
 
@@ -136,6 +138,18 @@ namespace BanaData.Logic.Dialogs.Listers
 
                 // Update UI
                 securitySource.Remove(SelectedSecurity);
+            }
+        }
+
+        private void OnPriceHistoryCommand()
+        {
+            if (SelectedSecurity != null)
+            {
+                var logic = new ListSecurityPricesLogic(mainWindowLogic, SelectedSecurity);
+                if (mainWindowLogic.GuiServices.ShowDialog(logic))
+                {
+                    mainWindowLogic.UpdateAccountNamesAndBalances(null);
+                }
             }
         }
 

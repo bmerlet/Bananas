@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Data;
 
-using Toolbox.Attributes;
 using Toolbox.UILogic;
 using Toolbox.Models;
 using BanaData.Database;
@@ -565,7 +564,7 @@ namespace BanaData.Logic.Main
             OnPropertyChanged(() => IsBankRegisterVisible);
 
             // Update all accounts
-            UpdateAccountNamessAndBalances(null);
+            UpdateAccountNamesAndBalances(null);
 
             OnPropertyChanged(() => NetWorth);
 
@@ -676,7 +675,7 @@ namespace BanaData.Logic.Main
         }
 
         // Update balances and net worth after a transaction is modified
-        public void UpdateAccountNamessAndBalances(IEnumerable<int> accountIDs)
+        public void UpdateAccountNamesAndBalances(IEnumerable<int> accountIDs)
         {
             NetWorth = 0;
 

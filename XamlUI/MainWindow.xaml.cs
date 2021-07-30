@@ -167,6 +167,10 @@ namespace XamlUI
             {
                 dialog = new EditSecurity(editSecurityLogic);
             }
+            else if (logic is ListSecurityPricesLogic listSecurityPricesLogic)
+            {
+                dialog = new ListSecurityPrices(listSecurityPricesLogic);
+            }
             else if (logic is ListTransactionReportsLogic listTransactionReportsLogic)
             {
                 dialog = new ListTransactionReports(listTransactionReportsLogic);
