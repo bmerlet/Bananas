@@ -261,6 +261,7 @@ namespace XamlUI.Widgets
                 // The selector's item collection may be shared by multiple autocomplete text box,
                 // the one with the focus needs to impose its own filter
                 selector.Items.Filter = Filter;
+                selector.SelectedItem = null;
 
                 editor.Focus();
                 RefreshSelector();

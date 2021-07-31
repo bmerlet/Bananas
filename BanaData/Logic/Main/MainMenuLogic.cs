@@ -334,6 +334,7 @@ namespace BanaData.Logic.Main
                         if (logic.InterestTransactionID >= 0)
                         {
                             mainWindow.BankRegister.AddTransaction(logic.InterestTransactionID);
+                            mainWindow.UpdateAccountNamesAndBalances(new int[] { accountID });
                         }
                     }
                 }

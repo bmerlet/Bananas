@@ -94,7 +94,7 @@ namespace BanaData.Logic.Dialogs.Reports
                 else
                 {
                     var liRows = transRow.GetLineItemRows();
-                    if (liRows.Sum(l => l.Amount) == searchDecimal)
+                    if (Math.Abs(liRows.Sum(l => l.Amount)) == Math.Abs(searchDecimal))
                     {
                         addIt = true;
                     }
@@ -102,7 +102,7 @@ namespace BanaData.Logic.Dialogs.Reports
                     {
                         foreach (var liRow in liRows)
                         {
-                            if (liRow.Amount == searchDecimal)
+                            if (Math.Abs(liRow.Amount) == Math.Abs(searchDecimal))
                             {
                                 addIt = true;
                             }
@@ -140,11 +140,11 @@ namespace BanaData.Logic.Dialogs.Reports
                     {
                         addIt = true;
                     }
-                    else if (!investRow.IsSecurityQuantityNull() && investRow.SecurityQuantity == searchDecimal)
+                    else if (!investRow.IsSecurityQuantityNull() && investRow.SecurityQuantity == Math.Abs(searchDecimal))
                     {
                         addIt = true;
                     }
-                    else if (!investRow.IsSecurityPriceNull() && investRow.SecurityPrice == searchDecimal)
+                    else if (!investRow.IsSecurityPriceNull() && investRow.SecurityPrice == Math.Abs(searchDecimal))
                     {
                         addIt = true;
                     }
