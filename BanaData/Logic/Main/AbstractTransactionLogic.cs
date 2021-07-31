@@ -262,26 +262,40 @@ namespace BanaData.Logic.Main
                         var formerTransferAccountRow = liTransferRow.AccountRow;
                         var newTransferAccountRow = household.Account.FindByID(li.CategoryAccountID);
                         
-                        if (formerTransferAccountRow.Type == EAccountType.Bank && newTransferAccountRow.Type != EAccountType.Bank)
+                        if (formerTransferAccountRow.Type == EAccountType.Bank &&
+                            newTransferAccountRow.Type != EAccountType.Bank)
                         {
                             peerTransactionRow.GetBankingTransaction().Delete();
                         }
-                        if (formerTransferAccountRow.Type == EAccountType.Investment && newTransferAccountRow.Type != EAccountType.Investment)
+                        if (formerTransferAccountRow.Type == EAccountType.Investment &&
+                            newTransferAccountRow.Type != EAccountType.Investment)
                         {
                             peerTransactionRow.GetInvestmentTransaction().Delete();
                         }
-                        if (formerTransferAccountRow.Type != EAccountType.Bank && newTransferAccountRow.Type == EAccountType.Bank)
-                        {
-                            household.BankingTransaction.Add(peerTransactionRow, ETransactionMedium.None, 0);
-                        }
-                        if (formerTransferAccountRow.Type != EAccountType.Investment && newTransferAccountRow.Type == EAccountType.Investment)
-                        {
-                            var type = li.Amount < 0 ? EInvestmentTransactionType.TransferCashIn : EInvestmentTransactionType.TransferCashOut;
-                            household.InvestmentTransaction.Add(peerTransactionRow, type, null, 0, 0, 0);
-                        }
 
+                        // If we are now transferring to self, we need to delete the peer and point to self
+                        if (newTransferAccountRow == accountRow)
+                        {
+                            DeletePeerTransaction(liTransferRow);
+                            liTransferRow.TransactionRow = transactionRow;
+                        }
+                        else
+                        {
+                            if (formerTransferAccountRow.Type != EAccountType.Bank &&
+                                newTransferAccountRow.Type == EAccountType.Bank)
+                            {
+                                household.BankingTransaction.Add(peerTransactionRow, ETransactionMedium.None, 0);
+                            }
+                            if (formerTransferAccountRow.Type != EAccountType.Investment &&
+                                newTransferAccountRow.Type == EAccountType.Investment)
+                            {
+                                var type = li.Amount < 0 ? EInvestmentTransactionType.TransferCashIn : EInvestmentTransactionType.TransferCashOut;
+                                household.InvestmentTransaction.Add(peerTransactionRow, type, null, 0, 0, 0);
+                            }
+
+                            peerTransactionRow.AccountID = li.CategoryAccountID;
+                        }
                         liTransferRow.AccountID = li.CategoryAccountID;
-                        peerTransactionRow.AccountID = li.CategoryAccountID;
                     }
                     if (string.IsNullOrWhiteSpace(data.Memo))
                     {
@@ -354,11 +368,17 @@ namespace BanaData.Logic.Main
             }
         }
 
-        private Household.TransactionRow CreatePeerTransaction(int targetAccountID, Household.TransactionRow transactionRow, Household.LineItemRow liRow, decimal peerAmount)
+        private void CreatePeerTransaction(int targetAccountID, Household.TransactionRow transactionRow, Household.LineItemRow liRow, decimal peerAmount)
         {
             var household = mainWindowLogic.Household;
-
             var targetAccountRow = household.Account.FindByID(targetAccountID);
+
+            // Special case of transfer to self
+            if (targetAccountRow == accountRow)
+            {
+                household.LineItemTransfer.AddLineItemTransferRow(liRow, accountRow, transactionRow);
+                return;
+            }
 
             // Add transaction on "other side"
             var peerTransactionRow = household.Transaction.Add(targetAccountRow, data.Date, "", data.Memo, ETransactionStatus.Pending, household.Checkpoint.GetMostRecentCheckpointID());
@@ -378,8 +398,6 @@ namespace BanaData.Logic.Main
             // Create the transfer line items
             household.LineItemTransfer.AddLineItemTransferRow(liRow, targetAccountRow, peerTransactionRow);
             household.LineItemTransfer.AddLineItemTransferRow(peerLiRow, accountRow, transactionRow);
-
-            return peerTransactionRow;
         }
 
         #endregion
@@ -458,6 +476,13 @@ namespace BanaData.Logic.Main
         protected void DeletePeerTransaction(Household.LineItemTransferRow lineItemTransferRow)
         {
             var peerTransactionRow = lineItemTransferRow.TransactionRow;
+
+            // Case of transfer to self
+            if (peerTransactionRow == lineItemTransferRow.LineItemRow.TransactionRow)
+            {
+                return;
+            }
+
             var peerLineItemRows = peerTransactionRow.GetLineItemRows();
 
             foreach (var peerLineItemRow in peerLineItemRows)
