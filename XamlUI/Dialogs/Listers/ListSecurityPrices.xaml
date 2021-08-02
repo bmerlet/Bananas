@@ -5,14 +5,47 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:XamlUI.Dialogs.Listers" 
         xmlns:ucs="clr-namespace:XamlUI.UserControls" 
+        xmlns:w="clr-namespace:XamlUI.Widgets" 
         xmlns:listers="clr-namespace:BanaData.Logic.Dialogs.Listers;assembly=BanaData" 
         d:DataContext="{d:DesignInstance Type=listers:ListSecurityPricesLogic}"
         mc:Ignorable="d"
+        Icon="/XamlUI;component/Images/Bananas.ico"
+        WindowStartupLocation="CenterOwner"
         Title="{Binding Title}" Height="450" Width="800">
     <DockPanel>
 
         <!-- OK / cancel -->
         <ucs:OKCancel DockPanel.Dock="Bottom"/>
-
+        
+        <!-- Main grid: list of prices on left, graphic on right -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- List of prices -->
+            <ucs:SecurityRegister DataContext="{Binding Register}"/>
+            
+            <!-- Graphic-->
+            <DockPanel Grid.Column="1">
+                <DockPanel.Resources>
+                    <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}"/>
+                    <Style TargetType="ComboBox" BasedOn="{StaticResource FormComboBox}"/>
+                    <Style TargetType="w:DateBox" BasedOn="{StaticResource FormDateBox}"/>
+                </DockPanel.Resources>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom">
+                    <TextBlock Text="Date range:"/>
+                    <ComboBox ItemsSource="{Binding DateRangesSource}" SelectedItem="{Binding DateRange, Mode=TwoWay}" Width="100"/>
+                    <TextBlock Text="Start date:"/>
+                    <w:DateBox Date="{Binding StartDate}" IsEnabled="{Binding AreDatesEnabled}" Width="80"/>
+                    <TextBlock Text="End date:"/>
+                    <w:DateBox Date="{Binding EndDate}" IsEnabled="{Binding AreDatesEnabled}" Width="80"/>
+                </StackPanel>
+                <Canvas>
+                    
+                </Canvas>
+            </DockPanel>
+        </Grid>
     </DockPanel>
 </Window>

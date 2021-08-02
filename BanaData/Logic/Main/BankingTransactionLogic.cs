@@ -507,7 +507,7 @@ namespace BanaData.Logic.Main
         {
             uint result = 0;
 
-            foreach(BankingTransactionLogic btl in bankRegisterLogic.Transactions)
+            foreach(BankingTransactionLogic btl in bankRegisterLogic.RegisterItems)
             {
                 if (btl != this)
                 {

@@ -74,7 +74,7 @@ namespace BanaData.Logic.Dialogs.Editors
         // Called by line item when amount changes and also when the collection of line items changes
         public void UpdateTotal()
         {
-            Total = Register.Transactions.Cast<GridViewLineItem>().Sum(gvli => gvli.Amount).ToString("N");
+            Total = Register.RegisterItems.Cast<GridViewLineItem>().Sum(gvli => gvli.Amount).ToString("N");
             OnPropertyChanged(() => Total);
         }
 
@@ -83,7 +83,7 @@ namespace BanaData.Logic.Dialogs.Editors
             // Build the new line items
             var newLineItems = new List<LineItem>();
 
-            foreach (GridViewLineItem gvli in Register.Transactions)
+            foreach (GridViewLineItem gvli in Register.RegisterItems)
             {
                 // Skip uncommitted with amount of 0
                 if (gvli.ID == -1 && gvli.Amount == 0 && string.IsNullOrWhiteSpace(gvli.Memo))
@@ -176,7 +176,7 @@ namespace BanaData.Logic.Dialogs.Editors
             gridViewLineItems.CollectionChanged += (o, e) => editSplitLogic.UpdateTotal();
 
             // Give the default view to the UI
-            Transactions = (CollectionView)CollectionViewSource.GetDefaultView(gridViewLineItems);
+            RegisterItems = (CollectionView)CollectionViewSource.GetDefaultView(gridViewLineItems);
 
             // Delete line item command
             DeleteLineItem = new CommandBase(OnDeleteLineItem);

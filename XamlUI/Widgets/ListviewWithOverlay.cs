@@ -178,7 +178,7 @@ namespace XamlUI.Widgets
             if (DataContext is BaseRegisterLogic brl)
             {
                 // Get tag name from the source
-                var sd = brl.Transactions.SortDescriptions;
+                var sd = brl.RegisterItems.SortDescriptions;
                 var column = sender as GridViewColumnHeader;
                 var memberName = column.Tag.ToString();
 
@@ -190,8 +190,8 @@ namespace XamlUI.Widgets
                 }
 
                 // Do the sorting
-                brl.Transactions.SortDescriptions.Clear();
-                brl.Transactions.SortDescriptions.Add(new SortDescription(memberName, direction));
+                brl.RegisterItems.SortDescriptions.Clear();
+                brl.RegisterItems.SortDescriptions.Add(new SortDescription(memberName, direction));
 
                 // Un-adorn existing adornment
                 if (sortAdorner != null)

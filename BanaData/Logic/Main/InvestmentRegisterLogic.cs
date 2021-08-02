@@ -83,7 +83,7 @@ namespace BanaData.Logic.Main
             // securityId -> share balance
             var dico = new Dictionary<int, decimal>();
 
-            foreach (InvestmentTransactionLogic itl in Transactions)
+            foreach (InvestmentTransactionLogic itl in RegisterItems)
             {
                 decimal balance = decimal.MinValue;
                 var secuID = itl.SecurityID;

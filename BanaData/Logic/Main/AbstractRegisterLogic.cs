@@ -37,9 +37,9 @@ namespace BanaData.Logic.Main
             mainWindowLogic = _mainWindowLogic;
 
             // Create transaction collection view, and sort by date
-            Transactions = (CollectionView)CollectionViewSource.GetDefaultView(transactions);
-            Transactions.SortDescriptions.Add(new SortDescription("Date", ListSortDirection.Ascending));
-            Transactions.GroupDescriptions.Add(new PropertyGroupDescription("GroupSorter"));
+            RegisterItems = (CollectionView)CollectionViewSource.GetDefaultView(transactions);
+            RegisterItems.SortDescriptions.Add(new SortDescription("Date", ListSortDirection.Ascending));
+            RegisterItems.GroupDescriptions.Add(new PropertyGroupDescription("GroupSorter"));
 
             // Create commands
             DeleteTransaction = new CommandBase(OnDeleteTransaction);
@@ -173,7 +173,7 @@ namespace BanaData.Logic.Main
         public override void RecomputeBalances()
         {
             decimal balance = 0;
-            foreach (var o in Transactions)
+            foreach (var o in RegisterItems)
             {
                 if (o is AbstractTransactionLogic atl)
                 {
@@ -397,7 +397,7 @@ namespace BanaData.Logic.Main
 
             // Delete from list
             transactions.Remove(atl);
-            Transactions.Refresh();
+            RegisterItems.Refresh();
 
             // Compute balances
             RecomputeBalances();
@@ -441,7 +441,7 @@ namespace BanaData.Logic.Main
 
                 // Delete from list
                 transactions.Remove(atl);
-                Transactions.Refresh();
+                RegisterItems.Refresh();
 
                 // Compute balances
                 RecomputeBalances();

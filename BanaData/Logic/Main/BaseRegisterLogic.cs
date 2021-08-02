@@ -15,8 +15,8 @@ namespace BanaData.Logic.Main
     /// </summary>
     public abstract class BaseRegisterLogic : LogicBase
     {
-        // Transactions. The CollectionView type enables sorting on columns, and is generic
-        public CollectionView Transactions { get; protected set; }
+        // The items making up the register. The CollectionView type enables sorting on columns, and is generic
+        public CollectionView RegisterItems { get; protected set; }
 
         // Transaction to show
         public object TransactionToScrollTo { get; protected set; }
@@ -34,7 +34,7 @@ namespace BanaData.Logic.Main
         // Get the next transaction, in the CollectionView order
         protected object GetNextTransaction(object trans)
         {
-            var nextTrans = Transactions.Cast<object>()
+            var nextTrans = RegisterItems.Cast<object>()
                 .SkipWhile(x => !Equals(x, trans)) //skip preceding transactions
                 .Skip(1) //skip the transaction itself
                 .FirstOrDefault();
@@ -47,7 +47,7 @@ namespace BanaData.Logic.Main
         {
             object lastTrans = null;
 
-            foreach (var curTrans in Transactions)
+            foreach (var curTrans in RegisterItems)
             {
                 if (curTrans.Equals(trans))
                 {

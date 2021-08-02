@@ -1,0 +1,95 @@
+﻿<w:ListviewWithOverlay x:Class="XamlUI.UserControls.SecurityRegister"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:local="clr-namespace:XamlUI.UserControls"
+        xmlns:w="clr-namespace:XamlUI.Widgets"
+        xmlns:t="clr-namespace:XamlUI.Tools"
+        xmlns:listers="clr-namespace:BanaData.Logic.Dialogs.Listers;assembly=BanaData" 
+        d:DataContext="{d:DesignInstance Type=listers:SecurityPricesRegisterLogic}"
+        mc:Ignorable="d" 
+        d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+
+        <!-- The listview -->
+        <ListView
+            x:Name="listView"
+            SelectionMode="Single"
+            SelectedItem="{Binding SelectedDatePrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            ScrollViewer.ScrollChanged="OnListViewScrollChanged"
+            ItemsSource="{Binding RegisterItems}">
+
+            <!-- View definition -->
+            <ListView.View>
+                <GridView>
+
+                    <!-- Date column-->
+                    <GridViewColumn Header="Date" Width="{Binding WidthOfDateColumn, Mode=TwoWay}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Date, StringFormat=MM/dd/yyyy}" TextAlignment="Right"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <!-- Price column-->
+                    <GridViewColumn Header="Price" Width="{Binding WidthOfPriceColumn, Mode=TwoWay}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=Price, StringFormat=N2}" TextAlignment="Right"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <!-- The overlay -->
+        <Grid
+             x:Name="overlay"
+             KeyboardNavigation.TabNavigation="Cycle"
+             Visibility="Hidden">
+
+            <Grid.Resources>
+
+                <ContextMenu x:Key="DatePriceContextMenu">
+                    <MenuItem Header="Delete" Command="{Binding DeleteDatePrice}"/>
+                </ContextMenu>
+
+                <Style TargetType="{x:Type w:DateBox}">
+                    <Setter Property="ContextMenu" Value="{StaticResource DatePriceContextMenu}"/>
+                </Style>
+
+                <Style TargetType="{x:Type w:AmountBox}">
+                    <Setter Property="ContextMenu" Value="{StaticResource DatePriceContextMenu}"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Right"/>
+                </Style>
+
+            </Grid.Resources>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="{Binding WidthOfDateColumn}"/>
+                <ColumnDefinition Width="{Binding WidthOfPriceColumn}"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Date -->
+            <w:DateBox
+                Grid.Column="0"
+                Date="{Binding EditedDatePrice.Date, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                TextAlignment="Right"
+                t:FocusAttachedProperty.IsFocused="{Binding DateFocus}"/>
+
+            <!-- Price -->
+            <w:AmountBox
+                Grid.Column="1"
+                Watermark="Price"
+                Amount="{Binding EditedDatePrice.Price, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        </Grid>
+    </Grid>
+</w:ListviewWithOverlay>

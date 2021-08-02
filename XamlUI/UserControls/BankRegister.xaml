@@ -24,7 +24,7 @@
             SelectionMode="Single"
             SelectedItem="{Binding SelectedTransaction, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             ScrollViewer.ScrollChanged="OnListViewScrollChanged"
-            ItemsSource="{Binding Transactions, IsAsync=True}">
+            ItemsSource="{Binding RegisterItems, IsAsync=True}">
 
             <!-- Neutralize the change of colrs when the mouse is over a row -->
             <ListView.ItemContainerStyle>

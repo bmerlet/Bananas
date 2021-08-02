@@ -185,6 +185,9 @@
     <Compile Include="UserControls\ReconcileGrid.xaml.cs">
       <DependentUpon>ReconcileGrid.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\SecurityRegister.xaml.cs">
+      <DependentUpon>SecurityRegister.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\SplitRegister.xaml.cs">
       <DependentUpon>SplitRegister.xaml</DependentUpon>
     </Compile>
@@ -350,6 +353,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserControls\ReconcileGrid.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\SecurityRegister.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
