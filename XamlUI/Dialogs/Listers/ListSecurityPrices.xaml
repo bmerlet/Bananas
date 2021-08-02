@@ -42,7 +42,7 @@
                     <TextBlock Text="End date:"/>
                     <w:DateBox Date="{Binding EndDate, Mode=TwoWay}" IsEnabled="{Binding AreDatesEnabled}" Width="80"/>
                 </StackPanel>
-                <Canvas x:Name="canvas" Margin="20"/>
+                <Canvas x:Name="canvas"/>
             </DockPanel>
         </Grid>
     </DockPanel>

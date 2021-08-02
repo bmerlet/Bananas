@@ -36,6 +36,7 @@ namespace XamlUI.Dialogs.Listers
 
         private void BuildGraph()
         {
+
             var logic = DataContext as ListSecurityPricesLogic;
             var points = logic.GraphPoints;
 
@@ -52,23 +53,48 @@ namespace XamlUI.Dialogs.Listers
             TimeSpan span = logic.EndDate - logic.StartDate;
             double spanInDays = span.TotalDays;
 
-            double canvasWidth = canvas.ActualWidth /*- canvas.Margin.Left - canvas.Margin.Right */;
-            double canvasHeight = canvas.ActualHeight /*- canvas.Margin.Top - canvas.Margin.Bottom */;
+            double marginX = 20;
+            double marginY = 20;
+            double canvasWidth = canvas.ActualWidth - 2 * marginX;
+            double canvasHeight = canvas.ActualHeight - 2 * marginY;
 
             double lastX = double.MinValue;
             double lastY = double.MinValue;
+            var strokeDash = new DoubleCollection(new double[] { 5, 18 });
 
+            // Draw high and low prices
+            canvas.Children.Add(new Line {
+                X1 = marginX / 2, X2 = canvasWidth + marginX / 2,
+                Y1 = marginY + canvasHeight, Y2= marginY + canvasHeight,
+                Stroke = Brushes.DarkGray, StrokeThickness = 1, StrokeDashArray = strokeDash
+            });
+            canvas.Children.Add(new Line {
+                X1 = marginX / 2, X2 = canvasWidth + marginX / 2,
+                Y1 = marginY, Y2 = marginY, 
+                Stroke = Brushes.DarkGray, StrokeThickness = 1, StrokeDashArray = strokeDash });
+
+            var highPriceTextBlock = new TextBlock { Text = $"Max:{maxPrice:N2}", FontSize = 9 };
+            canvas.Children.Add(highPriceTextBlock);
+            Canvas.SetLeft(highPriceTextBlock, 0);
+            Canvas.SetTop(highPriceTextBlock, 0);
+            var lowPriceTextBlock = new TextBlock { Text = $"Min:{minPrice:N2}", FontSize = 9 };
+            canvas.Children.Add(lowPriceTextBlock);
+            Canvas.SetLeft(lowPriceTextBlock, 0);
+            Canvas.SetTop(lowPriceTextBlock, canvasHeight + marginY);
+
+            // Draw price graph
             foreach (var p in points)
             {
                 double x = (p.Date - logic.StartDate).TotalDays / spanInDays * canvasWidth;
+                x += marginX;
                 double y = (double)((p.Price - minPrice) / (maxPrice - minPrice + 1)) * canvasHeight;
-                y = canvasHeight - y;
+                y = marginY + canvasHeight - y;
 
                 if (lastX != double.MinValue)
                 {
-                    var line = new Line()
+                    var line = new Line
                     {
-                        Stroke = System.Windows.Media.Brushes.LightSteelBlue,
+                        Stroke = Brushes.SteelBlue,
                         StrokeThickness = 1,
                         X1 = lastX,
                         X2 = x,
