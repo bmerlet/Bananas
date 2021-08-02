@@ -29,6 +29,59 @@ namespace XamlUI.Dialogs.Listers
             logic.CloseView = result => DialogResult = result;
 
             InitializeComponent();
+
+            logic.GraphPoints.CollectionChanged += (s, e) => BuildGraph();
+            Loaded += (s, e) => BuildGraph();
+        }
+
+        private void BuildGraph()
+        {
+            var logic = DataContext as ListSecurityPricesLogic;
+            var points = logic.GraphPoints;
+
+            canvas.Children.Clear();
+
+            if (points.Count == 0)
+            {
+                return;
+            }
+
+            decimal minPrice = points.Min(p => p.Price);
+            decimal maxPrice = points.Max(p => p.Price);
+
+            TimeSpan span = logic.EndDate - logic.StartDate;
+            double spanInDays = span.TotalDays;
+
+            double canvasWidth = canvas.ActualWidth /*- canvas.Margin.Left - canvas.Margin.Right */;
+            double canvasHeight = canvas.ActualHeight /*- canvas.Margin.Top - canvas.Margin.Bottom */;
+
+            double lastX = double.MinValue;
+            double lastY = double.MinValue;
+
+            foreach (var p in points)
+            {
+                double x = (p.Date - logic.StartDate).TotalDays / spanInDays * canvasWidth;
+                double y = (double)((p.Price - minPrice) / (maxPrice - minPrice + 1)) * canvasHeight;
+                y = canvasHeight - y;
+
+                if (lastX != double.MinValue)
+                {
+                    var line = new Line()
+                    {
+                        Stroke = System.Windows.Media.Brushes.LightSteelBlue,
+                        StrokeThickness = 1,
+                        X1 = lastX,
+                        X2 = x,
+                        Y1 = lastY,
+                        Y2 = y,
+                    };
+
+                    canvas.Children.Add(line);
+                }
+
+                lastX = x;
+                lastY = y;
+            }
         }
     }
 }

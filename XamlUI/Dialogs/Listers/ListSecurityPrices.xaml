@@ -38,13 +38,11 @@
                     <TextBlock Text="Date range:"/>
                     <ComboBox ItemsSource="{Binding DateRangesSource}" SelectedItem="{Binding DateRange, Mode=TwoWay}" Width="100"/>
                     <TextBlock Text="Start date:"/>
-                    <w:DateBox Date="{Binding StartDate}" IsEnabled="{Binding AreDatesEnabled}" Width="80"/>
+                    <w:DateBox Date="{Binding StartDate, Mode=TwoWay}" IsEnabled="{Binding AreDatesEnabled}" Width="80"/>
                     <TextBlock Text="End date:"/>
-                    <w:DateBox Date="{Binding EndDate}" IsEnabled="{Binding AreDatesEnabled}" Width="80"/>
+                    <w:DateBox Date="{Binding EndDate, Mode=TwoWay}" IsEnabled="{Binding AreDatesEnabled}" Width="80"/>
                 </StackPanel>
-                <Canvas>
-                    
-                </Canvas>
+                <Canvas x:Name="canvas" Margin="20"/>
             </DockPanel>
         </Grid>
     </DockPanel>

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using BanaData.Collections;
 using BanaData.Database;
 using BanaData.Logic.Items;
 using BanaData.Logic.Main;
@@ -33,6 +34,7 @@ namespace BanaData.Logic.Dialogs.Listers
             (this.mainWindowLogic, this.securityItem) = (mainWindowLogic, securityItem);
 
             Register = new SecurityPricesRegisterLogic(mainWindowLogic, this, securityItem.ID);
+            SetDateRange(dateRange);
             UpdateGraph();
         }
 
@@ -70,13 +72,17 @@ namespace BanaData.Logic.Dialogs.Listers
         // Custom dates enabled
         public bool? AreDatesEnabled => dateRange == DATE_RANGE_CUSTOM;
 
-        // Custom start datae
+        // Custom start date
         private DateTime startDate;
         public DateTime StartDate { get => startDate; set => SetCustomDateRange(value, endDate); }
 
         // Custom end date
         private DateTime endDate;
         public DateTime EndDate { get => endDate; set => SetCustomDateRange(startDate, value); }
+
+        // Points to go on the graph
+        public WpfObservableRangeCollection<DatePriceItem> GraphPoints { get; } =
+            new WpfObservableRangeCollection<DatePriceItem>();
 
         #endregion
 
@@ -86,7 +92,35 @@ namespace BanaData.Logic.Dialogs.Listers
         {
             dateRange = value;
 
-            // ZZZZZ
+            switch(dateRange)
+            {
+                case DATE_RANGE_ONE_WEEK:
+                    endDate = DateTime.Today;
+                    startDate = endDate.AddDays(-6);
+                    break;
+                case DATE_RANGE_ONE_MONTH:
+                    endDate = DateTime.Today;
+                    startDate = endDate.AddMonths(-1).AddDays(1);
+                    break;
+                case DATE_RANGE_ONE_YEAR:
+                    endDate = DateTime.Today;
+                    startDate = endDate.AddYears(-1).AddDays(1);
+                    break;
+                case DATE_RANGE_YTD:
+                    endDate = DateTime.Today;
+                    startDate = new DateTime(DateTime.Today.Year, 1, 1);
+                    break;
+                case DATE_RANGE_FIVE_YEAR:
+                    endDate = DateTime.Today;
+                    startDate = endDate.AddYears(-5).AddDays(1);
+                    break;
+                case DATE_RANGE_ALL:
+                    endDate = DateTime.Today;
+                    startDate = mainWindowLogic.Household.SecurityPrice.Where(sp => sp.SecurityID == securityItem.ID).Min(sp => sp.Date);
+                    break;
+                case DATE_RANGE_CUSTOM:
+                    break;
+            }
 
             OnPropertyChanged(() => StartDate);
             OnPropertyChanged(() => EndDate);
@@ -97,8 +131,6 @@ namespace BanaData.Logic.Dialogs.Listers
 
         private void SetCustomDateRange(DateTime startDate, DateTime endDate)
         {
-            // ZZZZ
-
             this.startDate = startDate;
             this.endDate = endDate;
 
@@ -107,7 +139,12 @@ namespace BanaData.Logic.Dialogs.Listers
 
         public void UpdateGraph()
         {
-            // ZZZZ
+            GraphPoints.ReplaceRange(
+                mainWindowLogic.Household.SecurityPrice
+                .Where(sp => sp.SecurityID == securityItem.ID)
+                .Where(sp => sp.Date.CompareTo(startDate) >= 0)
+                .Where(sp => sp.Date.CompareTo(endDate) <= 0)
+                .Select(sp => new DatePriceItem(sp)));
         }
 
         protected override bool? Commit()
@@ -361,87 +398,111 @@ namespace BanaData.Logic.Dialogs.Listers
         }
 
         #endregion
+    }
 
-        #region price-at-a-date class
+    /// <summary>
+    /// Price-at a date class
+    /// </summary>
+    public class DatePriceItem : LogicBase, IEditableObject
+    {
+        #region Private members
 
-        public class DatePriceItem : LogicBase, IEditableObject
+        private struct Data
         {
-            private struct Data
+            public DateTime Date;
+            public decimal Price;
+        }
+
+        private Data data;
+        private Data backup;
+        private bool editing;
+
+        #endregion
+
+        #region Constructors
+
+        // Create a date price from the DB
+        public DatePriceItem(Household.SecurityPriceRow _securityPriceRow)
+        {
+            securityPriceRow = _securityPriceRow;
+            data.Date = _securityPriceRow.Date;
+            data.Price = _securityPriceRow.Value;
+        }
+
+        // Create the open date/price
+        public DatePriceItem()
+        {
+            data.Date = DateTime.Now;
+        }
+
+        #endregion
+
+        #region Logic properties
+
+        public Household.SecurityPriceRow securityPriceRow;
+
+        #endregion
+
+        #region UI properties
+
+        public DateTime Date { get => data.Date; set => data.Date = value; }
+        public decimal Price { get => data.Price; set => data.Price = value; }
+
+        #endregion
+
+        #region Editable object implementation
+
+        public void BeginEdit()
+        {
+            if (!editing)
             {
-                public DateTime Date;
-                public decimal Price;
+                // Backup the data
+                backup = data;
+                editing = true;
             }
+        }
 
-            private Data data;
-            private Data backup;
-            private bool editing;
-
-            // Create a date price from the DB
-            public DatePriceItem(Household.SecurityPriceRow _securityPriceRow)
+        public void EndEdit()
+        {
+            if (editing)
             {
-                securityPriceRow = _securityPriceRow;
-                data.Date = _securityPriceRow.Date;
-                data.Price = _securityPriceRow.Value;
+                // Publish data
+                editing = false;
+                OnPropertyChanged(() => Date);
+                OnPropertyChanged(() => Price);
             }
+        }
 
-            // Create the open date/price
-            public DatePriceItem()
+        public void CancelEdit()
+        {
+            if (editing)
             {
-                data.Date = DateTime.Now;
-            }
-
-            public Household.SecurityPriceRow securityPriceRow;
-
-            public DateTime Date { get => data.Date; set => data.Date = value; }
-            public decimal Price { get => data.Price; set => data.Price = value; }
-
-            public void BeginEdit()
-            {
-                if (!editing)
-                {
-                    // Backup the data
-                    backup = data;
-                    editing = true;
-                }
-            }
-
-            public void EndEdit()
-            {
-                if (editing)
-                {
-                    // Publish data
-                    editing = false;
-                    OnPropertyChanged(() => Date);
-                    OnPropertyChanged(() => Price);
-                }
-            }
-
-            public void CancelEdit()
-            {
-                if (editing)
-                {
-                    // Recover from backup data
-                    editing = false;
-                    data = backup;
-                    OnPropertyChanged(() => Date);
-                    OnPropertyChanged(() => Price);
-                }
-            }
-
-            public override bool Equals(object obj)
-            {
-                return
-                    obj is DatePriceItem o &&
-                    o.Date == Date &&
-                    o.Price == Price;
-            }
-
-            public override int GetHashCode()
-            {
-                return base.GetHashCode();
+                // Recover from backup data
+                editing = false;
+                data = backup;
+                OnPropertyChanged(() => Date);
+                OnPropertyChanged(() => Price);
             }
         }
 
         #endregion
+
+        #region Overrides
+
+        public override bool Equals(object obj)
+        {
+            return
+                obj is DatePriceItem o &&
+                o.Date == Date &&
+                o.Price == Price;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        #endregion
     }
+
 }
