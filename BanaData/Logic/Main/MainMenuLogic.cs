@@ -39,7 +39,6 @@ namespace BanaData.Logic.Main
             Backup = new CommandBase(OnBackup);
             SetPassword = new CommandBase(OnSetPassword);
             Import = new CommandBase(OnImport);
-            Merge = new CommandBase(OnMerge);
             Export = new CommandBase(OnExport);
             DifferentialExport = new CommandBase(OnDifferentialExport);
             Exit = new CommandBase(OnExit);
@@ -157,20 +156,6 @@ namespace BanaData.Logic.Main
                 {
                     mainWindow.ImportQIF(logic.File);
                 }
-            }
-        }
-
-        //
-        // Merge
-        //
-        public CommandBase Merge { get; }
-
-        private void OnMerge()
-        {
-            OpenFileLogic logic = new OpenFileLogic(GetSuggestionForQIFFile(), "Quicken Interchange Format files (*.QIF)|*.QIF|Any file (*.*)|*.*", "Merge QIF file");
-            if (mainWindow.GuiServices.ShowDialog(logic))
-            {
-                mainWindow.MergeQIF(logic.File);
             }
         }
 

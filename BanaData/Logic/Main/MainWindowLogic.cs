@@ -448,27 +448,6 @@ namespace BanaData.Logic.Main
             UpdateAll();
         }
 
-        public void MergeQIF(string file)
-        {
-            GuiServices.SetCursor(true);
-
-            var parser = new QIFParser(this);
-            bool change = parser.MergeFromQIF(file);
-
-            GuiServices.SetCursor(false);
-
-            if (!string.IsNullOrEmpty(parser.Log))
-            {
-                ErrorMessage(parser.Log, "Merge results");
-            }
-
-            if (change)
-            {
-                Dirty = true;
-                UpdateAll();
-            }
-        }
-
         public void ExportQIF(string file)
         {
             GuiServices.SetCursor(true);
