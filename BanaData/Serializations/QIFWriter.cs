@@ -69,7 +69,7 @@ namespace BanaData.Serializations
             sw.WriteLine("!Type:Cat");
             foreach(Household.CategoryRow categoryRow in household.Category.Rows)
             {
-                sw.WriteLine($"N{mainWindowLogic.CategoriesAndTransfers.Find(c => c.ID == categoryRow.ID).FullName}");
+                sw.WriteLine($"N{categoryRow.FullName}");
                 if (!categoryRow.IsDescriptionNull())
                 {
                     sw.WriteLine($"D{categoryRow.Description}");
