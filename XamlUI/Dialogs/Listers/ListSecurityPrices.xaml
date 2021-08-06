@@ -33,7 +33,12 @@
                     <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}"/>
                     <Style TargetType="ComboBox" BasedOn="{StaticResource FormComboBox}"/>
                     <Style TargetType="w:DateBox" BasedOn="{StaticResource FormDateBox}"/>
+                    <Style TargetType="CheckBox" BasedOn="{StaticResource FormCheckBox}"/>
                 </DockPanel.Resources>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom">
+                    <CheckBox Content="Show dividendend reinvestment" IsChecked="{Binding ShowReinvDivs}"/>
+                    <CheckBox Content="Show trades" IsChecked="{Binding ShowTrades}"/>
+                </StackPanel>
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom">
                     <TextBlock Text="Date range:"/>
                     <ComboBox ItemsSource="{Binding DateRangesSource}" SelectedItem="{Binding DateRange, Mode=TwoWay}" Width="100"/>

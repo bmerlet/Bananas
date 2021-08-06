@@ -80,8 +80,20 @@ namespace BanaData.Logic.Dialogs.Listers
         private DateTime endDate;
         public DateTime EndDate { get => endDate; set => SetCustomDateRange(startDate, value); }
 
-        // Points to go on the graph
-        public WpfObservableRangeCollection<DatePriceItem> GraphPoints { get; } =
+        // Price points
+        public WpfObservableRangeCollection<DatePriceItem> Quotes { get; } =
+            new WpfObservableRangeCollection<DatePriceItem>();
+
+        // Dividend reinvestments date and price
+        private bool showReinvDivs = true;
+        public bool? ShowReinvDivs { get => showReinvDivs; set { showReinvDivs = value == true; OnPropertyChanged(() => ShowReinvDivs); } }
+        public WpfObservableRangeCollection<DatePriceItem> ReinvestedDividends { get; } =
+            new WpfObservableRangeCollection<DatePriceItem>();
+
+        // Sale/Purchase date and price
+        private bool showTrades = true;
+        public bool? ShowTrades { get => showTrades; set { showTrades = value == true; OnPropertyChanged(() => ShowTrades); } }
+        public WpfObservableRangeCollection<DatePriceItem> Trades { get; } =
             new WpfObservableRangeCollection<DatePriceItem>();
 
         #endregion
@@ -139,12 +151,34 @@ namespace BanaData.Logic.Dialogs.Listers
 
         public void UpdateGraph()
         {
-            GraphPoints.ReplaceRange(
+            Quotes.ReplaceRange(
                 mainWindowLogic.Household.SecurityPrice
                 .Where(sp => sp.SecurityID == securityItem.ID)
                 .Where(sp => sp.Date.CompareTo(startDate) >= 0)
                 .Where(sp => sp.Date.CompareTo(endDate) <= 0)
                 .Select(sp => new DatePriceItem(sp)));
+
+            ReinvestedDividends.ReplaceRange(
+                mainWindowLogic.Household.InvestmentTransaction
+                .Where(it => it.Type == EInvestmentTransactionType.ReinvestDividends ||
+                    it.Type == EInvestmentTransactionType.ReinvestShortTermCapitalGains ||
+                    it.Type == EInvestmentTransactionType.ReinvestMediumTermCapitalGains ||
+                    it.Type == EInvestmentTransactionType.ReinvestLongTermCapitalGains)
+                .Where(it => it.SecurityID == securityItem.ID)
+                .Where(it => it.TransactionRow.Date.CompareTo(startDate) >= 0)
+                .Where(it => it.TransactionRow.Date.CompareTo(endDate) <= 0)
+                .Select(it => new DatePriceItem(it)));
+
+            Trades.ReplaceRange(
+                mainWindowLogic.Household.InvestmentTransaction
+                .Where(it => it.Type == EInvestmentTransactionType.Buy ||
+                    it.Type == EInvestmentTransactionType.BuyFromTransferredCash ||
+                    it.Type == EInvestmentTransactionType.Sell ||
+                    it.Type == EInvestmentTransactionType.SellAndTransferCash)
+                .Where(it => it.SecurityID == securityItem.ID)
+                .Where(it => it.TransactionRow.Date.CompareTo(startDate) >= 0)
+                .Where(it => it.TransactionRow.Date.CompareTo(endDate) <= 0)
+                .Select(it => new DatePriceItem(it)));
         }
 
         protected override bool? Commit()
@@ -421,12 +455,24 @@ namespace BanaData.Logic.Dialogs.Listers
 
         #region Constructors
 
-        // Create a date price from the DB
-        public DatePriceItem(Household.SecurityPriceRow _securityPriceRow)
+        // Create a date price from a security price row
+        public DatePriceItem(Household.SecurityPriceRow securityPriceRow)
         {
-            securityPriceRow = _securityPriceRow;
-            data.Date = _securityPriceRow.Date;
-            data.Price = _securityPriceRow.Value;
+            SecurityPriceRow = securityPriceRow;
+            InvestmentTransactionRow = null;
+            data.Date = securityPriceRow.Date;
+            data.Price = securityPriceRow.Value;
+            UpdateTip();
+        }
+
+        // Create a date price from an investment transaction row
+        public DatePriceItem(Household.InvestmentTransactionRow investmentTransactionRow)
+        {
+            SecurityPriceRow = null;
+            InvestmentTransactionRow = investmentTransactionRow;
+            data.Date = investmentTransactionRow.TransactionRow.Date;
+            data.Price = investmentTransactionRow.SecurityPrice;
+            UpdateTip();
         }
 
         // Create the open date/price
@@ -435,11 +481,43 @@ namespace BanaData.Logic.Dialogs.Listers
             data.Date = DateTime.Now;
         }
 
+        private void UpdateTip()
+        {
+            if (SecurityPriceRow != null)
+            {
+                Tip = $"Quote: {Price:N2} on {Date:MM/dd/yyyy}";
+            }
+            else if (InvestmentTransactionRow != null)
+            {
+                if (InvestmentTransactionRow.Type == EInvestmentTransactionType.ReinvestDividends ||
+                    InvestmentTransactionRow.Type == EInvestmentTransactionType.ReinvestShortTermCapitalGains ||
+                    InvestmentTransactionRow.Type == EInvestmentTransactionType.ReinvestMediumTermCapitalGains ||
+                    InvestmentTransactionRow.Type == EInvestmentTransactionType.ReinvestLongTermCapitalGains)
+                {
+                    Tip = $"Reinvestment: {Price:N2} on {Date:MM/dd/yyyy}";
+                }
+                else if (InvestmentTransactionRow.Type == EInvestmentTransactionType.Sell ||
+                         InvestmentTransactionRow.Type == EInvestmentTransactionType.SellAndTransferCash)
+                {
+                    Tip = $"Sale: {Price:N2} on {Date:MM/dd/yyyy}";
+                }
+                else
+                {
+                    Tip = $"Purchase: {Price:N2} on {Date:MM/dd/yyyy}";
+                }
+            }
+            else
+            {
+                Tip = $"Manually entered: {Price:N2} on {Date:MM/dd/yyyy}";
+            }
+        }
+
         #endregion
 
         #region Logic properties
 
-        public Household.SecurityPriceRow securityPriceRow;
+        public Household.SecurityPriceRow SecurityPriceRow;
+        public Household.InvestmentTransactionRow InvestmentTransactionRow;
 
         #endregion
 
@@ -447,6 +525,8 @@ namespace BanaData.Logic.Dialogs.Listers
 
         public DateTime Date { get => data.Date; set => data.Date = value; }
         public decimal Price { get => data.Price; set => data.Price = value; }
+
+        public string Tip { get; private set; }
 
         #endregion
 
@@ -468,8 +548,10 @@ namespace BanaData.Logic.Dialogs.Listers
             {
                 // Publish data
                 editing = false;
+                UpdateTip();
                 OnPropertyChanged(() => Date);
                 OnPropertyChanged(() => Price);
+                OnPropertyChanged(() => Tip);
             }
         }
 

@@ -30,15 +30,26 @@ namespace XamlUI.Dialogs.Listers
 
             InitializeComponent();
 
-            logic.GraphPoints.CollectionChanged += (s, e) => BuildGraph();
+            logic.Quotes.CollectionChanged += (s, e) => BuildGraph();
+            logic.ReinvestedDividends.CollectionChanged += (s, e) => BuildGraph();
+            logic.Trades.CollectionChanged += (s, e) => BuildGraph();
+            logic.PropertyChanged += OnPropertyChanged;
             Loaded += (s, e) => BuildGraph();
+        }
+
+        private void OnPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "ShowReinvDivs" || e.PropertyName == "ShowTrades")
+            {
+                BuildGraph();
+            }
         }
 
         private void BuildGraph()
         {
 
             var logic = DataContext as ListSecurityPricesLogic;
-            var points = logic.GraphPoints;
+            var points = logic.Quotes;
 
             canvas.Children.Clear();
 
@@ -82,7 +93,7 @@ namespace XamlUI.Dialogs.Listers
             Canvas.SetLeft(lowPriceTextBlock, 0);
             Canvas.SetTop(lowPriceTextBlock, canvasHeight + marginY);
 
-            // Draw price graph
+            // Draw quotes graph
             foreach (var p in points)
             {
                 double x = (p.Date - logic.StartDate).TotalDays / spanInDays * canvasWidth;
@@ -100,6 +111,7 @@ namespace XamlUI.Dialogs.Listers
                         X2 = x,
                         Y1 = lastY,
                         Y2 = y,
+                        ToolTip = p.Tip
                     };
 
                     canvas.Children.Add(line);
@@ -107,6 +119,40 @@ namespace XamlUI.Dialogs.Listers
 
                 lastX = x;
                 lastY = y;
+            }
+
+            // Draw reinvestments
+            const double radius = 3;
+            if (logic.ShowReinvDivs == true)
+            {
+                foreach(var p in logic.ReinvestedDividends)
+                {
+                    double x = (p.Date - logic.StartDate).TotalDays / spanInDays * canvasWidth;
+                    x += marginX;
+                    double y = (double)((p.Price - minPrice) / (maxPrice - minPrice + 1)) * canvasHeight;
+                    y = marginY + canvasHeight - y;
+
+                    var ellipse = new Ellipse() { Fill = Brushes.Blue, Width=radius*2, Height=radius*2, ToolTip=p.Tip };
+                    canvas.Children.Add(ellipse);
+                    Canvas.SetLeft(ellipse, x - radius);
+                    Canvas.SetTop(ellipse, y - radius);
+                }
+            }
+
+            if (logic.ShowTrades == true)
+            {
+                foreach (var p in logic.Trades)
+                {
+                    double x = (p.Date - logic.StartDate).TotalDays / spanInDays * canvasWidth;
+                    x += marginX;
+                    double y = (double)((p.Price - minPrice) / (maxPrice - minPrice + 1)) * canvasHeight;
+                    y = marginY + canvasHeight - y;
+
+                    var ellipse = new Ellipse() { Fill = Brushes.Pink, Width = radius * 2, Height = radius * 2, ToolTip = p.Tip };
+                    canvas.Children.Add(ellipse);
+                    Canvas.SetLeft(ellipse, x - radius);
+                    Canvas.SetTop(ellipse, y - radius);
+                }
             }
         }
     }
