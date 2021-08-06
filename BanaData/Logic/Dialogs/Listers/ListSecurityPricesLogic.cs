@@ -183,7 +183,7 @@ namespace BanaData.Logic.Dialogs.Listers
 
         protected override bool? Commit()
         {
-            throw new NotImplementedException();
+            return Register.SaveChanges();
         }
 
         #endregion
@@ -198,15 +198,17 @@ namespace BanaData.Logic.Dialogs.Listers
 
         private readonly MainWindowLogic mainWindowLogic;
         private readonly ListSecurityPricesLogic listSecurityPricesLogic;
+        private readonly int securityID;
 
         #endregion
 
         #region Constructor
 
-        public SecurityPricesRegisterLogic(MainWindowLogic _mainWindowLogic, ListSecurityPricesLogic _listSecurityPricesLogic, int securityID)
+        public SecurityPricesRegisterLogic(MainWindowLogic _mainWindowLogic, ListSecurityPricesLogic _listSecurityPricesLogic, int _securityID)
         {
             mainWindowLogic = _mainWindowLogic;
             listSecurityPricesLogic = _listSecurityPricesLogic;
+            securityID = _securityID;
 
             // Build security price collection
             var household = mainWindowLogic.Household;
@@ -429,6 +431,59 @@ namespace BanaData.Logic.Dialogs.Listers
                 logicIsChangingSelection = false;
             }
             datePriceItems.Remove(dpi);
+        }
+
+        public bool SaveChanges()
+        {
+            bool change = false;
+            var household = mainWindowLogic.Household;
+            var securityRow = household.Security.FindByID(securityID);
+
+            // Delete all deleted items
+            var toDelete = new List<Household.SecurityPriceRow>();
+            foreach (var securityPriceRow in household.SecurityPrice.Where(sp => sp.SecurityID == securityID))
+            {
+                if (datePriceItems.FirstOrDefault(dpi => dpi.SecurityPriceRow == securityPriceRow) == null)
+                {
+                    toDelete.Add(securityPriceRow);
+                    change = true;
+                }
+            }
+            toDelete.ForEach(td => td.Delete());
+
+            // Commit all the changed and new items
+            foreach(var dpi in datePriceItems)
+            {
+                if (dpi.SecurityPriceRow == null)
+                {
+                    if (dpi.Price != 0)
+                    {
+                        change = true;
+                        var row = household.SecurityPrice.NewSecurityPriceRow();
+                        household.SecurityPrice.AddSecurityPriceRow(securityRow, dpi.Date, dpi.Price);
+                    }
+                }
+                else
+                {
+                    if (dpi.SecurityPriceRow.Date != dpi.Date)
+                    {
+                        dpi.SecurityPriceRow.Date = dpi.Date;
+                        change = true;
+                    }
+                    if (dpi.SecurityPriceRow.Value != dpi.Price)
+                    {
+                        dpi.SecurityPriceRow.Value = dpi.Price;
+                        change = true;
+                    }
+                }
+            }
+
+            if (change)
+            {
+                mainWindowLogic.CommitChanges();
+            }
+
+            return change;
         }
 
         #endregion
