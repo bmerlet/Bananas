@@ -58,21 +58,21 @@ namespace BanaData.Logic.Dialogs.Reports
                 }
 
                 // Category check
-                var lineItemRows = transactionRow.GetLineItemRows();
                 if (transactionReportItem.IsFilteringOnCategories)
                 {
-                    lineItemRows = transactionRow.GetLineItemRows()
+                    foreach (var lineItemRow in transactionRow.GetLineItemRows()
                         .Where(li => li.GetLineItemCategoryRow() is Household.LineItemCategoryRow lineItemCategoryRow &&
-                               transactionReportItem.Categories.Contains(lineItemCategoryRow.CategoryRow))
-                        .ToArray();
-                    if (lineItemRows.Length == 0)
+                               transactionReportItem.Categories.Contains(lineItemCategoryRow.CategoryRow)))
                     {
-                        continue;
+                        // Found matching transaction
+                        transactions.Add(new TransactionItem(transactionRow, new Household.LineItemRow[] { lineItemRow }, transactionReportItem));
                     }
                 }
-
-                // This transaction passes all the checks!
-                transactions.Add(new TransactionItem(transactionRow, lineItemRows, transactionReportItem));
+                else
+                {
+                    // This transaction passes all the checks!
+                    transactions.Add(new TransactionItem(transactionRow, transactionRow.GetLineItemRows(), transactionReportItem));
+                }
             }
 
             // Compute grand total
@@ -304,7 +304,9 @@ namespace BanaData.Logic.Dialogs.Reports
                 date = transactionRow.Date;
                 Date = transactionRow.Date.ToString("MM/dd/yyyy");
                 Payee = transactionRow.IsPayeeNull() ? "" : transactionRow.Payee;
-                Memo = transactionRow.IsMemoNull() ? "" : transactionRow.Memo;
+                Memo = transactionRow.IsMemoNull() ?
+                    (lineItemRows.Length == 1 && !lineItemRows[0].IsMemoNull() ? lineItemRows[0].Memo : "")
+                    : transactionRow.Memo;
                 Category =
                     lineItemRows.Length > 1 ? "<Split>" :
                     (lineItemRows[0].GetLineItemCategoryRow() != null ? lineItemRows[0].GetLineItemCategoryRow().CategoryRow.FullName :
