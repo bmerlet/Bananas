@@ -439,16 +439,6 @@ namespace BanaData.Logic.Main
             public string Name => TransactionReportItem.Name;
             public CommandBase GenerateReport { get; }
             public TransactionReportItem TransactionReportItem { get; }
-
-            public override bool Equals(object obj)
-            {
-                return obj is TransactionReportMenuItem o && o.Name == Name;
-            }
-
-            public override int GetHashCode()
-            {
-                return base.GetHashCode();
-            }
         }
 
         //

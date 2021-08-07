@@ -124,7 +124,14 @@ namespace XamlUI.Tools
                 flowDocument.ColumnGap = 0;
                 flowDocument.ColumnWidth = printDialog.PrintableAreaWidth;
                 IDocumentPaginatorSource dps = flowDocument;
-                printDialog.PrintDocument(dps.DocumentPaginator, Title);
+                try
+                {
+                    printDialog.PrintDocument(dps.DocumentPaginator, Title);
+                }
+                catch(Exception e)
+                {
+                    MessageBox.Show("Error: " + e.Message);
+                }
             }
         }
     }

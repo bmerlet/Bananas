@@ -104,7 +104,8 @@ namespace XamlUI.Dialogs.Reports
             // Create the columns
             foreach (var col in logic.Columns)
             {
-                ph.AddColumn(col.Header, col.PrintWidth);
+                var listviewColumn = ((GridView)listView.View).Columns.First(c => (string)c.Header == col.Header);
+                ph.AddColumn(col.Header, listviewColumn.ActualWidth * 1);
             }
 
             // Create the data

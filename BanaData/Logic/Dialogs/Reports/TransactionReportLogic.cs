@@ -121,9 +121,9 @@ namespace BanaData.Logic.Dialogs.Reports
                 (transactionReportItem.IsShowingTransactions ? SHOW_TRANS : SHOW_SUBTOTALONLY));
 
             // Now build the columns
-            var accountColumn = new ColumnItem(120, 145, "Account", "AccountName", null);
-            var payeeColumn = new ColumnItem(200, 145, "Payee", "Payee", null);
-            var categoryColumn = new ColumnItem(120, 145, "Category", "Category", null);
+            var accountColumn = new ColumnItem(120, "Account", "AccountName", null);
+            var payeeColumn = new ColumnItem(200, "Payee", "Payee", null);
+            var categoryColumn = new ColumnItem(120, "Category", "Category", null);
 
             // First column is the "group by" column
             if (transactionReportItem.IsGroupingByAccount)
@@ -148,7 +148,7 @@ namespace BanaData.Logic.Dialogs.Reports
                 }
                 if (transactionReportItem.IsShowingDateColumn)
                 {
-                    Columns.Add(new ColumnItem(80, 66, "Date", "Date", null, true));
+                    Columns.Add(new ColumnItem(80, "Date", "Date", null, true));
                 }
                 if (transactionReportItem.IsShowingPayeeColumn && !transactionReportItem.IsGroupingByPayee)
                 {
@@ -156,7 +156,7 @@ namespace BanaData.Logic.Dialogs.Reports
                 }
                 if (transactionReportItem.IsShowingMemoColumn)
                 {
-                    Columns.Add(new ColumnItem(200, 145, "Memo", "Memo", null));
+                    Columns.Add(new ColumnItem(200, "Memo", "Memo", null));
                 }
                 if (transactionReportItem.IsShowingCategoryColumn && !transactionReportItem.IsGroupingByCategory)
                 {
@@ -164,11 +164,11 @@ namespace BanaData.Logic.Dialogs.Reports
                 }
                 if (transactionReportItem.IsShowingStatusColumn)
                 {
-                    Columns.Add(new ColumnItem(30, 30, "Sts", "Status", null));
+                    Columns.Add(new ColumnItem(30, "Sts", "Status", null));
                 }
             }
 
-            Columns.Add(new ColumnItem(90, 60, "Amount", "Amount", "N2", true));
+            Columns.Add(new ColumnItem(90, "Amount", "Amount", "N2", true));
         }
 
         #endregion
@@ -272,11 +272,10 @@ namespace BanaData.Logic.Dialogs.Reports
 
         public class ColumnItem
         {
-            public ColumnItem(double width, double printWidth, string header, string propertyPath, string format, bool rightAligned = false) =>
-                (Width, PrintWidth, Header, PropertyPath, Format, RightAligned) = (width, printWidth, header, propertyPath, format, rightAligned);
+            public ColumnItem(double width, string header, string propertyPath, string format, bool rightAligned = false) =>
+                (Width, Header, PropertyPath, Format, RightAligned) = (width, header, propertyPath, format, rightAligned);
 
             public double Width { get; }
-            public double PrintWidth { get; }
             public string Header { get; }
             public string PropertyPath { get; }
             public string Format { get; }
