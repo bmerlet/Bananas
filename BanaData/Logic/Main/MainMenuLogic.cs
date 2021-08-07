@@ -357,6 +357,7 @@ namespace BanaData.Logic.Main
             }
 
             // Now ask quote for all securities held
+            var today = DateTime.Today;
             foreach (int security in securities)
             {
                 var secRow = household.Security.FindByID(security);
@@ -368,7 +369,16 @@ namespace BanaData.Logic.Main
 
                     if (price >= 0)
                     {
-                        household.SecurityPrice.Add(secRow, DateTime.Now, price);
+                        // Keep at most one price per day
+                        var secPriceRow = household.SecurityPrice.Where(sp => sp.SecurityRow == secRow && sp.Date == today).SingleOrDefault();
+                        if (secPriceRow == null)
+                        {
+                            household.SecurityPrice.Add(secRow, DateTime.Today, price);
+                        }
+                        else
+                        {
+                            secPriceRow.Value = price;
+                        }
                     }
                 }
             }
