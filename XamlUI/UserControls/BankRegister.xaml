@@ -6,6 +6,8 @@
              xmlns:local="clr-namespace:XamlUI.UserControls"
              xmlns:w="clr-namespace:XamlUI.Widgets"
              xmlns:t="clr-namespace:XamlUI.Tools"
+             xmlns:main="clr-namespace:BanaData.Logic.Main;assembly=BanaData" 
+             d:DataContext="{d:DesignInstance Type=main:BankRegisterLogic}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>

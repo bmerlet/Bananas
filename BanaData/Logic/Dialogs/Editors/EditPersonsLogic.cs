@@ -100,6 +100,21 @@ namespace BanaData.Logic.Dialogs.Editors
                 }
             }
 
+            // Find deleted persons
+            foreach (var item in persons.Where(p => string.IsNullOrWhiteSpace(p.Name) && p.ID != -1))
+            {
+                var row = household.Person.FindByID(item.ID);
+                if (row.GetAccountRows().Length > 0)
+                {
+                    mainWindowLogic.ErrorMessage($"Cannot delete '{row.Name}', as it owns one or more accounts");
+                    item.Name = row.Name;
+                    return null;
+                }
+                row.Delete();
+                change = true;
+            }
+
+            // Find added and modified persons
             foreach (var item in persons.Where(p => !string.IsNullOrWhiteSpace(p.Name)))
             {
                 if (item.ID < 0)
@@ -144,7 +159,7 @@ namespace BanaData.Logic.Dialogs.Editors
             public string Name
             {
                 get => name;
-                set { name = value; NameChanged?.Invoke(this, EventArgs.Empty); }
+                set { name = value; NameChanged?.Invoke(this, EventArgs.Empty); OnPropertyChanged(() => Name); }
             }
 
             public string Grouper => (ID < 0 && string.IsNullOrWhiteSpace(name)) ? "Z" : "A";
