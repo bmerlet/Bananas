@@ -85,5 +85,25 @@ namespace BanaData.Logic.Items
 
         public bool IsFilteringOnCategories => Flags.HasFlag(ETransactionReportFlag.IsFilteringOnCategories);
         public IEnumerable<Household.CategoryRow> Categories { get; }
+
+        public override bool Equals(object obj)
+        {
+            return
+                obj is TransactionReportItem o &&
+                TransactionReportRow == o.TransactionReportRow &&
+                Name == o.Name &&
+                Description == o.Description &&
+                StartDate.Equals(o.StartDate) &&
+                EndDate.Equals(o.EndDate) &&
+                Flags == o.Flags &&
+                Accounts.SequenceEqual(o.Accounts) &&
+                Payees.SequenceEqual(o.Payees) &&
+                Categories.SequenceEqual(o.Categories);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
 }

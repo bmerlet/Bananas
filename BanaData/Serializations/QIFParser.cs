@@ -1524,7 +1524,7 @@ namespace BanaData.Serializations
 
                 transactionReport.Accounts.AddRange(transactionReportRow.GetTransactionReportAccountRows().Select(a => a.AccountRow.Name));
                 transactionReport.Payees.AddRange(transactionReportRow.GetTransactionReportPayeeRows().Select(p => p.Payee));
-                transactionReport.Categories.AddRange(transactionReportRow.GetTransactionReportCategoryRows().Select(c => c.CategoryRow.Name));
+                transactionReport.Categories.AddRange(transactionReportRow.GetTransactionReportCategoryRows().Select(c => c.CategoryRow.FullName));
 
                 supplementalInfo.TransactionReports.Add(transactionReport);
             }

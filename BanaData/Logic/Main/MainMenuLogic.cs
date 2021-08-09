@@ -439,6 +439,20 @@ namespace BanaData.Logic.Main
             public string Name => TransactionReportItem.Name;
             public CommandBase GenerateReport { get; }
             public TransactionReportItem TransactionReportItem { get; }
+
+            // Needed by WpfObservableRangeCollection
+            public override bool Equals(object obj)
+            {
+                return
+                    obj is TransactionReportMenuItem o &&
+                    Name == o.Name &&
+                    TransactionReportItem.Equals(o.TransactionReportItem);
+            }
+
+            public override int GetHashCode()
+            {
+                return base.GetHashCode();
+            }
         }
 
         //

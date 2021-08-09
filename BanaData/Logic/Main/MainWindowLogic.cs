@@ -430,9 +430,6 @@ namespace BanaData.Logic.Main
 
         public void ImportQIF(string file)
         {
-            // Act as if we got a new file
-            NewFile();
-
             GuiServices.SetCursor(true);
 
             var parser = new QIFParser(this);
@@ -446,6 +443,7 @@ namespace BanaData.Logic.Main
             }
 
             UpdateAll();
+            UpdateTitle();
         }
 
         public void ExportQIF(string file)
