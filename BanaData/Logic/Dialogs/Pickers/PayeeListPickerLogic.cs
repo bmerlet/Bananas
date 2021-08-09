@@ -29,7 +29,7 @@ namespace BanaData.Logic.Dialogs.Pickers
         {
             (mainWindowLogic, oldPickedPayees) = (_mainWindowLogic, pickedPayees);
 
-            foreach (Household.TransactionRow transRow in mainWindowLogic.Household.Transaction)
+            foreach (Household.TransactionRow transRow in mainWindowLogic.Household.RegularTransactions)
             {
                 if (!transRow.IsPayeeNull() && payees.FirstOrDefault(p => p.Payee == transRow.Payee) == null)
                 {

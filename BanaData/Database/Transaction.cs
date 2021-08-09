@@ -17,21 +17,20 @@ namespace BanaData.Database
             // Bridges to local enum types
             public ETransactionStatus Status
             {
-                get { return (ETransactionStatus)IStatus; }
-                set { IStatus = (int)value; }
+                get => (ETransactionStatus)IStatus;
+                set => IStatus = (int)value;
+            }
+
+            public ETransactionType Type
+            {
+                get => (ETransactionType)IType;
+                set => IType = (int)value;
             }
 
             // Compute amount of a transaction by adding up all lines item
             public decimal GetAmount()
             {
-                decimal amount = 0;
-
-                foreach (LineItemRow lineItemRow in GetLineItemRows())
-                {
-                    amount += lineItemRow.Amount;
-                }
-
-                return amount;
+                return GetLineItemRows().Sum(lir => lir.Amount);
             }
 
             public BankingTransactionRow GetBankingTransaction()
@@ -80,31 +79,48 @@ namespace BanaData.Database
 
         }
 
+        public IEnumerable<TransactionRow> RegularTransactions => Transaction.Rows.Cast<Household.TransactionRow>().Where(t => t.Type == ETransactionType.Regular);
+
         partial class TransactionDataTable
         {
-            public TransactionRow Add(AccountRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status, int checkpointID)
+            public TransactionRow Add(AccountRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status, int checkpointID, ETransactionType type)
             {
                 var transactionRow = NewTransactionRow();
 
-                UpdateTransaction(transactionRow, accountRow, date, payee, memo, status, checkpointID);
+                UpdateTransaction(transactionRow, accountRow, date, payee, memo, status, checkpointID, type);
 
                 Rows.Add(transactionRow);
 
                 return transactionRow;
             }
 
-            public TransactionRow Update(int transactionID, AccountRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status, int checkpointID)
+            public TransactionRow Update(int transactionID, AccountRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status, int checkpointID, ETransactionType type)
             {
                 var transactionRow = FindByID(transactionID);
 
-                UpdateTransaction(transactionRow, accountRow, date, payee, memo, status, checkpointID);
+                UpdateTransaction(transactionRow, accountRow, date, payee, memo, status, checkpointID, type);
 
                 return transactionRow;
             }
 
-            private static TransactionRow UpdateTransaction(TransactionRow transactionRow, AccountRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status, int checkpointID)
+            private static TransactionRow UpdateTransaction(
+                TransactionRow transactionRow, 
+                AccountRow accountRow,
+                DateTime date, 
+                string payee, 
+                string memo, 
+                ETransactionStatus status,
+                int checkpointID,
+                ETransactionType type)
             {
-                transactionRow.AccountID = accountRow.ID;
+                if (accountRow == null)
+                {
+                    transactionRow.SetAccountIDNull();
+                }
+                else
+                {
+                    transactionRow.AccountID = accountRow.ID;
+                }
 
                 transactionRow.Date = date;
 
@@ -128,6 +144,7 @@ namespace BanaData.Database
 
                 transactionRow.Status = status;
                 transactionRow.CheckpointID = checkpointID;
+                transactionRow.Type = type;
 
                 return transactionRow;
             }

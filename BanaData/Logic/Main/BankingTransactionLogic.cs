@@ -318,14 +318,20 @@ namespace BanaData.Logic.Main
             if (TransID == TRANSID_NOT_COMMITTED)
             {
                 // Create new transaction row
-                var transactionRow = household.Transaction.Add(accountRow, data.Date, data.Payee, data.Memo, data.Status, household.Checkpoint.GetMostRecentCheckpointID());
+                var transactionRow = household.Transaction.Add(
+                    accountRow,
+                    data.Date,
+                    data.Payee,
+                    data.Memo,
+                    data.Status,
+                    household.Checkpoint.GetMostRecentCheckpointID(),
+                    ETransactionType.Regular);
                 TransID = transactionRow.ID;
 
                 // Create new banking transaction row if needed
                 if (bankRegisterLogic.IsBank)
                 {
-                    var _data = data as BankTransactionData;
-                    household.BankingTransaction.Add(transactionRow, _data.Medium, _data.CheckNumber);
+                    household.BankingTransaction.Add(transactionRow, data.Medium, data.CheckNumber);
                 }
 
                 // Create all line items
@@ -337,13 +343,20 @@ namespace BanaData.Logic.Main
             else
             {
                 // Update transaction row
-                var transactionRow = household.Transaction.Update(TransID, accountRow, data.Date, data.Payee, data.Memo, data.Status, household.Checkpoint.GetMostRecentCheckpointID());
+                var transactionRow = household.Transaction.Update(
+                    TransID,
+                    accountRow,
+                    data.Date, 
+                    data.Payee,
+                    data.Memo,
+                    data.Status, 
+                    household.Checkpoint.GetMostRecentCheckpointID(),
+                    ETransactionType.Regular);
 
                 // Update banking transaction if needed
                 if (bankRegisterLogic.IsBank)
                 {
-                    var _data = data as BankTransactionData;
-                    household.BankingTransaction.Update(transactionRow, _data.Medium, _data.CheckNumber);
+                    household.BankingTransaction.Update(transactionRow, data.Medium, data.CheckNumber);
                 }
 
                 //

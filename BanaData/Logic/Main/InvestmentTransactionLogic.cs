@@ -591,7 +591,14 @@ namespace BanaData.Logic.Main
             if (TransID == TRANSID_NOT_COMMITTED)
             {
                 // Create new transaction row
-                var transactionRow = household.Transaction.Add(accountRow, data.Date, data.Payee, data.Memo, data.Status, household.Checkpoint.GetMostRecentCheckpointID());
+                var transactionRow = household.Transaction.Add(
+                    accountRow, 
+                    data.Date,
+                    data.Payee,
+                    data.Memo,
+                    data.Status, 
+                    household.Checkpoint.GetMostRecentCheckpointID(),
+                    ETransactionType.Regular);
                 TransID = transactionRow.ID;
 
                 // Create new investment transaction row
@@ -603,7 +610,15 @@ namespace BanaData.Logic.Main
             else
             {
                 // Update transaction row
-                var transactionRow = household.Transaction.Update(TransID, accountRow, data.Date, data.Memo, data.Payee, data.Status, household.Checkpoint.GetMostRecentCheckpointID());
+                var transactionRow = household.Transaction.Update(
+                    TransID, 
+                    accountRow,
+                    data.Date,
+                    data.Memo,
+                    data.Payee,
+                    data.Status, 
+                    household.Checkpoint.GetMostRecentCheckpointID(),
+                    ETransactionType.Regular);
 
                 // Update the line item
                 UpdateLineItemInDB(data.LineItem, transactionRow, impactedAccounts);

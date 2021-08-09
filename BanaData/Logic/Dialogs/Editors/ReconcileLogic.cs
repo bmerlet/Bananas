@@ -259,7 +259,14 @@ namespace BanaData.Logic.Dialogs.Editors
             var household = mainWindowLogic.Household;
 
             // Create new transaction row
-            var transactionRow = household.Transaction.Add(accountRow, reconcileInfoRow.InterestDate, "Interest Earned", null, ETransactionStatus.Reconciled, household.Checkpoint.GetMostRecentCheckpointID());
+            var transactionRow = household.Transaction.Add(
+                accountRow, 
+                reconcileInfoRow.InterestDate,
+                "Interest Earned",
+                null, 
+                ETransactionStatus.Reconciled, 
+                household.Checkpoint.GetMostRecentCheckpointID(),
+                ETransactionType.Regular);
 
             // Create new banking transaction row
             household.BankingTransaction.Add(transactionRow, ETransactionMedium.None, 0);

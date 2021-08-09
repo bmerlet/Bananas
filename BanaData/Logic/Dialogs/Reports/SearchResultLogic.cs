@@ -75,7 +75,7 @@ namespace BanaData.Logic.Dialogs.Reports
                 searchDate = DateTime.MinValue;
             }
 
-            foreach (Household.TransactionRow transRow in household.Transaction.Rows)
+            foreach (Household.TransactionRow transRow in household.RegularTransactions)
             {
                 bool addIt = false;
 

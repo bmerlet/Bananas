@@ -43,11 +43,11 @@ namespace BanaData.Database
             string eol = Environment.NewLine;
 
             // Check that there are no mismatched transfers
-            foreach(var lineItemTransfer in LineItemTransfer)
+            foreach (var lineItemTransfer in LineItemTransfer)
             {
                 if (lineItemTransfer.AccountRow != lineItemTransfer.TransactionRow.AccountRow)
                 {
-                    error += 
+                    error +=
                         $"Line item transfer revord points to account {lineItemTransfer.AccountRow.Name}" + eol
                         + "  while the peer transaction points to account {lineItemTransfer.TransactionRow.AccountRow}" + eol;
                 }

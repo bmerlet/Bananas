@@ -27,7 +27,6 @@ namespace BanaData.Serializations
 
         #region Private members
 
-        private readonly MainWindowLogic mainWindowLogic;
         private readonly Household household;
         private int checkpointID;
         private readonly List<string> accountNames = new List<string>();
@@ -36,8 +35,7 @@ namespace BanaData.Serializations
 
         #region Constructor
 
-        public QIFParser(MainWindowLogic _mainWindowLogic) =>
-            (mainWindowLogic, household) = (_mainWindowLogic, _mainWindowLogic.Household);
+        public QIFParser(Household _household) => household = _household;
 
         #endregion
 
@@ -101,7 +99,7 @@ namespace BanaData.Serializations
             Log += $"Imported {household.Category.Rows.Count:N0} categories" + eol;
             Log += $"Imported {household.Security.Rows.Count:N0} securities" + eol;
             Log += $"Imported {household.SecurityPrice.Rows.Count:N0} security prices" + eol;
-            Log += $"Imported {household.Transaction.Rows.Count:N0} transactions" + eol;
+            Log += $"Imported {household.RegularTransactions.Count():N0} transactions" + eol;
             Log += $"Imported {household.MemorizedPayee.Rows.Count:N0} memorized payees" + eol;
             Log += eol;
 
@@ -621,7 +619,7 @@ namespace BanaData.Serializations
             IEnumerable<LineItemHolder> lineItemHolders)
         {
             // Create main transaction
-            var transRow = household.Transaction.Add(accountRow, date, payee, memo, status, checkpointID);
+            var transRow = household.Transaction.Add(accountRow, date, payee, memo, status, checkpointID, ETransactionType.Regular);
 
             // Add bank-specific stuff
             if (accountRow.Type == EAccountType.Bank)
@@ -837,7 +835,7 @@ namespace BanaData.Serializations
             decimal securityQuantity,
             decimal commission)
         {
-            var transRow = household.Transaction.Add(accountRow, date, payee, memo, status, checkpointID);
+            var transRow = household.Transaction.Add(accountRow, date, payee, memo, status, checkpointID, ETransactionType.Regular);
             household.InvestmentTransaction.Add(transRow, type, securityRow, securityPrice, securityQuantity, commission);
             var li = household.LineItem.Add(transRow, null, amount);
             if (categoryID != -1)

@@ -432,7 +432,7 @@ namespace BanaData.Logic.Main
         {
             GuiServices.SetCursor(true);
 
-            var parser = new QIFParser(this);
+            var parser = new QIFParser(Household);
             parser.ImportFromQIF(file, true);
 
             GuiServices.SetCursor(false);

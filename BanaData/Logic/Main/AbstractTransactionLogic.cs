@@ -381,7 +381,14 @@ namespace BanaData.Logic.Main
             }
 
             // Add transaction on "other side"
-            var peerTransactionRow = household.Transaction.Add(targetAccountRow, data.Date, "", data.Memo, ETransactionStatus.Pending, household.Checkpoint.GetMostRecentCheckpointID());
+            var peerTransactionRow = household.Transaction.Add(
+                targetAccountRow,
+                data.Date,
+                "",
+                data.Memo,
+                ETransactionStatus.Pending,
+                household.Checkpoint.GetMostRecentCheckpointID(),
+                ETransactionType.Regular);
             var peerLiRow = household.LineItem.Add(peerTransactionRow, null, peerAmount);
 
             // Create the investment/banking transactions

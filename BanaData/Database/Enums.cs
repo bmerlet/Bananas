@@ -73,6 +73,9 @@ namespace BanaData.Database
     // Transaction status
     public enum ETransactionStatus { Pending, Cleared, Reconciled };
 
+    // Transaction type
+    public enum ETransactionType { Regular, MemorizedPayee, RecurringTransaction }
+
     // Bank transaction medium
     public enum ETransactionMedium
     {

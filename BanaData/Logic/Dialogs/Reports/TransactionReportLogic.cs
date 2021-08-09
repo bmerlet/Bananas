@@ -34,7 +34,7 @@ namespace BanaData.Logic.Dialogs.Reports
 
             // Look for the transactions selected by this report
             var household = mainWindowLogic.Household;
-            foreach (Household.TransactionRow transactionRow in household.Transaction)
+            foreach (Household.TransactionRow transactionRow in household.RegularTransactions)
             {
                 // Date check
                 if (transactionRow.Date.CompareTo(transactionReportItem.StartDate) < 0 ||
