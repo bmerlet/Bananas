@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using BanaData.Database;
 using BanaData.Logic.Main;
 
 namespace BanaData.Logic.Items
@@ -30,9 +30,9 @@ namespace BanaData.Logic.Items
             int categoryAccountID,
             string _memo,
             decimal _amount,
-            bool _sealed) =>
+            bool @sealed) =>
             (mainWindowLogic, id, category, CategoryID, CategoryAccountID, memo, amount, Sealed) =
-            (_mainWindowLogic, _id, _category, categoryID, categoryAccountID, _memo, _amount, _sealed);
+            (_mainWindowLogic, _id, _category, categoryID, categoryAccountID, _memo, _amount, @sealed);
 
         // Lookup category ids and construct
         static public LineItem GetLineItem(MainWindowLogic _mainWindowLogic,
@@ -40,11 +40,21 @@ namespace BanaData.Logic.Items
             string category,
             string memo,
             decimal amount,
-            bool _sealed)
+            bool @sealed)
         {
             (int catID, int catAccntId) = GetCategoryIds(_mainWindowLogic, category);
 
-            return new LineItem(_mainWindowLogic, id, category, catID, catAccntId, memo, amount, _sealed);
+            return new LineItem(_mainWindowLogic, id, category, catID, catAccntId, memo, amount, @sealed);
+        }
+
+        // Construct from DB
+        public LineItem(MainWindowLogic _mainWindowLogic, Household.LineItemRow lineItemRow, bool @sealed)
+        {
+            (int catID, int catAccntID, string category) = lineItemRow.GetCategory();
+            string _memo = lineItemRow.IsMemoNull() ? "" : lineItemRow.Memo;
+
+            (mainWindowLogic, id, Category, CategoryID, CategoryAccountID, memo, amount, Sealed) =
+                (_mainWindowLogic, lineItemRow.ID, category, catID, catAccntID, _memo, lineItemRow.Amount, @sealed);
         }
 
         // Clone with a new ID

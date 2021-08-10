@@ -5,6 +5,22 @@ namespace BanaData.Database
 {
     public partial class Household
     {
+        partial class ScheduleRow
+        {
+            // Bridge to local enum type
+            public EScheduleFrequency Frequency
+            {
+                get => (EScheduleFrequency)IFrequency;
+                set => IFrequency = (int)value;
+            }
+
+            public EScheduleFlag Flags
+            {
+                get => (EScheduleFlag)IFlags;
+                set => IFlags = (int)value;
+            }
+        }
+
         partial class TransactionReportRow
         {
             // Bridge to local enum type

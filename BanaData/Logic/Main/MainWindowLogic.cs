@@ -522,6 +522,12 @@ namespace BanaData.Logic.Main
             }
         }
 
+        // Look for scheduled transactions that need to be executed
+        public void CheckForScheduledTransactions()
+        {
+            // ZZZZ
+        }
+
         #endregion
 
         #region Updates and notifications
@@ -546,11 +552,11 @@ namespace BanaData.Logic.Main
 
             OnPropertyChanged(() => NetWorth);
 
-            // Compute the memorized payees
-            BuildMemorizedPayeeList();
-
             // Compute the known categories
             BuildCategoriesList();
+
+            // Compute the memorized payees
+            BuildMemorizedPayeeList();
 
             // Compute the known securities
             BuildSecuritiesList();
@@ -734,23 +740,7 @@ namespace BanaData.Logic.Main
                 var lineItems = new List<LineItem>(dbLineItems.Length);
                 foreach (var dbli in dbLineItems)
                 {
-                    string category = "";
-                    int categoryID = -1;
-                    int categoryAccountID = -1;
-                    if (dbli.GetLineItemCategoryRow() is Household.LineItemCategoryRow licr)
-                    {
-                        category = licr.CategoryRow.FullName;
-                        categoryID = licr.CategoryRow.ID;
-                    }
-                    else if (dbli.GetLineItemTransferRow() is Household.LineItemTransferRow litr)
-                    {
-                        category = $"[{litr.AccountRow.Name}]";
-                        categoryAccountID = litr.AccountID;
-                    }
-
-                    string memo = dbli.IsMemoNull() ? "" : dbli.Memo;
-
-                    lineItems.Add(new LineItem(this, dbli.ID, category, categoryID, categoryAccountID, memo, dbli.Amount, true));
+                    lineItems.Add(new LineItem(this, dbli, true));
                 }
 
                 var mp = new MemorizedPayeeItem(mpr.ID, mpr.Payee, mpr.IsMemoNull() ? "" : mpr.Memo, lineItems.ToArray());

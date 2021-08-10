@@ -465,23 +465,7 @@ namespace BanaData.Logic.Main
             var lineItems = new List<LineItem>();
             foreach (var dbli in dbLineItems)
             {
-                int catID = -1;
-                int catAccntID = -1;
-                string category = "";
-                if (dbli.GetLineItemTransferRow() is Household.LineItemTransferRow lineItemTransferRow)
-                {
-                    category = "[" + lineItemTransferRow.AccountRow.Name + "]";
-                    catAccntID = lineItemTransferRow.AccountID;
-                }
-                else if (dbli.GetLineItemCategoryRow() is Household.LineItemCategoryRow lineItemCategoryRow)
-                {
-                    category = lineItemCategoryRow.CategoryRow.FullName;
-                    catID = lineItemCategoryRow.CategoryID;
-                }
-                string memo = dbli.IsMemoNull() ? "" : dbli.Memo;
-
-                var li = new LineItem(mainWindowLogic, dbli.ID, category, catID, catAccntID, memo, dbli.Amount, false);
-                lineItems.Add(li);
+                lineItems.Add(new LineItem(mainWindowLogic, dbli, false));
             }
 
             return lineItems;

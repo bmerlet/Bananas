@@ -47,6 +47,25 @@ namespace BanaData.Database
                 return true;
             }
 
+            public (int categoryID, int accountID, string category) GetCategory()
+            {
+                int categoryID = -1;
+                int accountID = -1;
+                string category = "";
+                if (GetLineItemTransferRow() is Household.LineItemTransferRow lineItemTransferRow)
+                {
+                    category = "[" + lineItemTransferRow.AccountRow.Name + "]";
+                    accountID = lineItemTransferRow.AccountID;
+                }
+                else if (GetLineItemCategoryRow() is Household.LineItemCategoryRow lineItemCategoryRow)
+                {
+                    category = lineItemCategoryRow.CategoryRow.FullName;
+                    categoryID = lineItemCategoryRow.CategoryID;
+                }
+
+                return (categoryID, accountID, category);
+            }
+
             public void CascadeDelete()
             {
                 if (GetLineItemCategoryRow() is Household.LineItemCategoryRow licr)

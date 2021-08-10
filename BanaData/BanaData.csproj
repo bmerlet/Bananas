@@ -75,12 +75,14 @@
     <Compile Include="Logic\Dialogs\Editors\EditCategoryLogic.cs" />
     <Compile Include="Logic\Dialogs\Editors\EditMemorizedPayeeLogic.cs" />
     <Compile Include="Logic\Dialogs\Editors\EditPersonsLogic.cs" />
+    <Compile Include="Logic\Dialogs\Editors\EditScheduleLogic.cs" />
     <Compile Include="Logic\Dialogs\Editors\EditSecurityLogic.cs" />
     <Compile Include="Logic\Dialogs\Editors\EditSplitLogic.cs" />
     <Compile Include="Logic\Dialogs\Editors\EditTransactionReportLogic.cs" />
     <Compile Include="Logic\Dialogs\Editors\ReconcileInfoLogic.cs" />
     <Compile Include="Logic\Dialogs\Editors\ReconcileInvestmentsLogic.cs" />
     <Compile Include="Logic\Dialogs\Editors\ReconcileLogic.cs" />
+    <Compile Include="Logic\Dialogs\Listers\ListSchedulesLogic.cs" />
     <Compile Include="Logic\Dialogs\Listers\ListSecurityPricesLogic.cs" />
     <Compile Include="Logic\Dialogs\Listers\ListTransactionReportsLogic.cs" />
     <Compile Include="Logic\Dialogs\Listers\ListAccountsLogic.cs" />
@@ -104,6 +106,7 @@
     <Compile Include="Logic\Items\InvestmentTransactionTypeItem.cs" />
     <Compile Include="Logic\Items\LineItem.cs" />
     <Compile Include="Logic\Items\MemorizedPayeeItem.cs" />
+    <Compile Include="Logic\Items\ScheduleItem.cs" />
     <Compile Include="Logic\Items\SecurityItem.cs" />
     <Compile Include="Logic\Items\TransactionReportItem.cs" />
     <Compile Include="Logic\Items\TransactionToReconcile.cs" />

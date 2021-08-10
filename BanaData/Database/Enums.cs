@@ -74,7 +74,7 @@ namespace BanaData.Database
     public enum ETransactionStatus { Pending, Cleared, Reconciled };
 
     // Transaction type
-    public enum ETransactionType { Regular, MemorizedPayee, RecurringTransaction }
+    public enum ETransactionType { Regular, MemorizedPayee, ScheduledTransaction }
 
     // Bank transaction medium
     public enum ETransactionMedium
@@ -189,7 +189,7 @@ namespace BanaData.Database
         Expire
     }
 
-    // Composite transaction state foir the UI
+    // Composite transaction state for the UI
     [Flags]
     public enum ETransactionState
     {
@@ -220,5 +220,38 @@ namespace BanaData.Database
         ShowMemoColumn = 0x8000,
         ShowCategoryColumn = 0x10000,
         ShowStatusColumn = 0x20000
+    }
+
+    // Scheduled transaction frequency
+    public enum EScheduleFrequency
+    {
+        [EnumDescription("Daily")]
+        Daily,
+
+        [EnumDescription("Weekly")]
+        Weekly,
+
+        [EnumDescription("Bi-weekly")]
+        Biweekly,
+
+        [EnumDescription("Semi-monthly")]
+        SemiMonthly,
+
+        [EnumDescription("Monthly")]
+        Monthly,
+
+        [EnumDescription("Quarterly")]
+        Quarterly,
+
+        [EnumDescription("Yearly")]
+        Yearly
+    }
+
+    [Flags]
+    public enum EScheduleFlag
+    {
+        None = 0,
+        PromptBefore = 0x1,
+        NotifyAfter = 0x2
     }
 }
