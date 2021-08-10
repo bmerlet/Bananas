@@ -184,7 +184,7 @@ namespace BanaData.Logic.Dialogs.Listers
                 var newLineItem = newPayee.LineItems.FirstOrDefault(li => li.ID == oldLineItem.ID);
                 if (newLineItem == null)
                 {
-                    oldLineItem.Delete();
+                    oldLineItem.CascadeDelete();
                 }
                 else
                 {
@@ -268,21 +268,10 @@ namespace BanaData.Logic.Dialogs.Listers
         {
             var household = mainWindowLogic.Household;
 
-            // Remove the corresponding memorized line items
+            // Remove the line items
             foreach (var lineItem in payee.LineItems)
             {
-                var lineItemRow = household.LineItem.FindByID(lineItem.ID);
-
-                if (lineItemRow.GetLineItemCategoryRow() is Household.LineItemCategoryRow licr)
-                {
-                    licr.Delete();
-                }
-                if (lineItemRow.GetLineItemTransferRow() is Household.LineItemTransferRow litr)
-                {
-                    litr.Delete();
-                }
-
-                lineItemRow.Delete();
+                household.LineItem.FindByID(lineItem.ID).CascadeDelete();
             }
 
             // Remove the memorized payee

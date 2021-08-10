@@ -46,6 +46,21 @@ namespace BanaData.Database
 
                 return true;
             }
+
+            public void CascadeDelete()
+            {
+                if (GetLineItemCategoryRow() is Household.LineItemCategoryRow licr)
+                {
+                    licr.Delete();
+                }
+
+                if (GetLineItemTransferRow() is Household.LineItemTransferRow litr)
+                {
+                    litr.Delete();
+                }
+
+                base.Delete();
+            }
         }
 
         partial class LineItemDataTable
