@@ -100,7 +100,7 @@ namespace BanaData.Serializations
             Log += $"Imported {household.Security.Rows.Count:N0} securities" + eol;
             Log += $"Imported {household.SecurityPrice.Rows.Count:N0} security prices" + eol;
             Log += $"Imported {household.RegularTransactions.Count():N0} transactions" + eol;
-            Log += $"Imported {household.MemorizedPayee.Rows.Count:N0} memorized payees" + eol;
+            Log += $"Imported {household.MemorizedPayees.Count():N0} memorized payees" + eol;
             Log += eol;
 
             // Find other sides of transfers
@@ -183,7 +183,7 @@ namespace BanaData.Serializations
                                 ParseInvestmentTransactions(sr, accountRow);
                                 break;
                             case "Memorized":
-                                ParseMemorizedPayees(sr, accountRow);
+                                ParseMemorizedPayees(sr);
                                 break;
                             case "Prices":
                                 ParseSecurityPrices(sr);
@@ -861,20 +861,15 @@ namespace BanaData.Serializations
 
         #region Parse memorized payee
 
-        private void ParseMemorizedPayees(StreamReader sr, Household.AccountRow account)
+        private void ParseMemorizedPayees(StreamReader sr)
         {
-            if (account == null)
-            {
-                throw new InvalidDataException("Memorized transaction without current account");
-            }
-
             while (sr.Peek() != '!' && !sr.EndOfStream)
             {
-                ParseOneMemorizedPayee(sr, account);
+                ParseOneMemorizedPayee(sr);
             }
         }
 
-        private void ParseOneMemorizedPayee(TextReader sr, Household.AccountRow account)
+        private void ParseOneMemorizedPayee(TextReader sr)
         {
             decimal amountToCheck = 0;
             decimal otherMysteriousAmount = 0;
@@ -933,7 +928,7 @@ namespace BanaData.Serializations
 
                     // Category
                     case 'L':
-                        (lineItemHolder.AccountID, lineItemHolder.CategoryID, _) = ParseTransactionTarget(household, account, l.Substring(1));
+                        (lineItemHolder.AccountID, lineItemHolder.CategoryID, _) = ParseTransactionTarget(household, null, l.Substring(1));
                         break;
 
                     // Payment/deposit
@@ -949,7 +944,7 @@ namespace BanaData.Serializations
                             lineItemHolder = new LineItemHolder();
                         }
                         parsingSplitLineItem = true;
-                        (lineItemHolder.AccountID, lineItemHolder.CategoryID, _) = ParseTransactionTarget(household, account, l.Substring(1));
+                        (lineItemHolder.AccountID, lineItemHolder.CategoryID, _) = ParseTransactionTarget(household, null, l.Substring(1));
                         break;
 
                     case 'A':
@@ -973,22 +968,32 @@ namespace BanaData.Serializations
             CreateMemorizedPayee(payee, status, memo, lineItemHolders);
         }
 
-        private Household.MemorizedPayeeRow CreateMemorizedPayee(string payee, ETransactionStatus status, string memo, IEnumerable<LineItemHolder> lineItemHolders)
+        private void CreateMemorizedPayee(string payee, ETransactionStatus status, string memo, IEnumerable<LineItemHolder> lineItemHolders)
         {
             // Create memorized payee
-            var memorizedPayeeRow = household.MemorizedPayee.Add(payee, status, memo);
+            var transRow = household.Transaction.Add(null, DateTime.MinValue, payee, memo, status, checkpointID, ETransactionType.MemorizedPayee);
 
             // Add the line item(s)
             foreach (var lih in lineItemHolders)
             {
-                household.MemorizedLineItem.Add(memorizedPayeeRow,
-                    lih.CategoryID,
-                    lih.AccountID,
-                    lih.Memo,
-                    lih.Amount);
-            }
+                var li = household.LineItem.Add(transRow, lih.Memo, lih.Amount);
 
-            return memorizedPayeeRow;
+                if (lih.CategoryID != -1)
+                {
+                    var lineItemCategoryRow = household.LineItemCategory.NewLineItemCategoryRow();
+                    lineItemCategoryRow.LineItemID = li.ID;
+                    lineItemCategoryRow.CategoryID = lih.CategoryID;
+                    household.LineItemCategory.AddLineItemCategoryRow(lineItemCategoryRow);
+                }
+                else if (lih.AccountID != -1)
+                {
+                    var lineItemTransferRow = household.LineItemTransfer.NewLineItemTransferRow();
+                    lineItemTransferRow.LineItemID = li.ID;
+                    lineItemTransferRow.AccountID = lih.AccountID;
+                    lineItemTransferRow.PeerTransID = -1;
+                    household.LineItemTransfer.AddLineItemTransferRow(lineItemTransferRow);
+                }
+            }
         }
 
         #endregion
@@ -1355,7 +1360,7 @@ namespace BanaData.Serializations
                 var categoryRow = household.Category.GetByFullName(target);
 
                 // Special case of _DivInc|[<currentAccount>}
-                if (categoryRow == null)
+                if (categoryRow == null && currentAccount != null)
                 {
                     if (target == "_DivInc|[" + currentAccount.Name + "]")
                     {

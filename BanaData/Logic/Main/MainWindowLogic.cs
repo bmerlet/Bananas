@@ -726,25 +726,24 @@ namespace BanaData.Logic.Main
 
             MemorizedPayees.Clear();
 
-            foreach (var mpr in Household.MemorizedPayee)
+            foreach (var mpr in Household.MemorizedPayees)
             {
                 // Get memorized line item(s)
-                var dbLineItems = mpr.GetMemorizedLineItemRows();
+                var dbLineItems = mpr.GetLineItemRows();
                 var lineItems = new List<LineItem>(dbLineItems.Length);
                 foreach (var dbli in dbLineItems)
                 {
                     string category = "";
                     int categoryID = -1;
                     int categoryAccountID = -1;
-                    if (!dbli.IsCategoryIDNull())
+                    if (dbli.GetLineItemCategoryRow() is Household.LineItemCategoryRow licr)
                     {
-                        var destCategory = household.Category.FindByID(dbli.CategoryID);
-                        category = destCategory.FullName;
-                        categoryID = destCategory.ID;
+                        category = licr.CategoryRow.FullName;
+                        categoryID = licr.CategoryRow.ID;
                     }
-                    else if (!dbli.IsAccountIDNull())
+                    else if (dbli.GetLineItemTransferRow() is Household.LineItemTransferRow litr)
                     {
-                        categoryAccountID = dbli.AccountID;
+                        categoryAccountID = litr.AccountID;
                     }
 
                     string memo = dbli.IsMemoNull() ? "" : dbli.Memo;

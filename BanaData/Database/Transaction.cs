@@ -80,6 +80,7 @@ namespace BanaData.Database
         }
 
         public IEnumerable<TransactionRow> RegularTransactions => Transaction.Rows.Cast<Household.TransactionRow>().Where(t => t.Type == ETransactionType.Regular);
+        public IEnumerable<TransactionRow> MemorizedPayees => Transaction.Rows.Cast<Household.TransactionRow>().Where(t => t.Type == ETransactionType.MemorizedPayee);
 
         partial class TransactionDataTable
         {

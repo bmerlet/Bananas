@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -122,13 +123,28 @@ namespace BanaData.Logic.Dialogs.Listers
             var household = mainWindowLogic.Household;
 
             // Commit new payee
-            var newPayeeRow = household.MemorizedPayee.Add(newPayee.Payee, ETransactionStatus.Pending, newPayee.Memo);
+            var newPayeeRow = household.Transaction.Add(
+                null,
+                DateTime.MinValue,
+                newPayee.Payee,
+                newPayee.Memo,
+                ETransactionStatus.Pending,
+                household.Checkpoint.GetMostRecentCheckpointID(), 
+                ETransactionType.MemorizedPayee);
 
             // Commit all line items
             var newLineItems = new List<LineItem>();
             foreach (var lineItem in newPayee.LineItems)
             {
-                var newRow = household.MemorizedLineItem.Add(newPayeeRow, lineItem.CategoryID, lineItem.CategoryAccountID, lineItem.Memo, lineItem.Amount);
+                var newRow = household.LineItem.Add(newPayeeRow, lineItem.Memo, lineItem.Amount);
+                if (lineItem.CategoryID != -1)
+                {
+                    household.LineItemCategory.AddLineItemCategoryRow(newRow, household.Category.FindByID(lineItem.CategoryID));
+                }
+                else if (lineItem.CategoryAccountID != -1)
+                {
+                    household.LineItemTransfer.AddLineItemTransferRow(newRow, household.Account.FindByID(lineItem.CategoryAccountID), null);
+                }
 
                 // Recreate line item with correct ID
                 newLineItems.Add(new LineItem(lineItem, newRow.ID));
@@ -146,11 +162,19 @@ namespace BanaData.Logic.Dialogs.Listers
             var household = mainWindowLogic.Household;
 
             // Update the memorized payee
-            var payeeRow = household.MemorizedPayee.FindByID(newPayee.ID);
-            household.MemorizedPayee.Update(payeeRow, newPayee.Payee, ETransactionStatus.Pending, newPayee.Memo);
+            var payeeRow = household.Transaction.FindByID(newPayee.ID);
+            household.Transaction.Update(
+                newPayee.ID,
+                null,
+                DateTime.MinValue,
+                newPayee.Payee,
+                newPayee.Memo,
+                ETransactionStatus.Pending,
+                household.Checkpoint.GetMostRecentCheckpointID(),
+                ETransactionType.MemorizedPayee);
 
             // Get existing line items
-            var oldLineItems = payeeRow.GetMemorizedLineItemRows();
+            var oldLineItems = payeeRow.GetLineItemRows();
 
             // Delete line items that don't exist in the new payee
             // Modify the other ones
@@ -164,19 +188,60 @@ namespace BanaData.Logic.Dialogs.Listers
                 }
                 else
                 {
-                    household.MemorizedLineItem.Update(oldLineItem, payeeRow, newLineItem.CategoryID, newLineItem.CategoryAccountID, newLineItem.Memo, newLineItem.Amount);
+                    household.LineItem.Update(oldLineItem, payeeRow, newLineItem.Memo, newLineItem.Amount);
+                    if (oldLineItem.GetLineItemCategoryRow() is Household.LineItemCategoryRow licr)
+                    {
+                        if (newLineItem.CategoryID != -1)
+                        {
+                            licr.CategoryID = newLineItem.CategoryID;
+                        }
+                        else
+                        {
+                            licr.Delete();
+                            if (newLineItem.CategoryAccountID != -1)
+                            {
+                                household.LineItemTransfer.AddLineItemTransferRow(oldLineItem, household.Account.FindByID(newLineItem.CategoryAccountID), null);
+                            }
+                        }
+                    }
+                    else if (oldLineItem.GetLineItemTransferRow() is Household.LineItemTransferRow litr)
+                    {
+                        if (newLineItem.CategoryAccountID != -1)
+                        {
+                            litr.AccountID = newLineItem.CategoryAccountID;
+                        }
+                        else
+                        {
+                            litr.Delete();
+                            if (newLineItem.CategoryID != -1)
+                            {
+                                household.LineItemCategory.AddLineItemCategoryRow(oldLineItem, household.Category.FindByID(newLineItem.CategoryID));
+                            }
+                        }
+                    }
+                    else
+                    {
+
+                    }
                     newMemorizedLineItems.Add(newLineItem);
                 }
             }
-            mainWindowLogic.CommitChanges();
 
             // Create the line items that don't exist
-            oldLineItems = payeeRow.GetMemorizedLineItemRows();
+            oldLineItems = payeeRow.GetLineItemRows();
             foreach (var newLineItem in newPayee.LineItems)
             {
                 if (oldLineItems.FirstOrDefault(oli => oli.ID == newLineItem.ID) == null)
                 {
-                    var newRow = household.MemorizedLineItem.Add(payeeRow, newLineItem.CategoryID, newLineItem.CategoryAccountID, newLineItem.Memo, newLineItem.Amount);
+                    var newRow = household.LineItem.Add(payeeRow, newLineItem.Memo, newLineItem.Amount);
+                    if (newLineItem.CategoryID != -1)
+                    {
+                        household.LineItemCategory.AddLineItemCategoryRow(newRow, household.Category.FindByID(newLineItem.CategoryID));
+                    }
+                    else if (newLineItem.CategoryAccountID != -1)
+                    {
+                        household.LineItemTransfer.AddLineItemTransferRow(newRow, household.Account.FindByID(newLineItem.CategoryAccountID), null);
+                    }
 
                     // Recreate line item with correct ID
                     newMemorizedLineItems.Add(new LineItem(newLineItem, newRow.ID));
@@ -197,11 +262,11 @@ namespace BanaData.Logic.Dialogs.Listers
             // Remove the corresponding memorized line items
             foreach (var lineItem in payee.LineItems)
             {
-                household.MemorizedLineItem.FindByID(lineItem.ID).Delete();
+                household.LineItem.FindByID(lineItem.ID).Delete();
             }
 
             // Remove the memorized payee
-            household.MemorizedPayee.FindByID(payee.ID).Delete();
+            household.Transaction.FindByID(payee.ID).Delete();
 
             mainWindowLogic.CommitChanges();
             mainWindowLogic.UpdateMemorizedPayees();

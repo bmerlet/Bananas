@@ -495,9 +495,9 @@ namespace BanaData.Serializations
         {
             sw.WriteLine("!Type:Memorized");
 
-            foreach(Household.MemorizedPayeeRow mpr in household.MemorizedPayee.Rows)
+            foreach(var mpr in household.MemorizedPayees)
             {
-                var liRows = mpr.GetMemorizedLineItemRows();
+                var liRows = mpr.GetLineItemRows();
                 decimal amount = liRows.Sum(li => li.Amount);
 
                 sw.WriteLine(amount > 0 ? "KD" : "KP");
@@ -510,13 +510,13 @@ namespace BanaData.Serializations
                     sw.WriteLine($"M{mpr.Memo}");
                 }
 
-                ExportCategoryForMemorizedPayee(sw, liRows[0], false);
+                ExportCategory(sw, liRows[0], false);
 
                 if (liRows.Length > 1)
                 {
                     foreach(var liRow in liRows)
                     {
-                        ExportCategoryForMemorizedPayee(sw, liRow, true);
+                        ExportCategory(sw, liRow, true);
                         if (!liRow.IsMemoNull())
                         {
                             sw.WriteLine($"E{liRow.Memo}");
@@ -525,19 +525,6 @@ namespace BanaData.Serializations
                     }
                 }
                 sw.WriteLine("^");
-            }
-        }
-
-        private void ExportCategoryForMemorizedPayee(StreamWriter sw, Household.MemorizedLineItemRow lineItemRow, bool forSplit)
-        {
-            string letter = forSplit ? "S" : "L";
-            if (!lineItemRow.IsCategoryIDNull())
-            {
-                sw.WriteLine(letter + mainWindowLogic.CategoriesAndTransfers.Find(c => c.ID == lineItemRow.CategoryID).FullName);
-            }
-            else if (!lineItemRow.IsAccountIDNull())
-            {
-                sw.WriteLine(letter + mainWindowLogic.CategoriesAndTransfers.Find(c => c.AccountID == lineItemRow.AccountID).FullName);
             }
         }
 

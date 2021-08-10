@@ -63,8 +63,6 @@
     <Compile Include="Database\InvestmentTransaction.cs" />
     <Compile Include="Database\LineItem.cs" />
     <Compile Include="Database\Lot.cs" />
-    <Compile Include="Database\MemorizedLineItem.cs" />
-    <Compile Include="Database\MemorizedPayee.cs" />
     <Compile Include="Database\Portfolio.cs" />
     <Compile Include="Database\Security.cs" />
     <Compile Include="Database\SecurityPrice.cs" />
