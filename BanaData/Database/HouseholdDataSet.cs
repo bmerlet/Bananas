@@ -45,7 +45,9 @@ namespace BanaData.Database
             // Check that there are no mismatched transfers
             foreach (var lineItemTransfer in LineItemTransfer)
             {
-                if (lineItemTransfer.AccountRow != lineItemTransfer.TransactionRow.AccountRow)
+                if (lineItemTransfer.RowState != System.Data.DataRowState.Deleted &&
+                    lineItemTransfer.LineItemRow.TransactionRow.Type == ETransactionType.Regular &&
+                    lineItemTransfer.AccountRow != lineItemTransfer.TransactionRow.AccountRow)
                 {
                     error +=
                         $"Line item transfer revord points to account {lineItemTransfer.AccountRow.Name}" + eol

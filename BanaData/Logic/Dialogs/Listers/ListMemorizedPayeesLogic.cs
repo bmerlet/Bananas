@@ -143,7 +143,7 @@ namespace BanaData.Logic.Dialogs.Listers
                 }
                 else if (lineItem.CategoryAccountID != -1)
                 {
-                    household.LineItemTransfer.AddLineItemTransferRow(newRow, household.Account.FindByID(lineItem.CategoryAccountID), null);
+                    household.LineItemTransfer.AddLineItemTransferRow(newRow, household.Account.FindByID(lineItem.CategoryAccountID), newPayeeRow);
                 }
 
                 // Recreate line item with correct ID
@@ -188,6 +188,8 @@ namespace BanaData.Logic.Dialogs.Listers
                 }
                 else
                 {
+                    bool createCategoryOrTransferLineItem = false;
+
                     household.LineItem.Update(oldLineItem, payeeRow, newLineItem.Memo, newLineItem.Amount);
                     if (oldLineItem.GetLineItemCategoryRow() is Household.LineItemCategoryRow licr)
                     {
@@ -198,10 +200,7 @@ namespace BanaData.Logic.Dialogs.Listers
                         else
                         {
                             licr.Delete();
-                            if (newLineItem.CategoryAccountID != -1)
-                            {
-                                household.LineItemTransfer.AddLineItemTransferRow(oldLineItem, household.Account.FindByID(newLineItem.CategoryAccountID), null);
-                            }
+                            createCategoryOrTransferLineItem = true;
                         }
                     }
                     else if (oldLineItem.GetLineItemTransferRow() is Household.LineItemTransferRow litr)
@@ -213,16 +212,26 @@ namespace BanaData.Logic.Dialogs.Listers
                         else
                         {
                             litr.Delete();
-                            if (newLineItem.CategoryID != -1)
-                            {
-                                household.LineItemCategory.AddLineItemCategoryRow(oldLineItem, household.Category.FindByID(newLineItem.CategoryID));
-                            }
+                            createCategoryOrTransferLineItem = true;
                         }
                     }
                     else
                     {
-
+                        createCategoryOrTransferLineItem = true;
                     }
+
+                    if (createCategoryOrTransferLineItem)
+                    {
+                        if (newLineItem.CategoryAccountID != -1)
+                        {
+                            household.LineItemTransfer.AddLineItemTransferRow(oldLineItem, household.Account.FindByID(newLineItem.CategoryAccountID), payeeRow);
+                        }
+                        else if (newLineItem.CategoryID != -1)
+                        {
+                            household.LineItemCategory.AddLineItemCategoryRow(oldLineItem, household.Category.FindByID(newLineItem.CategoryID));
+                        }
+                    }
+
                     newMemorizedLineItems.Add(newLineItem);
                 }
             }
@@ -240,7 +249,7 @@ namespace BanaData.Logic.Dialogs.Listers
                     }
                     else if (newLineItem.CategoryAccountID != -1)
                     {
-                        household.LineItemTransfer.AddLineItemTransferRow(newRow, household.Account.FindByID(newLineItem.CategoryAccountID), null);
+                        household.LineItemTransfer.AddLineItemTransferRow(newRow, household.Account.FindByID(newLineItem.CategoryAccountID), payeeRow);
                     }
 
                     // Recreate line item with correct ID
@@ -262,7 +271,18 @@ namespace BanaData.Logic.Dialogs.Listers
             // Remove the corresponding memorized line items
             foreach (var lineItem in payee.LineItems)
             {
-                household.LineItem.FindByID(lineItem.ID).Delete();
+                var lineItemRow = household.LineItem.FindByID(lineItem.ID);
+
+                if (lineItemRow.GetLineItemCategoryRow() is Household.LineItemCategoryRow licr)
+                {
+                    licr.Delete();
+                }
+                if (lineItemRow.GetLineItemTransferRow() is Household.LineItemTransferRow litr)
+                {
+                    litr.Delete();
+                }
+
+                lineItemRow.Delete();
             }
 
             // Remove the memorized payee

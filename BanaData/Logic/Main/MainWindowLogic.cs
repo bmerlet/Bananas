@@ -442,6 +442,7 @@ namespace BanaData.Logic.Main
                 ErrorMessage(parser.Log, "Import results");
             }
 
+            Dirty = true;
             UpdateAll();
             UpdateTitle();
         }
@@ -743,6 +744,7 @@ namespace BanaData.Logic.Main
                     }
                     else if (dbli.GetLineItemTransferRow() is Household.LineItemTransferRow litr)
                     {
+                        category = $"[{litr.AccountRow.Name}]";
                         categoryAccountID = litr.AccountID;
                     }
 
