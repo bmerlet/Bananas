@@ -76,6 +76,11 @@
         <Style TargetType="Button" x:Key="FormButton">
             <Setter Property="Margin" Value="5"/>
         </Style>
+        
+        <!-- Form autocomplete-->
+        <Style TargetType="w:AutoCompleteTextBox" x:Key="FormAutocompleteTextBox">
+            <Setter Property="Margin" Value="0"/>
+        </Style>
 
         <!--
           == Buttons ==

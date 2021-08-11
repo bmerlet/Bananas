@@ -18,7 +18,7 @@ namespace BanaData.Logic.Dialogs.Listers
     /// <summary>
     /// Logic to show and manipulate the list of schedules
     /// </summary>
-    class ListSchedulesLogic : LogicBase
+    public class ListSchedulesLogic : LogicBase
     {
         #region Private members
 
@@ -180,10 +180,10 @@ namespace BanaData.Logic.Dialogs.Listers
             scheduleRow.Flags = updatedScheduleItem.Flags;
 
             // Update the transaction
-            var transactionRow = household.Transaction.FindByID(updatedScheduleItem.ID);
+            var transactionRow = household.Transaction.FindByID(scheduleRow.TransactionID);
             household.Transaction.Update(
-                updatedScheduleItem.ID,
-                null,
+                scheduleRow.TransactionID,
+                household.Account.GetByName(updatedScheduleItem.Account),
                 DateTime.MinValue,
                 updatedScheduleItem.Payee,
                 updatedScheduleItem.Memo,

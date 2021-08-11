@@ -56,5 +56,7 @@ namespace BanaData.Logic.Items
         public string Account { get; }
         public string Payee { get; }
         public string Memo { get; }
+        public string Category => LineItems.Length == 1 ? LineItems[0].Category : "<Split>";
+        public decimal Amount => LineItems.Sum(li => li.Amount);
     }
 }

@@ -159,6 +159,14 @@ namespace XamlUI
             {
                 dialog = new EditPersons(editPersonsLogic);
             }
+            else if (logic is ListSchedulesLogic listSchedulesLogic)
+            {
+                dialog = new ListSchedules(listSchedulesLogic);
+            }
+            else if (logic is EditScheduleLogic editScheduleLogic)
+            {
+                dialog = new EditSchedule(editScheduleLogic);
+            }
             else if (logic is ListSecuritiesLogic listSecuritiesLogic)
             {
                 dialog = new ListSecurities(listSecuritiesLogic);

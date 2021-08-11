@@ -77,6 +77,9 @@
     <Compile Include="Dialogs\Editors\EditPersons.xaml.cs">
       <DependentUpon>EditPersons.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\Editors\EditSchedule.xaml.cs">
+      <DependentUpon>EditSchedule.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\Editors\EditSecurity.xaml.cs">
       <DependentUpon>EditSecurity.xaml</DependentUpon>
     </Compile>
@@ -103,6 +106,9 @@
     </Compile>
     <Compile Include="Dialogs\Listers\ListMemorizedPayees.xaml.cs">
       <DependentUpon>ListMemorizedPayees.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Listers\ListSchedules.xaml.cs">
+      <DependentUpon>ListSchedules.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Listers\ListSecurities.xaml.cs">
       <DependentUpon>ListSecurities.xaml</DependentUpon>
@@ -216,6 +222,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Dialogs\Editors\EditSchedule.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\Editors\EditSecurity.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -249,6 +259,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\Listers\ListMemorizedPayees.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Listers\ListSchedules.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

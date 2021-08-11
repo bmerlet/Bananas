@@ -1,0 +1,114 @@
+﻿<Window x:Class="XamlUI.Dialogs.Editors.EditSchedule"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:XamlUI.Dialogs.Editors"
+        xmlns:ucs="clr-namespace:XamlUI.UserControls"
+        xmlns:w="clr-namespace:XamlUI.Widgets"
+        xmlns:editors="clr-namespace:BanaData.Logic.Dialogs.Editors;assembly=BanaData"
+        d:DataContext="{d:DesignInstance Type=editors:EditScheduleLogic}"
+        mc:Ignorable="d"
+        Title="Edit scheduled transaction"
+        Icon="/XamlUI;component/Images/Bananas.ico"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        SizeToContent="WidthAndHeight">
+    <Window.Resources>
+
+        <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}"/>
+        <Style TargetType="w:WatermarkTextBox" BasedOn="{StaticResource FormWatermarkTextBox}"/>
+        <Style TargetType="w:DateBox" BasedOn="{StaticResource FormDateBox}"/>
+        <Style TargetType="w:AmountBox" BasedOn="{StaticResource FormAmountBox}"/>
+        <Style TargetType="ComboBox" BasedOn="{StaticResource FormComboBox}"/>
+        <Style TargetType="CheckBox" BasedOn="{StaticResource FormCheckBox}"/>
+        <Style TargetType="w:AutoCompleteTextBox" BasedOn="{StaticResource FormAutocompleteTextBox}"/>
+
+    </Window.Resources>
+    
+    <DockPanel>
+
+        <!-- OK/Cancel panel -->
+        <ucs:OKCancel DockPanel.Dock="Bottom"/>
+        
+        <!-- Main panel -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!--
+              - Left columns
+              -->
+            <!-- Row 0: Next date -->
+            <TextBlock Text="Next date:"/>
+            <w:DateBox Date="{Binding NextDate, Mode=TwoWay}" Grid.Column="1"/>
+
+            <!-- Row 1: End date -->
+            <TextBlock Text="End date:" Grid.Row="1"/>
+            <w:DateBox Date="{Binding EndDate, Mode=TwoWay}" Grid.Row="1" Grid.Column="1"/>
+
+            <!-- Row 2: Frequency -->
+            <TextBlock Text="Frequency:" Grid.Row="2"/>
+            <ComboBox ItemsSource="{Binding Frequencies, Mode=OneTime}" SelectedItem="{Binding Frequency}" Grid.Row="2" Grid.Column="1"/>
+
+            <!-- Row 3: Confirm before -->
+            <CheckBox Content="Ask before entering the transaction" Grid.Row="3" Grid.ColumnSpan="2" IsChecked="{Binding PromptBefore}"/>
+
+            <!-- Row 4: Notify afterwards -->
+            <CheckBox Content="Notify when transaction is entered" Grid.Row="4" Grid.ColumnSpan="2" IsChecked="{Binding PromptBefore}"/>
+            
+            <!-- Row 5: payment/deposit -->
+            <TextBlock Text="Type:" Grid.Row="5"/>
+            <ComboBox ItemsSource="{Binding TypeSource, Mode=OneTime}" SelectedItem="{Binding Type}" Grid.Row="5" Grid.Column="1" IsEditable="{Binding TypeEnabled}"/>
+
+            <!--
+              - Right columns
+              -->
+            <!-- Row 0: Account name -->
+            <TextBlock Text="Account name:" Grid.Column="2"/>
+            <w:AutoCompleteTextBox 
+                Text="{Binding Account, Mode=TwoWay}"
+                IsTextFromItemsSourceOnly="True"
+                ItemsSource="{Binding Accounts}"
+                ListBoxHeight="150" ListBoxWidth="250"
+                Watermark="Account" Grid.Column="3"/>
+
+            <!-- Row 1: Payee -->
+            <TextBlock Text="Payee:" Grid.Row="1" Grid.Column="2"/>
+            <w:WatermarkTextBox Text="{Binding Payee, Mode=TwoWay}" Watermark="Payee" Grid.Row="1" Grid.Column="3"/>
+
+            <!-- Row 2: Memo -->
+            <TextBlock Text="Memo:" Grid.Row="2" Grid.Column="2"/>
+            <w:WatermarkTextBox Text="{Binding Memo, Mode=TwoWay}" Watermark="Memo" Grid.Row="2" Grid.Column="3"/>
+            
+            <!-- Row 3: Category -->
+            <TextBlock Text="Category:" Grid.Row="3" Grid.Column="2"/>
+            <w:AutoCompleteTextBox 
+                Style="{StaticResource CategoryBoxStyle}" 
+                ItemsSource="{Binding Categories}"
+                IsEnabled="{Binding CategoryEnabled}"
+                Text="{Binding Category, Mode=TwoWay}"
+                Grid.Row="3" Grid.Column="3"/>
+            <Button Style="{StaticResource FormButton}" Content="Split..." Command="{Binding EditSplit}"  Grid.Row="3" Grid.Column="4"/>
+
+            <!-- Row 5: Amount -->
+            <TextBlock Text="Amount:" Grid.Row="5" Grid.Column="2"/>
+            <w:AmountBox Amount="{Binding AbsoluteAmount, Mode=TwoWay}" IsEnabled="{Binding AbsoluteAmountEnabled}" Grid.Row="5" Grid.Column="3"/>
+
+        </Grid>
+    </DockPanel>
+</Window>

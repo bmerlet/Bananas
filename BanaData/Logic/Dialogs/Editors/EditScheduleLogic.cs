@@ -41,6 +41,7 @@ namespace BanaData.Logic.Dialogs.Editors
             Account = scheduleItem.Account;
             Payee = scheduleItem.Payee;
             Memo = scheduleItem.Memo;
+            Categories = new List<CategoryItem>(mainWindowLogic.CategoriesAndTransfers);
             UpdateAfterLineItemChanges();
 
             EditSplit = new CommandBase(OnEditSplit);
@@ -58,7 +59,7 @@ namespace BanaData.Logic.Dialogs.Editors
 
         // Frequency
         public string Frequency { get; set; }
-        public string[] Frequencies = EnumDescriptionAttribute.GetDescriptions<EScheduleFrequency>();
+        public string[] Frequencies => EnumDescriptionAttribute.GetDescriptions<EScheduleFrequency>();
 
         // Flags
         private EScheduleFlag flags;
@@ -91,7 +92,7 @@ namespace BanaData.Logic.Dialogs.Editors
         // Category (when not split)
         public string Category { get; set; }
         public bool? CategoryEnabled { get; private set; }
-        public IEnumerable<CategoryItem> Categories => mainWindowLogic.CategoriesAndTransfers;
+        public IEnumerable<CategoryItem> Categories { get; }
 
         // Type (when not split)
         public string[] TypeSource { get; } = new string[] { DEPOSIT, PAYMENT };
