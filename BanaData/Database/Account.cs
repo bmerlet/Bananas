@@ -64,6 +64,12 @@ namespace BanaData.Database
             // Are there transactions associated with this account?
             public bool HasTransactions => GetTransactionRows().Length > 0;
 
+            // Get all the regular transactions on this account
+            public IEnumerable<TransactionRow> GetRegularTransactionRows()
+            {
+                return GetTransactionRows().Where(tr => tr.Type == ETransactionType.Regular);
+            }
+
             // Get the balance of an account
             public decimal GetBalance()
             {
@@ -82,7 +88,7 @@ namespace BanaData.Database
                 decimal balance = 0;
 
                 // Find balance from all transactions
-                foreach (var transaction in GetTransactionRows())
+                foreach (var transaction in GetRegularTransactionRows())
                 {
                     if (!filter || transaction.Status == statusToFilterOn)
                     {
@@ -107,7 +113,7 @@ namespace BanaData.Database
             // Get the unreconciled transactions of a banking account
             public IEnumerable<TransactionRow> GetUnreconciledTransactions()
             {
-                return GetTransactionRows().Where(tr => tr.Status != ETransactionStatus.Reconciled);
+                return GetRegularTransactionRows().Where(tr => tr.Status != ETransactionStatus.Reconciled);
             }
 
             // Get the balance of an investment account
@@ -115,7 +121,7 @@ namespace BanaData.Database
             {
                 // Compute the portfolio
                 var portfolio = new Portfolio();
-                foreach (var transRow in GetTransactionRows())
+                foreach (var transRow in GetRegularTransactionRows())
                 {
                     portfolio.ApplyTransaction(transRow);
                 }
@@ -129,7 +135,7 @@ namespace BanaData.Database
             {
                 // Compute the portfolio
                 var portfolio = new Portfolio();
-                foreach (var transRow in GetTransactionRows())
+                foreach (var transRow in GetRegularTransactionRows())
                 {
                     portfolio.ApplyTransaction(transRow);
                 }
@@ -143,7 +149,7 @@ namespace BanaData.Database
             {
                 // Compute the portfolio at the specified date
                 var portfolio = new Portfolio();
-                foreach (TransactionRow transRow in GetTransactionRows())
+                foreach (TransactionRow transRow in GetRegularTransactionRows())
                 {
                     if (transRow == excludedTransaction)
                     {

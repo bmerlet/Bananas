@@ -199,7 +199,7 @@ namespace BanaData.Serializations
                 bool accountWritten = false;
 
                 // Get all transactions on this account
-                foreach (var transactionRow in accountRow.GetTransactionRows())
+                foreach (var transactionRow in accountRow.GetRegularTransactionRows())
                 {
                     // If filtering on checkpoint, skip transactions that do not match
                     if (checkpointID >= 0 && transactionRow.CheckpointID != checkpointID)

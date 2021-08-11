@@ -96,7 +96,7 @@ namespace BanaData.Logic.Main
             // (for performance)
             temporaryTransactionList.Clear();
 
-            foreach (Household.TransactionRow transRow in accountRow.GetTransactionRows())
+            foreach (Household.TransactionRow transRow in accountRow.GetRegularTransactionRows())
             {
                 var lineItems = GetLineItems(transRow);
                 var trans = CreateTransactionFromDB(accountRow, transRow, lineItems);

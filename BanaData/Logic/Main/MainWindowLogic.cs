@@ -153,6 +153,7 @@ namespace BanaData.Logic.Main
         public readonly List<CategoryItem> Categories = new List<CategoryItem>();
         // Transfers only
         public readonly List<CategoryItem> Transfers = new List<CategoryItem>();
+        public readonly List<CategoryItem> HiddenTransfers = new List<CategoryItem>();
         // Categories and transfers
         public readonly List<CategoryItem> CategoriesAndTransfers = new List<CategoryItem>();
         // Hidden (system) categories
@@ -757,6 +758,7 @@ namespace BanaData.Logic.Main
         {
             Categories.Clear();
             Transfers.Clear();
+            HiddenTransfers.Clear();
             CategoriesAndTransfers.Clear();
             HiddenCategories.Clear();
 
@@ -808,9 +810,13 @@ namespace BanaData.Logic.Main
             // Add all possible transfers
             foreach (var account in Household.Account)
             {
-                if (!account.Hidden)
+                var transferItem = new CategoryItem(account.ID, account.Name);
+                if (account.Hidden)
                 {
-                    var transferItem = new CategoryItem(account.ID, account.Name);
+                    HiddenTransfers.Add(transferItem);
+                }
+                else
+                {
                     Transfers.Add(transferItem);
                     CategoriesAndTransfers.Add(transferItem);
                 }

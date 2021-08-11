@@ -100,6 +100,11 @@ namespace BanaData.Logic.Items
             return ID.GetHashCode() + AccountID.GetHashCode();
         }
 
+        public override string ToString()
+        {
+            return FullName;
+        }
+
         // Sort on full name
         public int CompareTo(CategoryItem other)
         {

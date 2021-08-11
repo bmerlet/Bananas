@@ -80,6 +80,10 @@ namespace BanaData.Logic.Items
                 var cat = mainWindowLogic.CategoriesAndTransfers.FirstOrDefault(c => c.FullName == category);
                 if (cat == null)
                 {
+                    cat = mainWindowLogic.HiddenTransfers.FirstOrDefault(c => c.FullName == category);
+                }
+                if (cat == null)
+                {
                     throw new ArgumentException($"Category {category} does not exist");
                 }
                 categoryID = cat.ID;

@@ -305,7 +305,7 @@ namespace BanaData.Logic.Dialogs.Reports
                     var accountName = accountRow.Name;
 
                     // Go through all the transactions for that year
-                    foreach (var transactionRow in accountRow.GetTransactionRows().Where(tr => tr.Date.Year == selectedYear))
+                    foreach (var transactionRow in accountRow.GetRegularTransactionRows().Where(tr => tr.Date.Year == selectedYear))
                     {
                         // Go through all the line items
                         foreach (var li in transactionRow.GetLineItemRows())
@@ -337,7 +337,7 @@ namespace BanaData.Logic.Dialogs.Reports
                     }
 
                     // Go through all the transactions for that year
-                    foreach (var transactionRow in accountRow.GetTransactionRows().Where(tr => tr.Date.Year == selectedYear))
+                    foreach (var transactionRow in accountRow.GetRegularTransactionRows().Where(tr => tr.Date.Year == selectedYear))
                     {
                         // Get the investment transaction
                         var investmentTransactionRow = transactionRow.GetInvestmentTransaction();

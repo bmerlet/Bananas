@@ -784,7 +784,7 @@ namespace BanaData.Serializations
             // For the fee on reinvestment, find the corresponding reinvestment transaction and modify its commission
             if (commissionOnDividend)
             {
-                var reinvDivTrans = accountRow.GetTransactionRows()
+                var reinvDivTrans = accountRow.GetRegularTransactionRows()
                     .Where(t => t.Date == date && t.GetInvestmentTransaction().Type == EInvestmentTransactionType.ReinvestDividends)
                     .Single();
                 reinvDivTrans.GetInvestmentTransaction().Commission = amount;
@@ -1532,6 +1532,32 @@ namespace BanaData.Serializations
                 supplementalInfo.TransactionReports.Add(transactionReport);
             }
 
+            // Scheduled transactions
+            foreach(Household.ScheduleRow scheduleRow in household.Schedule)
+            {
+                var transactionRow = scheduleRow.TransactionRow;
+                var schedule = new SupplementalInfo.Schedule(
+                    scheduleRow.NextDate, scheduleRow.EndDate, scheduleRow.Frequency, scheduleRow.Flags,
+                    transactionRow.AccountRow.Name,
+                    transactionRow.IsPayeeNull() ? null : transactionRow.Payee,
+                    transactionRow.IsMemoNull() ? null : transactionRow.Memo);
+
+                foreach(var lineItemRow in transactionRow.GetLineItemRows())
+                {
+                    string memo = lineItemRow.IsMemoNull() ? null : lineItemRow.Memo;
+                    if (lineItemRow.GetLineItemCategoryRow() is Household.LineItemCategoryRow licr)
+                    {
+                        schedule.ScheduleLineItems.Add(new SupplementalInfo.Schedule.ScheduleLineItem(memo, licr.CategoryRow.FullName, null, lineItemRow.Amount));
+                    }
+                    else if (lineItemRow.GetLineItemTransferRow() is Household.LineItemTransferRow litr)
+                    {
+                        schedule.ScheduleLineItems.Add(new SupplementalInfo.Schedule.ScheduleLineItem(memo, null, litr.AccountRow.Name, lineItemRow.Amount));
+                    }
+                }
+
+                supplementalInfo.Schedules.Add(schedule);
+            }
+
             return supplementalInfo;
         }
 
@@ -1671,6 +1697,57 @@ namespace BanaData.Serializations
                     }
                 }
             }
+
+            // Scheduled transactions
+            foreach(var schedule in supplementalInfo.Schedules)
+            {
+                // Check the categories and accounts referenced are still present
+                var accountRow = household.Account.GetByName(schedule.Account);
+                if (accountRow == null)
+                {
+                    continue;
+                }
+                if (schedule.ScheduleLineItems.Any(li => li.Category != null && household.Category.GetByFullName(li.Category) == null))
+                {
+                    continue;
+                }
+                if (schedule.ScheduleLineItems.Any(li => li.Account != null && household.Account.GetByName(li.Account) == null))
+                {
+                    continue;
+                }
+
+                // Build transaction
+                var transactionRow = household.Transaction.Add(
+                accountRow,
+                DateTime.MinValue,
+                schedule.Payee,
+                schedule.Memo,
+                ETransactionStatus.Pending,
+                checkpointID,
+                ETransactionType.ScheduledTransaction);
+
+                // Commit all line items
+                foreach (var lineItem in schedule.ScheduleLineItems)
+                {
+                    var newRow = household.LineItem.Add(transactionRow, lineItem.Memo, lineItem.Amount);
+                    if (lineItem.Category != null)
+                    {
+                        household.LineItemCategory.AddLineItemCategoryRow(newRow, household.Category.GetByFullName(lineItem.Category));
+                    }
+                    else if (lineItem.Account != null)
+                    {
+                        household.LineItemTransfer.AddLineItemTransferRow(newRow, household.Account.GetByName(lineItem.Account), transactionRow);
+                    }
+                }
+
+                // Commit the schedule
+                var newScheduleRow = household.Schedule.AddScheduleRow(
+                    schedule.NextDate,
+                    schedule.EndDate,
+                    (int)schedule.Frequency,
+                    (int)schedule.Flags,
+                    transactionRow);
+            }
         }
 
         private class SupplementalInfo
@@ -1743,6 +1820,40 @@ namespace BanaData.Serializations
                 public readonly List<string> Accounts = new List<string>();
                 public readonly List<string> Payees = new List<string>();
                 public readonly List<string> Categories = new List<string>();
+            }
+
+            // Scheduled transactions
+            public readonly List<Schedule> Schedules = new List<Schedule>();
+            public class Schedule
+            {
+                public Schedule(
+                    DateTime nextDate, DateTime endDate, EScheduleFrequency frequency, EScheduleFlag flags,
+                    string account, string payee, string memo)
+                {
+                    (NextDate, EndDate, Frequency, Flags) = (nextDate, endDate, frequency, flags);
+                    (Account, Payee, Memo) = (account, payee, memo);
+                }
+
+                public readonly DateTime NextDate;
+                public readonly DateTime EndDate;
+                public readonly EScheduleFrequency Frequency;
+                public readonly EScheduleFlag Flags;
+
+                public readonly string Account;
+                public readonly string Payee;
+                public readonly string Memo;
+                public readonly List<ScheduleLineItem> ScheduleLineItems = new List<ScheduleLineItem>();
+
+                public class ScheduleLineItem
+                {
+                    public ScheduleLineItem(string memo, string category, string account, decimal amount) =>
+                        (Memo, Category, Account, Amount) = (memo, category, account, amount);
+
+                    public readonly string Memo;
+                    public readonly string Category;
+                    public readonly string Account;
+                    public readonly decimal Amount;
+                }
             }
         }
 
