@@ -43,38 +43,44 @@ namespace BanaData.Database
                 return GetInvestmentTransactionRows().Single();
             }
 
-            public bool HasSame(DateTime date, string payee, string memo, ETransactionStatus status)
+            public void CreatePeerTransaction(int targetAccountID, LineItemRow liRow, decimal peerAmount)
             {
-                if (Date != date || Status != status)
+                var household = this.Table.DataSet as Household;
+
+                var targetAccountRow = household.Account.FindByID(targetAccountID);
+
+                // Special case of transfer to self
+                if (targetAccountRow == AccountRow)
                 {
-                    return false;
+                    household.LineItemTransfer.AddLineItemTransferRow(liRow, AccountRow, this);
+                    return;
                 }
 
-                if (IsPayeeNull())
+                // Add transaction on "other side"
+                var peerTransactionRow = household.Transaction.Add(
+                    targetAccountRow,
+                    Date,
+                    "",
+                    IsMemoNull() ? null : Memo,
+                    ETransactionStatus.Pending,
+                    household.Checkpoint.GetMostRecentCheckpointID(),
+                    ETransactionType.Regular);
+                var peerLiRow = household.LineItem.Add(peerTransactionRow, null, peerAmount);
+
+                // Create the investment/banking transactions
+                if (targetAccountRow.Type == EAccountType.Bank)
                 {
-                    if (!string.IsNullOrWhiteSpace(payee))
-                    {
-                        return false;
-                    }
+                    household.BankingTransaction.Add(peerTransactionRow, ETransactionMedium.None, 0);
                 }
-                else if (Payee != payee)
+                else if (targetAccountRow.Type == EAccountType.Investment)
                 {
-                    return false;
+                    var type = peerLiRow.Amount >= 0 ? EInvestmentTransactionType.TransferCashIn : EInvestmentTransactionType.TransferCashOut;
+                    household.InvestmentTransaction.Add(peerTransactionRow, type, null, 0, 0, 0);
                 }
 
-                if (IsMemoNull())
-                {
-                    if (!string.IsNullOrWhiteSpace(memo))
-                    {
-                        return false;
-                    }
-                }
-                else if (Memo != memo)
-                {
-                    return false;
-                }
-
-                return true;
+                // Create the transfer line items
+                household.LineItemTransfer.AddLineItemTransferRow(liRow, targetAccountRow, peerTransactionRow);
+                household.LineItemTransfer.AddLineItemTransferRow(peerLiRow, AccountRow, this);
             }
 
         }

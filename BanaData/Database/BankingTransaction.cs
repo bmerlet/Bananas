@@ -74,12 +74,7 @@ namespace BanaData.Database
                 if (str == MEDIUM_NEXTCHECKNUM)
                 {
                     medium = ETransactionMedium.Check;
-                    checkNumber = accountRow.GetRegularTransactionRows()
-                        .Select(tr => tr.GetBankingTransaction())
-                        .Where(btr => !btr.IsCheckNumberNull())
-                        .Select(btr => btr.CheckNumber)
-                        .Max();
-                    checkNumber += 1;
+                    checkNumber = GetNextCheckNumber(accountRow);
                 }
                 else if (MediumSource.Contains(str))
                 {
@@ -99,6 +94,17 @@ namespace BanaData.Database
                 }
 
                 return (medium, checkNumber);
+            }
+
+            public static decimal GetNextCheckNumber(AccountRow accountRow)
+            {
+                decimal checkNumber = accountRow.GetRegularTransactionRows()
+                    .Select(tr => tr.GetBankingTransaction())
+                    .Where(btr => !btr.IsCheckNumberNull())
+                    .Select(btr => btr.CheckNumber)
+                    .Max();
+
+                return checkNumber += 1;
             }
 
             public BankingTransactionRow Add(TransactionRow transactionRow, ETransactionMedium medium, uint checkNumber)

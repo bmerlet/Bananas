@@ -218,7 +218,7 @@ namespace BanaData.Logic.Main
             else if (li.CategoryAccountID != -1)
             {
                 impactedAccounts.Add(li.CategoryAccountID);
-                CreatePeerTransaction(li.CategoryAccountID, transactionRow, liRow, -li.Amount);
+                transactionRow.CreatePeerTransaction(li.CategoryAccountID, liRow, -li.Amount);
             }
         }
 
@@ -247,7 +247,7 @@ namespace BanaData.Logic.Main
                 if (liTransferRow == null)
                 {
                     // The line item was not a transfer: Make it one
-                    CreatePeerTransaction(li.CategoryAccountID, transactionRow, liRow, -li.Amount);
+                    transactionRow.CreatePeerTransaction(li.CategoryAccountID, liRow, -li.Amount);
                 }
                 else
                 {
@@ -366,45 +366,6 @@ namespace BanaData.Logic.Main
                     liTransferRow.Delete();
                 }
             }
-        }
-
-        private void CreatePeerTransaction(int targetAccountID, Household.TransactionRow transactionRow, Household.LineItemRow liRow, decimal peerAmount)
-        {
-            var household = mainWindowLogic.Household;
-            var targetAccountRow = household.Account.FindByID(targetAccountID);
-
-            // Special case of transfer to self
-            if (targetAccountRow == accountRow)
-            {
-                household.LineItemTransfer.AddLineItemTransferRow(liRow, accountRow, transactionRow);
-                return;
-            }
-
-            // Add transaction on "other side"
-            var peerTransactionRow = household.Transaction.Add(
-                targetAccountRow,
-                data.Date,
-                "",
-                data.Memo,
-                ETransactionStatus.Pending,
-                household.Checkpoint.GetMostRecentCheckpointID(),
-                ETransactionType.Regular);
-            var peerLiRow = household.LineItem.Add(peerTransactionRow, null, peerAmount);
-
-            // Create the investment/banking transactions
-            if (targetAccountRow.Type == EAccountType.Bank)
-            {
-                household.BankingTransaction.Add(peerTransactionRow, ETransactionMedium.None, 0);
-            }
-            else if (targetAccountRow.Type == EAccountType.Investment)
-            {
-                var type = peerLiRow.Amount >= 0 ? EInvestmentTransactionType.TransferCashIn : EInvestmentTransactionType.TransferCashOut;
-                household.InvestmentTransaction.Add(peerTransactionRow, type, null, 0, 0, 0);
-            }
-
-            // Create the transfer line items
-            household.LineItemTransfer.AddLineItemTransferRow(liRow, targetAccountRow, peerTransactionRow);
-            household.LineItemTransfer.AddLineItemTransferRow(peerLiRow, accountRow, transactionRow);
         }
 
         #endregion

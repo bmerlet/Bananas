@@ -526,7 +526,119 @@ namespace BanaData.Logic.Main
         // Look for scheduled transactions that need to be executed
         public void CheckForScheduledTransactions()
         {
-            // ZZZZ
+            var now = DateTime.Today;
+
+            foreach(var scheduleRow in Household.Schedule)
+            {
+                if (now.CompareTo(scheduleRow.NextDate) >= 0)
+                {
+                    // Time to enter a scheduled transaction!
+                    bool doIt = true;
+                    bool updateNextDate = true;
+
+                    // Prompt the user
+                    if (scheduleRow.Flags.HasFlag(EScheduleFlag.PromptBefore))
+                    {
+                        var scheduleItem = new ScheduleItem(this, scheduleRow);
+                        doIt = YesNoQuestion($"Do you want to enter the scheduled transaction on account {scheduleItem.Account}, category {scheduleItem.Category} for {scheduleItem.Amount:N2}?");
+                        if (!doIt)
+                        {
+                            updateNextDate = YesNoQuestion("Do you want to skip this iteration?");
+                        }
+                    }
+
+                    // Enter it
+                    if (doIt)
+                    {
+                        var str = scheduleRow.TransactionRow;
+
+                        // Create transaction
+                        var transactionRow = Household.Transaction.Add(
+                            str.AccountRow,
+                            scheduleRow.NextDate,
+                            str.IsPayeeNull() ? null : str.Payee,
+                            str.IsMemoNull() ? null : str.Memo,
+                            ETransactionStatus.Pending,
+                            Household.Checkpoint.GetMostRecentCheckpointID(),
+                            ETransactionType.Regular);
+
+                        // Banking transaction if needed
+                        if (str.AccountRow.Type == EAccountType.Bank)
+                        {
+                            var medium = str.GetBankingTransaction().Medium;
+                            decimal checkNumber = 0;
+                            if (medium == ETransactionMedium.NextCheckNum)
+                            {
+                                medium = ETransactionMedium.Check;
+                                checkNumber = Household.BankingTransactionDataTable.GetNextCheckNumber(str.AccountRow);
+                            }
+                            Household.BankingTransaction.Add(transactionRow, medium, (uint)checkNumber);
+                        }
+
+                        // Line items
+                        foreach(var sli in str.GetLineItemRows())
+                        {
+                            var memo = sli.IsMemoNull() ? null : sli.Memo;
+                            var lineItemRow = Household.LineItem.Add(transactionRow, memo, sli.Amount);
+
+                            if (sli.GetLineItemCategoryRow() is Household.LineItemCategoryRow licr)
+                            {
+                                Household.LineItemCategory.AddLineItemCategoryRow(lineItemRow, licr.CategoryRow);
+                            }
+                            else if (sli.GetLineItemTransferRow() is Household.LineItemTransferRow litr)
+                            {
+                                // Create peer transaction
+                                transactionRow.CreatePeerTransaction(litr.AccountID, lineItemRow, -lineItemRow.Amount);
+                            }
+                        }
+                    }
+
+                    // Update next date
+                    if (updateNextDate)
+                    {
+                        switch(scheduleRow.Frequency)
+                        {
+                            case EScheduleFrequency.Daily:
+                                scheduleRow.NextDate.AddDays(1);
+                                break;
+                            case EScheduleFrequency.Weekly:
+                                scheduleRow.NextDate.AddDays(7);
+                                break;
+                            case EScheduleFrequency.Biweekly:
+                                scheduleRow.NextDate.AddDays(14);
+                                break;
+                            case EScheduleFrequency.SemiMonthly:
+                                if (scheduleRow.NextDate.Day >= 15)
+                                {
+                                    scheduleRow.NextDate.AddDays(-15);
+                                    scheduleRow.NextDate.AddMonths(1);
+                                }
+                                else
+                                {
+                                    scheduleRow.NextDate.AddDays(14);
+                                }
+                                break;
+                            case EScheduleFrequency.Monthly:
+                                scheduleRow.NextDate.AddMonths(1);
+                                break;
+                            case EScheduleFrequency.Quarterly:
+                                scheduleRow.NextDate.AddMonths(3);
+                                break;
+                            case EScheduleFrequency.Yearly:
+                                scheduleRow.NextDate.AddYears(1);
+                                break;
+                        }
+                        CommitChanges();
+                    }
+
+                    // Notify 
+                    if (scheduleRow.Flags.HasFlag(EScheduleFlag.NotifyAfter))
+                    {
+                        var scheduleItem = new ScheduleItem(this, scheduleRow);
+                        ErrorMessage($"Note: Entered the scheduled transaction on account {scheduleItem.Account}, category {scheduleItem.Category} for {scheduleItem.Amount:N2}.");
+                    }
+                }
+            }
         }
 
         #endregion
@@ -564,6 +676,9 @@ namespace BanaData.Logic.Main
 
             // Update transaction reports in menu
             MainMenuLogic.UpdateTransactionReports();
+
+            // See if scheduled transactions need to happen
+            CheckForScheduledTransactions();
         }
 
         // Action after securities are changed
@@ -724,7 +839,11 @@ namespace BanaData.Logic.Main
         // Save to disk every 5 minutes
         private void OnSaveTimerElapsed(object sender, ElapsedEventArgs e)
         {
-            SaveIfDirty();
+            GuiServices.ExecuteAsync((Action)delegate ()
+            {
+                SaveIfDirty();
+                CheckForScheduledTransactions();
+            });
         }
 
         // Builds or rebuilds the list of memorized payees
