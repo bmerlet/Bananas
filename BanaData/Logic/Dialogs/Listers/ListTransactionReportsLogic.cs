@@ -34,11 +34,6 @@ namespace BanaData.Logic.Dialogs.Listers
                 reportsSource.Add(TransactionReportItem.CreateFromDB(reportRow));
             }
 
-            if (initialItem != null)
-            {
-                SelectedReport = reportsSource.FirstOrDefault(tri => tri.Name == initialItem.Name);
-            }
-
             ReportsSource = (CollectionView)CollectionViewSource.GetDefaultView(reportsSource);
             ReportsSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
 
@@ -46,6 +41,12 @@ namespace BanaData.Logic.Dialogs.Listers
             EditCommand = new CommandBase(OnEditReport);
             CloneCommand = new CommandBase(OnCloneCommand);
             DeleteCommand = new CommandBase(OnDeleteReport);
+
+            if (initialItem != null)
+            {
+                SelectedReport = reportsSource.FirstOrDefault(tri => tri.Name == initialItem.Name);
+                OnEditReport();
+            }
         }
 
         #endregion

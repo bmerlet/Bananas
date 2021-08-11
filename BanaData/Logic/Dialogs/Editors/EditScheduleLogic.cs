@@ -39,6 +39,7 @@ namespace BanaData.Logic.Dialogs.Editors
             flags = scheduleItem.Flags;
 
             Account = scheduleItem.Account;
+            Medium = scheduleItem.Medium;
             Payee = scheduleItem.Payee;
             Memo = scheduleItem.Memo;
             Categories = new List<CategoryItem>(mainWindowLogic.CategoriesAndTransfers);
@@ -76,12 +77,30 @@ namespace BanaData.Logic.Dialogs.Editors
         }
 
         // Account name
-        public string Account { get; set; }
+        private string account;
+        public string Account
+        { 
+            get => account;
+            set
+            {
+                account = value;
+                if (mainWindowLogic.Household.Account.GetByName(account) is Household.AccountRow accountRow)
+                {
+                    MediumEnabled = accountRow.Type == EAccountType.Bank;
+                    OnPropertyChanged(() => MediumEnabled);
+                }
+            }
+        }
         public IEnumerable<string> Accounts =>
             mainWindowLogic.Household.Account
             .Where(acc => !acc.Hidden)
             .Where(acc => acc.Type == Database.EAccountType.Bank || acc.Type == Database.EAccountType.Cash || acc.Type == Database.EAccountType.CreditCard)
-            .Select(acc => acc.Name); 
+            .Select(acc => acc.Name);
+
+        // Medium
+        public string Medium { get; set; }
+        public string[] MediumSource { get; } = Household.BankingTransactionDataTable.MediumSource;
+        public bool? MediumEnabled { get; private set; }
 
         // Name of payee
         public string Payee { get; set; }
@@ -177,7 +196,7 @@ namespace BanaData.Logic.Dialogs.Editors
             bool change = add ||
                 scheduleItem.NextDate != NextDate || scheduleItem.EndDate != EndDate ||
                 scheduleItem.Frequency != frequency || scheduleItem.Flags != flags ||
-                scheduleItem.Account != Account || scheduleItem.Payee != Payee ||
+                scheduleItem.Account != Account || scheduleItem.Medium != Medium || scheduleItem.Payee != Payee ||
                 scheduleItem.Memo != Memo || scheduleItem.LineItems.Length != lineItems.Length;
 
             if (!change)
@@ -230,6 +249,7 @@ namespace BanaData.Logic.Dialogs.Editors
                     flags,
                     scheduleItem.TransactionID,
                     Account,
+                    Medium,
                     Payee,
                     Memo,
                     lineItems);

@@ -69,7 +69,7 @@ namespace BanaData.Logic.Dialogs.Listers
             // Create new schedule
             var schedule = new ScheduleItem(
                 -1, DateTime.Today, DateTime.Today, EScheduleFrequency.Monthly, EScheduleFlag.None,
-                -1, "", "", "", new LineItem[] { new LineItem(mainWindowLogic, -1, "", -1, -1, "", 0, true)});
+                -1, "", "", "", "", new LineItem[] { new LineItem(mainWindowLogic, -1, "", -1, -1, "", 0, true)});
 
             var logic = new EditScheduleLogic(mainWindowLogic, schedule, true);
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
@@ -128,16 +128,24 @@ namespace BanaData.Logic.Dialogs.Listers
         private ScheduleItem AddScheduleToDataSet(ScheduleItem scheduleItem)
         {
             var household = mainWindowLogic.Household;
+            var accountRow = household.Account.GetByName(scheduleItem.Account);
 
             // Commit new transaction
             var newTransactionRow = household.Transaction.Add(
-                household.Account.GetByName(scheduleItem.Account),
+                accountRow,
                 DateTime.MinValue,
                 scheduleItem.Payee,
                 scheduleItem.Memo,
                 ETransactionStatus.Pending,
                 household.Checkpoint.GetMostRecentCheckpointID(),
                 ETransactionType.ScheduledTransaction);
+
+            // Create banking transaction if needed
+            if (accountRow.Type == EAccountType.Bank)
+            {
+                var medium = Household.BankingTransactionDataTable.ParseMediumString(scheduleItem.Medium);
+                household.BankingTransaction.Add(newTransactionRow, medium, 0);
+            }
 
             // Commit all line items
             foreach (var lineItem in scheduleItem.LineItems)
@@ -181,15 +189,36 @@ namespace BanaData.Logic.Dialogs.Listers
 
             // Update the transaction
             var transactionRow = household.Transaction.FindByID(scheduleRow.TransactionID);
+            var oldAccountRow = transactionRow.AccountRow;
+            var newAccountRow = household.Account.GetByName(updatedScheduleItem.Account);
+            if (oldAccountRow.Type == EAccountType.Bank)
+            {
+                if (newAccountRow.Type == EAccountType.Bank)
+                {
+                    var medium = Household.BankingTransactionDataTable.ParseMediumString(updatedScheduleItem.Medium);
+                    transactionRow.GetBankingTransaction().Medium = medium;
+                }
+                else
+                {
+                    transactionRow.GetBankingTransaction().Delete();
+                }
+            }
+            else if (newAccountRow.Type == EAccountType.Bank)
+            {
+                var medium = Household.BankingTransactionDataTable.ParseMediumString(updatedScheduleItem.Medium);
+                household.BankingTransaction.Add(transactionRow, medium, 0);
+            }
+
             household.Transaction.Update(
                 scheduleRow.TransactionID,
-                household.Account.GetByName(updatedScheduleItem.Account),
+                newAccountRow,
                 DateTime.MinValue,
                 updatedScheduleItem.Payee,
                 updatedScheduleItem.Memo,
                 ETransactionStatus.Pending,
                 household.Checkpoint.GetMostRecentCheckpointID(),
                 ETransactionType.ScheduledTransaction);
+
 
             // Get existing line items
             var existingLineItems = transactionRow.GetLineItemRows();

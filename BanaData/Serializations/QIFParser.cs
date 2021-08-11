@@ -1536,9 +1536,11 @@ namespace BanaData.Serializations
             foreach(Household.ScheduleRow scheduleRow in household.Schedule)
             {
                 var transactionRow = scheduleRow.TransactionRow;
+                var medium = transactionRow.AccountRow.Type == EAccountType.Bank ? transactionRow.GetBankingTransaction().Medium : ETransactionMedium.None;
                 var schedule = new SupplementalInfo.Schedule(
                     scheduleRow.NextDate, scheduleRow.EndDate, scheduleRow.Frequency, scheduleRow.Flags,
                     transactionRow.AccountRow.Name,
+                    medium,
                     transactionRow.IsPayeeNull() ? null : transactionRow.Payee,
                     transactionRow.IsMemoNull() ? null : transactionRow.Memo);
 
@@ -1718,13 +1720,18 @@ namespace BanaData.Serializations
 
                 // Build transaction
                 var transactionRow = household.Transaction.Add(
-                accountRow,
-                DateTime.MinValue,
-                schedule.Payee,
-                schedule.Memo,
-                ETransactionStatus.Pending,
-                checkpointID,
-                ETransactionType.ScheduledTransaction);
+                    accountRow,
+                    DateTime.MinValue,
+                    schedule.Payee,
+                    schedule.Memo,
+                    ETransactionStatus.Pending,
+                    checkpointID,
+                    ETransactionType.ScheduledTransaction);
+
+                if (accountRow.Type == EAccountType.Bank)
+                {
+                    household.BankingTransaction.Add(transactionRow, schedule.Medium, 0);
+                }
 
                 // Commit all line items
                 foreach (var lineItem in schedule.ScheduleLineItems)
@@ -1828,10 +1835,10 @@ namespace BanaData.Serializations
             {
                 public Schedule(
                     DateTime nextDate, DateTime endDate, EScheduleFrequency frequency, EScheduleFlag flags,
-                    string account, string payee, string memo)
+                    string account, ETransactionMedium medium, string payee, string memo)
                 {
                     (NextDate, EndDate, Frequency, Flags) = (nextDate, endDate, frequency, flags);
-                    (Account, Payee, Memo) = (account, payee, memo);
+                    (Account, Medium, Payee, Memo) = (account, medium, payee, memo);
                 }
 
                 public readonly DateTime NextDate;
@@ -1840,6 +1847,7 @@ namespace BanaData.Serializations
                 public readonly EScheduleFlag Flags;
 
                 public readonly string Account;
+                public readonly ETransactionMedium Medium;
                 public readonly string Payee;
                 public readonly string Memo;
                 public readonly List<ScheduleLineItem> ScheduleLineItems = new List<ScheduleLineItem>();

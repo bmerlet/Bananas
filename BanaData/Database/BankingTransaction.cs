@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Toolbox.Attributes;
 
 namespace BanaData.Database
 {
@@ -20,26 +21,86 @@ namespace BanaData.Database
                 get => (ETransactionMedium)IMedium;
                 set => IMedium = (int)value;
             }
-
-            public bool HasSame(ETransactionMedium medium, uint checkNumber)
-            {
-                if (Medium != medium)
-                {
-                    return false;
-                }
-
-                if (Medium == ETransactionMedium.Check && CheckNumber != checkNumber)
-                {
-                    return false;
-                }
-
-                return true;
-            }
-
         }
 
         partial class BankingTransactionDataTable
         {
+            //
+            // Medium helpers
+            //
+
+            // Strings for medium
+            static private readonly string MEDIUM_NEXTCHECKNUM = EnumDescriptionAttribute.GetDescription(ETransactionMedium.NextCheckNum);
+            static private readonly string MEDIUM_ATM = EnumDescriptionAttribute.GetDescription(ETransactionMedium.ATM);
+            static private readonly string MEDIUM_DEPOSIT = EnumDescriptionAttribute.GetDescription(ETransactionMedium.Deposit);
+            static private readonly string MEDIUM_DIVIDEND = EnumDescriptionAttribute.GetDescription(ETransactionMedium.Dividend);
+            static private readonly string MEDIUM_EFT = EnumDescriptionAttribute.GetDescription(ETransactionMedium.EFT);
+            static private readonly string MEDIUM_TRANSFER = EnumDescriptionAttribute.GetDescription(ETransactionMedium.Transfer);
+
+            public static string[] MediumSource { get; } =
+            {
+                MEDIUM_NEXTCHECKNUM, MEDIUM_ATM, MEDIUM_DEPOSIT, MEDIUM_DIVIDEND, MEDIUM_EFT, MEDIUM_TRANSFER
+            };
+
+            public static string GetMediumString(ETransactionMedium medium, uint checkNumber)
+            {
+                string rs = "???";
+
+                if (medium == ETransactionMedium.Check)
+                {
+                    if (checkNumber > 0)
+                    {
+                        rs = checkNumber.ToString();
+                    }
+                }
+                else
+                {
+                    rs = EnumDescriptionAttribute.GetDescription(medium);
+                }
+
+                return rs;
+            }
+
+            public static ETransactionMedium ParseMediumString(string str)
+            {
+                return EnumDescriptionAttribute.MatchDescription<ETransactionMedium>(str);
+            }
+
+            public static (ETransactionMedium medium, decimal checkNumber) ParseMediumString(string str, AccountRow accountRow)
+            {
+                decimal checkNumber = 0;
+                ETransactionMedium medium;
+
+                if (str == MEDIUM_NEXTCHECKNUM)
+                {
+                    medium = ETransactionMedium.Check;
+                    checkNumber = accountRow.GetRegularTransactionRows()
+                        .Select(tr => tr.GetBankingTransaction())
+                        .Where(btr => !btr.IsCheckNumberNull())
+                        .Select(btr => btr.CheckNumber)
+                        .Max();
+                    checkNumber += 1;
+                }
+                else if (MediumSource.Contains(str))
+                {
+                    medium = EnumDescriptionAttribute.MatchDescription<ETransactionMedium>(str);
+                }
+                else
+                {
+                    if (uint.TryParse(str, out uint checkNum))
+                    {
+                        medium = ETransactionMedium.Check;
+                        checkNumber = checkNum;
+                    }
+                    else
+                    {
+                        medium = ETransactionMedium.None;
+                    }
+                }
+
+                return (medium, checkNumber);
+            }
+
             public BankingTransactionRow Add(TransactionRow transactionRow, ETransactionMedium medium, uint checkNumber)
             {
                 var bankTransRow = NewBankingTransactionRow();

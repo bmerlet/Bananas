@@ -71,7 +71,7 @@
             <!-- Row 4: Notify afterwards -->
             <CheckBox Content="Notify when transaction is entered" Grid.Row="4" Grid.ColumnSpan="2" IsChecked="{Binding PromptBefore}"/>
             
-            <!-- Row 5: payment/deposit -->
+            <!-- Row 6: payment/deposit -->
             <TextBlock Text="Type:" Grid.Row="5"/>
             <ComboBox ItemsSource="{Binding TypeSource, Mode=OneTime}" SelectedItem="{Binding Type}" Grid.Row="5" Grid.Column="1" IsEditable="{Binding TypeEnabled}"/>
 
@@ -87,23 +87,27 @@
                 ListBoxHeight="150" ListBoxWidth="250"
                 Watermark="Account" Grid.Column="3"/>
 
-            <!-- Row 1: Payee -->
-            <TextBlock Text="Payee:" Grid.Row="1" Grid.Column="2"/>
-            <w:WatermarkTextBox Text="{Binding Payee, Mode=TwoWay}" Watermark="Payee" Grid.Row="1" Grid.Column="3"/>
+            <!-- Row 1: Medium -->
+            <TextBlock Text="Type:" Grid.Row="1" Grid.Column="2"/>
+            <ComboBox ItemsSource="{Binding MediumSource, Mode=OneTime}" SelectedItem="{Binding Medium}" Grid.Row="1" Grid.Column="3" IsEnabled="{Binding MediumEnabled}"/>
 
-            <!-- Row 2: Memo -->
-            <TextBlock Text="Memo:" Grid.Row="2" Grid.Column="2"/>
-            <w:WatermarkTextBox Text="{Binding Memo, Mode=TwoWay}" Watermark="Memo" Grid.Row="2" Grid.Column="3"/>
+            <!-- Row 2: Payee -->
+            <TextBlock Text="Payee:" Grid.Row="2" Grid.Column="2"/>
+            <w:WatermarkTextBox Text="{Binding Payee, Mode=TwoWay}" Watermark="Payee" Grid.Row="2" Grid.Column="3"/>
+
+            <!-- Row 3: Memo -->
+            <TextBlock Text="Memo:" Grid.Row="3" Grid.Column="2"/>
+            <w:WatermarkTextBox Text="{Binding Memo, Mode=TwoWay}" Watermark="Memo" Grid.Row="3" Grid.Column="3"/>
             
-            <!-- Row 3: Category -->
-            <TextBlock Text="Category:" Grid.Row="3" Grid.Column="2"/>
+            <!-- Row 4: Category -->
+            <TextBlock Text="Category:" Grid.Row="4" Grid.Column="2"/>
             <w:AutoCompleteTextBox 
                 Style="{StaticResource CategoryBoxStyle}" 
                 ItemsSource="{Binding Categories}"
                 IsEnabled="{Binding CategoryEnabled}"
                 Text="{Binding Category, Mode=TwoWay}"
-                Grid.Row="3" Grid.Column="3"/>
-            <Button Style="{StaticResource FormButton}" Content="Split..." Command="{Binding EditSplit}"  Grid.Row="3" Grid.Column="4"/>
+                Grid.Row="4" Grid.Column="3"/>
+            <Button Style="{StaticResource FormButton}" Content="Split..." Command="{Binding EditSplit}"  Grid.Row="4" Grid.Column="4"/>
 
             <!-- Row 5: Amount -->
             <TextBlock Text="Amount:" Grid.Row="5" Grid.Column="2"/>

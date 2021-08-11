@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Toolbox.Attributes;
 using BanaData.Database;
 using BanaData.Logic.Main;
 
@@ -16,10 +17,10 @@ namespace BanaData.Logic.Items
         // Constructors
         public ScheduleItem(
             int id, DateTime nextDate, DateTime endDate, EScheduleFrequency frequency, EScheduleFlag flags,
-            int transactionID, string account, string payee, string memo, LineItem[] lineItems)
+            int transactionID, string account, string medium, string payee, string memo, LineItem[] lineItems)
         {
             (ID, NextDate, EndDate, Frequency, Flags) = (id, nextDate, endDate, frequency, flags);
-            (TransactionID, Account, Payee, Memo, LineItems) = (transactionID, account, payee, memo, lineItems);
+            (TransactionID, Account, Medium, Payee, Memo, LineItems) = (transactionID, account, medium, payee, memo, lineItems);
         }
 
         public ScheduleItem(MainWindowLogic mainWindowLogic, Household.ScheduleRow scheduleRow)
@@ -32,6 +33,10 @@ namespace BanaData.Logic.Items
             Memo = transactionRow.IsMemoNull() ? "" : transactionRow.Memo;
             var lineItemRows = transactionRow.GetLineItemRows();
             var lis = new List<LineItem>();
+            if (transactionRow.AccountRow.Type == EAccountType.Bank)
+            {
+                Medium = EnumDescriptionAttribute.GetDescription(transactionRow.GetBankingTransaction().Medium);
+            }
             foreach(var lir in lineItemRows)
             {
                 lis.Add(new LineItem(mainWindowLogic, lir, true));
@@ -54,6 +59,7 @@ namespace BanaData.Logic.Items
 
         // Transaction
         public string Account { get; }
+        public string Medium { get; }
         public string Payee { get; }
         public string Memo { get; }
         public string Category => LineItems.Length == 1 ? LineItems[0].Category : "<Split>";

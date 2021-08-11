@@ -101,7 +101,10 @@ namespace BanaData.Database
         Dividend,
 
         [EnumDescription("")]
-        None
+        None,
+
+        [EnumDescription("Next check num")]
+        NextCheckNum
     };
 
     // Memorized transaction type

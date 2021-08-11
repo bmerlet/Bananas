@@ -60,22 +60,11 @@ namespace BanaData.Logic.Main
         // Medium of transaction
         public string Medium 
         {
-            get => GetMediumString();
+            get => Household.BankingTransactionDataTable.GetMediumString(data.Medium, data.CheckNumber);
             set => ParseMediumString(value);
         }
 
-        // Strings for medium
-        private const string MEDIUM_NEXTCHECKNUM = "Next Check Num";
-        static private readonly string MEDIUM_ATM = EnumDescriptionAttribute.GetDescription(ETransactionMedium.ATM);
-        static private readonly string MEDIUM_DEPOSIT = EnumDescriptionAttribute.GetDescription(ETransactionMedium.Deposit);
-        static private readonly string MEDIUM_DIVIDEND = EnumDescriptionAttribute.GetDescription(ETransactionMedium.Dividend);
-        static private readonly string MEDIUM_EFT = EnumDescriptionAttribute.GetDescription(ETransactionMedium.EFT);
-        static private readonly string MEDIUM_TRANSFER = EnumDescriptionAttribute.GetDescription(ETransactionMedium.Transfer);
-
-        public string[] MediumSource { get; } =
-        {
-            MEDIUM_NEXTCHECKNUM, MEDIUM_ATM, MEDIUM_DEPOSIT, MEDIUM_DIVIDEND, MEDIUM_EFT, MEDIUM_TRANSFER
-        };
+        public string[] MediumSource { get; } = Household.BankingTransactionDataTable.MediumSource;
 
         // Category
         public string Category
@@ -464,71 +453,23 @@ namespace BanaData.Logic.Main
             }
         }
 
-        private string GetMediumString()
-        {
-            string rs = "???";
-
-            var _data = data as BankTransactionData;
-            if (_data.Medium == ETransactionMedium.Check)
-            {
-                if (_data.CheckNumber > 0)
-                {
-                    rs = _data.CheckNumber.ToString();
-                }
-            }
-            else
-            {
-                rs = EnumDescriptionAttribute.GetDescription(_data.Medium);
-            }
-
-            return rs;
-        }
-
         private void ParseMediumString(string type)
         {
-            var _data = data as BankTransactionData;
-            _data.CheckNumber = 0;
+            (ETransactionMedium medium, decimal checkNumber) = Household.BankingTransactionDataTable.ParseMediumString(type, accountRow);
 
-            if (type == MEDIUM_NEXTCHECKNUM)
+            if (data.Medium != medium)
             {
-                _data.Medium = ETransactionMedium.Check;
-                _data.CheckNumber = GetNextCheckNumber();
+                data.Medium = medium;
+                OnPropertyChanged(() => Medium);
+                OnPropertyChanged(() => IsDepositTabStop);
+                OnPropertyChanged(() => IsPaymentTabStop);
+            }
+
+            if (data.CheckNumber != (uint)checkNumber)
+            {
+                data.CheckNumber = (uint)checkNumber;
                 OnPropertyChanged(() => Medium);
             }
-            else if (MediumSource.Contains(type))
-            {
-                _data.Medium = EnumDescriptionAttribute.MatchDescription<ETransactionMedium>(type);
-            }
-            else
-            {
-                if (uint.TryParse(type, out uint checkNum))
-                {
-                    _data.Medium = ETransactionMedium.Check;
-                    _data.CheckNumber = checkNum;
-                }
-                else
-                {
-                    _data.Medium = ETransactionMedium.None;
-                }
-            }
-
-            OnPropertyChanged(() => IsDepositTabStop);
-            OnPropertyChanged(() => IsPaymentTabStop);
-        }
-
-        private uint GetNextCheckNumber()
-        {
-            uint result = 0;
-
-            foreach(BankingTransactionLogic btl in bankRegisterLogic.RegisterItems)
-            {
-                if (btl != this)
-                {
-                    result = Math.Max(result, ((BankTransactionData)(btl.data)).CheckNumber);
-                }
-            }
-
-            return result + 1;
         }
 
         #endregion
