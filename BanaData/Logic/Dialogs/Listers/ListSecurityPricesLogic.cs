@@ -226,11 +226,6 @@ namespace BanaData.Logic.Dialogs.Listers
 
             // Delete line item command
             DeleteDatePrice = new CommandBase(OnDeleteLineItem);
-
-            // Select first transaction
-            logicIsChangingSelection = true;
-            SelectedDatePrice = datePriceItems[0];
-            logicIsChangingSelection = false;
         }
 
         #endregion

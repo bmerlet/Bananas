@@ -170,7 +170,6 @@ namespace BanaData.Logic.Dialogs.Listers
                 newTransactionRow);
 
             mainWindowLogic.CommitChanges();
-            mainWindowLogic.CheckForScheduledTransactions();
 
             // Recreate schedule with correct IDs
             return new ScheduleItem(mainWindowLogic, newScheduleRow);
@@ -299,7 +298,6 @@ namespace BanaData.Logic.Dialogs.Listers
             }
 
             mainWindowLogic.CommitChanges();
-            mainWindowLogic.CheckForScheduledTransactions();
 
             // Recreate memorized payee with correct IDs
             return new ScheduleItem(mainWindowLogic, scheduleRow);

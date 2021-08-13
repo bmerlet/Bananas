@@ -34,7 +34,7 @@ namespace XamlUI.Dialogs.Listers
             logic.ReinvestedDividends.CollectionChanged += (s, e) => BuildGraph();
             logic.Trades.CollectionChanged += (s, e) => BuildGraph();
             logic.PropertyChanged += OnPropertyChanged;
-            Loaded += (s, e) => BuildGraph();
+            Loaded += (s, e) => { logic.Register.OnLoaded(); BuildGraph(); };
         }
 
         private void OnPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

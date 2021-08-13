@@ -527,6 +527,7 @@ namespace BanaData.Logic.Main
         public void CheckForScheduledTransactions()
         {
             var now = DateTime.Today;
+            bool changesToCommit = false;
 
             foreach(var scheduleRow in Household.Schedule)
             {
@@ -591,6 +592,15 @@ namespace BanaData.Logic.Main
                                 transactionRow.CreatePeerTransaction(litr.AccountID, lineItemRow, -lineItemRow.Amount);
                             }
                         }
+
+                        // Update balances
+                        UpdateAccountNamesAndBalances(new int[] { str.AccountID });
+
+                        // Update register if open
+                        if (DisplayedAccountID == str.AccountID)
+                        {
+                            BankRegister.AddTransaction(transactionRow.ID);
+                        }
                     }
 
                     // Update next date
@@ -599,33 +609,33 @@ namespace BanaData.Logic.Main
                         switch(scheduleRow.Frequency)
                         {
                             case EScheduleFrequency.Daily:
-                                scheduleRow.NextDate.AddDays(1);
+                                scheduleRow.NextDate = scheduleRow.NextDate.AddDays(1);
                                 break;
                             case EScheduleFrequency.Weekly:
-                                scheduleRow.NextDate.AddDays(7);
+                                scheduleRow.NextDate = scheduleRow.NextDate.AddDays(7);
                                 break;
                             case EScheduleFrequency.Biweekly:
-                                scheduleRow.NextDate.AddDays(14);
+                                scheduleRow.NextDate = scheduleRow.NextDate.AddDays(14);
                                 break;
                             case EScheduleFrequency.SemiMonthly:
                                 if (scheduleRow.NextDate.Day >= 15)
                                 {
-                                    scheduleRow.NextDate.AddDays(-15);
-                                    scheduleRow.NextDate.AddMonths(1);
+                                    scheduleRow.NextDate = scheduleRow.NextDate.AddDays(-15);
+                                    scheduleRow.NextDate = scheduleRow.NextDate.AddMonths(1);
                                 }
                                 else
                                 {
-                                    scheduleRow.NextDate.AddDays(14);
+                                    scheduleRow.NextDate = scheduleRow.NextDate.AddDays(14);
                                 }
                                 break;
                             case EScheduleFrequency.Monthly:
-                                scheduleRow.NextDate.AddMonths(1);
+                                scheduleRow.NextDate = scheduleRow.NextDate.AddMonths(1);
                                 break;
                             case EScheduleFrequency.Quarterly:
-                                scheduleRow.NextDate.AddMonths(3);
+                                scheduleRow.NextDate = scheduleRow.NextDate.AddMonths(3);
                                 break;
                             case EScheduleFrequency.Yearly:
-                                scheduleRow.NextDate.AddYears(1);
+                                scheduleRow.NextDate = scheduleRow.NextDate.AddYears(1);
                                 break;
                         }
                         CommitChanges();
@@ -638,6 +648,35 @@ namespace BanaData.Logic.Main
                         ErrorMessage($"Note: Entered the scheduled transaction on account {scheduleItem.Account}, category {scheduleItem.Category} for {scheduleItem.Amount:N2}.");
                     }
                 }
+
+                if (now.CompareTo(scheduleRow.EndDate) >= 0)
+                {
+                    var scheduleItem = new ScheduleItem(this, scheduleRow);
+                    bool del = YesNoQuestion($"Scheduled transaction on account {scheduleItem.Account}, category {scheduleItem.Category} for {scheduleItem.Amount:N2} has expired - delete it?");
+                    if (del)
+                    {
+                        var str = scheduleRow.TransactionRow;
+                        foreach (var li in str.GetLineItemRows())
+                        {
+                            li.CascadeDelete();
+                        }
+
+                        if (str.AccountRow.Type == EAccountType.Bank)
+                        {
+                            str.GetBankingTransaction().Delete();
+                        }
+
+                        scheduleRow.Delete();
+                        str.Delete();
+
+                        changesToCommit = true;
+                    }
+                }
+            } // for all schedules
+
+            if (changesToCommit)
+            {
+                CommitChanges();
             }
         }
 

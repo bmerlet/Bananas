@@ -69,7 +69,7 @@
             <CheckBox Content="Ask before entering the transaction" Grid.Row="3" Grid.ColumnSpan="2" IsChecked="{Binding PromptBefore}"/>
 
             <!-- Row 4: Notify afterwards -->
-            <CheckBox Content="Notify when transaction is entered" Grid.Row="4" Grid.ColumnSpan="2" IsChecked="{Binding PromptBefore}"/>
+            <CheckBox Content="Notify when transaction is entered" Grid.Row="4" Grid.ColumnSpan="2" IsChecked="{Binding NotifyAfter}"/>
             
             <!-- Row 6: payment/deposit -->
             <TextBlock Text="Type:" Grid.Row="5"/>

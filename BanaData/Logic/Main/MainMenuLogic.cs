@@ -288,6 +288,7 @@ namespace BanaData.Logic.Main
         {
             var logic = new ListSchedulesLogic(mainWindow);
             mainWindow.GuiServices.ShowDialog(logic);
+            mainWindow.CheckForScheduledTransactions();
         }
 
         #endregion

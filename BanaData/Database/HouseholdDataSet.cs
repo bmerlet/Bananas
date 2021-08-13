@@ -39,6 +39,11 @@ namespace BanaData.Database
                 DateTime mostRecent = DateTime.MinValue;
                 int id = -1;
 
+                if (Rows.Count == 0)
+                {
+                    AddCheckpointRow(DateTime.Now);
+                }
+
                 foreach (CheckpointRow checkpointRow in Rows)
                 {
                     if (checkpointRow.Date.CompareTo(mostRecent) > 0)
