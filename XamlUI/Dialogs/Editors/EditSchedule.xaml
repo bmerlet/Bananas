@@ -58,8 +58,8 @@
             <w:DateBox Date="{Binding NextDate, Mode=TwoWay}" Grid.Column="1"/>
 
             <!-- Row 1: End date -->
-            <TextBlock Text="End date:" Grid.Row="1"/>
-            <w:DateBox Date="{Binding EndDate, Mode=TwoWay}" Grid.Row="1" Grid.Column="1"/>
+            <CheckBox Content="End date:" IsChecked="{Binding Expires, Mode=TwoWay}" Grid.Row="1"/>
+            <w:DateBox Date="{Binding EndDate, Mode=TwoWay}" IsEnabled="{Binding EndDateEnabled}" Grid.Row="1" Grid.Column="1"/>
 
             <!-- Row 2: Frequency -->
             <TextBlock Text="Frequency:" Grid.Row="2"/>

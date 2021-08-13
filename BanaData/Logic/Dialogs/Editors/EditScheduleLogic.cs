@@ -57,6 +57,7 @@ namespace BanaData.Logic.Dialogs.Editors
 
         // End date
         public DateTime EndDate { get; set; }
+        public bool? EndDateEnabled => flags.HasFlag(EScheduleFlag.Expires);
 
         // Frequency
         public string Frequency { get; set; }
@@ -74,6 +75,12 @@ namespace BanaData.Logic.Dialogs.Editors
         {
             get => flags.HasFlag(EScheduleFlag.NotifyAfter);
             set => flags = value == true ? flags | EScheduleFlag.NotifyAfter : flags & ~EScheduleFlag.NotifyAfter;
+        }
+
+        public bool? Expires
+        {
+            get => flags.HasFlag(EScheduleFlag.Expires);
+            set { flags = value == true ? flags | EScheduleFlag.Expires : flags & ~EScheduleFlag.Expires; OnPropertyChanged(() => EndDateEnabled); }
         }
 
         // Account name

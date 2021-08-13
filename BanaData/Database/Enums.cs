@@ -255,6 +255,7 @@ namespace BanaData.Database
     {
         None = 0,
         PromptBefore = 0x1,
-        NotifyAfter = 0x2
+        NotifyAfter = 0x2,
+        Expires = 0x4
     }
 }

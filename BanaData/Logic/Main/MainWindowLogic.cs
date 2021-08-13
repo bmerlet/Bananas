@@ -649,7 +649,7 @@ namespace BanaData.Logic.Main
                     }
                 }
 
-                if (now.CompareTo(scheduleRow.EndDate) >= 0)
+                if (scheduleRow.Flags.HasFlag(EScheduleFlag.Expires) && now.CompareTo(scheduleRow.EndDate) >= 0)
                 {
                     var scheduleItem = new ScheduleItem(this, scheduleRow);
                     bool del = YesNoQuestion($"Scheduled transaction on account {scheduleItem.Account}, category {scheduleItem.Category} for {scheduleItem.Amount:N2} has expired - delete it?");

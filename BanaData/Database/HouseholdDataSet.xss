@@ -332,18 +332,6 @@
         </Point>
       </RoutePoints>
     </Connector>
-    <Connector ID="DesignRelation:Transaction_LineItemTransfer" ZOrder="5" LineWidth="11">
-      <RoutePoints>
-        <Point>
-          <X>427</X>
-          <Y>218</Y>
-        </Point>
-        <Point>
-          <X>427</X>
-          <Y>395</Y>
-        </Point>
-      </RoutePoints>
-    </Connector>
     <Connector ID="DesignRelation:FK_Transaction_Schedule" ZOrder="1" LineWidth="11">
       <RoutePoints>
         <Point>
@@ -357,6 +345,18 @@
         <Point>
           <X>693</X>
           <Y>269</Y>
+        </Point>
+      </RoutePoints>
+    </Connector>
+    <Connector ID="DesignRelation:Transaction_LineItemTransfer" ZOrder="5" LineWidth="11">
+      <RoutePoints>
+        <Point>
+          <X>427</X>
+          <Y>218</Y>
+        </Point>
+        <Point>
+          <X>427</X>
+          <Y>395</Y>
         </Point>
       </RoutePoints>
     </Connector>
