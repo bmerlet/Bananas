@@ -25,9 +25,6 @@ namespace XamlUI.Dialogs.Listers
             // Use the view model as data context
             this.DataContext = logic;
 
-            // Tell the view model how to close this dialog
-            logic.CloseView = result => DialogResult = result;
-
             InitializeComponent();
 
             logic.Quotes.CollectionChanged += (s, e) => BuildGraph();
@@ -98,7 +95,7 @@ namespace XamlUI.Dialogs.Listers
             {
                 double x = (p.Date - logic.StartDate).TotalDays / spanInDays * canvasWidth;
                 x += marginX;
-                double y = (double)((p.Price - minPrice) / (maxPrice - minPrice + 1)) * canvasHeight;
+                double y = (double)((p.Price - minPrice) / (maxPrice - minPrice + 0.01M)) * canvasHeight;
                 y = marginY + canvasHeight - y;
 
                 if (lastX != double.MinValue)

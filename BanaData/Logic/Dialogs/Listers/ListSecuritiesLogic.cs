@@ -146,10 +146,8 @@ namespace BanaData.Logic.Dialogs.Listers
             if (SelectedSecurity != null)
             {
                 var logic = new ListSecurityPricesLogic(mainWindowLogic, SelectedSecurity);
-                if (mainWindowLogic.GuiServices.ShowDialog(logic))
-                {
-                    mainWindowLogic.UpdateAccountNamesAndBalances(null);
-                }
+                mainWindowLogic.GuiServices.ShowDialog(logic);
+                mainWindowLogic.UpdateAccountNamesAndBalances(null);
             }
         }
 

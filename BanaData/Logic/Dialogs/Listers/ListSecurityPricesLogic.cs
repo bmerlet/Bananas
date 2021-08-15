@@ -18,7 +18,7 @@ namespace BanaData.Logic.Dialogs.Listers
     /// <summary>
     /// Security price logic: Handles the security price register and the security value graph
     /// </summary>
-    public class ListSecurityPricesLogic : LogicDialogBase
+    public class ListSecurityPricesLogic : LogicBase
     {
         #region Private members
 
@@ -81,20 +81,20 @@ namespace BanaData.Logic.Dialogs.Listers
         public DateTime EndDate { get => endDate; set => SetCustomDateRange(startDate, value); }
 
         // Price points
-        public WpfObservableRangeCollection<DatePriceItem> Quotes { get; } =
-            new WpfObservableRangeCollection<DatePriceItem>();
+        public WpfObservableRangeCollection<DatePriceGraphItem> Quotes { get; } =
+            new WpfObservableRangeCollection<DatePriceGraphItem>();
 
         // Dividend reinvestments date and price
         private bool showReinvDivs = true;
         public bool? ShowReinvDivs { get => showReinvDivs; set { showReinvDivs = value == true; OnPropertyChanged(() => ShowReinvDivs); } }
-        public WpfObservableRangeCollection<DatePriceItem> ReinvestedDividends { get; } =
-            new WpfObservableRangeCollection<DatePriceItem>();
+        public WpfObservableRangeCollection<DatePriceGraphItem> ReinvestedDividends { get; } =
+            new WpfObservableRangeCollection<DatePriceGraphItem>();
 
         // Sale/Purchase date and price
         private bool showTrades = true;
         public bool? ShowTrades { get => showTrades; set { showTrades = value == true; OnPropertyChanged(() => ShowTrades); } }
-        public WpfObservableRangeCollection<DatePriceItem> Trades { get; } =
-            new WpfObservableRangeCollection<DatePriceItem>();
+        public WpfObservableRangeCollection<DatePriceGraphItem> Trades { get; } =
+            new WpfObservableRangeCollection<DatePriceGraphItem>();
 
         #endregion
 
@@ -156,7 +156,7 @@ namespace BanaData.Logic.Dialogs.Listers
                 .Where(sp => sp.SecurityID == securityItem.ID)
                 .Where(sp => sp.Date.CompareTo(startDate) >= 0)
                 .Where(sp => sp.Date.CompareTo(endDate) <= 0)
-                .Select(sp => new DatePriceItem(sp)));
+                .Select(sp => new DatePriceGraphItem(sp)));
 
             ReinvestedDividends.ReplaceRange(
                 mainWindowLogic.Household.InvestmentTransaction
@@ -167,7 +167,7 @@ namespace BanaData.Logic.Dialogs.Listers
                 .Where(it => it.SecurityID == securityItem.ID)
                 .Where(it => it.TransactionRow.Date.CompareTo(startDate) >= 0)
                 .Where(it => it.TransactionRow.Date.CompareTo(endDate) <= 0)
-                .Select(it => new DatePriceItem(it)));
+                .Select(it => new DatePriceGraphItem(it)));
 
             Trades.ReplaceRange(
                 mainWindowLogic.Household.InvestmentTransaction
@@ -178,12 +178,7 @@ namespace BanaData.Logic.Dialogs.Listers
                 .Where(it => it.SecurityID == securityItem.ID)
                 .Where(it => it.TransactionRow.Date.CompareTo(startDate) >= 0)
                 .Where(it => it.TransactionRow.Date.CompareTo(endDate) <= 0)
-                .Select(it => new DatePriceItem(it)));
-        }
-
-        protected override bool? Commit()
-        {
-            return Register.SaveChanges();
+                .Select(it => new DatePriceGraphItem(it)));
         }
 
         #endregion
@@ -215,7 +210,7 @@ namespace BanaData.Logic.Dialogs.Listers
             datePriceItems = new ObservableCollection<DatePriceItem>();
             foreach (var securityPrice in household.SecurityPrice.Where(sp => sp.SecurityID == securityID))
             {
-                datePriceItems.Add(new DatePriceItem(securityPrice));
+                datePriceItems.Add(new DatePriceItem(mainWindowLogic, securityPrice));
             }
 
             // Update graph when a line is deleted
@@ -326,7 +321,7 @@ namespace BanaData.Logic.Dialogs.Listers
             if (datePriceItems.Count == 0)
             {
                 // Need to add a new item
-                datePriceItems.Add(new DatePriceItem());
+                datePriceItems.Add(new DatePriceItem(mainWindowLogic, securityID));
             }
 
             selectedDatePrice = datePriceItems[0];
@@ -368,6 +363,7 @@ namespace BanaData.Logic.Dialogs.Listers
                 }
 
                 selectedDatePrice.EndEdit();
+                listSecurityPricesLogic.UpdateGraph();
             }
 
             if (GetNextTransaction(selectedDatePrice) is DatePriceItem nextDatePrice)
@@ -379,7 +375,7 @@ namespace BanaData.Logic.Dialogs.Listers
             else
             {
                 // Need to add a new item
-                var dpi = new DatePriceItem();
+                var dpi = new DatePriceItem(mainWindowLogic, securityID);
                 datePriceItems.Add(dpi);
 
                 logicIsChangingSelection = true;
@@ -408,88 +404,38 @@ namespace BanaData.Logic.Dialogs.Listers
                 return;
             }
 
-            if (dpi == editedDatePrice)
+            // Select next line item (if it exists) or previous one
+            int ix = datePriceItems.IndexOf(dpi);
+            if (ix < datePriceItems.Count - 1)
             {
-                // Select next line item (if it exists) or previous one
-                int ix = datePriceItems.IndexOf(dpi);
-                if (ix < datePriceItems.Count - 1)
-                {
-                    ix += 1;
-                }
-                else
-                {
-                    ix -= 1;
-                }
-
-                logicIsChangingSelection = true;
-                SelectedDatePrice = datePriceItems[ix];
-                logicIsChangingSelection = false;
+                ix += 1;
             }
+            else
+            {
+                ix -= 1;
+            }
+
+            logicIsChangingSelection = true;
+            SelectedDatePrice = datePriceItems[ix];
+            logicIsChangingSelection = false;
+
+            dpi.Delete();
             datePriceItems.Remove(dpi);
-        }
-
-        public bool SaveChanges()
-        {
-            bool change = false;
-            var household = mainWindowLogic.Household;
-            var securityRow = household.Security.FindByID(securityID);
-
-            // Delete all deleted items
-            var toDelete = new List<Household.SecurityPriceRow>();
-            foreach (var securityPriceRow in household.SecurityPrice.Where(sp => sp.SecurityID == securityID))
-            {
-                if (datePriceItems.FirstOrDefault(dpi => dpi.SecurityPriceRow == securityPriceRow) == null)
-                {
-                    toDelete.Add(securityPriceRow);
-                    change = true;
-                }
-            }
-            toDelete.ForEach(td => td.Delete());
-
-            // Commit all the changed and new items
-            foreach(var dpi in datePriceItems)
-            {
-                if (dpi.SecurityPriceRow == null)
-                {
-                    if (dpi.Price != 0)
-                    {
-                        change = true;
-                        var row = household.SecurityPrice.NewSecurityPriceRow();
-                        household.SecurityPrice.AddSecurityPriceRow(securityRow, dpi.Date, dpi.Price);
-                    }
-                }
-                else
-                {
-                    if (dpi.SecurityPriceRow.Date != dpi.Date)
-                    {
-                        dpi.SecurityPriceRow.Date = dpi.Date;
-                        change = true;
-                    }
-                    if (dpi.SecurityPriceRow.Value != dpi.Price)
-                    {
-                        dpi.SecurityPriceRow.Value = dpi.Price;
-                        change = true;
-                    }
-                }
-            }
-
-            if (change)
-            {
-                mainWindowLogic.CommitChanges();
-            }
-
-            return change;
         }
 
         #endregion
     }
 
     /// <summary>
-    /// Price-at a date class
+    /// Price-at a date class for register
     /// </summary>
     public class DatePriceItem : LogicBase, IEditableObject
     {
         #region Private members
+
+        private readonly MainWindowLogic mainWindowLogic;
+        private Household.SecurityPriceRow securityPriceRow;
+        private readonly int securityID;
 
         private struct Data
         {
@@ -506,29 +452,147 @@ namespace BanaData.Logic.Dialogs.Listers
         #region Constructors
 
         // Create a date price from a security price row
-        public DatePriceItem(Household.SecurityPriceRow securityPriceRow)
+        public DatePriceItem(MainWindowLogic _mainWindowLogic, Household.SecurityPriceRow _securityPriceRow)
+        {
+            mainWindowLogic = _mainWindowLogic;
+            securityPriceRow = _securityPriceRow;
+
+            data.Date = securityPriceRow.Date;
+            data.Price = securityPriceRow.Value;
+        }
+
+        // Create the open date/price
+        public DatePriceItem(MainWindowLogic _mainWindowLogic, int _securityID)
+        {
+            mainWindowLogic = _mainWindowLogic;
+            securityID = _securityID;
+
+            data.Date = DateTime.Now;
+        }
+
+        #endregion
+
+        #region Logic properties
+
+
+        #endregion
+
+        #region UI properties
+
+        public DateTime Date { get => data.Date; set => data.Date = value; }
+        public decimal Price { get => data.Price; set => data.Price = value; }
+
+        public string Tip { get; private set; }
+
+        #endregion
+
+        #region Editable object implementation
+
+        public void BeginEdit()
+        {
+            if (!editing)
+            {
+                // Backup the data
+                backup = data;
+                editing = true;
+            }
+        }
+
+        public void EndEdit()
+        {
+            if (editing)
+            {
+                // Publish data
+                editing = false;
+                OnPropertyChanged(() => Date);
+                OnPropertyChanged(() => Price);
+                OnPropertyChanged(() => Tip);
+
+                // Save in DB
+                if (mainWindowLogic != null)
+                {
+                    if (securityPriceRow != null)
+                    {
+                        securityPriceRow.Date = data.Date;
+                        securityPriceRow.Value = data.Price;
+                    }
+                    else
+                    {
+                        var securityRow = mainWindowLogic.Household.Security.FindByID(securityID);
+                        securityPriceRow = mainWindowLogic.Household.SecurityPrice.AddSecurityPriceRow(securityRow, data.Date, data.Price);
+                    }
+                    mainWindowLogic.CommitChanges();
+                }
+            }
+        }
+
+        public void CancelEdit()
+        {
+            if (editing)
+            {
+                // Recover from backup data
+                editing = false;
+                data = backup;
+                OnPropertyChanged(() => Date);
+                OnPropertyChanged(() => Price);
+            }
+        }
+
+        public void Delete()
+        {
+            if (securityPriceRow != null)
+            {
+                securityPriceRow.Delete();
+                securityPriceRow = null;
+                mainWindowLogic.CommitChanges();
+            }
+        }
+
+        #endregion
+
+        #region Overrides
+
+        public override bool Equals(object obj)
+        {
+            return
+                obj is DatePriceItem o &&
+                o.Date == Date &&
+                o.Price == Price;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        #endregion
+    }
+
+    /// <summary>
+    /// Price-at a date class for graph
+    /// </summary>
+    public class DatePriceGraphItem : LogicBase
+    {
+        #region Constructors
+
+        // Create a date price from a security price row
+        public DatePriceGraphItem(Household.SecurityPriceRow securityPriceRow)
         {
             SecurityPriceRow = securityPriceRow;
             InvestmentTransactionRow = null;
-            data.Date = securityPriceRow.Date;
-            data.Price = securityPriceRow.Value;
+            Date = securityPriceRow.Date;
+            Price = securityPriceRow.Value;
             UpdateTip();
         }
 
         // Create a date price from an investment transaction row
-        public DatePriceItem(Household.InvestmentTransactionRow investmentTransactionRow)
+        public DatePriceGraphItem(Household.InvestmentTransactionRow investmentTransactionRow)
         {
             SecurityPriceRow = null;
             InvestmentTransactionRow = investmentTransactionRow;
-            data.Date = investmentTransactionRow.TransactionRow.Date;
-            data.Price = investmentTransactionRow.SecurityPrice;
+            Date = investmentTransactionRow.TransactionRow.Date;
+            Price = investmentTransactionRow.SecurityPrice;
             UpdateTip();
-        }
-
-        // Create the open date/price
-        public DatePriceItem()
-        {
-            data.Date = DateTime.Now;
         }
 
         private void UpdateTip()
@@ -573,49 +637,10 @@ namespace BanaData.Logic.Dialogs.Listers
 
         #region UI properties
 
-        public DateTime Date { get => data.Date; set => data.Date = value; }
-        public decimal Price { get => data.Price; set => data.Price = value; }
+        public DateTime Date { get; }
+        public decimal Price { get; }
 
         public string Tip { get; private set; }
-
-        #endregion
-
-        #region Editable object implementation
-
-        public void BeginEdit()
-        {
-            if (!editing)
-            {
-                // Backup the data
-                backup = data;
-                editing = true;
-            }
-        }
-
-        public void EndEdit()
-        {
-            if (editing)
-            {
-                // Publish data
-                editing = false;
-                UpdateTip();
-                OnPropertyChanged(() => Date);
-                OnPropertyChanged(() => Price);
-                OnPropertyChanged(() => Tip);
-            }
-        }
-
-        public void CancelEdit()
-        {
-            if (editing)
-            {
-                // Recover from backup data
-                editing = false;
-                data = backup;
-                OnPropertyChanged(() => Date);
-                OnPropertyChanged(() => Price);
-            }
-        }
 
         #endregion
 
@@ -624,7 +649,9 @@ namespace BanaData.Logic.Dialogs.Listers
         public override bool Equals(object obj)
         {
             return
-                obj is DatePriceItem o &&
+                obj is DatePriceGraphItem o &&
+                o.SecurityPriceRow == SecurityPriceRow &&
+                o.InvestmentTransactionRow == InvestmentTransactionRow &&
                 o.Date == Date &&
                 o.Price == Price;
         }
@@ -636,5 +663,4 @@ namespace BanaData.Logic.Dialogs.Listers
 
         #endregion
     }
-
 }
