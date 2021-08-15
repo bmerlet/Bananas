@@ -27,16 +27,13 @@ namespace XamlUI.Dialogs.Listers
 
             InitializeComponent();
 
-            logic.Quotes.CollectionChanged += (s, e) => BuildGraph();
-            logic.ReinvestedDividends.CollectionChanged += (s, e) => BuildGraph();
-            logic.Trades.CollectionChanged += (s, e) => BuildGraph();
             logic.PropertyChanged += OnPropertyChanged;
             Loaded += (s, e) => { logic.Register.OnLoaded(); BuildGraph(); };
         }
 
         private void OnPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "ShowReinvDivs" || e.PropertyName == "ShowTrades")
+            if (e.PropertyName == "UpdateGraphSignal")
             {
                 BuildGraph();
             }

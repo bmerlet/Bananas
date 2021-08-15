@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,7 +13,6 @@ using Toolbox.Models;
 using BanaData.Database;
 using BanaData.Serializations;
 using BanaData.Logic.Items;
-using BanaData.Logic.Dialogs;
 using BanaData.Logic.Dialogs.Reports;
 using BanaData.Logic.Dialogs.Basics;
 using System.IO;
@@ -912,7 +910,7 @@ namespace BanaData.Logic.Main
         }
 
         // Builds or rebuilds the list of categories
-        private void BuildCategoriesList()
+        public void BuildCategoriesList()
         {
             Categories.Clear();
             Transfers.Clear();

@@ -96,6 +96,9 @@ namespace BanaData.Logic.Dialogs.Listers
         public WpfObservableRangeCollection<DatePriceGraphItem> Trades { get; } =
             new WpfObservableRangeCollection<DatePriceGraphItem>();
 
+        // Graph generator
+        public bool UpdateGraphSignal { get; private set; }
+
         #endregion
 
         #region Actions
@@ -179,6 +182,9 @@ namespace BanaData.Logic.Dialogs.Listers
                 .Where(it => it.TransactionRow.Date.CompareTo(startDate) >= 0)
                 .Where(it => it.TransactionRow.Date.CompareTo(endDate) <= 0)
                 .Select(it => new DatePriceGraphItem(it)));
+
+            UpdateGraphSignal = !UpdateGraphSignal;
+            OnPropertyChanged(() => UpdateGraphSignal);
         }
 
         #endregion

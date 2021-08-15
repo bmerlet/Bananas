@@ -231,6 +231,7 @@ namespace XamlUI.Widgets
             {
                 editor.TextChanged += OnEditorTextChanged;
                 editor.LostFocus += OnEditorLostFocus;
+                editor.LostKeyboardFocus += OnEditorLostKeyboardFocus;
                 editor.PreviewKeyDown += OnEditorPreviewKeyDown;
             }
 
@@ -271,6 +272,15 @@ namespace XamlUI.Widgets
         //
         // Lost focus: close popup if really lost focus
         private void OnEditorLostFocus(object sender, RoutedEventArgs e)
+        {
+            if (!IsKeyboardFocusWithin)
+            {
+                IsPopupOpen = false;
+                selector.Items.Filter = null;
+            }
+        }
+
+        private void OnEditorLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             if (!IsKeyboardFocusWithin)
             {

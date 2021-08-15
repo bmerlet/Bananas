@@ -143,6 +143,7 @@ namespace BanaData.Logic.Dialogs.Listers
 
             mainWindowLogic.CommitChanges();
             mainWindowLogic.UpdateAccountNamesAndBalances(null);
+            mainWindowLogic.BuildCategoriesList();
 
             // Note that a new ID is created automatically, so we need to update the account item with it
             return new AccountItem(newAccount, newAccountRow);
@@ -160,6 +161,7 @@ namespace BanaData.Logic.Dialogs.Listers
             mainWindowLogic.CommitChanges();
             mainWindowLogic.UpdateAccountNamesAndBalances(new int[] { newAccount.AccountRow.ID });
             mainWindowLogic.CloseRegisterIfOpen(newAccount.AccountRow.ID);
+            mainWindowLogic.BuildCategoriesList();
         }
 
         private void RemoveAccountFromDataSet(AccountItem account)
@@ -171,6 +173,7 @@ namespace BanaData.Logic.Dialogs.Listers
             mainWindowLogic.CommitChanges();
             mainWindowLogic.UpdateAccountNamesAndBalances(null);
             mainWindowLogic.CloseRegisterIfOpen(id);
+            mainWindowLogic.BuildCategoriesList();
         }
 
         private Household.PersonRow FindPersonRow(string owner)
