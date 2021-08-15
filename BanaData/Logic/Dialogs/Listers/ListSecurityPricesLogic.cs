@@ -356,9 +356,21 @@ namespace BanaData.Logic.Dialogs.Listers
         {
             if (selectedDatePrice != null)
             {
+                // Check price
                 if (selectedDatePrice.Price == 0)
                 {
                     mainWindowLogic.ErrorMessage("Please enter a price.");
+                    return;
+                }
+
+                // Check no 2 prices for the same day
+                if (mainWindowLogic.Household.SecurityPrice
+                    .Where(sp => sp != selectedDatePrice.SecurityPriceRow &&
+                           sp.Date == selectedDatePrice.Date &&
+                           sp.SecurityID == securityID)
+                    .Count() > 0)
+                {
+                    mainWindowLogic.ErrorMessage("There is alreasy a price for this date");
                     return;
                 }
 
@@ -434,7 +446,6 @@ namespace BanaData.Logic.Dialogs.Listers
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
-        private Household.SecurityPriceRow securityPriceRow;
         private readonly int securityID;
 
         private struct Data
@@ -452,10 +463,10 @@ namespace BanaData.Logic.Dialogs.Listers
         #region Constructors
 
         // Create a date price from a security price row
-        public DatePriceItem(MainWindowLogic _mainWindowLogic, Household.SecurityPriceRow _securityPriceRow)
+        public DatePriceItem(MainWindowLogic _mainWindowLogic, Household.SecurityPriceRow securityPriceRow)
         {
             mainWindowLogic = _mainWindowLogic;
-            securityPriceRow = _securityPriceRow;
+            SecurityPriceRow = securityPriceRow;
 
             data.Date = securityPriceRow.Date;
             data.Price = securityPriceRow.Value;
@@ -474,6 +485,7 @@ namespace BanaData.Logic.Dialogs.Listers
 
         #region Logic properties
 
+        public Household.SecurityPriceRow SecurityPriceRow { get; private set; }
 
         #endregion
 
@@ -511,15 +523,15 @@ namespace BanaData.Logic.Dialogs.Listers
                 // Save in DB
                 if (mainWindowLogic != null)
                 {
-                    if (securityPriceRow != null)
+                    if (SecurityPriceRow != null)
                     {
-                        securityPriceRow.Date = data.Date;
-                        securityPriceRow.Value = data.Price;
+                        SecurityPriceRow.Date = data.Date;
+                        SecurityPriceRow.Value = data.Price;
                     }
                     else
                     {
                         var securityRow = mainWindowLogic.Household.Security.FindByID(securityID);
-                        securityPriceRow = mainWindowLogic.Household.SecurityPrice.AddSecurityPriceRow(securityRow, data.Date, data.Price);
+                        SecurityPriceRow = mainWindowLogic.Household.SecurityPrice.AddSecurityPriceRow(securityRow, data.Date, data.Price);
                     }
                     mainWindowLogic.CommitChanges();
                 }
@@ -540,10 +552,10 @@ namespace BanaData.Logic.Dialogs.Listers
 
         public void Delete()
         {
-            if (securityPriceRow != null)
+            if (SecurityPriceRow != null)
             {
-                securityPriceRow.Delete();
-                securityPriceRow = null;
+                SecurityPriceRow.Delete();
+                SecurityPriceRow = null;
                 mainWindowLogic.CommitChanges();
             }
         }
