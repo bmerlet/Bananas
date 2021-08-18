@@ -154,12 +154,15 @@ namespace BanaData.Logic.Dialogs.Listers
 
         public void UpdateGraph()
         {
-            Quotes.ReplaceRange(
+            var sortableList =
                 mainWindowLogic.Household.SecurityPrice
                 .Where(sp => sp.SecurityID == securityItem.ID)
                 .Where(sp => sp.Date.CompareTo(startDate) >= 0)
                 .Where(sp => sp.Date.CompareTo(endDate) <= 0)
-                .Select(sp => new DatePriceGraphItem(sp)));
+                .Select(sp => new DatePriceGraphItem(sp))
+                .ToList();
+            sortableList.Sort((sp1, sp2) => sp1.Date.CompareTo(sp2.Date));
+            Quotes.ReplaceRange(sortableList);
 
             ReinvestedDividends.ReplaceRange(
                 mainWindowLogic.Household.InvestmentTransaction
