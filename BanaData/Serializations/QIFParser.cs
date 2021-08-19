@@ -28,7 +28,7 @@ namespace BanaData.Serializations
         #region Private members
 
         private readonly Household household;
-        private int checkpointID;
+        private Household.CheckpointRow checkpointRow;
         private readonly List<string> accountNames = new List<string>();
 
         #endregion
@@ -89,7 +89,7 @@ namespace BanaData.Serializations
             household.AcceptChanges();
 
             // Create a checkpoint - all transactions are created under this checkpoint
-            household.Checkpoint.AddCheckpointRow(DateTime.Now);
+            checkpointRow = household.Checkpoint.CreateNewCheckpoint();
 
             // Parse the file
             ParseFile(fileName);
@@ -113,9 +113,9 @@ namespace BanaData.Serializations
 
             household.AcceptChanges();
 
-            // Create a new checkpoint, all transactions created by the user
+            // Create a new checkpoint, all transactions created by the user henceforth
             // will be associated with this new checkpoint
-            household.Checkpoint.AddCheckpointRow(DateTime.Now);
+            household.Checkpoint.CreateNewCheckpoint();
         }
 
         #endregion
@@ -125,9 +125,6 @@ namespace BanaData.Serializations
         // Parse a QIF file file
         private void ParseFile(string fileName)
         {
-            // Get current checkpoint
-            checkpointID = household.Checkpoint.GetMostRecentCheckpointID();
-
             // Read the file
             using (var sr = new StreamReader(fileName))
             {
@@ -619,7 +616,7 @@ namespace BanaData.Serializations
             IEnumerable<LineItemHolder> lineItemHolders)
         {
             // Create main transaction
-            var transRow = household.Transaction.Add(accountRow, date, payee, memo, status, checkpointID, ETransactionType.Regular);
+            var transRow = household.Transaction.Add(accountRow, date, payee, memo, status, checkpointRow, ETransactionType.Regular);
 
             // Add bank-specific stuff
             if (accountRow.Type == EAccountType.Bank)
@@ -835,7 +832,7 @@ namespace BanaData.Serializations
             decimal securityQuantity,
             decimal commission)
         {
-            var transRow = household.Transaction.Add(accountRow, date, payee, memo, status, checkpointID, ETransactionType.Regular);
+            var transRow = household.Transaction.Add(accountRow, date, payee, memo, status, checkpointRow, ETransactionType.Regular);
             household.InvestmentTransaction.Add(transRow, type, securityRow, securityPrice, securityQuantity, commission);
             var li = household.LineItem.Add(transRow, null, amount);
             if (categoryID != -1)
@@ -971,7 +968,7 @@ namespace BanaData.Serializations
         private void CreateMemorizedPayee(string payee, ETransactionStatus status, string memo, IEnumerable<LineItemHolder> lineItemHolders)
         {
             // Create memorized payee
-            var transRow = household.Transaction.Add(null, DateTime.MinValue, payee, memo, status, checkpointID, ETransactionType.MemorizedPayee);
+            var transRow = household.Transaction.Add(null, DateTime.MinValue, payee, memo, status, checkpointRow, ETransactionType.MemorizedPayee);
 
             // Add the line item(s)
             foreach (var lih in lineItemHolders)
@@ -1725,7 +1722,7 @@ namespace BanaData.Serializations
                     schedule.Payee,
                     schedule.Memo,
                     ETransactionStatus.Pending,
-                    checkpointID,
+                    checkpointRow,
                     ETransactionType.ScheduledTransaction);
 
                 if (accountRow.Type == EAccountType.Bank)

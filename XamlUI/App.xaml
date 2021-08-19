@@ -145,7 +145,7 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="120"/>
                                 <ColumnDefinition Width="65"/>
-                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="150"/>
                                 <ColumnDefinition Width="100"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="{Binding Payee}"/>

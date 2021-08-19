@@ -63,7 +63,7 @@ namespace BanaData.Database
                     "",
                     IsMemoNull() ? null : Memo,
                     ETransactionStatus.Pending,
-                    household.Checkpoint.GetMostRecentCheckpointID(),
+                    household.Checkpoint.GetMostRecentCheckpoint(),
                     ETransactionType.Regular);
                 var peerLiRow = household.LineItem.Add(peerTransactionRow, null, peerAmount);
 
@@ -91,22 +91,22 @@ namespace BanaData.Database
 
         partial class TransactionDataTable
         {
-            public TransactionRow Add(AccountRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status, int checkpointID, ETransactionType type)
+            public TransactionRow Add(AccountRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status, CheckpointRow checkpointRow, ETransactionType type)
             {
                 var transactionRow = NewTransactionRow();
 
-                UpdateTransaction(transactionRow, accountRow, date, payee, memo, status, checkpointID, type);
+                UpdateTransaction(transactionRow, accountRow, date, payee, memo, status, checkpointRow, type);
 
                 Rows.Add(transactionRow);
 
                 return transactionRow;
             }
 
-            public TransactionRow Update(int transactionID, AccountRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status, int checkpointID, ETransactionType type)
+            public TransactionRow Update(int transactionID, AccountRow accountRow, DateTime date, string payee, string memo, ETransactionStatus status, CheckpointRow checkpointRow, ETransactionType type)
             {
                 var transactionRow = FindByID(transactionID);
 
-                UpdateTransaction(transactionRow, accountRow, date, payee, memo, status, checkpointID, type);
+                UpdateTransaction(transactionRow, accountRow, date, payee, memo, status, checkpointRow, type);
 
                 return transactionRow;
             }
@@ -118,7 +118,7 @@ namespace BanaData.Database
                 string payee, 
                 string memo, 
                 ETransactionStatus status,
-                int checkpointID,
+                CheckpointRow checkpointRow,
                 ETransactionType type)
             {
                 if (accountRow == null)
@@ -151,7 +151,7 @@ namespace BanaData.Database
                 }
 
                 transactionRow.Status = status;
-                transactionRow.CheckpointID = checkpointID;
+                transactionRow.CheckpointRow = checkpointRow;
                 transactionRow.Type = type;
 
                 return transactionRow;

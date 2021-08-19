@@ -238,13 +238,13 @@ namespace BanaData.Logic.Dialogs.Editors
         private void UpdateAllMarkedTransactionsTo(ETransactionStatus newStatus)
         {
             var household = mainWindowLogic.Household;
-            var latestCheckpoint = household.Checkpoint.GetMostRecentCheckpointID();
+            var latestCheckpoint = household.Checkpoint.GetMostRecentCheckpoint();
 
             foreach (TransactionToReconcile tr in Transactions.Transactions)
             {
                 var transRow = household.Transaction.FindByID(tr.ID);
                 transRow.Status = tr.IsCleared == true ? newStatus : ETransactionStatus.Pending;
-                transRow.CheckpointID = latestCheckpoint;
+                transRow.CheckpointRow = latestCheckpoint;
             }
         }
 

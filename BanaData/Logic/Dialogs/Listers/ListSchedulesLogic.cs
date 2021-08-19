@@ -137,7 +137,7 @@ namespace BanaData.Logic.Dialogs.Listers
                 scheduleItem.Payee,
                 scheduleItem.Memo,
                 ETransactionStatus.Pending,
-                household.Checkpoint.GetMostRecentCheckpointID(),
+                household.Checkpoint.GetMostRecentCheckpoint(),
                 ETransactionType.ScheduledTransaction);
 
             // Create banking transaction if needed
@@ -215,7 +215,7 @@ namespace BanaData.Logic.Dialogs.Listers
                 updatedScheduleItem.Payee,
                 updatedScheduleItem.Memo,
                 ETransactionStatus.Pending,
-                household.Checkpoint.GetMostRecentCheckpointID(),
+                household.Checkpoint.GetMostRecentCheckpoint(),
                 ETransactionType.ScheduledTransaction);
 
 

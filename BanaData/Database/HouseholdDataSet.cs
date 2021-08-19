@@ -34,26 +34,40 @@ namespace BanaData.Database
         partial class CheckpointDataTable
         {
             // Get the most recent checkpoint ID
-            public int GetMostRecentCheckpointID()
+            public CheckpointRow GetMostRecentCheckpoint()
             {
-                DateTime mostRecent = DateTime.MinValue;
-                int id = -1;
+                CheckpointRow mostRecent = null;
 
                 if (Rows.Count == 0)
                 {
-                    AddCheckpointRow(DateTime.Now);
+                    return CreateNewCheckpoint();
                 }
 
                 foreach (CheckpointRow checkpointRow in Rows)
                 {
-                    if (checkpointRow.Date.CompareTo(mostRecent) > 0)
+                    if (mostRecent == null || checkpointRow.Date.CompareTo(mostRecent.Date) > 0)
                     {
-                        mostRecent = checkpointRow.Date;
-                        id = checkpointRow.ID;
+                        mostRecent = checkpointRow;
                     }
                 }
 
-                return id;
+                return mostRecent;
+            }
+
+            // Create new checkpoint
+            public CheckpointRow CreateNewCheckpoint()
+            {
+                // Make sure we don't create a duplicate
+                if (Rows.Count > 0)
+                {
+                    CheckpointRow mostRecent = GetMostRecentCheckpoint();
+                    while (DateTime.Now.Equals(mostRecent.Date))
+                    {
+                        _ = System.Threading.Thread.Yield();
+                    }
+                }
+
+                return AddCheckpointRow(DateTime.Now);
             }
         }
 

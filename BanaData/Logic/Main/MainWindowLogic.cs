@@ -460,8 +460,8 @@ namespace BanaData.Logic.Main
         public void DifferentialExportQIF(string file)
         {
             var exporter = new QIFWriter(this);
-            exporter.DifferentialExportToQIF(file);
-            ErrorMessage("Differential export completed; new checkpoint created", "Export results");
+            (int numAccounts, int numTransactions)  = exporter.DifferentialExportToQIF(file);
+            ErrorMessage($"Differential export: Exported {numTransactions} in {numAccounts} accounts; new checkpoint created", "Export results");
         }
 
         public void SaveIfDirty()
@@ -558,7 +558,7 @@ namespace BanaData.Logic.Main
                             str.IsPayeeNull() ? null : str.Payee,
                             str.IsMemoNull() ? null : str.Memo,
                             ETransactionStatus.Pending,
-                            Household.Checkpoint.GetMostRecentCheckpointID(),
+                            Household.Checkpoint.GetMostRecentCheckpoint(),
                             ETransactionType.Regular);
 
                         // Banking transaction if needed

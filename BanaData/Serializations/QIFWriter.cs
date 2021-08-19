@@ -44,20 +44,26 @@ namespace BanaData.Serializations
             }
         }
 
+        //
         // Only write out the transactions associated with the current checkpoint
         // then create a new checkpoint
-        public void DifferentialExportToQIF(string filename)
+        //
+        public (int numAccounts, int numTransactions) DifferentialExportToQIF(string filename)
         {
-            int checkpointID = household.Checkpoint.GetMostRecentCheckpointID();
+            var checkpointRow = household.Checkpoint.GetMostRecentCheckpoint();
+            int numAccounts;
+            int numTransactions;
 
             using (var sw = new StreamWriter(filename, false))
             {
-                ExportTransactions(sw, checkpointID);
+                (numAccounts, numTransactions) = ExportTransactions(sw, checkpointRow);
             }
 
             // Create a new checkpoint
-            household.Checkpoint.AddCheckpointRow(DateTime.Now);
+            household.Checkpoint.CreateNewCheckpoint();
             mainWindowLogic.CommitChanges();
+
+            return (numAccounts, numTransactions);
         }
 
         #endregion
@@ -190,9 +196,11 @@ namespace BanaData.Serializations
 
         #region Write QIF transactions
 
-        private void ExportTransactions(StreamWriter sw, int checkpointID = -1)
+        private (int numAccounts, int numTransactions) ExportTransactions(StreamWriter sw, Household.CheckpointRow checkpointRow = null)
         {
             sw.WriteLine("!Option:AutoSwitch");
+            int numAccounts = 0;
+            int numTransactions = 0;
 
             foreach (Household.AccountRow accountRow in household.Account.Rows)
             {
@@ -202,7 +210,7 @@ namespace BanaData.Serializations
                 foreach (var transactionRow in accountRow.GetRegularTransactionRows())
                 {
                     // If filtering on checkpoint, skip transactions that do not match
-                    if (checkpointID >= 0 && transactionRow.CheckpointID != checkpointID)
+                    if (checkpointRow != null && transactionRow.CheckpointRow != checkpointRow)
                     {
                         continue;
                     }
@@ -216,6 +224,8 @@ namespace BanaData.Serializations
 
                         sw.WriteLine($"!Type:{accountType}");
                         accountWritten = true;
+
+                        numAccounts += 1;
                     }
 
                     ExportDate(sw, transactionRow.Date);
@@ -230,8 +240,11 @@ namespace BanaData.Serializations
                     }
 
                     sw.WriteLine("^");
+                    numTransactions += 1;
                 }
             }
+
+            return (numAccounts, numTransactions);
         }
 
         private void ExportBankingTransaction(StreamWriter sw, Household.AccountRow accountRow, Household.TransactionRow transactionRow)

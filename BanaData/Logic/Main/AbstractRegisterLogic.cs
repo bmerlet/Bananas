@@ -436,7 +436,7 @@ namespace BanaData.Logic.Main
                 var household = mainWindowLogic.Household;
                 var transRow = household.Transaction.FindByID(atl.TransID);
                 transRow.AccountID = logic.PickedAccount.ID;
-                transRow.CheckpointID = household.Checkpoint.GetMostRecentCheckpointID();
+                transRow.CheckpointRow = household.Checkpoint.GetMostRecentCheckpoint();
                 mainWindowLogic.CommitChanges();
 
                 // Delete from list
