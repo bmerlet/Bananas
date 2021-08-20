@@ -227,6 +227,10 @@ namespace XamlUI
             {
                 dialog = new ShowRebalance(showRebalanceLogic);
             }
+            else if (logic is ShowQuoteUpdateLogic showQuoteUpdateLogic)
+            {
+                dialog = new ShowQuoteUpdate(showQuoteUpdateLogic);
+            }
             else if (logic is TransactionReportLogic transactionReportLogic)
             {
                 dialog = new TransactionReport(transactionReportLogic);

@@ -346,6 +346,7 @@ namespace BanaData.Logic.Main
 
         private void OnUpdateStockPrices()
         {
+            decimal oldNetWorth = mainWindow.NetWorth;
             var household = mainWindow.Household;
             var securities = new List<int>();
             var quoter = new Quote();
@@ -398,6 +399,8 @@ namespace BanaData.Logic.Main
 
             mainWindow.CommitChanges();
             mainWindow.UpdateAccountNamesAndBalances(investmentIDs);
+
+            mainWindow.GuiServices.ShowDialog(new ShowQuoteUpdateLogic(securities.Count, oldNetWorth, mainWindow.NetWorth));
         }
 
         #endregion
