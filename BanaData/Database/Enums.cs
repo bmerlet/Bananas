@@ -217,12 +217,23 @@ namespace BanaData.Database
         GroupByPayee = 0x200,
         GroupByCategory = 0x400,
 
+        SortDescending = 0x800,
+
         ShowAccountColumn = 0x1000,
         ShowDateColumn = 0x2000,
         ShowPayeeColumn = 0x4000,
         ShowMemoColumn = 0x8000,
         ShowCategoryColumn = 0x10000,
-        ShowStatusColumn = 0x20000
+        ShowStatusColumn = 0x20000,
+
+        SubtotalFrequencyLSB = 0x100000,
+        SubtotalFrequencyMSB = 0x200000,
+
+        SubtotalFrequencyNone = 0,
+        SubtotalFrequencyWeekly = SubtotalFrequencyLSB,
+        SubtotalFrequencyMonthly = SubtotalFrequencyMSB,
+        SubtotalFrequencyYearly = SubtotalFrequencyMSB | SubtotalFrequencyLSB,
+        SubtotalFrequencyMask = SubtotalFrequencyMSB | SubtotalFrequencyLSB
     }
 
     // Scheduled transaction frequency

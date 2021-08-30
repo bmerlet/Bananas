@@ -70,12 +70,19 @@ namespace BanaData.Logic.Items
         public bool IsGroupingByPayee => Flags.HasFlag(ETransactionReportFlag.GroupByPayee);
         public bool IsGroupingByCategory => Flags.HasFlag(ETransactionReportFlag.GroupByCategory);
 
+        public bool IsSortDescending => Flags.HasFlag(ETransactionReportFlag.SortDescending);
+
         public bool IsShowingAccountColumn => Flags.HasFlag(ETransactionReportFlag.ShowAccountColumn);
         public bool IsShowingDateColumn => Flags.HasFlag(ETransactionReportFlag.ShowDateColumn);
         public bool IsShowingPayeeColumn => Flags.HasFlag(ETransactionReportFlag.ShowPayeeColumn);
         public bool IsShowingMemoColumn => Flags.HasFlag(ETransactionReportFlag.ShowMemoColumn);
         public bool IsShowingCategoryColumn => Flags.HasFlag(ETransactionReportFlag.ShowCategoryColumn);
         public bool IsShowingStatusColumn => Flags.HasFlag(ETransactionReportFlag.ShowStatusColumn);
+
+        public bool IsSubtotalFrequencyNone => (Flags & ETransactionReportFlag.SubtotalFrequencyMask) == ETransactionReportFlag.SubtotalFrequencyNone;
+        public bool IsSubtotalFrequencyWeekly => (Flags & ETransactionReportFlag.SubtotalFrequencyMask) == ETransactionReportFlag.SubtotalFrequencyWeekly;
+        public bool IsSubtotalFrequencyMonthly => (Flags & ETransactionReportFlag.SubtotalFrequencyMask) == ETransactionReportFlag.SubtotalFrequencyMonthly;
+        public bool IsSubtotalFrequencyYearly => (Flags & ETransactionReportFlag.SubtotalFrequencyMask) == ETransactionReportFlag.SubtotalFrequencyYearly;
 
         public bool IsFilteringOnAccounts => Flags.HasFlag(ETransactionReportFlag.IsFilteringOnAccounts);
         public IEnumerable<Household.AccountRow> Accounts { get; }

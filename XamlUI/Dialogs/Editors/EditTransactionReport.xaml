@@ -54,23 +54,46 @@
         </Grid>
         
         <!-- Organization panel -->
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-            <TextBlock Text="Group transactions by:"/>
-            <ComboBox ItemsSource="{Binding GroupSource}" SelectedItem="{Binding Group, Mode=TwoWay}" Width="120"/>
-            <TextBlock Text="and show:"/>
-            <ComboBox ItemsSource="{Binding ShowSource}" SelectedItem="{Binding Show, Mode=TwoWay}" Width="170"/>
-        </StackPanel>
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="Sort transactions by:"/>
+            <ComboBox Grid.Column="1" ItemsSource="{Binding SortSource}" SelectedItem="{Binding Sort, Mode=TwoWay}"/>
+            <TextBlock Grid.Column="2" Text="Group transactions by:"/>
+            <ComboBox Grid.Column="3" ItemsSource="{Binding GroupSource}" SelectedItem="{Binding Group, Mode=TwoWay}"/>
+            <TextBlock Grid.Row="1" Text="Show:"/>
+            <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding ShowSource}" SelectedItem="{Binding Show, Mode=TwoWay}"/>
+            <TextBlock Grid.Row="1" Grid.Column="2" Text="Additional subtotals:"/>
+            <ComboBox Grid.Row="1" Grid.Column="3" ItemsSource="{Binding SubtotalFrequencySource}" SelectedItem="{Binding SubtotalFrequency, Mode=TwoWay}" IsEnabled="{Binding IsSubtotalFrequencyEnabled}"/>
+        </Grid>
 
         <!-- Columns panel -->
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" IsEnabled="{Binding IsColumnPanelEnabled}">
+        <Grid DockPanel.Dock="Top" IsEnabled="{Binding IsColumnPanelEnabled}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
             <TextBlock Text="Show columns:"/>
-            <CheckBox Content="Account" IsChecked="{Binding ShowAccountColumn}" IsEnabled="{Binding IsAccountColumnEnabled}"/>
-            <CheckBox Content="Date" IsChecked="{Binding ShowDateColumn}"/>
-            <CheckBox Content="Payee" IsChecked="{Binding ShowPayeeColumn}" IsEnabled="{Binding IsPayeeColumnEnabled}"/>
-            <CheckBox Content="Memo" IsChecked="{Binding ShowMemoColumn}"/>
-            <CheckBox Content="Category" IsChecked="{Binding ShowCategoryColumn}" IsEnabled="{Binding IsCategoryColumnEnabled}"/>
-            <CheckBox Content="Status" IsChecked="{Binding ShowStatusColumn}"/>
-        </StackPanel>
+            <CheckBox Grid.Column="1" Content="Account" IsChecked="{Binding ShowAccountColumn}" IsEnabled="{Binding IsAccountColumnEnabled}"/>
+            <CheckBox Grid.Column="2" Content="Date" IsChecked="{Binding ShowDateColumn}"/>
+            <CheckBox Grid.Column="3" Content="Payee" IsChecked="{Binding ShowPayeeColumn}" IsEnabled="{Binding IsPayeeColumnEnabled}"/>
+            <CheckBox Grid.Column="4" Content="Memo" IsChecked="{Binding ShowMemoColumn}"/>
+            <CheckBox Grid.Column="5" Content="Category" IsChecked="{Binding ShowCategoryColumn}" IsEnabled="{Binding IsCategoryColumnEnabled}"/>
+            <CheckBox Grid.Column="6" Content="Status" IsChecked="{Binding ShowStatusColumn}"/>
+        </Grid>
 
         <!-- Main panel: Accounts, categories, payees -->
         <Grid>

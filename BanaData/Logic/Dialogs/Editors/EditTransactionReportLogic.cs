@@ -49,6 +49,9 @@ namespace BanaData.Logic.Dialogs.Editors
             ShowCategoryColumn = reportItem.IsShowingCategoryColumn;
             ShowStatusColumn = reportItem.IsShowingStatusColumn;
 
+            SetSort(
+                reportItem.IsSortDescending ? SORT_REVDATE : SORT_DATE);
+
             SetGroup(
                 reportItem.IsGroupingByAccount ? GROUP_ACCOUNT :
                 (reportItem.IsGroupingByPayee ? GROUP_PAYEE :
@@ -57,6 +60,11 @@ namespace BanaData.Logic.Dialogs.Editors
             SetShow(
                 reportItem.IsShowingTransactions && reportItem.IsShowingSubtotals ? SHOW_SUBTOTAL :
                 (reportItem.IsShowingTransactions ? SHOW_TRANS : SHOW_SUBTOTALONLY));
+
+            SetSubtotalFrequency(
+                reportItem.IsSubtotalFrequencyNone ? SUBFREQ_NONE :
+                (reportItem.IsSubtotalFrequencyWeekly ? SUBFREQ_WEEKLY :
+                (reportItem.IsSubtotalFrequencyMonthly ? SUBFREQ_MONTHLY : SUBFREQ_YEARLY)));
 
             IsFilteringOnAccounts = reportItem.IsFilteringOnAccounts;
             accounts.AddRange(reportItem.Accounts);
@@ -88,6 +96,13 @@ namespace BanaData.Logic.Dialogs.Editors
         // Generate the report
         public CommandBase GenerateReport { get; }
 
+        // Sort by
+        private const string SORT_DATE = "Date (oldest to newest)";
+        private const string SORT_REVDATE = "Date (newest to oldest)";
+        public string[] SortSource { get; } = new string[] { SORT_DATE, SORT_REVDATE };
+        private string sort;
+        public string Sort { get => sort; set => SetSort(value); }
+
         // Group by
         private const string GROUP_NONE = "None";
         private const string GROUP_ACCOUNT = "Account";
@@ -104,6 +119,16 @@ namespace BanaData.Logic.Dialogs.Editors
         public string[] ShowSource { get; } = new string[] { SHOW_TRANS, SHOW_SUBTOTAL, SHOW_SUBTOTALONLY };
         private string show;
         public string Show { get => show; set => SetShow(value); }
+
+        // Time-based subtotals
+        private const string SUBFREQ_NONE = "None";
+        private const string SUBFREQ_WEEKLY = "Weekly";
+        private const string SUBFREQ_MONTHLY = "Monthly";
+        private const string SUBFREQ_YEARLY = "Yearly";
+        public string[] SubtotalFrequencySource { get; } = new string[] { SUBFREQ_NONE, SUBFREQ_WEEKLY, SUBFREQ_MONTHLY, SUBFREQ_YEARLY };
+        private string subtotalFrequency;
+        public string SubtotalFrequency { get => subtotalFrequency; set => SetSubtotalFrequency(value); }
+        public bool? IsSubtotalFrequencyEnabled => Show != SHOW_TRANS;
 
         // Columns
         public bool? IsColumnPanelEnabled => Show != SHOW_SUBTOTALONLY;
@@ -160,6 +185,22 @@ namespace BanaData.Logic.Dialogs.Editors
         #endregion
 
         #region Actions
+
+        private void SetSort(string value)
+        {
+            if (value != sort)
+            {
+                sort = value;
+                if (sort == SORT_DATE)
+                {
+                    localFlags &= ~ETransactionReportFlag.SortDescending;
+                }
+                else
+                {
+                    localFlags |= ETransactionReportFlag.SortDescending;
+                }
+            }
+        }
 
         private void SetGroup(string value)
         {
@@ -221,6 +262,32 @@ namespace BanaData.Logic.Dialogs.Editors
                 }
 
                 OnPropertyChanged(() => IsColumnPanelEnabled);
+                OnPropertyChanged(() => IsSubtotalFrequencyEnabled);
+            }
+        }
+
+        private void SetSubtotalFrequency(string value)
+        {
+            if (value != subtotalFrequency)
+            {
+                subtotalFrequency = value;
+                localFlags &= ~ETransactionReportFlag.SubtotalFrequencyMask;
+
+                switch(subtotalFrequency)
+                {
+                    case SUBFREQ_NONE:
+                        localFlags |= ETransactionReportFlag.SubtotalFrequencyNone;
+                        break;
+                    case SUBFREQ_WEEKLY:
+                        localFlags |= ETransactionReportFlag.SubtotalFrequencyWeekly;
+                        break;
+                    case SUBFREQ_MONTHLY:
+                        localFlags |= ETransactionReportFlag.SubtotalFrequencyMonthly;
+                        break;
+                    case SUBFREQ_YEARLY:
+                        localFlags |= ETransactionReportFlag.SubtotalFrequencyYearly;
+                        break;
+                }
             }
         }
 
