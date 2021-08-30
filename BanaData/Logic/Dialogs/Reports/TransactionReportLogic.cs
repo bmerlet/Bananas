@@ -75,7 +75,7 @@ namespace BanaData.Logic.Dialogs.Reports
                 }
             }
 
-            // Compute grand total
+            // Compute grand total before adding the subtotals
             decimal grandTotal = transactions.Sum(ti => ti.Amount);
 
             // Build subtotals
@@ -83,28 +83,50 @@ namespace BanaData.Logic.Dialogs.Reports
             {
                 foreach(string accountName in transactions.Select(tr => tr.AccountName).Distinct().ToArray())
                 {
-                    decimal subtotal = transactions.Where(tr => tr.AccountName == accountName).Sum(tr => tr.Amount);
+                    var trans = transactions.Where(tr => tr.AccountName == accountName).ToArray();
+
+                    // Build subtotal for this account
+                    decimal subtotal = trans.Sum(tr => tr.Amount);
                     transactions.Add(new TransactionItem(accountName, subtotal, transactionReportItem));
+
+                    // Build periodic subtotals
+                    BuildPeriodicSubtotals(trans, accountName);
                 }
             }
             else if (transactionReportItem.IsGroupingByPayee)
             {
                 foreach (string payee in transactions.Select(tr => tr.Payee).Distinct().ToArray())
                 {
-                    decimal subtotal = transactions.Where(tr => tr.Payee == payee).Sum(tr => tr.Amount);
+                    var trans = transactions.Where(tr => tr.Payee == payee).ToArray();
+
+                    // Build subtotal for this account
+                    decimal subtotal = trans.Sum(tr => tr.Amount);
                     transactions.Add(new TransactionItem(payee, subtotal, transactionReportItem));
+
+                    // Build periodic subtotals
+                    BuildPeriodicSubtotals(trans, payee);
                 }
             }
             else if (transactionReportItem.IsGroupingByCategory)
             {
                 foreach (string category in transactions.Select(tr => tr.Category).Distinct().ToArray())
                 {
-                    decimal subtotal = transactions.Where(tr => tr.Category == category).Sum(tr => tr.Amount);
+                    var trans = transactions.Where(tr => tr.Category == category).ToArray();
+
+                    // Build subtotal for this category
+                    decimal subtotal = trans.Sum(tr => tr.Amount);
                     transactions.Add(new TransactionItem(category, subtotal, transactionReportItem));
+
+                    // Build periodic subtotals
+                    BuildPeriodicSubtotals(trans, category);
                 }
             }
+            else
+            {
+                BuildPeriodicSubtotals(transactions.ToArray(), "Overall");
+            }
 
-            // Build grand total
+            // Add the grand total (after adding the subtotals so that it is not mistaken for a transaction)
             transactions.Add(new TransactionItem(grandTotal, transactionReportItem));
 
             // Sort according to grouping
@@ -169,6 +191,36 @@ namespace BanaData.Logic.Dialogs.Reports
             }
 
             Columns.Add(new ColumnItem(90, "Amount", "Amount", "N2", true));
+        }
+
+        private void BuildPeriodicSubtotals(IEnumerable<TransactionItem> trans, string item)
+        {
+            if (!transactionReportItem.IsSubtotalFrequencyNone)
+            {
+                DateTime startDate = transactionReportItem.StartDate;
+                while(startDate.CompareTo(transactionReportItem.EndDate) < 0)
+                {
+                    DateTime endDate;
+                    if (transactionReportItem.IsSubtotalFrequencyWeekly)
+                    {
+                        endDate = startDate.AddDays(7);
+                    }
+                    else if (transactionReportItem.IsSubtotalFrequencyMonthly)
+                    {
+                        endDate = startDate.AddMonths(1);
+                    }
+                    else
+                    {
+                        endDate = startDate.AddYears(1);
+                    }
+
+                    decimal periodicSubtotal = trans.Where(t => t.RawDate.CompareTo(startDate) >= 0 && t.RawDate.CompareTo(endDate) < 0).Select(t => t.Amount).Sum();
+                    transactions.Add(new TransactionItem(startDate, item, periodicSubtotal, transactionReportItem));
+
+                    startDate = endDate;
+                }
+
+            }
         }
 
         #endregion
@@ -241,9 +293,10 @@ namespace BanaData.Logic.Dialogs.Reports
 
             if (obj is TransactionItem item)
             {
+                bool subtotal = item.IsSubtotal || item.IsPeriodicSubtotal || item.IsGrandTotal;
                 result =
-                    localFlags.HasFlag(ETransactionReportFlag.ShowTransactions) && !item.IsSubtotal ||
-                    localFlags.HasFlag(ETransactionReportFlag.ShowSubtotals) && item.IsSubtotal;
+                    localFlags.HasFlag(ETransactionReportFlag.ShowTransactions) && !subtotal ||
+                    localFlags.HasFlag(ETransactionReportFlag.ShowSubtotals) && subtotal;
             }
 
             return result;
@@ -289,7 +342,6 @@ namespace BanaData.Logic.Dialogs.Reports
         public class TransactionItem : IComparable<TransactionItem>
         {
             private readonly TransactionReportItem transactionReportItem;
-            private readonly DateTime date;
 
             // Build a transaction
             public TransactionItem(
@@ -300,13 +352,13 @@ namespace BanaData.Logic.Dialogs.Reports
                 (TransactionRow, transactionReportItem) = (transactionRow, _transactionReportItem);
 
                 AccountName = transactionRow.AccountRow.Name;
-                date = transactionRow.Date;
+                RawDate = transactionRow.Date;
                 Date = transactionRow.Date.ToString("MM/dd/yyyy");
                 Payee = transactionRow.IsPayeeNull() ? "" : transactionRow.Payee;
                 Memo = transactionRow.IsMemoNull() ?
                     (lineItemRows.Length == 1 && !lineItemRows[0].IsMemoNull() ? lineItemRows[0].Memo : "")
                     : transactionRow.Memo;
-                Category =
+                RawCategory = Category =
                     lineItemRows.Length > 1 ? "<Split>" :
                     (lineItemRows[0].GetLineItemCategoryRow() != null ? lineItemRows[0].GetLineItemCategoryRow().CategoryRow.FullName :
                     (lineItemRows[0].GetLineItemTransferRow() != null ? $"[{lineItemRows[0].GetLineItemTransferRow().AccountRow.Name}]" : ""));
@@ -315,10 +367,10 @@ namespace BanaData.Logic.Dialogs.Reports
             }
 
             // Build a subtotal
-            public TransactionItem(string item, decimal subtotal, TransactionReportItem _transactionReportItem)
+            public TransactionItem(string rawItem, decimal subtotal, TransactionReportItem _transactionReportItem)
             {
                 transactionReportItem = _transactionReportItem;
-                item += " subtotal";
+                string item = rawItem + " subtotal";
                 if (transactionReportItem.IsGroupingByAccount)
                 {
                     AccountName = item;
@@ -329,11 +381,37 @@ namespace BanaData.Logic.Dialogs.Reports
                 }
                 else if (transactionReportItem.IsGroupingByCategory)
                 {
+                    RawCategory = rawItem;
                     Category = item;
                 }
 
                 Amount = subtotal;
                 IsSubtotal = true;
+            }
+
+            // Build a periodic subtotal
+            public TransactionItem(DateTime _date, string rawItem, decimal subtotal, TransactionReportItem _transactionReportItem)
+            {
+                transactionReportItem = _transactionReportItem;
+                RawDate = _date;
+                Date = RawDate.ToString("MM/dd/yyyy"); ;
+                string item = rawItem + " subtotal for " + Date;
+                if (transactionReportItem.IsGroupingByAccount)
+                {
+                    AccountName = item;
+                }
+                else if (transactionReportItem.IsGroupingByPayee)
+                {
+                    Payee = item;
+                }
+                else if (transactionReportItem.IsGroupingByCategory)
+                {
+                    RawCategory = rawItem;
+                    Category = item;
+                }
+
+                Amount = subtotal;
+                IsPeriodicSubtotal = true;
             }
 
             // Build grand total
@@ -364,6 +442,8 @@ namespace BanaData.Logic.Dialogs.Reports
             }
 
             public readonly Household.TransactionRow TransactionRow;
+            public readonly DateTime RawDate;
+            public readonly string RawCategory;
 
             public string AccountName { get; }
             public string Date { get; }
@@ -374,7 +454,8 @@ namespace BanaData.Logic.Dialogs.Reports
             public string Status { get; }
             public bool IsSubtotal { get; }
             public bool IsGrandTotal { get; }
-            public bool IsBold => IsSubtotal || IsGrandTotal;
+            public bool IsPeriodicSubtotal { get; }
+            public bool IsBold => IsSubtotal || IsPeriodicSubtotal || IsGrandTotal;
 
             public int CompareTo(TransactionItem other)
             {
@@ -397,21 +478,22 @@ namespace BanaData.Logic.Dialogs.Reports
                     return Payee.CompareTo(other.Payee);
                 }
 
-                if (transactionReportItem.IsGroupingByCategory && Category != other.Category)
+                if (transactionReportItem.IsGroupingByCategory && RawCategory != other.RawCategory)
                 {
-                    return Category.CompareTo(other.Category);
+                    return RawCategory.CompareTo(other.RawCategory);
                 }
 
                 if (IsSubtotal && !other.IsSubtotal)
                 {
                     return 1;
                 }
+
                 if (!IsSubtotal && other.IsSubtotal)
                 {
                     return -1;
                 }
 
-                return date.CompareTo(other.date);
+                return RawDate.CompareTo(other.RawDate) * (transactionReportItem.IsSortDescending ? -1 : 1);
             }
         }
 
