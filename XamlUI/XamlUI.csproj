@@ -149,6 +149,9 @@
     <Compile Include="Dialogs\Reports\ShowRebalance.xaml.cs">
       <DependentUpon>ShowRebalance.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\Reports\ShowWealthOverTime.xaml.cs">
+      <DependentUpon>ShowWealthOverTime.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\Reports\ShowYearlyCGDivInt.xaml.cs">
       <DependentUpon>ShowYearlyCGDivInt.xaml</DependentUpon>
     </Compile>
@@ -318,6 +321,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\Reports\ShowRebalance.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Reports\ShowWealthOverTime.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

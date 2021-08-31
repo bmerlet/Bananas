@@ -215,6 +215,10 @@ namespace XamlUI
             {
                 dialog = new ShowHoldingsPerPerson(showHoldingsPerPersonLogic);
             }
+            else if (logic is ShowWealthOverTimeLogic showWealthOverTimeLogic)
+            {
+                dialog = new ShowWealthOverTime(showWealthOverTimeLogic);
+            }
             else if (logic is ShowCapitalGainsLogic showCapitalGainsLogic)
             {
                 dialog = new ShowCapitalGains(showCapitalGainsLogic);

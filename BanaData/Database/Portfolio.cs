@@ -126,13 +126,13 @@ namespace BanaData.Database
             return usedLots;
         }
 
-        public decimal GetValuation()
+        public decimal GetValuation(DateTime? limit)
         {
             decimal val = cashBalance;
 
             foreach (var lot in lots)
             {
-                val += lot.GetValuation();
+                val += lot.GetValuation(limit);
             }
 
             return val;

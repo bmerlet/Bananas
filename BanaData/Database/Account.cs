@@ -71,25 +71,30 @@ namespace BanaData.Database
             }
 
             // Get the balance of an account
-            public decimal GetBalance()
+            public decimal GetBalance(DateTime? limit = null)
             {
-                return GetBalance(false);
+                return GetBalance(false, ETransactionStatus.Pending, limit);
             }
 
             // Get the reconciled balance of an account
             public decimal GetReconciledBalance()
             {
-                return GetBalance(true, ETransactionStatus.Reconciled);
+                return GetBalance(true, ETransactionStatus.Reconciled, null);
             }
 
             // Get the balance of a banking account
-            private decimal GetBalance(bool filter, ETransactionStatus statusToFilterOn = ETransactionStatus.Pending)
+            private decimal GetBalance(bool filter, ETransactionStatus statusToFilterOn = ETransactionStatus.Pending, DateTime? limit = null)
             {
                 decimal balance = 0;
 
                 // Find balance from all transactions
                 foreach (var transaction in GetRegularTransactionRows())
                 {
+                    if (limit.HasValue && transaction.Date.CompareTo(limit.Value) > 0)
+                    {
+                        continue;
+                    }
+
                     if (!filter || transaction.Status == statusToFilterOn)
                     {
                         if (Type == EAccountType.Investment)
@@ -116,18 +121,14 @@ namespace BanaData.Database
                 return GetRegularTransactionRows().Where(tr => tr.Status != ETransactionStatus.Reconciled);
             }
 
-            // Get the balance of an investment account
-            public decimal GetInvestmentValue()
+            // Get the value of an investment account
+            public decimal GetInvestmentValue(DateTime? date = null)
             {
                 // Compute the portfolio
-                var portfolio = new Portfolio();
-                foreach (var transRow in GetRegularTransactionRows())
-                {
-                    portfolio.ApplyTransaction(transRow);
-                }
+                var portfolio = GetPortfolio(date);
 
                 // Get latest price for the securities in the portfolio
-                return portfolio.GetValuation();
+                return portfolio.GetValuation(date);
             }
 
             // Get the securities held in an investment account
@@ -142,6 +143,13 @@ namespace BanaData.Database
 
                 // Get latest price for the securities in the portfolio
                 return portfolio.GetSecurities();
+            }
+
+            // Get the payout of an investment (= money invested - money paid out) 
+            public decimal GetInvestmentPayout(DateTime date)
+            {
+                // ZZZZ
+                return 0;
             }
 
             // Get the portfolio at a specific date
@@ -170,42 +178,6 @@ namespace BanaData.Database
                 }
 
                 return portfolio;
-            }
-
-            public bool HasSame(string description, EAccountType type, decimal creditLimit, EInvestmentKind kind)
-            {
-                if (IsDescriptionNull())
-                {
-                    if (!string.IsNullOrWhiteSpace(description))
-                    {
-                        return false;
-                    }
-                }
-                else if (Description != description)
-                {
-                    return false;
-                }
-
-                if (Type != type)
-                {
-                    return false;
-                }
-
-                if (CreditLimit != creditLimit)
-                {
-                    return false;
-                }
-
-                if (type == EAccountType.Investment)
-                {
-                    if (Kind != kind &&
-                        !(Kind == EInvestmentKind.TraditionalIRA && kind == EInvestmentKind.Brokerage))
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
             }
         }
 

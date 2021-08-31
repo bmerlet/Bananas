@@ -26,9 +26,9 @@ namespace BanaData.Database
 
         public decimal SecurityPrice { get; }
 
-        public decimal GetValuation()
+        public decimal GetValuation(DateTime? limit)
         {
-            decimal price = Security.GetMostRecentPrice();
+            decimal price = Security.GetMostRecentPrice(limit);
             return price * Quantity;
         }
 

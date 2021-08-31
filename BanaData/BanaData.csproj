@@ -99,6 +99,7 @@
     <Compile Include="Logic\Dialogs\Reports\ShowHoldingsPerPersonLogic.cs" />
     <Compile Include="Logic\Dialogs\Reports\ShowQuoteUpdateLogic.cs" />
     <Compile Include="Logic\Dialogs\Reports\ShowRebalanceLogic.cs" />
+    <Compile Include="Logic\Dialogs\Reports\ShowWealthOverTimeLogic.cs" />
     <Compile Include="Logic\Dialogs\Reports\ShowYearlyCGDivIntLogic.cs" />
     <Compile Include="Logic\Dialogs\Reports\TransactionReportLogic.cs" />
     <Compile Include="Logic\IGuiServices.cs" />

@@ -17,7 +17,7 @@ namespace BanaData.Logic.Dialogs.Pickers
 {
     public class AccountListPickerLogic : LogicDialogBase
     {
-        #region Private memebers
+        #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
         private readonly IEnumerable<Household.AccountRow> oldPickedAccounts;

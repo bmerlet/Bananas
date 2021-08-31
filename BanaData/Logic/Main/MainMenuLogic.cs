@@ -61,6 +61,7 @@ namespace BanaData.Logic.Main
             ShowHoldings.SetCanExecute(false);
             ShowRebalance = new CommandBase(OnShowRebalance);
             ShowRebalance.SetCanExecute(false);
+            ShowWealthOverTime = new CommandBase(OnShowWealthOverTime);
 
             TransactionReportsSource = (CollectionView)CollectionViewSource.GetDefaultView(transactionReports);
             TransactionReportsSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
@@ -511,6 +512,16 @@ namespace BanaData.Logic.Main
         private void OnShowRebalance()
         {
             mainWindow.GuiServices.ShowDialog(new ShowRebalanceLogic(mainWindow, mainWindow.DisplayedAccountID));
+        }
+
+        //
+        // Show wealth over time
+        //
+        public CommandBase ShowWealthOverTime { get; }
+
+        private void OnShowWealthOverTime()
+        {
+            mainWindow.GuiServices.ShowDialog(new ShowWealthOverTimeLogic(mainWindow));
         }
 
         #endregion
