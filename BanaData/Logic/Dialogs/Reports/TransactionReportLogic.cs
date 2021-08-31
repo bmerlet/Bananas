@@ -351,10 +351,10 @@ namespace BanaData.Logic.Dialogs.Reports
             {
                 (TransactionRow, transactionReportItem) = (transactionRow, _transactionReportItem);
 
-                AccountName = transactionRow.AccountRow.Name;
+                RawAccountName = AccountName = transactionRow.AccountRow.Name;
                 RawDate = transactionRow.Date;
                 Date = transactionRow.Date.ToString("MM/dd/yyyy");
-                Payee = transactionRow.IsPayeeNull() ? "" : transactionRow.Payee;
+                RawPayee = Payee = transactionRow.IsPayeeNull() ? "" : transactionRow.Payee;
                 Memo = transactionRow.IsMemoNull() ?
                     (lineItemRows.Length == 1 && !lineItemRows[0].IsMemoNull() ? lineItemRows[0].Memo : "")
                     : transactionRow.Memo;
@@ -373,10 +373,12 @@ namespace BanaData.Logic.Dialogs.Reports
                 string item = rawItem + " subtotal";
                 if (transactionReportItem.IsGroupingByAccount)
                 {
+                    RawAccountName = rawItem;
                     AccountName = item;
                 }
                 else if (transactionReportItem.IsGroupingByPayee)
                 {
+                    RawPayee = rawItem;
                     Payee = item;
                 }
                 else if (transactionReportItem.IsGroupingByCategory)
@@ -398,10 +400,12 @@ namespace BanaData.Logic.Dialogs.Reports
                 string item = rawItem + " subtotal for " + Date;
                 if (transactionReportItem.IsGroupingByAccount)
                 {
+                    RawAccountName = rawItem;
                     AccountName = item;
                 }
                 else if (transactionReportItem.IsGroupingByPayee)
                 {
+                    RawPayee = rawItem;
                     Payee = item;
                 }
                 else if (transactionReportItem.IsGroupingByCategory)
@@ -443,7 +447,9 @@ namespace BanaData.Logic.Dialogs.Reports
 
             public readonly Household.TransactionRow TransactionRow;
             public readonly DateTime RawDate;
+            public readonly string RawAccountName;
             public readonly string RawCategory;
+            public readonly string RawPayee;
 
             public string AccountName { get; }
             public string Date { get; }
@@ -468,14 +474,14 @@ namespace BanaData.Logic.Dialogs.Reports
                     return -1;
                 }
 
-                if (transactionReportItem.IsGroupingByAccount && AccountName != other.AccountName)
+                if (transactionReportItem.IsGroupingByAccount && RawAccountName != other.RawAccountName)
                 {
-                    return AccountName.CompareTo(other.AccountName);
+                    return RawAccountName.CompareTo(other.RawAccountName);
                 }
 
-                if (transactionReportItem.IsGroupingByPayee && Payee != other.Payee)
+                if (transactionReportItem.IsGroupingByPayee && RawPayee != other.RawPayee)
                 {
-                    return Payee.CompareTo(other.Payee);
+                    return RawPayee.CompareTo(other.RawPayee);
                 }
 
                 if (transactionReportItem.IsGroupingByCategory && RawCategory != other.RawCategory)
