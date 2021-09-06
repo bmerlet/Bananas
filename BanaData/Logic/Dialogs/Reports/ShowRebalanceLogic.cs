@@ -33,7 +33,7 @@ namespace BanaData.Logic.Dialogs.Reports
             mainWindowLogic = _mainWindowLogic;
             accountRow = mainWindowLogic.Household.Account.FindByID(accountID);
 
-            var portfolio = accountRow.GetPortfolio(null);
+            var portfolio = accountRow.GetPortfolio();
             foreach (var securityRow in portfolio.GetSecuritiesRows())
             {
                 decimal securityQuantity = portfolio.Lots.Where(l => l.Security == securityRow).Sum(l => l.Quantity);

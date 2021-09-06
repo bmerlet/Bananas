@@ -44,7 +44,7 @@ namespace BanaData.Logic.Dialogs.Editors
             trackers.Add(new SecurityTracker("Cash", "Cash", priorStatementCashBalance, 0, statementCashBalance, 0, "C2"));
 
             // Add trackers for securities
-            var reconciledPortfolio = accountRow.GetPortfolio(null, null, ETransactionStatus.Reconciled);
+            var reconciledPortfolio = accountRow.GetReconciledPortfolio();
             foreach (var securityReconcileInfo in reconcileInfo.GetSecurityReconcileInfoRows())
             {
                 decimal prioStatementQuantity = reconciledPortfolio.Lots.Where(l => l.Security == securityReconcileInfo.SecurityRow).Sum(l => l.Quantity);

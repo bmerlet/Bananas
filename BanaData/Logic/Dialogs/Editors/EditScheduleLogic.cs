@@ -91,11 +91,8 @@ namespace BanaData.Logic.Dialogs.Editors
             set
             {
                 account = value;
-                if (mainWindowLogic.Household.Account.GetByName(account) is Household.AccountRow accountRow)
-                {
-                    MediumEnabled = accountRow.Type == EAccountType.Bank;
-                    OnPropertyChanged(() => MediumEnabled);
-                }
+                MediumEnabled = (mainWindowLogic.Household.Account.GetByName(account) is Household.AccountRow accountRow) && accountRow.Type == EAccountType.Bank;
+                OnPropertyChanged(() => MediumEnabled);
             }
         }
         public IEnumerable<string> Accounts =>

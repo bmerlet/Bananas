@@ -42,6 +42,7 @@ namespace XamlUI.Dialogs.Reports
 
             var logic = DataContext as ShowWealthOverTimeLogic;
             var points = logic.DateValues;
+            var payoutPoints = logic.PayoutDateValues;
 
             canvas.Children.Clear();
 
@@ -50,8 +51,14 @@ namespace XamlUI.Dialogs.Reports
                 return;
             }
 
-            decimal minPrice = points.Min(p => p.Value);
-            decimal maxPrice = points.Max(p => p.Value);
+            decimal minValue = points.Min(p => p.Value);
+            decimal maxValue = points.Max(p => p.Value);
+
+            if (logic.ShowPayout == true)
+            {
+                minValue = Math.Min(minValue, payoutPoints.Min(pp => pp.Value));
+                maxValue = Math.Max(maxValue, payoutPoints.Max(pp => pp.Value));
+            }
 
             TimeSpan span = logic.EndDate - logic.StartDate;
             double spanInDays = span.TotalDays;
@@ -65,7 +72,7 @@ namespace XamlUI.Dialogs.Reports
             double lastY = double.MinValue;
             var strokeDash = new DoubleCollection(new double[] { 5, 18 });
 
-            // Draw high and low prices
+            // Draw high and low values
             canvas.Children.Add(new Line
             {
                 X1 = marginX / 2,
@@ -87,21 +94,21 @@ namespace XamlUI.Dialogs.Reports
                 StrokeDashArray = strokeDash
             });
 
-            var highPriceTextBlock = new TextBlock { Text = $"Max:{maxPrice:N2}", FontSize = 9 };
+            var highPriceTextBlock = new TextBlock { Text = $"Max:{maxValue:N2}", FontSize = 9 };
             canvas.Children.Add(highPriceTextBlock);
             Canvas.SetLeft(highPriceTextBlock, 0);
             Canvas.SetTop(highPriceTextBlock, 0);
-            var lowPriceTextBlock = new TextBlock { Text = $"Min:{minPrice:N2}", FontSize = 9 };
+            var lowPriceTextBlock = new TextBlock { Text = $"Min:{minValue:N2}", FontSize = 9 };
             canvas.Children.Add(lowPriceTextBlock);
             Canvas.SetLeft(lowPriceTextBlock, 0);
             Canvas.SetTop(lowPriceTextBlock, canvasHeight + marginY);
 
-            // Draw quotes graph
+            // Draw values graph
             foreach (var p in points)
             {
                 double x = (p.Date - logic.StartDate).TotalDays / spanInDays * canvasWidth;
                 x += marginX;
-                double y = (double)((p.Value - minPrice) / (maxPrice - minPrice + 0.01M)) * canvasHeight;
+                double y = (double)((p.Value - minValue) / (maxValue - minValue + 0.01M)) * canvasHeight;
                 y = marginY + canvasHeight - y;
 
                 if (lastX != double.MinValue)
@@ -122,6 +129,38 @@ namespace XamlUI.Dialogs.Reports
 
                 lastX = x;
                 lastY = y;
+            }
+
+            if (logic.ShowPayout == true)
+            {
+                lastX = double.MinValue;
+
+                foreach (var p in payoutPoints)
+                {
+                    double x = (p.Date - logic.StartDate).TotalDays / spanInDays * canvasWidth;
+                    x += marginX;
+                    double y = (double)((p.Value - minValue) / (maxValue - minValue + 0.01M)) * canvasHeight;
+                    y = marginY + canvasHeight - y;
+
+                    if (lastX != double.MinValue)
+                    {
+                        var line = new Line
+                        {
+                            Stroke = Brushes.DarkGreen,
+                            StrokeThickness = 1,
+                            X1 = lastX,
+                            X2 = x,
+                            Y1 = lastY,
+                            Y2 = y,
+                            ToolTip = p.Tip
+                        };
+
+                        canvas.Children.Add(line);
+                    }
+
+                    lastX = x;
+                    lastY = y;
+                }
             }
         }
     }

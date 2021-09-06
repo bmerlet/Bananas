@@ -191,7 +191,7 @@ namespace BanaData.Logic.Dialogs.Editors
             }
 
             // Get the reconciled protfolio state
-            portfolio = accountRow.GetPortfolio(null, null, ETransactionStatus.Reconciled);
+            portfolio = accountRow.GetReconciledPortfolio();
 
             // Add any missing security with a presumed quantity of zero
             foreach (var security in portfolio.GetSecuritiesRows())

@@ -59,7 +59,15 @@ namespace BanaData.Database
 
             public EInvestmentKind SKind => IsIKindNull() ? EInvestmentKind.Invalid : Kind;
 
-            public string Owner => IsPersonIDNull() ? null : PersonRow.Name; 
+            public string Owner => IsPersonIDNull() ? null : PersonRow.Name;
+
+            // Get the unreconciled transactions of an account
+            public IEnumerable<TransactionRow> GetUnreconciledTransactions()
+            {
+                return GetRegularTransactionRows().Where(tr => tr.Status != ETransactionStatus.Reconciled);
+            }
+
+            #region Banking utilities
 
             // Are there transactions associated with this account?
             public bool HasTransactions => GetTransactionRows().Length > 0;
@@ -70,32 +78,43 @@ namespace BanaData.Database
                 return GetTransactionRows().Where(tr => tr.Type == ETransactionType.Regular);
             }
 
-            // Get the balance of an account
-            public decimal GetBalance(DateTime? limit = null)
+            // Get the current balance of a bank account
+            public decimal GetBalance()
             {
-                return GetBalance(false, ETransactionStatus.Pending, limit);
+                return GetBalance(null, null, null);
             }
 
-            // Get the reconciled balance of an account
+            // Get the reconciled balance of a bank account
             public decimal GetReconciledBalance()
             {
-                return GetBalance(true, ETransactionStatus.Reconciled, null);
+                return GetBalance(ETransactionStatus.Reconciled, null, null);
+            }
+
+            // Get balance of a bank account over a period of time
+            public decimal GetBalance(DateTime dateFrom , DateTime dateTo)
+            {
+                return GetBalance(null, dateFrom, dateTo);
             }
 
             // Get the balance of a banking account
-            private decimal GetBalance(bool filter, ETransactionStatus statusToFilterOn = ETransactionStatus.Pending, DateTime? limit = null)
+            private decimal GetBalance(ETransactionStatus? status, DateTime? fromDate, DateTime? toDate)
             {
                 decimal balance = 0;
 
                 // Find balance from all transactions
                 foreach (var transaction in GetRegularTransactionRows())
                 {
-                    if (limit.HasValue && transaction.Date.CompareTo(limit.Value) > 0)
+                    if (fromDate.HasValue && transaction.Date.CompareTo(fromDate.Value) <= 0)
                     {
                         continue;
                     }
 
-                    if (!filter || transaction.Status == statusToFilterOn)
+                    if (toDate.HasValue && transaction.Date.CompareTo(toDate.Value) > 0)
+                    {
+                        continue;
+                    }
+
+                    if (!status.HasValue || transaction.Status == status.Value)
                     {
                         if (Type == EAccountType.Investment)
                         {
@@ -115,48 +134,72 @@ namespace BanaData.Database
                 return balance;
             }
 
-            // Get the unreconciled transactions of a banking account
-            public IEnumerable<TransactionRow> GetUnreconciledTransactions()
-            {
-                return GetRegularTransactionRows().Where(tr => tr.Status != ETransactionStatus.Reconciled);
-            }
+            #endregion
 
-            // Get the value of an investment account
-            public decimal GetInvestmentValue(DateTime? date = null)
+            #region Investment utilties
+
+            //
+            // Value
+            //
+
+            // Get the current value of an investment account
+            public decimal GetInvestmentValue()
             {
                 // Compute the portfolio
+                var portfolio = GetPortfolio();
+
+                // Get latest price for the securities in the portfolio
+                return portfolio.GetValuation(null);
+            }
+
+            // Get the value of an investment account at a specified time ZZZZ toDel
+            public decimal GetInvestmentValue(DateTime date)
+            {
+                // Compute the portfolio at the specified date
                 var portfolio = GetPortfolio(date);
 
                 // Get latest price for the securities in the portfolio
                 return portfolio.GetValuation(date);
             }
 
-            // Get the securities held in an investment account
-            public IEnumerable<int> GetInvestmentSecurities()
+            //
+            // Portfolio
+            //
+
+            // Get current portfolio
+            public Portfolio GetPortfolio()
             {
-                // Compute the portfolio
-                var portfolio = new Portfolio();
-                foreach (var transRow in GetRegularTransactionRows())
+                return GetPortfolio(null, null, null, null);
+            }
+
+            // Get portfolio atr a specific time
+            public Portfolio GetPortfolio(DateTime date, TransactionRow excludedTransaction = null)
+            {
+                return GetPortfolio(null, null, null, date, excludedTransaction);
+            }
+
+            // Get reconciled portfolio
+            public Portfolio GetReconciledPortfolio()
+            {
+                return GetPortfolio(null, ETransactionStatus.Reconciled, null, null);
+            }
+
+            // Shift portfolio through time
+            public void GetPortfolio(Portfolio portfolio, DateTime fromDate, DateTime toDate)
+            {
+                GetPortfolio(portfolio, null, fromDate, toDate);
+            }
+
+            // Internal portfolio-building workhorse
+            private Portfolio GetPortfolio(Portfolio portfolio, ETransactionStatus? status, DateTime? fromDate, DateTime? toDate, Household.TransactionRow excludedTransaction = null)
+            {
+                // Create portfolio if none supplied
+                if (portfolio == null)
                 {
-                    portfolio.ApplyTransaction(transRow);
+                    portfolio = new Portfolio();
                 }
 
-                // Get latest price for the securities in the portfolio
-                return portfolio.GetSecurities();
-            }
-
-            // Get the payout of an investment (= money invested - money paid out) 
-            public decimal GetInvestmentPayout(DateTime date)
-            {
-                // ZZZZ
-                return 0;
-            }
-
-            // Get the portfolio at a specific date
-            public Portfolio GetPortfolio(DateTime? date, Household.TransactionRow excludedTransaction = null, ETransactionStatus? status = null)
-            {
-                // Compute the portfolio at the specified date
-                var portfolio = new Portfolio();
+                // Shift the portfolio to the specified time
                 foreach (TransactionRow transRow in GetRegularTransactionRows())
                 {
                     if (transRow == excludedTransaction)
@@ -164,7 +207,12 @@ namespace BanaData.Database
                         continue;
                     }
 
-                    if (date.HasValue && transRow.Date.CompareTo(date.Value) > 0)
+                    if (fromDate.HasValue && transRow.Date.CompareTo(fromDate.Value) <= 0)
+                    {
+                        continue;
+                    }
+
+                    if (toDate.HasValue && transRow.Date.CompareTo(toDate.Value) > 0)
                     {
                         continue;
                     }
@@ -179,6 +227,36 @@ namespace BanaData.Database
 
                 return portfolio;
             }
+
+            // Get the payout of an investment (= money invested - money paid out) 
+            public decimal GetInvestmentPayout(Portfolio portfolio, DateTime fromDate, DateTime toDate)
+            {
+                decimal payout = 0;
+
+                // Compute the payout in the specified period
+                foreach (TransactionRow transRow in GetRegularTransactionRows())
+                {
+                    if (transRow.Date.CompareTo(fromDate) <= 0)
+                    {
+                        continue;
+                    }
+
+                    if (transRow.Date.CompareTo(toDate) > 0)
+                    {
+                        continue;
+                    }
+
+                    var investmentTransactionRow = transRow.GetInvestmentTransaction();
+                    if (investmentTransactionRow.IsTransferIn || investmentTransactionRow.IsTransferOut)
+                    {
+                        payout += transRow.GetLineItemRows().Sum(li => li.Amount);
+                    }
+                }
+
+                return payout;
+            }
+
+            #endregion
         }
 
         #endregion

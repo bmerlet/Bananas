@@ -74,7 +74,8 @@ namespace BanaData.Logic.Dialogs.Reports
         private const string DATE_RANGE_ONE_MONTH = "One month";
         private const string DATE_RANGE_ONE_YEAR = "One year";
         private const string DATE_RANGE_YTD = "Year to date";
-        private const string DATE_RANGE_FIVE_YEAR = "5 years";
+        private const string DATE_RANGE_FIVE_YEARS = "5 years";
+        private const string DATE_RANGE_TEN_YEARS = "10 years";
         private const string DATE_RANGE_ALL = "All available";
         private const string DATE_RANGE_CUSTOM = "Custom";
         public string[] DateRangesSource { get; } = new string[] {
@@ -82,12 +83,13 @@ namespace BanaData.Logic.Dialogs.Reports
             DATE_RANGE_ONE_MONTH,
             DATE_RANGE_ONE_YEAR,
             DATE_RANGE_YTD,
-            DATE_RANGE_FIVE_YEAR,
+            DATE_RANGE_FIVE_YEARS,
+            DATE_RANGE_TEN_YEARS,
             DATE_RANGE_ALL,
             DATE_RANGE_CUSTOM
         };
 
-        private string dateRange = DATE_RANGE_ONE_YEAR;
+        private string dateRange = DATE_RANGE_TEN_YEARS;
         public string DateRange { get => dateRange; set => SetDateRange(value); }
 
         // Custom dates enabled
@@ -116,7 +118,7 @@ namespace BanaData.Logic.Dialogs.Reports
             FREQUENCY_YEAR
         };
 
-        private string frequency = FREQUENCY_MONTH;
+        private string frequency = FREQUENCY_YEAR;
         public string Frequency { get => frequency; set { frequency = value; UpdateGraph(); } }
 
         // Show payout
@@ -196,23 +198,27 @@ namespace BanaData.Logic.Dialogs.Reports
             {
                 case DATE_RANGE_ONE_WEEK:
                     endDate = DateTime.Today;
-                    startDate = endDate.AddDays(-6);
+                    startDate = endDate.AddDays(-7);
                     break;
                 case DATE_RANGE_ONE_MONTH:
                     endDate = DateTime.Today;
-                    startDate = endDate.AddMonths(-1).AddDays(1);
+                    startDate = endDate.AddMonths(-1);
                     break;
                 case DATE_RANGE_ONE_YEAR:
                     endDate = DateTime.Today;
-                    startDate = endDate.AddYears(-1).AddDays(1);
+                    startDate = endDate.AddYears(-1);
                     break;
                 case DATE_RANGE_YTD:
                     endDate = DateTime.Today;
                     startDate = new DateTime(DateTime.Today.Year, 1, 1);
                     break;
-                case DATE_RANGE_FIVE_YEAR:
+                case DATE_RANGE_FIVE_YEARS:
                     endDate = DateTime.Today;
-                    startDate = endDate.AddYears(-5).AddDays(1);
+                    startDate = endDate.AddYears(-5);
+                    break;
+                case DATE_RANGE_TEN_YEARS:
+                    endDate = DateTime.Today;
+                    startDate = endDate.AddYears(-10);
                     break;
                 case DATE_RANGE_ALL:
                     endDate = DateTime.Today;
@@ -243,27 +249,45 @@ namespace BanaData.Logic.Dialogs.Reports
             DateValues.Clear();
             PayoutDateValues.Clear();
 
+            var prevDate = DateTime.MinValue;
             var date = startDate;
-            while(date < endDate)
+            decimal bankBalance = 0;
+            decimal payout = 0;
+            Dictionary<Household.AccountRow, Portfolio> portfolios = new Dictionary<Household.AccountRow, Portfolio>();
+
+            foreach (var account in accounts.Where(a => a.IsSelected == true && a.AccountRow.Type == EAccountType.Investment))
+            {
+                portfolios[account.AccountRow] = new Portfolio();
+            }
+
+            while (date <= endDate)
             {
                 // Compute value at this date
                 decimal wealth = 0;
-                decimal payout = 0;
                 foreach (var account in accounts.Where(a => a.IsSelected == true))
                 {
                     if (account.AccountRow.Type == EAccountType.Investment)
                     {
-                        wealth += account.AccountRow.GetInvestmentValue(date);
+                        // Get the portfolio at prevDate
+                        var portfolio = portfolios[account.AccountRow];
+
+                        // Compute payout BEFORE moving the portfolio to the current date
                         if (showPayout)
                         {
-                            payout += account.AccountRow.GetInvestmentPayout(date);
+                            payout += account.AccountRow.GetInvestmentPayout(portfolio, prevDate, date);
                         }
+
+                        // Move portfolio to current date
+                        account.AccountRow.GetPortfolio(portfolio, prevDate, date);
+                        wealth += portfolio.GetValuation(date);
                     }
                     else
                     {
-                        wealth += account.AccountRow.GetBalance(date);
+                        bankBalance += account.AccountRow.GetBalance(prevDate, date);
                     }
                 }
+
+                wealth += bankBalance;
 
                 DateValues.Add(new DateValue(date, wealth));
                 if (showPayout)
@@ -272,6 +296,7 @@ namespace BanaData.Logic.Dialogs.Reports
                 }
 
                 // Increment date
+                prevDate = date;
                 switch(frequency)
                 {
                     case FREQUENCY_DAY:

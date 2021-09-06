@@ -359,7 +359,7 @@ namespace BanaData.Logic.Main
                 if (account.Type == EAccountType.Investment)
                 {
                     // Find the securities held
-                    foreach(int security in account.GetInvestmentSecurities())
+                    foreach(int security in account.GetPortfolio().GetSecurities())
                     {
                         if (!securities.Contains(security))
                         {
