@@ -90,12 +90,6 @@ namespace BanaData.Database
                 return GetBalance(ETransactionStatus.Reconciled, null, null);
             }
 
-            // Get balance of a bank account over a period of time
-            public decimal GetBalance(DateTime dateFrom , DateTime dateTo)
-            {
-                return GetBalance(null, dateFrom, dateTo);
-            }
-
             // Get the balance of a banking account
             private decimal GetBalance(ETransactionStatus? status, DateTime? fromDate, DateTime? toDate)
             {
@@ -184,12 +178,6 @@ namespace BanaData.Database
                 return GetPortfolio(null, ETransactionStatus.Reconciled, null, null);
             }
 
-            // Shift portfolio through time
-            public void GetPortfolio(Portfolio portfolio, DateTime fromDate, DateTime toDate)
-            {
-                GetPortfolio(portfolio, null, fromDate, toDate);
-            }
-
             // Internal portfolio-building workhorse
             private Portfolio GetPortfolio(Portfolio portfolio, ETransactionStatus? status, DateTime? fromDate, DateTime? toDate, Household.TransactionRow excludedTransaction = null)
             {
@@ -226,34 +214,6 @@ namespace BanaData.Database
                 }
 
                 return portfolio;
-            }
-
-            // Get the payout of an investment (= money invested - money paid out) 
-            public decimal GetInvestmentPayout(Portfolio portfolio, DateTime fromDate, DateTime toDate)
-            {
-                decimal payout = 0;
-
-                // Compute the payout in the specified period
-                foreach (TransactionRow transRow in GetRegularTransactionRows())
-                {
-                    if (transRow.Date.CompareTo(fromDate) <= 0)
-                    {
-                        continue;
-                    }
-
-                    if (transRow.Date.CompareTo(toDate) > 0)
-                    {
-                        continue;
-                    }
-
-                    var investmentTransactionRow = transRow.GetInvestmentTransaction();
-                    if (investmentTransactionRow.IsTransferIn || investmentTransactionRow.IsTransferOut)
-                    {
-                        payout += transRow.GetLineItemRows().Sum(li => li.Amount);
-                    }
-                }
-
-                return payout;
             }
 
             #endregion

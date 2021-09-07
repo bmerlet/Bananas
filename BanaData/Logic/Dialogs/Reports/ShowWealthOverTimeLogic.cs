@@ -38,6 +38,7 @@ namespace BanaData.Logic.Dialogs.Reports
 
             // Setup account view
             Accounts = (CollectionView)CollectionViewSource.GetDefaultView(accounts);
+            Accounts.SortDescriptions.Add(new SortDescription("AccountItem.Hidden", ListSortDirection.Ascending));
             Accounts.SortDescriptions.Add(new SortDescription("AccountItem.Name", ListSortDirection.Ascending));
 
             // Setup commands
@@ -249,71 +250,112 @@ namespace BanaData.Logic.Dialogs.Reports
             DateValues.Clear();
             PayoutDateValues.Clear();
 
-            var prevDate = DateTime.MinValue;
-            var date = startDate;
-            decimal bankBalance = 0;
-            decimal payout = 0;
-            Dictionary<Household.AccountRow, Portfolio> portfolios = new Dictionary<Household.AccountRow, Portfolio>();
-
-            foreach (var account in accounts.Where(a => a.IsSelected == true && a.AccountRow.Type == EAccountType.Investment))
+            // Get time-sorted transactions for relevant accounts
+            var transactions = mainWindowLogic.Household.RegularTransactions
+                .Where(tr => accounts.First(a => a.AccountRow == tr.AccountRow).IsSelected == true)
+                .ToList();
+            transactions.Sort((t1, t2) =>
             {
-                portfolios[account.AccountRow] = new Portfolio();
-            }
-
-            while (date <= endDate)
-            {
-                // Compute value at this date
-                decimal wealth = 0;
-                foreach (var account in accounts.Where(a => a.IsSelected == true))
+                // Sort by date
+                int ret = t1.Date.CompareTo(t2.Date);
+                if (ret == 0)
                 {
-                    if (account.AccountRow.Type == EAccountType.Investment)
+                    // The sort by account
+                    ret = t1.AccountID.CompareTo(t2.AccountID);
+                    if (ret == 0 && t1.AccountRow.Type == EAccountType.Investment)
                     {
-                        // Get the portfolio at prevDate
-                        var portfolio = portfolios[account.AccountRow];
-
-                        // Compute payout BEFORE moving the portfolio to the current date
-                        if (showPayout)
+                        // Shares in first to avoid empty lot issues
+                        var i1 = t1.GetInvestmentTransaction();
+                        var i2 = t2.GetInvestmentTransaction();
+                        if (i1.IsSecurityIn && i2.IsSecurityIn)
                         {
-                            payout += account.AccountRow.GetInvestmentPayout(portfolio, prevDate, date);
+                            ret = 0;
                         }
-
-                        // Move portfolio to current date
-                        account.AccountRow.GetPortfolio(portfolio, prevDate, date);
-                        wealth += portfolio.GetValuation(date);
+                        else if (i1.IsSecurityIn)
+                        {
+                            ret = -1;
+                        }
+                        else if (i2.IsSecurityIn)
+                        {
+                            ret = 1;
+                        }
                     }
-                    else
+
+                    // Don't let anybody think they are equal
+                    if (ret == 0)
                     {
-                        bankBalance += account.AccountRow.GetBalance(prevDate, date);
+                        return t1.ID.CompareTo(t2.ID);
+                    }
+                }
+                return ret;
+            });
+
+            var date = startDate;
+            var portfolio = new Portfolio(); // Combined portfolio of all selected investment accounts
+            decimal bankBalance = 0; // Combined bank balance of all selected bank accounts
+            decimal payout = 0;
+            decimal wealth;
+
+            // Iterate over the transaction list
+            foreach (var transaction in transactions)
+            {
+                // Get to next date if we reached the current date
+                while (transaction.Date >= date)
+                {
+                    // Create graph point for this date
+                    wealth = bankBalance + portfolio.GetValuation(date);
+                    DateValues.Add(new DateValue(date, wealth));
+                    PayoutDateValues.Add(new DateValue(date, payout));
+
+                    // End if reached the end of the date range
+                    if (date > endDate)
+                    {
+                        break;
+                    }
+
+                    switch (frequency)
+                    {
+                        case FREQUENCY_DAY:
+                            date = date.AddDays(1);
+                            break;
+                        case FREQUENCY_WEEK:
+                            date = date.AddDays(7);
+                            break;
+                        case FREQUENCY_MONTH:
+                            date = date.AddMonths(1);
+                            break;
+                        case FREQUENCY_YEAR:
+                            date = date.AddYears(1);
+                            break;
                     }
                 }
 
-                wealth += bankBalance;
-
-                DateValues.Add(new DateValue(date, wealth));
-                if (showPayout)
+                // Process this transaction
+                if (transaction.AccountRow.Type == EAccountType.Investment)
                 {
-                    PayoutDateValues.Add(new DateValue(date, payout));
+                    // Update portfolio for this transaction
+                    portfolio.ApplyTransaction(transaction);
+
+                    // Update payout for this transaction
+                    var investmentTransactionRow = transaction.GetInvestmentTransaction();
+                    if (investmentTransactionRow.IsTransferIn || investmentTransactionRow.IsTransferOut)
+                    {
+                        payout += transaction.GetAmount();
+                    }
                 }
-
-                // Increment date
-                prevDate = date;
-                switch(frequency)
+                else
                 {
-                    case FREQUENCY_DAY:
-                        date = date.AddDays(1);
-                        break;
-                    case FREQUENCY_WEEK:
-                        date = date.AddDays(7);
-                        break;
-                    case FREQUENCY_MONTH:
-                        date = date.AddMonths(1);
-                        break;
-                    case FREQUENCY_YEAR:
-                        date = date.AddYears(1);
-                        break;
+                    // Update bank balance for this transaction
+                    bankBalance += transaction.GetAmount();
+
                 }
             }
- 
+
+            // Create graph point for last date
+            wealth = bankBalance + portfolio.GetValuation(date);
+            DateValues.Add(new DateValue(date, wealth));
+            PayoutDateValues.Add(new DateValue(date, payout));
+
             UpdateGraphSignal = !UpdateGraphSignal;
             OnPropertyChanged(() => UpdateGraphSignal);
 
