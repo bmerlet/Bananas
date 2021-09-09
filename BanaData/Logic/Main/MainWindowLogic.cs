@@ -461,7 +461,7 @@ namespace BanaData.Logic.Main
         {
             var exporter = new QIFWriter(this);
             (int numAccounts, int numTransactions)  = exporter.DifferentialExportToQIF(file);
-            ErrorMessage($"Differential export: Exported {numTransactions} in {numAccounts} accounts; new checkpoint created", "Export results");
+            ErrorMessage($"Differential export: Exported {numTransactions} transactions in {numAccounts} accounts; new checkpoint created", "Export results");
         }
 
         public void SaveIfDirty()

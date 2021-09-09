@@ -622,6 +622,9 @@ namespace BanaData.Logic.Main
 
                 // Update the line item
                 UpdateLineItemInDB(data.LineItem, transactionRow, impactedAccounts);
+
+                // Update investment transaction row
+                household.InvestmentTransaction.Update(transactionRow, data.Type, securityRow, data.SecurityPrice, data.SecurityQuantity, data.Commission);
             }
 
             mainWindowLogic.CommitChanges();
