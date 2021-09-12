@@ -496,7 +496,12 @@ namespace BanaData.Serializations
             }
             else if (lineItemRow.GetLineItemTransferRow() is Household.LineItemTransferRow lineItemTransferRow)
             {
-                sw.WriteLine(letter + mainWindowLogic.Transfers.Find(t => t.AccountID == lineItemTransferRow.AccountID).FullName);
+                var tx = mainWindowLogic.Transfers.Find(t => t.AccountID == lineItemTransferRow.AccountID);
+                if (tx == null)
+                {
+                    tx = mainWindowLogic.HiddenTransfers.Find(t => t.AccountID == lineItemTransferRow.AccountID);
+                }
+                sw.WriteLine(letter + tx.FullName);
             }
         }
 

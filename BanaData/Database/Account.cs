@@ -188,7 +188,35 @@ namespace BanaData.Database
                 }
 
                 // Shift the portfolio to the specified time
-                foreach (TransactionRow transRow in GetRegularTransactionRows())
+                var transactions = GetRegularTransactionRows().ToList();
+                transactions.Sort((t1, t2) =>
+                {
+                    int ret = t1.Date.CompareTo(t2.Date);
+                    if (ret == 0 && Type == EAccountType.Investment)
+                    {
+                        var i1 = t1.GetInvestmentTransaction();
+                        var i2 = t2.GetInvestmentTransaction();
+                        if (i1.IsSecurityIn && i2.IsSecurityIn)
+                        {
+                            ret = 0;
+                        }
+                        else if (i1.IsSecurityIn)
+                        {
+                            ret = -1;
+                        }
+                        else if (i2.IsSecurityIn)
+                        {
+                            ret = 1;
+                        }
+                    }
+                    if (ret == 0)
+                    {
+                        ret = t1.ID.CompareTo(t2.ID);
+                    }
+                    return ret;
+                });
+
+                foreach (TransactionRow transRow in transactions)
                 {
                     if (transRow == excludedTransaction)
                     {
