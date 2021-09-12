@@ -26,7 +26,7 @@ namespace BanaData.Database
 
         public IEnumerable<Lot> Lots => lots;
 
-        public void ApplyTransaction(Household.TransactionRow transaction)
+        public void ApplyTransaction(Household.TransactionRow transaction, bool allowNegativeLots)
         {
             // Get investment transaction
             var investmentTransaction = transaction.GetInvestmentTransaction();
@@ -52,7 +52,7 @@ namespace BanaData.Database
             }
             else if (investmentTransaction.IsSecurityOut)
             {
-                RemoveShares(security, investmentTransaction.SecurityQuantity);
+                RemoveShares(security, investmentTransaction.SecurityQuantity, allowNegativeLots);
             }
         }
 
@@ -66,7 +66,7 @@ namespace BanaData.Database
             lots.Add(new Lot(date, security, quantity, securityPrice));
         }
 
-        private void RemoveShares(Household.SecurityRow security, decimal quantity)
+        private void RemoveShares(Household.SecurityRow security, decimal quantity, bool allowNegativeLots)
         {
             // Only FIFO supported
             while (quantity > 0)
@@ -75,7 +75,11 @@ namespace BanaData.Database
                 var lot = lots.FirstOrDefault(l => l.Security.ID == security.ID);
                 if (lot == null)
                 {
-                    throw new InvalidOperationException("Cannot find lot to remove shares from");
+                    if (!allowNegativeLots)
+                    {
+                        throw new InvalidOperationException("Cannot find lot to remove shares from");
+                    }
+                    return;
                 }
 
                 if (quantity >= lot.Quantity)

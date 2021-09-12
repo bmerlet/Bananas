@@ -330,7 +330,8 @@ namespace BanaData.Logic.Main
             }
 
             // Check amount
-            decimal expectedAmount = data.SecurityQuantity * data.SecurityPrice - data.Commission;
+            decimal expectedAmount = Math.Round(data.SecurityQuantity * data.SecurityPrice - data.Commission, 2);
+            data.PositiveAmount = Math.Round(data.PositiveAmount, 2);
             if (data.PositiveAmount != expectedAmount)
             {
                 return

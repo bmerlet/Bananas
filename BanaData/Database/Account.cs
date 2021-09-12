@@ -163,23 +163,23 @@ namespace BanaData.Database
             // Get current portfolio
             public Portfolio GetPortfolio()
             {
-                return GetPortfolio(null, null, null, null);
+                return GetPortfolio(null, null, null, null, false, null);
             }
 
-            // Get portfolio atr a specific time
+            // Get portfolio at a specific time
             public Portfolio GetPortfolio(DateTime date, TransactionRow excludedTransaction = null)
             {
-                return GetPortfolio(null, null, null, date, excludedTransaction);
+                return GetPortfolio(null, null, null, date, false, excludedTransaction);
             }
 
             // Get reconciled portfolio
             public Portfolio GetReconciledPortfolio()
             {
-                return GetPortfolio(null, ETransactionStatus.Reconciled, null, null);
+                return GetPortfolio(null, ETransactionStatus.Reconciled, null, null, true, null);
             }
 
             // Internal portfolio-building workhorse
-            private Portfolio GetPortfolio(Portfolio portfolio, ETransactionStatus? status, DateTime? fromDate, DateTime? toDate, Household.TransactionRow excludedTransaction = null)
+            private Portfolio GetPortfolio(Portfolio portfolio, ETransactionStatus? status, DateTime? fromDate, DateTime? toDate, bool allowNegativeLots, Household.TransactionRow excludedTransaction)
             {
                 // Create portfolio if none supplied
                 if (portfolio == null)
@@ -238,7 +238,7 @@ namespace BanaData.Database
                         continue;
                     }
 
-                    portfolio.ApplyTransaction(transRow);
+                    portfolio.ApplyTransaction(transRow, allowNegativeLots);
                 }
 
                 return portfolio;

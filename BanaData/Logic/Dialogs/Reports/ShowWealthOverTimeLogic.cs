@@ -334,7 +334,7 @@ namespace BanaData.Logic.Dialogs.Reports
                 if (transaction.AccountRow.Type == EAccountType.Investment)
                 {
                     // Update portfolio for this transaction
-                    portfolio.ApplyTransaction(transaction);
+                    portfolio.ApplyTransaction(transaction, false);
 
                     // Update payout for this transaction
                     var investmentTransactionRow = transaction.GetInvestmentTransaction();
