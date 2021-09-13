@@ -20,6 +20,7 @@ namespace BanaData.Logic.Dialogs.Reports
 
         private readonly MainWindowLogic mainWindowLogic;
         private bool internalUpdate = false;
+        private List<Household.TransactionRow> transactions;
 
         #endregion
 
@@ -32,7 +33,14 @@ namespace BanaData.Logic.Dialogs.Reports
             foreach (Household.AccountRow accountRow in mainWindowLogic.Household.Account)
             {
                 var accountItem = new AccountPickerItem(accountRow, true);
-                accountItem.PropertyChanged += (s, e) => { if (!internalUpdate) UpdateGraph(); };
+                accountItem.PropertyChanged += (s, e) =>
+                {
+                    if (!internalUpdate)
+                    {
+                        UpdateTransactions();
+                        UpdateGraph();
+                    }
+                };
                 accounts.Add(accountItem);
             }
 
@@ -47,6 +55,7 @@ namespace BanaData.Logic.Dialogs.Reports
             SelectInvestmentCommand = new CommandBase(OnSelectInvestmentCommand);
             SelectBankingCommand = new CommandBase(OnSelectBankingCommand);
 
+            UpdateTransactions();
             SetDateRange(dateRange);
         }
 
@@ -110,17 +119,23 @@ namespace BanaData.Logic.Dialogs.Reports
         private const string FREQUENCY_DAY = "day";
         private const string FREQUENCY_WEEK = "week";
         private const string FREQUENCY_MONTH = "month";
+        private const string FREQUENCY_QUARTER = "quarter";
         private const string FREQUENCY_YEAR = "year";
         public string[] FrequencySource { get; } = new string[]
         {
             FREQUENCY_DAY,
             FREQUENCY_WEEK,
             FREQUENCY_MONTH,
+            FREQUENCY_QUARTER,
             FREQUENCY_YEAR
         };
 
         private string frequency = FREQUENCY_YEAR;
         public string Frequency { get => frequency; set { frequency = value; UpdateGraph(); } }
+
+        // 0-based Y axis
+        private bool zeroYAxis;
+        public bool? ZeroYAxis { get => zeroYAxis; set { zeroYAxis = value == true; RedrawGraph(); } }
 
         // Show payout
         private bool showPayout;
@@ -149,6 +164,7 @@ namespace BanaData.Logic.Dialogs.Reports
             }
 
             internalUpdate = false;
+            UpdateTransactions();
             UpdateGraph();
         }
 
@@ -162,6 +178,7 @@ namespace BanaData.Logic.Dialogs.Reports
             }
 
             internalUpdate = false;
+            UpdateTransactions();
             UpdateGraph();
         }
 
@@ -175,6 +192,7 @@ namespace BanaData.Logic.Dialogs.Reports
             }
 
             internalUpdate = false;
+            UpdateTransactions();
             UpdateGraph();
         }
 
@@ -188,6 +206,7 @@ namespace BanaData.Logic.Dialogs.Reports
             }
 
             internalUpdate = false;
+            UpdateTransactions();
             UpdateGraph();
         }
 
@@ -244,14 +263,10 @@ namespace BanaData.Logic.Dialogs.Reports
             UpdateGraph();
         }
 
-        private void UpdateGraph()
+        private void UpdateTransactions()
         {
-            mainWindowLogic.GuiServices.SetCursor(true);
-            DateValues.Clear();
-            PayoutDateValues.Clear();
-
             // Get time-sorted transactions for relevant accounts
-            var transactions = mainWindowLogic.Household.RegularTransactions
+            transactions = mainWindowLogic.Household.RegularTransactions
                 .Where(tr => accounts.First(a => a.AccountRow == tr.AccountRow).IsSelected == true)
                 .ToList();
             transactions.Sort((t1, t2) =>
@@ -289,6 +304,13 @@ namespace BanaData.Logic.Dialogs.Reports
                 }
                 return ret;
             });
+        }
+
+        private void UpdateGraph()
+        {
+            mainWindowLogic.GuiServices.SetCursor(true);
+            DateValues.Clear();
+            PayoutDateValues.Clear();
 
             var date = startDate;
             var portfolio = new Portfolio(); // Combined portfolio of all selected investment accounts
@@ -324,6 +346,9 @@ namespace BanaData.Logic.Dialogs.Reports
                         case FREQUENCY_MONTH:
                             date = date.AddMonths(1);
                             break;
+                        case FREQUENCY_QUARTER:
+                            date = date.AddMonths(3);
+                            break;
                         case FREQUENCY_YEAR:
                             date = date.AddYears(1);
                             break;
@@ -356,10 +381,15 @@ namespace BanaData.Logic.Dialogs.Reports
             DateValues.Add(new DateValue(date, wealth));
             PayoutDateValues.Add(new DateValue(date, payout));
 
-            UpdateGraphSignal = !UpdateGraphSignal;
-            OnPropertyChanged(() => UpdateGraphSignal);
+            RedrawGraph();
 
             mainWindowLogic.GuiServices.SetCursor(false);
+        }
+
+        private void RedrawGraph()
+        {
+            UpdateGraphSignal = !UpdateGraphSignal;
+            OnPropertyChanged(() => UpdateGraphSignal);
         }
 
         #endregion

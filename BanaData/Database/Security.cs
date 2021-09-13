@@ -32,14 +32,15 @@ namespace BanaData.Database
 
                 foreach (SecurityPriceRow securityPriceRow in GetSecurityPriceRows())
                 {
-                    if (limit.HasValue && securityPriceRow.Date.CompareTo(limit.Value) > 0)
+                    var date = securityPriceRow.Date;
+                    if (limit.HasValue && date.CompareTo(limit.Value) > 0)
                     {
                         continue;
                     }
 
-                    if (securityPriceRow.Date.CompareTo(mostRecent) > 0)
+                    if (date.CompareTo(mostRecent) > 0)
                     {
-                        mostRecent = securityPriceRow.Date;
+                        mostRecent = date;
                         price = securityPriceRow.Value;
                     }
                 }

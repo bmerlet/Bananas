@@ -51,7 +51,7 @@ namespace XamlUI.Dialogs.Reports
                 return;
             }
 
-            decimal minValue = points.Min(p => p.Value);
+            decimal minValue = logic.ZeroYAxis == true ? 0 : points.Min(p => p.Value);
             decimal maxValue = points.Max(p => p.Value);
 
             if (logic.ShowPayout == true)

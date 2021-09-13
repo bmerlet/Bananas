@@ -93,7 +93,8 @@
                 <w:DateBox Grid.Column="5" Date="{Binding EndDate, Mode=TwoWay}" IsEnabled="{Binding AreDatesEnabled}" Width="80"/>
                 <TextBlock Grid.Row="1" Text="Compute value every:"/>
                 <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding FrequencySource}" SelectedItem="{Binding Frequency, Mode=TwoWay}" Width="100"/>
-                <CheckBox Grid.Row="1" Grid.Column="3" Content="Show payout" IsChecked="{Binding ShowPayout}"/>
+                <CheckBox Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Content="Show payout" IsChecked="{Binding ShowPayout}"/>
+                <CheckBox Grid.Row="1" Grid.Column="4" Grid.ColumnSpan="2" Content="0-based Y axis" IsChecked="{Binding ZeroYAxis}"/>
             </Grid>
             
             <Canvas x:Name="canvas"/>
