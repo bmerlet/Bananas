@@ -32,6 +32,12 @@ namespace BanaData.Database
             return price * Quantity;
         }
 
+        public decimal GetValuation(DateTime limit, Func<int, DateTime, decimal> getSecurityPriceOnDate)
+        {
+            decimal price = getSecurityPriceOnDate(Security.ID, limit);
+            return price * Quantity;
+        }
+
         public override string ToString()
         {
             return $"{Quantity:N4} {Security.Symbol} at {SecurityPrice:C4} on {Date:MM/dd/yyyy}";

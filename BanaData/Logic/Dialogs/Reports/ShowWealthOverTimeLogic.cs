@@ -20,6 +20,7 @@ namespace BanaData.Logic.Dialogs.Reports
 
         private readonly MainWindowLogic mainWindowLogic;
         private bool internalUpdate = false;
+        private readonly Dictionary<int, List<SecurityPrice>> securityPrices = new Dictionary<int, List<SecurityPrice>>();
         private List<Household.TransactionRow> transactions;
 
         #endregion
@@ -54,6 +55,18 @@ namespace BanaData.Logic.Dialogs.Reports
             SelectAllCommand = new CommandBase(OnSelectAllCommand);
             SelectInvestmentCommand = new CommandBase(OnSelectInvestmentCommand);
             SelectBankingCommand = new CommandBase(OnSelectBankingCommand);
+
+            // Setup dictionary of sorted security prices. The key is the security ID
+            foreach(var securityRow in mainWindowLogic.Household.Security)
+            {
+                var prices = new List<SecurityPrice>();
+                foreach(var price in securityRow.GetSecurityPriceRows())
+                {
+                    prices.Add(new SecurityPrice(price.Date, price.Value));
+                }
+                prices.Sort();
+                securityPrices[securityRow.ID] = prices;
+            }
 
             UpdateTransactions();
             SetDateRange(dateRange);
@@ -325,7 +338,7 @@ namespace BanaData.Logic.Dialogs.Reports
                 while (transaction.Date >= date)
                 {
                     // Create graph point for this date
-                    wealth = bankBalance + portfolio.GetValuation(date);
+                    wealth = bankBalance + portfolio.GetValuation(date, GetSecurityPriceOnDate);
                     DateValues.Add(new DateValue(date, wealth));
                     PayoutDateValues.Add(new DateValue(date, payout));
 
@@ -377,13 +390,36 @@ namespace BanaData.Logic.Dialogs.Reports
             }
 
             // Create graph point for last date
-            wealth = bankBalance + portfolio.GetValuation(date);
+            wealth = bankBalance + portfolio.GetValuation(date, GetSecurityPriceOnDate);
             DateValues.Add(new DateValue(date, wealth));
             PayoutDateValues.Add(new DateValue(date, payout));
 
             RedrawGraph();
 
             mainWindowLogic.GuiServices.SetCursor(false);
+        }
+
+        // Get security price at a specified date knowing that the list is sorted by date
+        private decimal GetSecurityPriceOnDate(int securityID, DateTime date)
+        {
+            var prices = securityPrices[securityID];
+
+            decimal price = 0;
+            int index = prices.BinarySearch(new SecurityPrice(date, 0));
+            if (index >= 0)
+            {
+                price = prices[index].Price;
+            }
+            else
+            {
+                index = ~index;
+                if (index > 0)
+                {
+                    price = prices[index - 1].Price;
+                }
+            }
+
+            return price;
         }
 
         private void RedrawGraph()
@@ -428,6 +464,17 @@ namespace BanaData.Logic.Dialogs.Reports
 
             public DateValue(DateTime date, decimal value) =>
                 (Date, Value, Tip) = (date, value, $"{date:MM/dd/yyyy}: {value:N2}");
+        }
+
+        public class SecurityPrice : IComparable<SecurityPrice>
+        {
+            public readonly DateTime Date;
+            public readonly decimal Price;
+
+            public SecurityPrice(DateTime date, decimal price) =>
+                (Date, Price) = (date, price);
+
+            public int CompareTo(SecurityPrice other) => Date.CompareTo(other.Date);
         }
 
         #endregion

@@ -142,6 +142,19 @@ namespace BanaData.Database
             return val;
         }
 
+        public decimal GetValuation(DateTime limit, Func<int, DateTime, decimal> getSecurityPriceOnDate)
+        {
+            decimal val = cashBalance;
+
+            foreach (var lot in lots)
+            {
+                val += lot.GetValuation(limit, getSecurityPriceOnDate);
+            }
+
+            return val;
+        }
+
+
         // Get the securities held in this portfolio
         public IEnumerable<int> GetSecurities()
         {
