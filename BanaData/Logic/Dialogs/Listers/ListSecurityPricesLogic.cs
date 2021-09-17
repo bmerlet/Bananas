@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using BanaData.Collections;
 using BanaData.Database;
+using BanaData.Logic.Dialogs.Basics;
 using BanaData.Logic.Items;
 using BanaData.Logic.Main;
 using Toolbox.UILogic;
@@ -34,7 +35,12 @@ namespace BanaData.Logic.Dialogs.Listers
             (this.mainWindowLogic, this.securityItem) = (mainWindowLogic, securityItem);
 
             Register = new SecurityPricesRegisterLogic(mainWindowLogic, this, securityItem.ID);
-            SetDateRange(dateRange);
+
+            DateRangeLogic = new DateRangeLogic(
+                DateRangeLogic.ERange.LastYear, 
+                () => mainWindowLogic.Household.SecurityPrice.Where(sp => sp.SecurityID == securityItem.ID).Min(sp => sp.Date));
+            DateRangeLogic.DateRangeChanged += (s, e) => UpdateGraph();
+
             UpdateGraph();
         }
 
@@ -48,37 +54,8 @@ namespace BanaData.Logic.Dialogs.Listers
         // Security prices register
         public SecurityPricesRegisterLogic Register { get; }
 
-        // Date range combo box
-        private const string DATE_RANGE_ONE_WEEK = "One week";
-        private const string DATE_RANGE_ONE_MONTH = "One month";
-        private const string DATE_RANGE_ONE_YEAR = "One year";
-        private const string DATE_RANGE_YTD = "Year to date";
-        private const string DATE_RANGE_FIVE_YEAR = "5 years";
-        private const string DATE_RANGE_ALL = "All available";
-        private const string DATE_RANGE_CUSTOM = "Custom";
-        public string[] DateRangesSource { get; } = new string[] {
-            DATE_RANGE_ONE_WEEK, 
-            DATE_RANGE_ONE_MONTH,
-            DATE_RANGE_ONE_YEAR,
-            DATE_RANGE_YTD,
-            DATE_RANGE_FIVE_YEAR,
-            DATE_RANGE_ALL,
-            DATE_RANGE_CUSTOM
-        };
-
-        private string dateRange = DATE_RANGE_ONE_YEAR;
-        public string DateRange { get => dateRange; set => SetDateRange(value); }
-
-        // Custom dates enabled
-        public bool? AreDatesEnabled => dateRange == DATE_RANGE_CUSTOM;
-
-        // Custom start date
-        private DateTime startDate;
-        public DateTime StartDate { get => startDate; set => SetCustomDateRange(value, endDate); }
-
-        // Custom end date
-        private DateTime endDate;
-        public DateTime EndDate { get => endDate; set => SetCustomDateRange(startDate, value); }
+        // Date range
+        public DateRangeLogic DateRangeLogic { get; }
 
         // Price points
         public WpfObservableRangeCollection<DatePriceGraphItem> Quotes { get; } =
@@ -103,62 +80,13 @@ namespace BanaData.Logic.Dialogs.Listers
 
         #region Actions
 
-        private void SetDateRange(string value)
-        {
-            dateRange = value;
-
-            switch(dateRange)
-            {
-                case DATE_RANGE_ONE_WEEK:
-                    endDate = DateTime.Today;
-                    startDate = endDate.AddDays(-6);
-                    break;
-                case DATE_RANGE_ONE_MONTH:
-                    endDate = DateTime.Today;
-                    startDate = endDate.AddMonths(-1).AddDays(1);
-                    break;
-                case DATE_RANGE_ONE_YEAR:
-                    endDate = DateTime.Today;
-                    startDate = endDate.AddYears(-1).AddDays(1);
-                    break;
-                case DATE_RANGE_YTD:
-                    endDate = DateTime.Today;
-                    startDate = new DateTime(DateTime.Today.Year, 1, 1);
-                    break;
-                case DATE_RANGE_FIVE_YEAR:
-                    endDate = DateTime.Today;
-                    startDate = endDate.AddYears(-5).AddDays(1);
-                    break;
-                case DATE_RANGE_ALL:
-                    endDate = DateTime.Today;
-                    startDate = mainWindowLogic.Household.SecurityPrice.Where(sp => sp.SecurityID == securityItem.ID).Min(sp => sp.Date);
-                    break;
-                case DATE_RANGE_CUSTOM:
-                    break;
-            }
-
-            OnPropertyChanged(() => StartDate);
-            OnPropertyChanged(() => EndDate);
-            OnPropertyChanged(() => AreDatesEnabled);
-
-            UpdateGraph();
-        }
-
-        private void SetCustomDateRange(DateTime startDate, DateTime endDate)
-        {
-            this.startDate = startDate;
-            this.endDate = endDate;
-
-            UpdateGraph();
-        }
-
         public void UpdateGraph()
         {
             var sortableList =
                 mainWindowLogic.Household.SecurityPrice
                 .Where(sp => sp.SecurityID == securityItem.ID)
-                .Where(sp => sp.Date.CompareTo(startDate) >= 0)
-                .Where(sp => sp.Date.CompareTo(endDate) <= 0)
+                .Where(sp => sp.Date.CompareTo(DateRangeLogic.StartDate) >= 0)
+                .Where(sp => sp.Date.CompareTo(DateRangeLogic.EndDate) <= 0)
                 .Select(sp => new DatePriceGraphItem(sp))
                 .ToList();
             sortableList.Sort((sp1, sp2) => sp1.Date.CompareTo(sp2.Date));
@@ -171,8 +99,8 @@ namespace BanaData.Logic.Dialogs.Listers
                     it.Type == EInvestmentTransactionType.ReinvestMediumTermCapitalGains ||
                     it.Type == EInvestmentTransactionType.ReinvestLongTermCapitalGains)
                 .Where(it => it.SecurityID == securityItem.ID)
-                .Where(it => it.TransactionRow.Date.CompareTo(startDate) >= 0)
-                .Where(it => it.TransactionRow.Date.CompareTo(endDate) <= 0)
+                .Where(it => it.TransactionRow.Date.CompareTo(DateRangeLogic.StartDate) >= 0)
+                .Where(it => it.TransactionRow.Date.CompareTo(DateRangeLogic.EndDate) <= 0)
                 .Select(it => new DatePriceGraphItem(it)));
 
             Trades.ReplaceRange(
@@ -182,8 +110,8 @@ namespace BanaData.Logic.Dialogs.Listers
                     it.Type == EInvestmentTransactionType.Sell ||
                     it.Type == EInvestmentTransactionType.SellAndTransferCash)
                 .Where(it => it.SecurityID == securityItem.ID)
-                .Where(it => it.TransactionRow.Date.CompareTo(startDate) >= 0)
-                .Where(it => it.TransactionRow.Date.CompareTo(endDate) <= 0)
+                .Where(it => it.TransactionRow.Date.CompareTo(DateRangeLogic.StartDate) >= 0)
+                .Where(it => it.TransactionRow.Date.CompareTo(DateRangeLogic.EndDate) <= 0)
                 .Select(it => new DatePriceGraphItem(it)));
 
             UpdateGraphSignal = !UpdateGraphSignal;

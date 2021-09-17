@@ -55,7 +55,9 @@ namespace XamlUI.Dialogs.Listers
             decimal minPrice = points.Min(p => p.Price);
             decimal maxPrice = points.Max(p => p.Price);
 
-            TimeSpan span = logic.EndDate - logic.StartDate;
+            DateTime startDate = logic.DateRangeLogic.StartDate;
+            DateTime endDate = logic.DateRangeLogic.EndDate;
+            TimeSpan span = endDate - startDate;
             double spanInDays = span.TotalDays;
 
             double marginX = 20;
@@ -90,7 +92,7 @@ namespace XamlUI.Dialogs.Listers
             // Draw quotes graph
             foreach (var p in points)
             {
-                double x = (p.Date - logic.StartDate).TotalDays / spanInDays * canvasWidth;
+                double x = (p.Date - startDate).TotalDays / spanInDays * canvasWidth;
                 x += marginX;
                 double y = (double)((p.Price - minPrice) / (maxPrice - minPrice + 0.01M)) * canvasHeight;
                 y = marginY + canvasHeight - y;
@@ -121,7 +123,7 @@ namespace XamlUI.Dialogs.Listers
             {
                 foreach(var p in logic.ReinvestedDividends)
                 {
-                    double x = (p.Date - logic.StartDate).TotalDays / spanInDays * canvasWidth;
+                    double x = (p.Date - startDate).TotalDays / spanInDays * canvasWidth;
                     x += marginX;
                     double y = (double)((p.Price - minPrice) / (maxPrice - minPrice + 1)) * canvasHeight;
                     y = marginY + canvasHeight - y;
@@ -137,7 +139,7 @@ namespace XamlUI.Dialogs.Listers
             {
                 foreach (var p in logic.Trades)
                 {
-                    double x = (p.Date - logic.StartDate).TotalDays / spanInDays * canvasWidth;
+                    double x = (p.Date - startDate).TotalDays / spanInDays * canvasWidth;
                     x += marginX;
                     double y = (double)((p.Price - minPrice) / (maxPrice - minPrice + 1)) * canvasHeight;
                     y = marginY + canvasHeight - y;

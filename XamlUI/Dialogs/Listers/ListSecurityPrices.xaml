@@ -41,11 +41,11 @@
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom">
                     <TextBlock Text="Date range:"/>
-                    <ComboBox ItemsSource="{Binding DateRangesSource}" SelectedItem="{Binding DateRange, Mode=TwoWay}" Width="100"/>
+                    <ComboBox ItemsSource="{Binding DateRangeLogic.DateRangesSource}" SelectedItem="{Binding DateRangeLogic.DateRange, Mode=TwoWay}" Width="100"/>
                     <TextBlock Text="Start date:"/>
-                    <w:DateBox Date="{Binding StartDate, Mode=TwoWay}" IsEnabled="{Binding AreDatesEnabled}" Width="80"/>
+                    <w:DateBox Date="{Binding DateRangeLogic.StartDate, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" IsEnabled="{Binding DateRangeLogic.AreDatesEnabled}" Width="80"/>
                     <TextBlock Text="End date:"/>
-                    <w:DateBox Date="{Binding EndDate, Mode=TwoWay}" IsEnabled="{Binding AreDatesEnabled}" Width="80"/>
+                    <w:DateBox Date="{Binding DateRangeLogic.EndDate, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" IsEnabled="{Binding DateRangeLogic.AreDatesEnabled}" Width="80"/>
                 </StackPanel>
                 <Canvas x:Name="canvas"/>
             </DockPanel>
