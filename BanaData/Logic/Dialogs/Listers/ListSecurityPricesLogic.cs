@@ -155,6 +155,7 @@ namespace BanaData.Logic.Dialogs.Listers
 
             // Give the default view to the UI
             RegisterItems = (CollectionView)CollectionViewSource.GetDefaultView(datePriceItems);
+            RegisterItems.SortDescriptions.Add(new SortDescription("Date", ListSortDirection.Ascending));
 
             // Delete line item command
             DeleteDatePrice = new CommandBase(OnDeleteLineItem);
@@ -229,7 +230,7 @@ namespace BanaData.Logic.Dialogs.Listers
         // Delete command from context menu
         public CommandBase DeleteDatePrice { get; }
 
-        // To focus the overlay on the category
+        // To focus the overlay on the date
         public bool DateFocus { get; private set; }
 
         // Column widths
@@ -261,8 +262,9 @@ namespace BanaData.Logic.Dialogs.Listers
                 datePriceItems.Add(new DatePriceItem(mainWindowLogic, securityID));
             }
 
-            selectedDatePrice = datePriceItems[0];
-            editedDatePrice = datePriceItems[0];
+            RegisterItems.MoveCurrentToFirst();
+            selectedDatePrice = RegisterItems.CurrentItem as DatePriceItem;
+            editedDatePrice = selectedDatePrice;
             OnPropertyChanged(() => SelectedDatePrice);
             OnPropertyChanged(() => EditedDatePrice);
             OnPropertyChanged("UpdateOverlayPosition");
