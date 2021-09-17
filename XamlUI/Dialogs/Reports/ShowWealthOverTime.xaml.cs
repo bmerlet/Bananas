@@ -60,7 +60,8 @@ namespace XamlUI.Dialogs.Reports
                 maxValue = Math.Max(maxValue, payoutPoints.Max(pp => pp.Value));
             }
 
-            TimeSpan span = logic.EndDate - logic.StartDate;
+            DateTime startDate = logic.DateRangeLogic.StartDate;
+            TimeSpan span = logic.DateRangeLogic.EndDate - startDate;
             double spanInDays = span.TotalDays;
 
             double marginX = 20;
@@ -106,7 +107,7 @@ namespace XamlUI.Dialogs.Reports
             // Draw values graph
             foreach (var p in points)
             {
-                double x = (p.Date - logic.StartDate).TotalDays / spanInDays * canvasWidth;
+                double x = (p.Date - startDate).TotalDays / spanInDays * canvasWidth;
                 x += marginX;
                 double y = (double)((p.Value - minValue) / (maxValue - minValue + 0.01M)) * canvasHeight;
                 y = marginY + canvasHeight - y;
@@ -137,7 +138,7 @@ namespace XamlUI.Dialogs.Reports
 
                 foreach (var p in payoutPoints)
                 {
-                    double x = (p.Date - logic.StartDate).TotalDays / spanInDays * canvasWidth;
+                    double x = (p.Date - startDate).TotalDays / spanInDays * canvasWidth;
                     x += marginX;
                     double y = (double)((p.Value - minValue) / (maxValue - minValue + 0.01M)) * canvasHeight;
                     y = marginY + canvasHeight - y;

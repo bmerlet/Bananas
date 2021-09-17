@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 
 using BanaData.Database;
+using BanaData.Logic.Dialogs.Basics;
 using BanaData.Logic.Items;
 using BanaData.Logic.Main;
 using Toolbox.UILogic;
@@ -31,6 +32,7 @@ namespace BanaData.Logic.Dialogs.Reports
         {
             mainWindowLogic = _mainWindowLogic;
 
+            // Init account items
             foreach (Household.AccountRow accountRow in mainWindowLogic.Household.Account)
             {
                 var accountItem = new AccountPickerItem(accountRow, true);
@@ -68,8 +70,22 @@ namespace BanaData.Logic.Dialogs.Reports
                 securityPrices[securityRow.ID] = prices;
             }
 
+            // Get time-sorted transactions for selected accounts
             UpdateTransactions();
-            SetDateRange(dateRange);
+
+            // Setup date range
+            DateRangeLogic = new DateRangeLogic(DateRangeLogic.ERange.LastTenYears, () =>
+                // Return start date of all available transactions
+                mainWindowLogic.Household.RegularTransactions
+                    .Where(tr => accounts.First(a => a.AccountRow == tr.AccountRow).IsSelected == true)
+                    .Min(tr => tr.Date)
+            );
+
+            // Get notified of date changes
+            DateRangeLogic.DateRangeChanged += (s, e) => UpdateGraph();
+
+            // Build graph
+            UpdateGraph();
         }
 
         #endregion
@@ -91,40 +107,9 @@ namespace BanaData.Logic.Dialogs.Reports
         public CommandBase SelectBankingCommand { get; }
 
         //
-        // Date range combo box
+        // Date Range
         //
-        private const string DATE_RANGE_ONE_WEEK = "One week";
-        private const string DATE_RANGE_ONE_MONTH = "One month";
-        private const string DATE_RANGE_ONE_YEAR = "One year";
-        private const string DATE_RANGE_YTD = "Year to date";
-        private const string DATE_RANGE_FIVE_YEARS = "5 years";
-        private const string DATE_RANGE_TEN_YEARS = "10 years";
-        private const string DATE_RANGE_ALL = "All available";
-        private const string DATE_RANGE_CUSTOM = "Custom";
-        public string[] DateRangesSource { get; } = new string[] {
-            DATE_RANGE_ONE_WEEK,
-            DATE_RANGE_ONE_MONTH,
-            DATE_RANGE_ONE_YEAR,
-            DATE_RANGE_YTD,
-            DATE_RANGE_FIVE_YEARS,
-            DATE_RANGE_TEN_YEARS,
-            DATE_RANGE_ALL,
-            DATE_RANGE_CUSTOM
-        };
-
-        private string dateRange = DATE_RANGE_TEN_YEARS;
-        public string DateRange { get => dateRange; set => SetDateRange(value); }
-
-        // Custom dates enabled
-        public bool? AreDatesEnabled => dateRange == DATE_RANGE_CUSTOM;
-
-        // Custom start date
-        private DateTime startDate;
-        public DateTime StartDate { get => startDate; set => SetCustomDateRange(value, endDate); }
-
-        // Custom end date
-        private DateTime endDate;
-        public DateTime EndDate { get => endDate; set => SetCustomDateRange(startDate, value); }
+        public DateRangeLogic DateRangeLogic { get; }
 
         //
         // Frequency
@@ -223,59 +208,6 @@ namespace BanaData.Logic.Dialogs.Reports
             UpdateGraph();
         }
 
-        private void SetDateRange(string value)
-        {
-            dateRange = value;
-
-            switch (dateRange)
-            {
-                case DATE_RANGE_ONE_WEEK:
-                    endDate = DateTime.Today;
-                    startDate = endDate.AddDays(-7);
-                    break;
-                case DATE_RANGE_ONE_MONTH:
-                    endDate = DateTime.Today;
-                    startDate = endDate.AddMonths(-1);
-                    break;
-                case DATE_RANGE_ONE_YEAR:
-                    endDate = DateTime.Today;
-                    startDate = endDate.AddYears(-1);
-                    break;
-                case DATE_RANGE_YTD:
-                    endDate = DateTime.Today;
-                    startDate = new DateTime(DateTime.Today.Year, 1, 1);
-                    break;
-                case DATE_RANGE_FIVE_YEARS:
-                    endDate = DateTime.Today;
-                    startDate = endDate.AddYears(-5);
-                    break;
-                case DATE_RANGE_TEN_YEARS:
-                    endDate = DateTime.Today;
-                    startDate = endDate.AddYears(-10);
-                    break;
-                case DATE_RANGE_ALL:
-                    endDate = DateTime.Today;
-                    startDate = mainWindowLogic.Household.RegularTransactions.Where(tr => accounts.First(a => a.AccountRow == tr.AccountRow).IsSelected == true).Min(tr => tr.Date);
-                    break;
-                case DATE_RANGE_CUSTOM:
-                    break;
-            }
-
-            OnPropertyChanged(() => StartDate);
-            OnPropertyChanged(() => EndDate);
-            OnPropertyChanged(() => AreDatesEnabled);
-
-            UpdateGraph();
-        }
-
-        private void SetCustomDateRange(DateTime startDate, DateTime endDate)
-        {
-            this.startDate = startDate;
-            this.endDate = endDate;
-
-            UpdateGraph();
-        }
-
         private void UpdateTransactions()
         {
             // Get time-sorted transactions for relevant accounts
@@ -325,7 +257,7 @@ namespace BanaData.Logic.Dialogs.Reports
             DateValues.Clear();
             PayoutDateValues.Clear();
 
-            var date = startDate;
+            var date = DateRangeLogic.StartDate;
             var portfolio = new Portfolio(); // Combined portfolio of all selected investment accounts
             decimal bankBalance = 0; // Combined bank balance of all selected bank accounts
             decimal payout = 0;
@@ -343,7 +275,7 @@ namespace BanaData.Logic.Dialogs.Reports
                     PayoutDateValues.Add(new DateValue(date, payout));
 
                     // End if reached the end of the date range
-                    if (date > endDate)
+                    if (date > DateRangeLogic.EndDate)
                     {
                         break;
                     }

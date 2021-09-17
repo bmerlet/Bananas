@@ -86,11 +86,11 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <TextBlock Text="Date range:"/>
-                <ComboBox Grid.Column="1" ItemsSource="{Binding DateRangesSource}" SelectedItem="{Binding DateRange, Mode=TwoWay}" Width="100"/>
+                <ComboBox Grid.Column="1" ItemsSource="{Binding DateRangeLogic.DateRangesSource}" SelectedItem="{Binding DateRangeLogic.DateRange, Mode=TwoWay}" Width="100"/>
                 <TextBlock Grid.Column="2" Text="Start date:"/>
-                <w:DateBox Grid.Column="3" Date="{Binding StartDate, Mode=TwoWay}" IsEnabled="{Binding AreDatesEnabled}" Width="80"/>
+                <w:DateBox Grid.Column="3" Date="{Binding DateRangeLogic.StartDate, Mode=TwoWay}" IsEnabled="{Binding DateRangeLogic.AreDatesEnabled}" Width="80"/>
                 <TextBlock Grid.Column="4" Text="End date:"/>
-                <w:DateBox Grid.Column="5" Date="{Binding EndDate, Mode=TwoWay}" IsEnabled="{Binding AreDatesEnabled}" Width="80"/>
+                <w:DateBox Grid.Column="5" Date="{Binding DateRangeLogic.EndDate, Mode=TwoWay}" IsEnabled="{Binding DateRangeLogic.AreDatesEnabled}" Width="80"/>
                 <TextBlock Grid.Row="1" Text="Compute value every:"/>
                 <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding FrequencySource}" SelectedItem="{Binding Frequency, Mode=TwoWay}" Width="100"/>
                 <CheckBox Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Content="Show payout" IsChecked="{Binding ShowPayout}"/>

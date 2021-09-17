@@ -68,6 +68,7 @@
     <Compile Include="Database\SecurityPrice.cs" />
     <Compile Include="Database\Transaction.cs" />
     <Compile Include="Logic\Controls\ReconcileGridLogic.cs" />
+    <Compile Include="Logic\Dialogs\Basics\DateRangeLogic.cs" />
     <Compile Include="Logic\Dialogs\Basics\ErrorLogic.cs" />
     <Compile Include="Logic\Dialogs\Basics\OpenFileLogic.cs" />
     <Compile Include="Logic\Dialogs\Basics\PasswordPromptLogic.cs" />
