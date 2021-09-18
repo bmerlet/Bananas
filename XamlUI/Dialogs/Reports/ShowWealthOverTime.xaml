@@ -18,7 +18,7 @@
         <ucs:DonePanel DockPanel.Dock="Bottom"/>
 
         <!-- List of accounts panel -->
-        <DockPanel DockPanel.Dock="Left">
+        <DockPanel DockPanel.Dock="Left" DataContext="{Binding AccountListLogic}">
             <Grid DockPanel.Dock="Bottom">
                 <Grid.Resources>
                     <Style TargetType="Button" BasedOn="{StaticResource FormButton}"/>

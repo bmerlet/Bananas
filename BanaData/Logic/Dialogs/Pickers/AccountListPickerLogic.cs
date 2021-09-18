@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 
 using BanaData.Database;
+using BanaData.Logic.Dialogs.Basics;
 using BanaData.Logic.Items;
 using BanaData.Logic.Main;
 using Toolbox.UILogic;
@@ -30,20 +31,14 @@ namespace BanaData.Logic.Dialogs.Pickers
         {
             (mainWindowLogic, oldPickedAccounts) = (_mainWindowLogic, pickedAccounts);
 
-            foreach (Household.AccountRow accountRow in mainWindowLogic.Household.Account)
+            // Create account list
+            AccountListLogic = new AccountListLogic(mainWindowLogic);
+
+            // Select passed in accounts
+            foreach (AccountListLogic.AccountPickerItem accountItem in AccountListLogic.Accounts)
             {
-                accounts.Add(new AccountPickerItem(accountRow, oldPickedAccounts.Contains(accountRow)));
+                accountItem.IsSelected = oldPickedAccounts.Contains(accountItem.AccountRow);
             }
-
-            // Setup account view
-            Accounts = (CollectionView)CollectionViewSource.GetDefaultView(accounts);
-            Accounts.SortDescriptions.Add(new SortDescription("AccountItem.Name", ListSortDirection.Ascending));
-
-            // Setup commands
-            ClearAllCommand = new CommandBase(OnClearAllCommand);
-            SelectAllCommand = new CommandBase(OnSelectAllCommand);
-            SelectInvestmentCommand = new CommandBase(OnSelectInvestmentCommand);
-            SelectBankingCommand = new CommandBase(OnSelectBankingCommand);
         }
 
         #endregion
@@ -51,18 +46,9 @@ namespace BanaData.Logic.Dialogs.Pickers
         #region UI properties
 
         //
-        // List of accounts
+        // List of accounts with checkboxes
         //
-        private readonly ObservableCollection<AccountPickerItem> accounts = new ObservableCollection<AccountPickerItem>();
-        public CollectionView Accounts { get; }
-
-        //
-        // Buttons
-        //
-        public CommandBase ClearAllCommand { get; }
-        public CommandBase SelectAllCommand { get; }
-        public CommandBase SelectInvestmentCommand { get; }
-        public CommandBase SelectBankingCommand { get; }
+        public AccountListLogic AccountListLogic { get; }
 
         #endregion
 
@@ -75,11 +61,11 @@ namespace BanaData.Logic.Dialogs.Pickers
         {
             var pickedAccounts = new List<Household.AccountRow>();
 
-            foreach (var acct in accounts)
+            foreach (AccountListLogic.AccountPickerItem accountItem in AccountListLogic.Accounts)
             {
-                if (acct.IsSelected == true)
+                if (accountItem.IsSelected == true)
                 {
-                    pickedAccounts.Add(acct.AccountRow);
+                    pickedAccounts.Add(accountItem.AccountRow);
                 }
             }
 
@@ -87,66 +73,6 @@ namespace BanaData.Logic.Dialogs.Pickers
 
             // Err on the side of caution
             return true;
-        }
-
-        private void OnClearAllCommand()
-        {
-            foreach (var acct in accounts)
-            {
-                acct.IsSelected = false;
-            }
-        }
-
-        private void OnSelectAllCommand()
-        {
-            foreach (var acct in accounts)
-            {
-                acct.IsSelected = true;
-            }
-        }
-
-        private void OnSelectInvestmentCommand()
-        {
-            foreach (var acct in accounts)
-            {
-                acct.IsSelected = acct.AccountRow.Type == EAccountType.Investment;
-            }
-        }
-
-        private void OnSelectBankingCommand()
-        {
-            foreach (var acct in accounts)
-            {
-                acct.IsSelected = acct.AccountRow.Type == EAccountType.Bank;
-            }
-        }
-
-        #endregion
-
-        #region Supporting class
-
-        public class AccountPickerItem : LogicBase
-        {
-            public AccountPickerItem(Household.AccountRow accountRow, bool selected) =>
-                (AccountRow, AccountItem, isSelected) = (accountRow, AccountItem.CreateFromDB(accountRow), selected);
-
-            public readonly Household.AccountRow AccountRow;
-
-            public AccountItem AccountItem { get; }
-
-            private bool? isSelected;
-            public bool? IsSelected
-            {
-                get => isSelected;
-                set
-                {
-                    if (isSelected != value)
-                    {
-                        isSelected = value;
-                        OnPropertyChanged(() => IsSelected);
-                    }
-                }
-            }
         }
 
         #endregion

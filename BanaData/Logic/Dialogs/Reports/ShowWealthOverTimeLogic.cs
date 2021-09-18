@@ -20,7 +20,6 @@ namespace BanaData.Logic.Dialogs.Reports
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
-        private bool internalUpdate = false;
         private readonly Dictionary<int, List<SecurityPrice>> securityPrices = new Dictionary<int, List<SecurityPrice>>();
         private List<Household.TransactionRow> transactions;
 
@@ -32,31 +31,18 @@ namespace BanaData.Logic.Dialogs.Reports
         {
             mainWindowLogic = _mainWindowLogic;
 
-            // Init account items
-            foreach (Household.AccountRow accountRow in mainWindowLogic.Household.Account)
+            // Init account list
+            AccountListLogic = new AccountListLogic(mainWindowLogic);
+            foreach(AccountListLogic.AccountPickerItem accountItem in AccountListLogic.Accounts)
             {
-                var accountItem = new AccountPickerItem(accountRow, true);
-                accountItem.PropertyChanged += (s, e) =>
-                {
-                    if (!internalUpdate)
-                    {
-                        UpdateTransactions();
-                        UpdateGraph();
-                    }
-                };
-                accounts.Add(accountItem);
+                accountItem.IsSelected = true;
             }
 
-            // Setup account view
-            Accounts = (CollectionView)CollectionViewSource.GetDefaultView(accounts);
-            Accounts.SortDescriptions.Add(new SortDescription("AccountItem.Hidden", ListSortDirection.Ascending));
-            Accounts.SortDescriptions.Add(new SortDescription("AccountItem.Name", ListSortDirection.Ascending));
-
-            // Setup commands
-            ClearAllCommand = new CommandBase(OnClearAllCommand);
-            SelectAllCommand = new CommandBase(OnSelectAllCommand);
-            SelectInvestmentCommand = new CommandBase(OnSelectInvestmentCommand);
-            SelectBankingCommand = new CommandBase(OnSelectBankingCommand);
+            AccountListLogic.SelectionChanged += (s, e) =>
+            {
+                UpdateTransactions();
+                UpdateGraph();
+            };
 
             // Setup dictionary of sorted security prices. The key is the security ID
             foreach(var securityRow in mainWindowLogic.Household.Security)
@@ -77,7 +63,7 @@ namespace BanaData.Logic.Dialogs.Reports
             DateRangeLogic = new DateRangeLogic(DateRangeLogic.ERange.LastTenYears, () =>
                 // Return start date of all available transactions
                 mainWindowLogic.Household.RegularTransactions
-                    .Where(tr => accounts.First(a => a.AccountRow == tr.AccountRow).IsSelected == true)
+                    .Where(tr => AccountListLogic.IsAccountSelected(tr.AccountRow))
                     .Min(tr => tr.Date)
             );
 
@@ -93,18 +79,9 @@ namespace BanaData.Logic.Dialogs.Reports
         #region UI properties
 
         //
-        // List of accounts
+        // List of accounts with checkboxes
         //
-        private readonly ObservableCollection<AccountPickerItem> accounts = new ObservableCollection<AccountPickerItem>();
-        public CollectionView Accounts { get; }
-
-        //
-        // Account selection buttons
-        //
-        public CommandBase ClearAllCommand { get; }
-        public CommandBase SelectAllCommand { get; }
-        public CommandBase SelectInvestmentCommand { get; }
-        public CommandBase SelectBankingCommand { get; }
+        public AccountListLogic AccountListLogic { get; }
 
         //
         // Date Range
@@ -152,67 +129,11 @@ namespace BanaData.Logic.Dialogs.Reports
 
         #region Actions
 
-        private void OnClearAllCommand()
-        {
-            internalUpdate = true;
-
-            foreach (var acct in accounts)
-            {
-                acct.IsSelected = false;
-            }
-
-            internalUpdate = false;
-            UpdateTransactions();
-            UpdateGraph();
-        }
-
-        private void OnSelectAllCommand()
-        {
-            internalUpdate = true;
-
-            foreach (var acct in accounts)
-            {
-                acct.IsSelected = true;
-            }
-
-            internalUpdate = false;
-            UpdateTransactions();
-            UpdateGraph();
-        }
-
-        private void OnSelectInvestmentCommand()
-        {
-            internalUpdate = true;
-
-            foreach (var acct in accounts)
-            {
-                acct.IsSelected = acct.AccountRow.Type == EAccountType.Investment;
-            }
-
-            internalUpdate = false;
-            UpdateTransactions();
-            UpdateGraph();
-        }
-
-        private void OnSelectBankingCommand()
-        {
-            internalUpdate = true;
-
-            foreach (var acct in accounts)
-            {
-                acct.IsSelected = acct.AccountRow.Type == EAccountType.Bank;
-            }
-
-            internalUpdate = false;
-            UpdateTransactions();
-            UpdateGraph();
-        }
-
         private void UpdateTransactions()
         {
             // Get time-sorted transactions for relevant accounts
             transactions = mainWindowLogic.Household.RegularTransactions
-                .Where(tr => accounts.First(a => a.AccountRow == tr.AccountRow).IsSelected == true)
+                .Where(tr => AccountListLogic.IsAccountSelected(tr.AccountRow))
                 .ToList();
             transactions.Sort((t1, t2) =>
             {
@@ -363,30 +284,6 @@ namespace BanaData.Logic.Dialogs.Reports
         #endregion
 
         #region Supporting classes
-
-        public class AccountPickerItem : LogicBase
-        {
-            public AccountPickerItem(Household.AccountRow accountRow, bool selected) =>
-                (AccountRow, AccountItem, isSelected) = (accountRow, AccountItem.CreateFromDB(accountRow), selected);
-
-            public readonly Household.AccountRow AccountRow;
-
-            public AccountItem AccountItem { get; }
-
-            private bool? isSelected;
-            public bool? IsSelected
-            {
-                get => isSelected;
-                set
-                {
-                    if (isSelected != value)
-                    {
-                        isSelected = value;
-                        OnPropertyChanged(() => IsSelected);
-                    }
-                }
-            }
-        }
 
         public class DateValue
         {
