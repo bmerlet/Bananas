@@ -66,6 +66,11 @@ namespace BanaData.Logic.Dialogs.Editors
                 (reportItem.IsSubtotalFrequencyWeekly ? SUBFREQ_WEEKLY :
                 (reportItem.IsSubtotalFrequencyMonthly ? SUBFREQ_MONTHLY : SUBFREQ_YEARLY)));
 
+            SetPieChart(
+                reportItem.IsPieChartNone ? PIECHART_NONE :
+                (reportItem.IsPieChartCategory ? PIECHART_CATEGORY :
+                (reportItem.IsPieChartVendor ? PIECHART_VENDOR : PIECHART_ACCOUNT)));
+
             IsFilteringOnAccounts = reportItem.IsFilteringOnAccounts;
             accounts.AddRange(reportItem.Accounts);
             AccountsSource.ReplaceRange(reportItem.Accounts.Select(a => a.Name));
@@ -119,6 +124,15 @@ namespace BanaData.Logic.Dialogs.Editors
         public string[] ShowSource { get; } = new string[] { SHOW_TRANS, SHOW_SUBTOTAL, SHOW_SUBTOTALONLY };
         private string show;
         public string Show { get => show; set => SetShow(value); }
+
+        // Pie chart
+        private const string PIECHART_NONE = "None";
+        private const string PIECHART_CATEGORY = "by category";
+        private const string PIECHART_VENDOR = "by vendor";
+        private const string PIECHART_ACCOUNT = "by account";
+        public string[] PieChartsSource { get; } = new string[] { PIECHART_NONE, PIECHART_CATEGORY, PIECHART_VENDOR, PIECHART_ACCOUNT };
+        private string pieChart;
+        public string PieChart { get => pieChart; set => SetPieChart(value); }
 
         // Time-based subtotals
         private const string SUBFREQ_NONE = "None";
@@ -286,6 +300,31 @@ namespace BanaData.Logic.Dialogs.Editors
                         break;
                     case SUBFREQ_YEARLY:
                         localFlags |= ETransactionReportFlag.SubtotalFrequencyYearly;
+                        break;
+                }
+            }
+        }
+
+        private void SetPieChart(string value)
+        {
+            if (value != pieChart)
+            {
+                pieChart = value;
+
+                localFlags &= ~ETransactionReportFlag.PieChartMask;
+                switch (pieChart)
+                {
+                    case PIECHART_NONE:
+                        localFlags |= ETransactionReportFlag.PieChartNone;
+                        break;
+                    case PIECHART_CATEGORY:
+                        localFlags |= ETransactionReportFlag.PieChartCategory;
+                        break;
+                    case PIECHART_VENDOR:
+                        localFlags |= ETransactionReportFlag.PieChartVendor;
+                        break;
+                    case PIECHART_ACCOUNT:
+                        localFlags |= ETransactionReportFlag.PieChartAccount;
                         break;
                 }
             }

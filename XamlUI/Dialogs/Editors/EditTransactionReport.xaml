@@ -12,7 +12,7 @@
         Title="Edit transaction report"
         Icon="/XamlUI;component/Images/Bananas.ico"
         WindowStartupLocation="CenterOwner"
-        Height="350" Width="800">
+        Height="400" Width="800">
     <Window.Resources>
 
         <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}"/>
@@ -52,7 +52,7 @@
             <w:DateBox Grid.Row="1" Grid.Column="3" Date="{Binding EndDate, Mode=TwoWay, StringFormat=MM/dd/yyyy}"/>
             <Button Grid.Column="5" Content="Generate report..." Command="{Binding GenerateReport}"/>
         </Grid>
-        
+
         <!-- Organization panel -->
         <Grid DockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
@@ -64,6 +64,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <TextBlock Text="Sort transactions by:"/>
             <ComboBox Grid.Column="1" ItemsSource="{Binding SortSource}" SelectedItem="{Binding Sort, Mode=TwoWay}"/>
@@ -73,12 +74,15 @@
             <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding ShowSource}" SelectedItem="{Binding Show, Mode=TwoWay}"/>
             <TextBlock Grid.Row="1" Grid.Column="2" Text="Additional subtotals:"/>
             <ComboBox Grid.Row="1" Grid.Column="3" ItemsSource="{Binding SubtotalFrequencySource}" SelectedItem="{Binding SubtotalFrequency, Mode=TwoWay}" IsEnabled="{Binding IsSubtotalFrequencyEnabled}"/>
+            <TextBlock Grid.Row="2" Text="Pie chart:"/>
+            <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding PieChartsSource}" SelectedItem="{Binding PieChart, Mode=TwoWay}"/>
         </Grid>
 
         <!-- Columns panel -->
         <Grid DockPanel.Dock="Top" IsEnabled="{Binding IsColumnPanelEnabled}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="23.732"/>
+                <ColumnDefinition Width="35.268"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
@@ -86,13 +90,13 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Text="Show columns:"/>
-            <CheckBox Grid.Column="1" Content="Account" IsChecked="{Binding ShowAccountColumn}" IsEnabled="{Binding IsAccountColumnEnabled}"/>
-            <CheckBox Grid.Column="2" Content="Date" IsChecked="{Binding ShowDateColumn}"/>
-            <CheckBox Grid.Column="3" Content="Payee" IsChecked="{Binding ShowPayeeColumn}" IsEnabled="{Binding IsPayeeColumnEnabled}"/>
-            <CheckBox Grid.Column="4" Content="Memo" IsChecked="{Binding ShowMemoColumn}"/>
-            <CheckBox Grid.Column="5" Content="Category" IsChecked="{Binding ShowCategoryColumn}" IsEnabled="{Binding IsCategoryColumnEnabled}"/>
-            <CheckBox Grid.Column="6" Content="Status" IsChecked="{Binding ShowStatusColumn}"/>
+            <TextBlock Text="Columns:" Grid.ColumnSpan="2"/>
+            <CheckBox Grid.Column="2" Content="Account" IsChecked="{Binding ShowAccountColumn}" IsEnabled="{Binding IsAccountColumnEnabled}" Margin="5,6"/>
+            <CheckBox Grid.Column="3" Content="Date" IsChecked="{Binding ShowDateColumn}" Margin="5,6"/>
+            <CheckBox Grid.Column="4" Content="Payee" IsChecked="{Binding ShowPayeeColumn}" IsEnabled="{Binding IsPayeeColumnEnabled}" Margin="5,6"/>
+            <CheckBox Grid.Column="5" Content="Memo" IsChecked="{Binding ShowMemoColumn}" Margin="5,6"/>
+            <CheckBox Grid.Column="6" Content="Category" IsChecked="{Binding ShowCategoryColumn}" IsEnabled="{Binding IsCategoryColumnEnabled}" Margin="5,6"/>
+            <CheckBox Grid.Column="7" Content="Status" IsChecked="{Binding ShowStatusColumn}" Margin="5,6"/>
         </Grid>
 
         <!-- Main panel: Accounts, categories, payees -->

@@ -88,6 +88,8 @@ namespace BanaData.Logic.Dialogs.Listers
                 ReportToScrollTo = newReport;
                 OnPropertyChanged(() => SelectedReport);
                 OnPropertyChanged(() => ReportToScrollTo);
+
+                mainWindowLogic.MainMenuLogic.UpdateTransactionReports();
             }
         }
 
@@ -111,6 +113,8 @@ namespace BanaData.Logic.Dialogs.Listers
                     ReportToScrollTo = newReport;
                     OnPropertyChanged(() => SelectedReport);
                     OnPropertyChanged(() => ReportToScrollTo);
+
+                    mainWindowLogic.MainMenuLogic.UpdateTransactionReports();
                 }
             }
         }
@@ -145,6 +149,8 @@ namespace BanaData.Logic.Dialogs.Listers
                     ReportToScrollTo = newReport;
                     OnPropertyChanged(() => SelectedReport);
                     OnPropertyChanged(() => ReportToScrollTo);
+
+                    mainWindowLogic.MainMenuLogic.UpdateTransactionReports();
                 }
             }
         }
@@ -157,6 +163,7 @@ namespace BanaData.Logic.Dialogs.Listers
                 RemoveReportFromDataSet(SelectedReport);
 
                 reportsSource.Remove(SelectedReport);
+                mainWindowLogic.MainMenuLogic.UpdateTransactionReports();
             }
         }
 

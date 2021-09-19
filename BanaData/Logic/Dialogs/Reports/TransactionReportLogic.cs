@@ -75,6 +75,12 @@ namespace BanaData.Logic.Dialogs.Reports
                 }
             }
 
+            // Compute pie slices if needed
+            if (!transactionReportItem.IsPieChartNone)
+            {
+                ComputePieSizes();
+            }
+
             // Compute grand total before adding the subtotals
             decimal grandTotal = transactions.Sum(ti => ti.Amount);
 
@@ -223,6 +229,44 @@ namespace BanaData.Logic.Dialogs.Reports
             }
         }
 
+        private void ComputePieSizes()
+        {
+            var dic = new Dictionary<string, List<TransactionItem>>();
+
+            foreach (var transaction in transactions)
+            {
+                string id;
+                if (transactionReportItem.IsPieChartCategory)
+                {
+                    id = transaction.Category;
+                }
+                else if (transactionReportItem.IsPieChartVendor)
+                {
+                    id = transaction.Payee;
+                }
+                else // IsPieAccount
+                {
+                    id = transaction.AccountName;
+                }
+
+                if (!dic.ContainsKey(id))
+                {
+                    dic.Add(id, new List<TransactionItem>());
+                }
+                dic[id].Add(transaction);
+            }
+
+            PieSlices.Clear();
+            foreach(var id in dic.Keys)
+            {
+                decimal amount = dic[id].Sum(tr => tr.Amount);
+                string tip = $"{id}: {amount:N2}";
+                PieSlices.Add(new PieSliceLogic(amount, tip));
+            }
+
+            PieSlices.Sort();
+        }
+
         #endregion
 
         #region UI properties
@@ -248,6 +292,10 @@ namespace BanaData.Logic.Dialogs.Reports
 
         // Columns
         public ObservableCollection<ColumnItem> Columns { get; } = new ObservableCollection<ColumnItem>();
+
+        // Pie chart
+        public bool IsPieChartVisible => !transactionReportItem.IsPieChartNone;
+        public List<PieSliceLogic> PieSlices { get; } = new List<PieSliceLogic>();
 
         #endregion
 
@@ -501,6 +549,20 @@ namespace BanaData.Logic.Dialogs.Reports
 
                 return RawDate.CompareTo(other.RawDate) * (transactionReportItem.IsSortDescending ? -1 : 1);
             }
+        }
+
+        #endregion
+
+        #region Class describing a slice of the pie chart
+
+        public class PieSliceLogic : IComparable<PieSliceLogic>
+        {
+            public PieSliceLogic(decimal amount, string tip) => (Amount, Tip) = (amount, tip);
+
+            public decimal Amount { get; } 
+            public string Tip { get; }
+
+            public int CompareTo(PieSliceLogic other) => Math.Abs(Amount).CompareTo(Math.Abs(other.Amount));
         }
 
         #endregion

@@ -84,6 +84,11 @@ namespace BanaData.Logic.Items
         public bool IsSubtotalFrequencyMonthly => (Flags & ETransactionReportFlag.SubtotalFrequencyMask) == ETransactionReportFlag.SubtotalFrequencyMonthly;
         public bool IsSubtotalFrequencyYearly => (Flags & ETransactionReportFlag.SubtotalFrequencyMask) == ETransactionReportFlag.SubtotalFrequencyYearly;
 
+        public bool IsPieChartNone => (Flags & ETransactionReportFlag.PieChartMask) == ETransactionReportFlag.PieChartNone;
+        public bool IsPieChartCategory => (Flags & ETransactionReportFlag.PieChartMask) == ETransactionReportFlag.PieChartCategory;
+        public bool IsPieChartVendor => (Flags & ETransactionReportFlag.PieChartMask) == ETransactionReportFlag.PieChartVendor;
+        public bool IsPieChartAccount => (Flags & ETransactionReportFlag.PieChartMask) == ETransactionReportFlag.PieChartAccount;
+
         public bool IsFilteringOnAccounts => Flags.HasFlag(ETransactionReportFlag.IsFilteringOnAccounts);
         public IEnumerable<Household.AccountRow> Accounts { get; }
 

@@ -233,7 +233,16 @@ namespace BanaData.Database
         SubtotalFrequencyWeekly = SubtotalFrequencyLSB,
         SubtotalFrequencyMonthly = SubtotalFrequencyMSB,
         SubtotalFrequencyYearly = SubtotalFrequencyMSB | SubtotalFrequencyLSB,
-        SubtotalFrequencyMask = SubtotalFrequencyMSB | SubtotalFrequencyLSB
+        SubtotalFrequencyMask = SubtotalFrequencyMSB | SubtotalFrequencyLSB,
+
+        PieChartLSB = 0x400000,
+        PieChartMSB = 0x800000,
+        
+        PieChartNone = 0,
+        PieChartCategory = PieChartLSB,
+        PieChartVendor = PieChartMSB,
+        PieChartAccount = PieChartMSB | PieChartLSB,
+        PieChartMask = PieChartMSB | PieChartLSB
     }
 
     // Scheduled transaction frequency

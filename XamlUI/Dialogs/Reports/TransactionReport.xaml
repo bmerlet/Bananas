@@ -12,7 +12,7 @@
         Title="{Binding Title}"
         Icon="/XamlUI;component/Images/Bananas.ico"
         WindowStartupLocation="CenterOwner"
-        Width="700" Height="400">
+        SizeToContent="WidthAndHeight">
     <DockPanel>
 
         <!-- Done panel -->
@@ -24,7 +24,7 @@
             </Grid.Resources>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="170"/>
+                <ColumnDefinition Width="200"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
@@ -38,8 +38,26 @@
             <Button Grid.Column="5" Content="Close" IsCancel="True"/>
         </Grid>
 
+        <!-- Pie chart -->
+        <Canvas 
+            DockPanel.Dock="Right"
+            Width="400"
+            Height="400"
+            x:Name="pieChartCanvas"
+            Visibility="{Binding IsPieChartVisible, Converter={StaticResource visibilityBoolConverter}}">
+            <Ellipse
+                Width="380"
+                Height="380"
+                Stroke="Black"
+                StrokeThickness="1"
+                Canvas.Left="10"
+                Canvas.Top="10"/>
+        </Canvas>
+
         <!-- Main listview -->
         <ListView 
+            Width="700"
+            Height="400"
             x:Name="listView"
             ItemsSource="{Binding TransactionsSource}"
             MouseDoubleClick="OnListViewMouseDoubleClick"/>
