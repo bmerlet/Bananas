@@ -45,13 +45,6 @@
             Height="400"
             x:Name="pieChartCanvas"
             Visibility="{Binding IsPieChartVisible, Converter={StaticResource visibilityBoolConverter}}">
-            <Ellipse
-                Width="380"
-                Height="380"
-                Stroke="Black"
-                StrokeThickness="1"
-                Canvas.Left="10"
-                Canvas.Top="10"/>
         </Canvas>
 
         <!-- Main listview -->

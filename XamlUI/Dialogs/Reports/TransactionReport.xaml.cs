@@ -32,6 +32,10 @@ namespace XamlUI.Dialogs.Reports
             InitializeComponent();
 
             BuildListView(logic);
+            if (logic.IsPieChartVisible)
+            {
+                BuildPieChart(logic);
+            }
         }
 
         private void BuildListView(TransactionReportLogic logic)
@@ -126,6 +130,60 @@ namespace XamlUI.Dialogs.Reports
 
             // Print
             ph.Print();
+        }
+
+        private void BuildPieChart(TransactionReportLogic logic)
+        {
+            // Get total sum in slices
+            decimal total = logic.PieSlices.Sum(ps => Math.Abs(ps.Amount));
+            if (total == 0)
+            {
+                return;
+            }
+
+            // Drawing constants
+            double canvasWidth = pieChartCanvas.Width;
+            double canvasHeight = pieChartCanvas.Height;
+            double centerX = canvasWidth / 2.0;
+            double centerY = canvasHeight / 2.0;
+            double pieMargin = 10;
+            double radius = Math.Min(canvasWidth, canvasHeight) / 2.0 - pieMargin;
+
+            // Create all pie slices
+            double angle = 0;
+            byte r = 100, g = 170, b = 250;
+            foreach(var pieSlice in logic.PieSlices)
+            {
+                double startArcX = radius * Math.Sin(angle);
+                double startArcY = -radius * Math.Cos(angle);
+                angle += 2.0 * Math.PI * (double)(Math.Abs(pieSlice.Amount) / total);
+                double endArcX = radius * Math.Sin(angle);
+                double endArcY = -radius * Math.Cos(angle);
+
+                var pathFigure = new PathFigure() { IsClosed = true, StartPoint = new Point(startArcX, startArcY) };
+                pathFigure.Segments.Add(new LineSegment() { Point = new Point(0, 0) });
+                pathFigure.Segments.Add(new LineSegment() { Point = new Point(endArcX, endArcY) });
+                pathFigure.Segments.Add(new ArcSegment() { SweepDirection = SweepDirection.Counterclockwise, Size = new Size(radius, radius), Point = new Point(startArcX, startArcY) });
+
+                var pathGeometry = new PathGeometry();
+                pathGeometry.Figures.Add(pathFigure);
+
+                var path = new Path();
+                path.Fill = Brushes.Blue;
+                path.Fill = new SolidColorBrush(new Color() { R = r, G = g, B = b, A = 255 });
+                path.Stroke = Brushes.Black;
+                path.Data = pathGeometry;
+                path.ToolTip = pieSlice.Tip;
+
+                pieChartCanvas.Children.Add(path);
+                Canvas.SetLeft(path, centerX);
+                Canvas.SetTop(path, centerY);
+
+                byte cst = 110;
+                r = (byte)(r + cst);
+                g = (byte)(g + cst);
+                b = (byte)(b + cst);
+            }
         }
     }
 }

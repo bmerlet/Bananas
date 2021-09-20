@@ -562,7 +562,7 @@ namespace BanaData.Logic.Dialogs.Reports
             public decimal Amount { get; } 
             public string Tip { get; }
 
-            public int CompareTo(PieSliceLogic other) => Math.Abs(Amount).CompareTo(Math.Abs(other.Amount));
+            public int CompareTo(PieSliceLogic other) => Math.Abs(other.Amount).CompareTo(Math.Abs(Amount));
         }
 
         #endregion
