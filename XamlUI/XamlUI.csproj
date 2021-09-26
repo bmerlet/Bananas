@@ -137,6 +137,9 @@
     <Compile Include="Dialogs\Reports\ShowCapitalGains.xaml.cs">
       <DependentUpon>ShowCapitalGains.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\Reports\ShowCashFlowBetweenPersons.xaml.cs">
+      <DependentUpon>ShowCashFlowBetweenPersons.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\Reports\ShowHoldings.xaml.cs">
       <DependentUpon>ShowHoldings.xaml</DependentUpon>
     </Compile>
@@ -305,6 +308,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\Reports\ShowCapitalGains.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Reports\ShowCashFlowBetweenPersons.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,0 +1,70 @@
+﻿<Window x:Class="XamlUI.Dialogs.Reports.ShowCashFlowBetweenPersons"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:XamlUI.Dialogs.Reports"
+        xmlns:w="clr-namespace:XamlUI.UserControls"
+        xmlns:l="clr-namespace:BanaData.Logic.Dialogs.Reports;assembly=BanaData"
+        d:DataContext="{d:DesignInstance Type=l:ShowCashFlowBetweenPersonsLogic}"
+        mc:Ignorable="d"
+        Icon="/XamlUI;component/Images/Bananas.ico"
+        WindowStartupLocation="CenterOwner"
+        Title="Cash flow between household members" Height="450" Width="800">
+    <DockPanel>
+
+        <!-- Done panel -->
+        <w:DonePanel DockPanel.Dock="Bottom"/>
+
+        <!-- Controls -->
+        <Grid DockPanel.Dock="Top">
+            <Grid.Resources>
+                <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}"/>
+                <Style TargetType="ComboBox" BasedOn="{StaticResource FormComboBox}"/>
+                <Style TargetType="CheckBox" BasedOn="{StaticResource FormCheckBox}"/>
+                <Style TargetType="Button" BasedOn="{StaticResource FormButton}"/>
+            </Grid.Resources>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Year:"/>
+            <ComboBox
+                Padding="0"
+                Grid.Column="1"
+                ItemsSource="{Binding YearPickerLogic.YearSource}"
+                SelectedItem="{Binding YearPickerLogic.SelectedYear, Mode=TwoWay}"/>
+            <TextBlock
+                Grid.Column="2" Text="Show expense/income every:"/>
+            <ComboBox
+                Padding="0"
+                Grid.Column="3"
+                ItemsSource="{Binding FrequencySource}"
+                SelectedItem="{Binding SelectedFrequency, Mode=TwoWay}"/>
+            <CheckBox
+                Grid.Column="4"
+                Content="Group accounts"
+                IsChecked="{Binding IsGroupingAccounts, Mode=TwoWay}"/>
+            <Button
+                Grid.Column="6" Width="100"
+                Content="Pick members..."
+                Command="{Binding PickMembersCommand}"/>
+        </Grid>
+
+        <!-- Main listview -->
+        <ListView>
+            
+        </ListView>
+
+    </DockPanel>
+</Window>

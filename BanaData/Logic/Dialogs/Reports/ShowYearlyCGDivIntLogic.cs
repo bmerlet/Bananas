@@ -14,6 +14,7 @@ using BanaData.Collections;
 using BanaData.Database;
 using BanaData.Logic.Items;
 using BanaData.Logic.Dialogs.Pickers;
+using BanaData.Logic.Dialogs.Basics;
 
 namespace BanaData.Logic.Dialogs.Reports
 {
@@ -34,14 +35,8 @@ namespace BanaData.Logic.Dialogs.Reports
             mainWindowLogic = _mainWindowLogic;
 
             // Setup years
-            var thisYear = DateTime.Today.Year;
-            var years = new List<int>();
-            for (int i = 0; i < 15; i++) // Go back 15 years
-            {
-                years.Add(thisYear - i);
-            }
-            YearSource = years.ToArray();
-            SelectedYear = years[0];
+            YearPickerLogic = new YearPickerLogic(mainWindowLogic);
+            YearPickerLogic.YearChanged += (s, e) => UpdateTransactions();
 
             // Setup accounts - skip IRAs as they are not taxable
             foreach (Household.AccountRow accountRow in mainWindowLogic.Household.Account.Rows)
@@ -79,20 +74,7 @@ namespace BanaData.Logic.Dialogs.Reports
         //
         // Year
         //
-        private int selectedYear;
-        public int SelectedYear
-        {
-            get => selectedYear;
-            set
-            {
-                if (selectedYear != value)
-                {
-                    selectedYear = value;
-                    UpdateTransactions();
-                }
-            }
-        }
-        public int[] YearSource { get; }
+        public YearPickerLogic YearPickerLogic { get; }
 
         //
         // Show interest or not
@@ -305,7 +287,7 @@ namespace BanaData.Logic.Dialogs.Reports
                     var accountName = accountRow.Name;
 
                     // Go through all the transactions for that year
-                    foreach (var transactionRow in accountRow.GetRegularTransactionRows().Where(tr => tr.Date.Year == selectedYear))
+                    foreach (var transactionRow in accountRow.GetRegularTransactionRows().Where(tr => tr.Date.Year == YearPickerLogic.SelectedYear))
                     {
                         // Go through all the line items
                         foreach (var li in transactionRow.GetLineItemRows())
@@ -337,7 +319,7 @@ namespace BanaData.Logic.Dialogs.Reports
                     }
 
                     // Go through all the transactions for that year
-                    foreach (var transactionRow in accountRow.GetRegularTransactionRows().Where(tr => tr.Date.Year == selectedYear))
+                    foreach (var transactionRow in accountRow.GetRegularTransactionRows().Where(tr => tr.Date.Year == YearPickerLogic.SelectedYear))
                     {
                         // Get the investment transaction
                         var investmentTransactionRow = transactionRow.GetInvestmentTransaction();

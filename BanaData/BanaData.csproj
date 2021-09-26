@@ -73,6 +73,7 @@
     <Compile Include="Logic\Dialogs\Basics\ErrorLogic.cs" />
     <Compile Include="Logic\Dialogs\Basics\OpenFileLogic.cs" />
     <Compile Include="Logic\Dialogs\Basics\PasswordPromptLogic.cs" />
+    <Compile Include="Logic\Dialogs\Basics\YearPickerLogic.cs" />
     <Compile Include="Logic\Dialogs\Editors\EditAccountLogic.cs" />
     <Compile Include="Logic\Dialogs\Editors\EditCategoryLogic.cs" />
     <Compile Include="Logic\Dialogs\Editors\EditMemorizedPayeeLogic.cs" />
@@ -97,6 +98,7 @@
     <Compile Include="Logic\Dialogs\Pickers\PayeeListPickerLogic.cs" />
     <Compile Include="Logic\Dialogs\Reports\SearchResultLogic.cs" />
     <Compile Include="Logic\Dialogs\Reports\ShowCapitalGainsLogic.cs" />
+    <Compile Include="Logic\Dialogs\Reports\ShowCashFlowBetweenPersonsLogic.cs" />
     <Compile Include="Logic\Dialogs\Reports\ShowHoldingsLogic.cs" />
     <Compile Include="Logic\Dialogs\Reports\ShowHoldingsPerPersonLogic.cs" />
     <Compile Include="Logic\Dialogs\Reports\ShowQuoteUpdateLogic.cs" />

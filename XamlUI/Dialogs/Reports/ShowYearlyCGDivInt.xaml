@@ -42,8 +42,8 @@
             <ComboBox
                 Padding="0"
                 Grid.Column="1"
-                ItemsSource="{Binding YearSource}"
-                SelectedItem="{Binding SelectedYear, Mode=TwoWay}"/>
+                ItemsSource="{Binding YearPickerLogic.YearSource}"
+                SelectedItem="{Binding YearPickerLogic.SelectedYear, Mode=TwoWay}"/>
             <CheckBox
                 Grid.Column="2"
                 Content="Show dividends"

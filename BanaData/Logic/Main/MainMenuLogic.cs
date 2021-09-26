@@ -62,6 +62,7 @@ namespace BanaData.Logic.Main
             ShowRebalance = new CommandBase(OnShowRebalance);
             ShowRebalance.SetCanExecute(false);
             ShowWealthOverTime = new CommandBase(OnShowWealthOverTime);
+            ShowCashFlowBetweenPersons = new CommandBase(OnShowCashFlowBetweenPersons);
 
             TransactionReportsSource = (CollectionView)CollectionViewSource.GetDefaultView(transactionReports);
             TransactionReportsSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
@@ -522,6 +523,16 @@ namespace BanaData.Logic.Main
         private void OnShowWealthOverTime()
         {
             mainWindow.GuiServices.ShowDialog(new ShowWealthOverTimeLogic(mainWindow));
+        }
+
+        //
+        // Show cash flow between household members
+        //
+        public CommandBase ShowCashFlowBetweenPersons { get; }
+
+        private void OnShowCashFlowBetweenPersons()
+        {
+            mainWindow.GuiServices.ShowDialog(new ShowCashFlowBetweenPersonsLogic(mainWindow));
         }
 
         #endregion
