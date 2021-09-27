@@ -79,7 +79,16 @@ namespace BanaData.Logic.Dialogs.Reports
 
         // RFU
         public CommandBase PickMembersCommand { get; }
-        public Household.PersonRow[] Members;
+        public Household.PersonRow[] Members { get;  }
+
+        // First line
+        public CashFlowItem CashFlowFirstItem { get; private set; }
+
+        // Other lines
+        public List<CashFlowItem> CashFlowItems { get; } = new List<CashFlowItem>();
+
+        // Last line
+        public CashFlowItem CashFlowLastItem { get; private set; }
 
         #endregion
 
@@ -87,18 +96,84 @@ namespace BanaData.Logic.Dialogs.Reports
 
         private void ComputeCashFlow()
         {
-            // Compute member assets at beginning of year
+            // Compute start/end date
+            var startDate = new DateTime(YearPickerLogic.SelectedYear, 1, 1);
+            var endDate = new DateTime(YearPickerLogic.SelectedYear, 12, 31);
+            CashFlowItems.Clear();
 
-            // ZZZZ
+            // Compute member assets at beginning of year
+            CashFlowFirstItem = ComputeMemberValueAtDate(startDate, "Initial balance");
 
             // Compute member assets at end of year
+            CashFlowLastItem = ComputeMemberValueAtDate(endDate, "End balance");
+
+            // Find transfers between members
+            ComputeTransfersBetweenMembers(startDate, endDate);
+
+            CashFlowItems.Sort();
         }
+
+        private CashFlowItem ComputeMemberValueAtDate(DateTime date, string description)
+        {
+            var household = mainWindowLogic.Household;
+            var mis = new List<MemberItem>();
+
+            foreach (var member in Members)
+            {
+                decimal value = household.Account
+                    .Where(accnt => !accnt.IsPersonIDNull() && accnt.PersonRow == member)
+                    .Select(accnt => accnt.Type == EAccountType.Investment ? accnt.GetInvestmentValue(date) : accnt.GetBalance(date))
+                    .Sum();
+                mis.Add(new MemberItem(0, false, value, true));
+            }
+
+            return new CashFlowItem(date, description, mis.ToArray());
+        }
+
+        private void ComputeTransfersBetweenMembers(DateTime startDate, DateTime endDate)
+        {
+            var household = mainWindowLogic.Household;
+
+            // Find transfers from an account owned by this member to an account owned by another member
+            foreach (var transactionRow in household.RegularTransactions
+                .Where(tr => tr.Date >= startDate && tr.Date <= endDate && !tr.AccountRow.IsPersonIDNull()))
+            {
+                foreach (var lineItemRow in transactionRow.GetLineItemRows())
+                {
+                    if (lineItemRow.Amount > 0 &&
+                        lineItemRow.GetLineItemTransferRow() is Household.LineItemTransferRow tx &&
+                        !tx.AccountRow.IsPersonIDNull() && tx.AccountRow.PersonRow != transactionRow.AccountRow.PersonRow)
+                    {
+                        // Gotcha
+                        var mis = new List<MemberItem>();
+                        foreach (var m in Members)
+                        {
+                            if (m == transactionRow.AccountRow.PersonRow)
+                            {
+                                mis.Add(new MemberItem(lineItemRow.Amount, true, 0, false));
+                            }
+                            else if (m == tx.AccountRow.PersonRow)
+                            {
+                                mis.Add(new MemberItem(-lineItemRow.Amount, true, 0, false));
+                            }
+                            else
+                            {
+                                mis.Add(new MemberItem(0, false, 0, false));
+                            }
+                        }
+                        var desc = transactionRow.IsMemoNull() ? $"{tx.AccountRow.Name} => {transactionRow.AccountRow.Name}" : transactionRow.Memo;
+                        CashFlowItems.Add(new CashFlowItem(transactionRow.Date, desc, mis.ToArray()));
+                    }
+                }
+            }
+        }
+
 
         #endregion
 
         #region Support classes
 
-        public class CashFlowItem
+        public class CashFlowItem : IComparable<CashFlowItem>
         {
             public CashFlowItem(DateTime date, string description, MemberItem[] memberItems) 
                 => (Date, Description, MemberItems) = (date, description, memberItems);
@@ -106,13 +181,18 @@ namespace BanaData.Logic.Dialogs.Reports
             public DateTime Date { get; }
             public string Description { get; }
             public MemberItem[] MemberItems { get; }
+
+            public int CompareTo(CashFlowItem other) => Date.CompareTo(other.Date);
         }
 
         public class MemberItem
         {
-            public bool IsVisible { get; }
+            public MemberItem(decimal amount, bool showAmount, decimal balance, bool showBalance) =>
+                (Amount, ShowAmount, Balance, ShowBalance) = (amount, showAmount, balance, showBalance);
             public decimal Amount { get; }
+            public bool ShowAmount { get; }
             public decimal Balance { get; }
+            public bool ShowBalance { get; }
         }
 
         #endregion

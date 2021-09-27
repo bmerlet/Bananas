@@ -12,22 +12,21 @@
         WindowStartupLocation="CenterOwner"
         Title="Cash flow between household members" Height="450" Width="800">
     <DockPanel>
+        <DockPanel.Resources>
+            <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}"/>
+            <Style TargetType="ComboBox" BasedOn="{StaticResource FormComboBox}"/>
+            <Style TargetType="CheckBox" BasedOn="{StaticResource FormCheckBox}"/>
+            <Style TargetType="Button" BasedOn="{StaticResource FormButton}"/>
+        </DockPanel.Resources>
 
         <!-- Done panel -->
         <w:DonePanel DockPanel.Dock="Bottom"/>
 
         <!-- Controls -->
         <Grid DockPanel.Dock="Top">
-            <Grid.Resources>
-                <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}"/>
-                <Style TargetType="ComboBox" BasedOn="{StaticResource FormComboBox}"/>
-                <Style TargetType="CheckBox" BasedOn="{StaticResource FormCheckBox}"/>
-                <Style TargetType="Button" BasedOn="{StaticResource FormButton}"/>
-            </Grid.Resources>
-
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="120"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="120"/>
                 <ColumnDefinition Width="Auto"/>
@@ -47,7 +46,6 @@
             <TextBlock
                 Grid.Column="2" Text="Show expense/income every:"/>
             <ComboBox
-                Padding="0"
                 Grid.Column="3"
                 ItemsSource="{Binding FrequencySource}"
                 SelectedItem="{Binding SelectedFrequency, Mode=TwoWay}"/>
@@ -61,10 +59,10 @@
                 Command="{Binding PickMembersCommand}"/>
         </Grid>
 
-        <!-- Main listview -->
-        <ListView>
-            
-        </ListView>
+        <!-- Main table -->
+        <ScrollViewer>
+            <Grid x:Name="grid"/>
+        </ScrollViewer>
 
     </DockPanel>
 </Window>

@@ -90,6 +90,12 @@ namespace BanaData.Database
                 return GetBalance(ETransactionStatus.Reconciled, null, null);
             }
 
+            // Get the balance of a bank account at a given date
+            public decimal GetBalance(DateTime date)
+            {
+                return GetBalance(null, null, date);
+            }
+
             // Get the balance of a banking account
             private decimal GetBalance(ETransactionStatus? status, DateTime? fromDate, DateTime? toDate)
             {

@@ -168,12 +168,13 @@ namespace XamlUI.Dialogs.Reports
                 var pathGeometry = new PathGeometry();
                 pathGeometry.Figures.Add(pathFigure);
 
-                var path = new Path();
-                path.Fill = Brushes.Blue;
-                path.Fill = new SolidColorBrush(new Color() { R = r, G = g, B = b, A = 255 });
-                path.Stroke = Brushes.Black;
-                path.Data = pathGeometry;
-                path.ToolTip = pieSlice.Tip;
+                var path = new Path
+                {
+                    Fill = new SolidColorBrush(new Color() { R = r, G = g, B = b, A = 255 }),
+                    Stroke = Brushes.Black,
+                    Data = pathGeometry,
+                    ToolTip = pieSlice.Tip
+                };
 
                 pieChartCanvas.Children.Add(path);
                 Canvas.SetLeft(path, centerX);
