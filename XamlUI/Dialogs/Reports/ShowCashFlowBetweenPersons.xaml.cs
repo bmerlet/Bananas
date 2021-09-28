@@ -27,6 +27,8 @@ namespace XamlUI.Dialogs.Reports
             InitializeComponent();
 
             Loaded += OnLoaded;
+
+            logic.PropertyChanged += OnPropertyChanged;
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)
@@ -34,9 +36,20 @@ namespace XamlUI.Dialogs.Reports
             BuildGrid();
         }
 
+        private void OnPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "RebuildTableSignal")
+            {
+                BuildGrid();
+            }
+        }
+
         private void BuildGrid()
         {
             var logic = DataContext as ShowCashFlowBetweenPersonsLogic;
+            grid.Children.Clear();
+            grid.ColumnDefinitions.Clear();
+            grid.RowDefinitions.Clear();
 
             //
             // Define columns
@@ -44,7 +57,7 @@ namespace XamlUI.Dialogs.Reports
             // Date
             grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(80) });
             // Description
-            grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(210) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
             // Amount/Balance
             for (int i = 0; i < logic.Members.Length; i++)
             {

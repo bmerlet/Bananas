@@ -90,6 +90,9 @@ namespace BanaData.Logic.Dialogs.Reports
         // Last line
         public CashFlowItem CashFlowLastItem { get; private set; }
 
+        // Flag to rebuild table
+        public bool RebuildTableSignal { get; private set; }
+
         #endregion
 
         #region Actions
@@ -110,7 +113,21 @@ namespace BanaData.Logic.Dialogs.Reports
             // Find transfers between members
             ComputeTransfersBetweenMembers(startDate, endDate);
 
+            // Sort by date
             CashFlowItems.Sort();
+
+            // Consolidate transfers from same account and same date
+            ConsolidateTransfersBetweenMembers();
+
+            // Compute per-member expenses
+            ComputePerMemberExpenses(startDate, endDate);
+
+            // Sort by date
+            CashFlowItems.Sort();
+
+            // Rebuild table
+            RebuildTableSignal = !RebuildTableSignal;
+            OnPropertyChanged(() => RebuildTableSignal);
         }
 
         private CashFlowItem ComputeMemberValueAtDate(DateTime date, string description)
@@ -161,13 +178,169 @@ namespace BanaData.Logic.Dialogs.Reports
                                 mis.Add(new MemberItem(0, false, 0, false));
                             }
                         }
-                        var desc = transactionRow.IsMemoNull() ? $"{tx.AccountRow.Name} => {transactionRow.AccountRow.Name}" : transactionRow.Memo;
+                        var desc = transactionRow.IsMemoNull() ? $"{tx.AccountRow.Name} -> {transactionRow.AccountRow.Name}" : transactionRow.Memo;
                         CashFlowItems.Add(new CashFlowItem(transactionRow.Date, desc, mis.ToArray()));
                     }
                 }
             }
         }
 
+        private void ConsolidateTransfersBetweenMembers()
+        {
+            List<CashFlowItem> tmpList = new List<CashFlowItem>(CashFlowItems);
+            CashFlowItems.Clear();
+            for(int i = 0; i < tmpList.Count; i++)
+            {
+                var item = tmpList[i];
+                for (int j = i + 1; j < tmpList.Count; j++)
+                {
+                    if (tmpList[j].Date == item.Date && tmpList[j].Description == item.Description)
+                    {
+                        var mis = new MemberItem[item.MemberItems.Length];
+                        for(int k = 0; k < mis.Length; k++)
+                        {
+                            var amount = item.MemberItems[k].Amount + tmpList[j].MemberItems[k].Amount;
+                            mis[k] = new MemberItem(amount, amount != 0, 0, false);
+                        }
+                        item = new CashFlowItem(item.Date, item.Description, mis);
+                        i = j;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                CashFlowItems.Add(item);
+            }
+        }
+
+        private void ComputePerMemberExpenses(DateTime startDate, DateTime finalEndDate)
+        {
+            // Amount per member
+            Dictionary<Household.PersonRow, decimal> memberAmount = new Dictionary<Household.PersonRow, decimal>();
+            foreach (var member in Members)
+            {
+                memberAmount.Add(member, 0);
+            }
+
+            // Get time-sorted transactions for relevant accounts and relevant time period
+            List<Household.TransactionRow> transactions;
+            transactions = mainWindowLogic.Household.RegularTransactions
+                .Where(tr => tr.Date >= startDate && tr.Date <= finalEndDate)
+                .Where(tr => !tr.AccountRow.IsPersonIDNull() && Members.Contains(tr.AccountRow.PersonRow))
+                .ToList();
+            transactions.Sort((t1, t2) =>
+            {
+                // Sort by date
+                int ret = t1.Date.CompareTo(t2.Date);
+                if (ret == 0)
+                {
+                    // The sort by account
+                    ret = t1.AccountID.CompareTo(t2.AccountID);
+                    if (ret == 0 && t1.AccountRow.Type == EAccountType.Investment)
+                    {
+                        // Shares in first to avoid empty lot issues
+                        var i1 = t1.GetInvestmentTransaction();
+                        var i2 = t2.GetInvestmentTransaction();
+                        if (i1.IsSecurityIn && i2.IsSecurityIn)
+                        {
+                            ret = 0;
+                        }
+                        else if (i1.IsSecurityIn)
+                        {
+                            ret = -1;
+                        }
+                        else if (i2.IsSecurityIn)
+                        {
+                            ret = 1;
+                        }
+                    }
+
+                    // Don't let anybody think they are equal
+                    if (ret == 0)
+                    {
+                        return t1.ID.CompareTo(t2.ID);
+                    }
+                }
+                return ret;
+            });
+
+            // Get the first end date
+            DateTime endDate = GetNextEndDate(startDate);
+            var transactionEnum = transactions.GetEnumerator();
+            bool moreTransactions = transactionEnum.MoveNext();
+
+            // Loop over all the dates
+            for (DateTime curDate = startDate; curDate <= finalEndDate; curDate = curDate.AddDays(1))
+            {
+                if (curDate >= endDate)
+                {
+                    // Create the item
+                    var mis = new List<MemberItem>();
+                    foreach (var member in Members)
+                    {
+                        mis.Add(new MemberItem(memberAmount[member], true, 0, false));
+                    }
+                    CashFlowItems.Add(new CashFlowItem(endDate.AddDays(-1), GetExpenseDescriptionForDate(endDate), mis.ToArray()));
+
+                    // Get next end date
+                    endDate = GetNextEndDate(endDate);
+                }
+
+                while(moreTransactions && transactionEnum.Current is Household.TransactionRow transaction && transaction.Date <= curDate)
+                {
+                    var lis = transaction.GetLineItemRows();
+                    foreach (var li in lis)
+                    {
+                        if (li.GetLineItemCategoryRow() is Household.LineItemCategoryRow licr)
+                        {
+                            memberAmount[transaction.AccountRow.PersonRow] += li.Amount;
+                        }
+                    }
+
+                    moreTransactions = transactionEnum.MoveNext();
+                }
+            }
+        }
+
+        private DateTime GetNextEndDate(DateTime start)
+        {
+            DateTime end = start;
+
+            switch(selectedFrequency)
+            {
+                case FREQ_MONTHLY:
+                    end = start.AddMonths(1);
+                    break;
+                case FREQ_QUARTERLY:
+                    end = start.AddMonths(3);
+                    break;
+                case FREQ_YEARLY:
+                    end = start.AddYears(1);
+                    break;
+            }
+
+            return end;
+        }
+
+        private string GetExpenseDescriptionForDate(DateTime endDate)
+        {
+            string desc = "???";
+
+            switch (selectedFrequency)
+            {
+                case FREQ_MONTHLY:
+                    desc = $"Income/expenses for the month of {endDate.AddDays(-1):MMMM}";
+                    break;
+                case FREQ_QUARTERLY:
+                    desc = $"Income/expenses for Q{(endDate.AddDays(-1).Month / 4) + 1}";
+                    break;
+                case FREQ_YEARLY:
+                    desc = "Income/expenses for the year";
+                    break;
+            }
+            return desc;
+        }
 
         #endregion
 
@@ -182,7 +355,15 @@ namespace BanaData.Logic.Dialogs.Reports
             public string Description { get; }
             public MemberItem[] MemberItems { get; }
 
-            public int CompareTo(CashFlowItem other) => Date.CompareTo(other.Date);
+            public int CompareTo(CashFlowItem other)
+            {
+                int result = Date.CompareTo(other.Date);
+                if (result == 0)
+                {
+                    result = Description.CompareTo(other.Description);
+                }
+                return result;
+            }
         }
 
         public class MemberItem
