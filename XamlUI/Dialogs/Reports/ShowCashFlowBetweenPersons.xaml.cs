@@ -143,7 +143,7 @@ namespace XamlUI.Dialogs.Reports
             {
                 if (member.ShowAmount)
                 {
-                    txt = new TextBlock() { Text = $"{member.Amount:N2}", TextAlignment = TextAlignment.Right };
+                    txt = BuilAmountBox(member.Amount);
                     Grid.SetRow(txt, row);
                     Grid.SetColumn(txt, col);
                     grid.Children.Add(txt);
@@ -153,7 +153,7 @@ namespace XamlUI.Dialogs.Reports
 
                 if (member.ShowBalance)
                 {
-                    txt = new TextBlock() { Text = $"{member.Balance:N2}", TextAlignment=TextAlignment.Right };
+                    txt = BuilAmountBox(member.Balance);
                     Grid.SetRow(txt, row);
                     Grid.SetColumn(txt, col);
                     grid.Children.Add(txt);
@@ -161,6 +161,11 @@ namespace XamlUI.Dialogs.Reports
 
                 col++;
             }
+        }
+
+        private TextBlock BuilAmountBox(decimal amount)
+        {
+            return new TextBlock() { Text = $"{amount:N2}", TextAlignment = TextAlignment.Right, Foreground = amount >= 0 ? Brushes.Black : Brushes.Red };
         }
     }
 }

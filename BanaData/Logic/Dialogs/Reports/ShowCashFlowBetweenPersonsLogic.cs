@@ -125,6 +125,9 @@ namespace BanaData.Logic.Dialogs.Reports
             // Sort by date
             CashFlowItems.Sort();
 
+            // Balances
+            ComputeBalances();
+
             // Rebuild table
             RebuildTableSignal = !RebuildTableSignal;
             OnPropertyChanged(() => RebuildTableSignal);
@@ -139,9 +142,10 @@ namespace BanaData.Logic.Dialogs.Reports
             {
                 decimal value = household.Account
                     .Where(accnt => !accnt.IsPersonIDNull() && accnt.PersonRow == member)
-                    .Select(accnt => accnt.Type == EAccountType.Investment ? accnt.GetInvestmentValue(date) : accnt.GetBalance(date))
+                    //.Select(accnt => accnt.Type == EAccountType.Investment ? accnt.GetInvestmentValue(date) : accnt.GetBalance(date))
+                    .Select(accnt => accnt.Type == EAccountType.OtherAsset || accnt.Type == EAccountType.OtherLiability ? 0 : accnt.GetBalance(date))
                     .Sum();
-                mis.Add(new MemberItem(0, false, value, true));
+                mis.Add(MemberItem.GetBalanceMemberItem(member, value));
             }
 
             return new CashFlowItem(date, description, mis.ToArray());
@@ -167,15 +171,15 @@ namespace BanaData.Logic.Dialogs.Reports
                         {
                             if (m == transactionRow.AccountRow.PersonRow)
                             {
-                                mis.Add(new MemberItem(lineItemRow.Amount, true, 0, false));
+                                mis.Add(MemberItem.GetAmountMemberItem(m, lineItemRow.Amount, true));
                             }
                             else if (m == tx.AccountRow.PersonRow)
                             {
-                                mis.Add(new MemberItem(-lineItemRow.Amount, true, 0, false));
+                                mis.Add(MemberItem.GetAmountMemberItem(m, -lineItemRow.Amount, true));
                             }
                             else
                             {
-                                mis.Add(new MemberItem(0, false, 0, false));
+                                mis.Add(MemberItem.GetAmountMemberItem(m, 0, false));
                             }
                         }
                         var desc = transactionRow.IsMemoNull() ? $"{tx.AccountRow.Name} -> {transactionRow.AccountRow.Name}" : transactionRow.Memo;
@@ -194,13 +198,13 @@ namespace BanaData.Logic.Dialogs.Reports
                 var item = tmpList[i];
                 for (int j = i + 1; j < tmpList.Count; j++)
                 {
-                    if (tmpList[j].Date == item.Date && tmpList[j].Description == item.Description)
+                    if (tmpList[j].Date == item.Date && IsSameDescriptionOrSimilarEnough(tmpList[j].Description, item.Description))
                     {
                         var mis = new MemberItem[item.MemberItems.Length];
                         for(int k = 0; k < mis.Length; k++)
                         {
                             var amount = item.MemberItems[k].Amount + tmpList[j].MemberItems[k].Amount;
-                            mis[k] = new MemberItem(amount, amount != 0, 0, false);
+                            mis[k] = MemberItem.GetAmountMemberItem(item.MemberItems[k].Member, amount, amount != 0);
                         }
                         item = new CashFlowItem(item.Date, item.Description, mis);
                         i = j;
@@ -212,6 +216,27 @@ namespace BanaData.Logic.Dialogs.Reports
                 }
                 CashFlowItems.Add(item);
             }
+        }
+
+        private bool IsSameDescriptionOrSimilarEnough(string x, string y)
+        {
+            bool ret = x == y;
+
+            /*
+            // ZZZZZ
+            if (!ret && x.Contains("BAmerican") && y.Contains("BAmerican"))
+            {
+                ret = true;
+            }
+
+            // ZZZZZ
+            if (!ret && x.Contains("SAmerican") && y.Contains("SAmerican"))
+            {
+                ret = true;
+            }
+            */
+
+            return ret;
         }
 
         private void ComputePerMemberExpenses(DateTime startDate, DateTime finalEndDate)
@@ -273,13 +298,14 @@ namespace BanaData.Logic.Dialogs.Reports
             // Loop over all the dates
             for (DateTime curDate = startDate; curDate <= finalEndDate; curDate = curDate.AddDays(1))
             {
-                if (curDate >= endDate)
+                if (curDate >= endDate || curDate == finalEndDate)
                 {
                     // Create the item
                     var mis = new List<MemberItem>();
                     foreach (var member in Members)
                     {
-                        mis.Add(new MemberItem(memberAmount[member], true, 0, false));
+                        mis.Add(MemberItem.GetAmountMemberItem(member, memberAmount[member], true));
+                        memberAmount[member] = 0;
                     }
                     CashFlowItems.Add(new CashFlowItem(endDate.AddDays(-1), GetExpenseDescriptionForDate(endDate), mis.ToArray()));
 
@@ -294,7 +320,23 @@ namespace BanaData.Logic.Dialogs.Reports
                     {
                         if (li.GetLineItemCategoryRow() is Household.LineItemCategoryRow licr)
                         {
+                            // Count all income/expense
                             memberAmount[transaction.AccountRow.PersonRow] += li.Amount;
+                        }
+                        else if (transaction.AccountRow.Type == EAccountType.Investment &&
+                            li.GetLineItemTransferRow() is Household.LineItemTransferRow litr)
+                        {
+                            // Also count the cash that comes in/out because of investment transactions but is transferred right away
+                            var investmentTransaction = transaction.GetInvestmentTransaction();
+                            var type = investmentTransaction.Type;
+                            if (type == EInvestmentTransactionType.BuyFromTransferredCash ||
+                                type == EInvestmentTransactionType.SellAndTransferCash ||
+                                type == EInvestmentTransactionType.TransferDividends ||
+                                type == EInvestmentTransactionType.TransferShortTermCapitalGains ||
+                                type == EInvestmentTransactionType.TransferLongTermCapitalGains)
+                            {
+                                memberAmount[transaction.AccountRow.PersonRow] -= li.Amount;
+                            }
                         }
                     }
 
@@ -342,6 +384,43 @@ namespace BanaData.Logic.Dialogs.Reports
             return desc;
         }
 
+        private void ComputeBalances()
+        {
+            // Per-member balance
+            Dictionary<Household.PersonRow, decimal> memberBalance = new Dictionary<Household.PersonRow, decimal>();
+            foreach (var member in Members)
+            {
+                memberBalance.Add(member, 0);
+            }
+
+            // Init
+            foreach(var m in CashFlowFirstItem.MemberItems)
+            {
+                memberBalance[m.Member] = m.Balance;
+            }
+
+            // Update
+            foreach(var cashFlowItem in CashFlowItems)
+            {
+                foreach(var m in cashFlowItem.MemberItems)
+                {
+                    memberBalance[m.Member] += m.Amount;
+                    if (m.ShowAmount)
+                    {
+                        m.SetBalance(memberBalance[m.Member]);
+                    }
+                }
+            }
+
+            // ZZZ
+            var mis = new List<MemberItem>();
+            foreach (var member in Members)
+            {
+                mis.Add(MemberItem.GetBalanceMemberItem(member, memberBalance[member]));
+            }
+            CashFlowItems.Add(new CashFlowItem(new DateTime(YearPickerLogic.SelectedYear, 12, 31), "EXPECTED BALANCES", mis.ToArray()));
+        }
+
         #endregion
 
         #region Support classes
@@ -368,12 +447,22 @@ namespace BanaData.Logic.Dialogs.Reports
 
         public class MemberItem
         {
-            public MemberItem(decimal amount, bool showAmount, decimal balance, bool showBalance) =>
-                (Amount, ShowAmount, Balance, ShowBalance) = (amount, showAmount, balance, showBalance);
+            private MemberItem(Household.PersonRow member, decimal amount, bool showAmount, decimal balance, bool showBalance) =>
+                (Member, Amount, ShowAmount, Balance, ShowBalance) = (member, amount, showAmount, balance, showBalance);
+
+            static public MemberItem GetAmountMemberItem(Household.PersonRow member, decimal amount, bool showAmount)
+                => new MemberItem(member, amount, showAmount, 0, false);
+
+            static public MemberItem GetBalanceMemberItem(Household.PersonRow member, decimal balance)
+                => new MemberItem(member, 0, false, balance, true);
+
+            public void SetBalance(decimal balance) => (Balance, ShowBalance) = (balance, true);
+
+            public readonly Household.PersonRow Member;
             public decimal Amount { get; }
             public bool ShowAmount { get; }
-            public decimal Balance { get; }
-            public bool ShowBalance { get; }
+            public decimal Balance { get; private set; }
+            public bool ShowBalance { get; private set; }
         }
 
         #endregion
