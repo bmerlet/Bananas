@@ -1,0 +1,126 @@
+﻿<Window x:Class="XamlUI.Dialogs.Reports.Accounting.BalanceSheet"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:XamlUI.Dialogs.Reports.Accounting"
+        xmlns:ucs="clr-namespace:XamlUI.UserControls"
+        xmlns:w="clr-namespace:XamlUI.Widgets"
+        xmlns:l="clr-namespace:BanaData.Logic.Dialogs.Reports.Accounting;assembly=BanaData"
+        d:DataContext="{d:DesignInstance Type=l:BalanceSheetLogic}"
+        mc:Ignorable="d"
+        Icon="/XamlUI;component/Images/Bananas.ico"
+        WindowStartupLocation="CenterOwner"
+        Title="Balance sheet" Height="450" Width="760">
+    <DockPanel>
+        <DockPanel.Resources>
+            <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}"/>
+            <Style TargetType="w:DateBox" BasedOn="{StaticResource FormDateBox}"/>
+            <Style TargetType="ComboBox" BasedOn="{StaticResource FormComboBox}"/>
+            <Style TargetType="Button" BasedOn="{StaticResource FormButton}"/>
+        </DockPanel.Resources>
+
+        <!-- Done panel -->
+        <ucs:DonePanel DockPanel.Dock="Bottom"/>
+
+        <!-- Controls -->
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="90"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="80"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Date:"/>
+            <w:DateBox
+                Grid.Column="1"
+                Date="{Binding Date, Mode=TwoWay}"/>
+            <TextBlock
+                Grid.Column="2" Text="Household member:"/>
+            <ComboBox
+                Grid.Column="3"
+                Padding="0"
+                ItemsSource="{Binding MembersSource}"
+                SelectedItem="{Binding SelectedMember, Mode=TwoWay}"/>
+            <Button
+                Grid.Column="5"
+                Content="Print..."
+                Command="{Binding PrintCommand}"/>
+        </Grid>
+
+        <!-- Listviews -->
+        <ScrollViewer>
+            <Grid>
+                <Grid.Resources>
+                    <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}"/>
+                </Grid.Resources>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="Assets:" FontSize="14" FontWeight="Bold"/>
+                <TextBlock Text="Liabilities:" FontSize="14" FontWeight="Bold" Grid.Column="1"/>
+            
+                <ListView
+                    Grid.Row="1"
+                    ItemsSource="{Binding AssetsSource}">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Name" Width="240">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Name}" FontWeight="{Binding Bold, Converter={StaticResource fontWeightConverter}}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Amount" Width="80">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Value, Converter={StaticResource amountToStringConverter}}" TextAlignment="Right"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+        
+                <ListView
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    ItemsSource="{Binding LiabilitiesSource}">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Name" Width="260">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Name}" FontWeight="{Binding Bold, Converter={StaticResource fontWeightConverter}}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Amount" Width="80">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Value, Converter={StaticResource amountToStringConverter}}" TextAlignment="Right"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+
+            </Grid>
+        </ScrollViewer>
+
+    </DockPanel>
+</Window>

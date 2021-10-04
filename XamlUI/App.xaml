@@ -64,6 +64,7 @@
         <Style TargetType="w:DateBox" x:Key="FormDateBox">
             <Setter Property="Margin" Value="5"/>
             <Setter Property="HorizontalContentAlignment" Value="Right"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
 
         <!-- Form text box -->

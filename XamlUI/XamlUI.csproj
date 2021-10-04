@@ -131,6 +131,12 @@
     <Compile Include="Dialogs\Pickers\PayeeListPicker.xaml.cs">
       <DependentUpon>PayeeListPicker.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\Reports\Accounting\BalanceSheet.xaml.cs">
+      <DependentUpon>BalanceSheet.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Reports\Accounting\IncomeStatement.xaml.cs">
+      <DependentUpon>IncomeStatement.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\Reports\SearchResult.xaml.cs">
       <DependentUpon>SearchResult.xaml</DependentUpon>
     </Compile>
@@ -300,6 +306,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\Pickers\PayeeListPicker.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Reports\Accounting\BalanceSheet.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Reports\Accounting\IncomeStatement.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -29,6 +29,8 @@ using XamlUI.Dialogs.Editors;
 using XamlUI.Dialogs.Listers;
 using XamlUI.Dialogs.Pickers;
 using XamlUI.Dialogs.Reports;
+using BanaData.Logic.Dialogs.Reports.Accounting;
+using XamlUI.Dialogs.Reports.Accounting;
 
 namespace XamlUI
 {
@@ -246,6 +248,14 @@ namespace XamlUI
             else if (logic is PasswordPromptLogic passwordPromptLogic)
             {
                 dialog = new PasswordPrompt(passwordPromptLogic);
+            }
+            else if (logic is BalanceSheetLogic balanceSheetLogic)
+            {
+                dialog = new BalanceSheet(balanceSheetLogic);
+            }
+            else if (logic is IncomeStatementLogic incomeStatementLogic)
+            {
+                dialog = new IncomeStatement(incomeStatementLogic);
             }
             else
             {

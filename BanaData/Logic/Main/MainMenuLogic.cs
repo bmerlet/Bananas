@@ -15,6 +15,7 @@ using BanaData.Logic.Dialogs.Reports;
 using BanaData.Web;
 using BanaData.Logic.Items;
 using BanaData.Collections;
+using BanaData.Logic.Dialogs.Reports.Accounting;
 
 namespace BanaData.Logic.Main
 {
@@ -63,6 +64,8 @@ namespace BanaData.Logic.Main
             ShowRebalance.SetCanExecute(false);
             ShowWealthOverTime = new CommandBase(OnShowWealthOverTime);
             ShowCashFlowBetweenPersons = new CommandBase(OnShowCashFlowBetweenPersons);
+            ShowBalanceSheet = new CommandBase(OnShowBalanceSheet);
+            ShowIncomeStatement = new CommandBase(OnShowIncomeStatement);
 
             TransactionReportsSource = (CollectionView)CollectionViewSource.GetDefaultView(transactionReports);
             TransactionReportsSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
@@ -533,6 +536,26 @@ namespace BanaData.Logic.Main
         private void OnShowCashFlowBetweenPersons()
         {
             mainWindow.GuiServices.ShowDialog(new ShowCashFlowBetweenPersonsLogic(mainWindow));
+        }
+
+        //
+        // Balance sheet
+        //
+        public CommandBase ShowBalanceSheet { get; }
+
+        private void OnShowBalanceSheet()
+        {
+            mainWindow.GuiServices.ShowDialog(new BalanceSheetLogic(mainWindow));
+        }
+
+        //
+        // Income statement
+        //
+        public CommandBase ShowIncomeStatement { get; }
+
+        private void OnShowIncomeStatement()
+        {
+            mainWindow.GuiServices.ShowDialog(new IncomeStatementLogic(mainWindow));
         }
 
         #endregion
