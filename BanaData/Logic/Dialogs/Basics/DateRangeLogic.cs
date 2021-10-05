@@ -49,6 +49,9 @@ namespace BanaData.Logic.Dialogs.Basics
             [EnumDescription("Last year")]
             LastYear,
 
+            [EnumDescription("Prior year")]
+            PriorYear,
+
             [EnumDescription("Last five years")]
             LastFiveYears,
 
@@ -122,6 +125,10 @@ namespace BanaData.Logic.Dialogs.Basics
                 case ERange.LastYear:
                     endDate = DateTime.Today;
                     startDate = endDate.AddYears(-1);
+                    break;
+                case ERange.PriorYear:
+                    endDate = new DateTime(DateTime.Today.Year - 1, 12, 31);
+                    startDate = new DateTime(DateTime.Today.Year - 1, 1, 1);
                     break;
                 case ERange.YearToDate:
                     endDate = DateTime.Today;

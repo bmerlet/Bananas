@@ -311,14 +311,26 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
             //
             statements.Add(IncomeStatementItem.GetTitle("Other comprehensive income", "700OtherComprehensiveIncome"));
 
-            // Compute portfolio at end date
+            // Compute portfolio at end date for all investment accounts belonging to member
             decimal changeInInvestmentValue = 0;
             foreach (var accountRow in household.Account
                 .Where(acct => acct.Type == EAccountType.Investment && (member == null || (!acct.IsPersonIDNull() && acct.PersonRow == member))))
             {
                 var portfolio = accountRow.GetPortfolio(endDate);
+
+                // Compute portfolio value at end date
                 decimal endDateValue = portfolio.GetValuation(endDate);
-                decimal startDateValue = portfolio.GetValuation(startDate);
+
+                // Compute base portfolio value: value of lots at start date for lots that are older than start date,
+                // and value of lot when acquired for lots acquired after start date
+                decimal startDateValue = 0;
+                foreach(var lot in portfolio.Lots)
+                {
+                    decimal securityPrice = lot.Date < startDate ? lot.Security.GetMostRecentPrice(startDate) : securityPrice = lot.SecurityPrice;
+                    decimal lotValue = securityPrice * lot.Quantity;
+                    startDateValue += lotValue;
+                }
+
                 changeInInvestmentValue += endDateValue - startDateValue;
             }
             statements.Add(IncomeStatementItem.GetItem("Change in investment value", null, "701ChangeInInvestmentValue", changeInInvestmentValue));
