@@ -86,7 +86,8 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
 
             //
             // Income
-            // - Rent
+            // v Rent
+            // v Int
             // - Div
             // - CG
             // - Other (sale of shares or assets)
@@ -94,7 +95,8 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
             // Total Revenues
 
             // Expenses
-            // - Any and all
+            // v Regular expenses
+            // - Tx to others
             // - cost basis of sold shares
             // Total Expenses
 
@@ -105,36 +107,225 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
 
             decimal totalRevenues = 0;
             decimal totalExpenses = 0;
-            bool hasRevenues = false;
-            bool hasExpenses = false;
+            var revenues = new Dictionary<CategoryItem, decimal>();
+            var expenses = new Dictionary<CategoryItem, decimal>();
 
             // Loop on all transaction for the selcted period and selected member
             foreach (var transactionRow in household.RegularTransactions
                 .Where(tr => tr.Date >= startDate && tr.Date <= endDate && (member == null || (!tr.AccountRow.IsPersonIDNull() && tr.AccountRow.PersonRow == member))))
             {
-                if (transactionRow.AccountRow.Type == EAccountType.Investment)
+                foreach (var li in transactionRow.GetLineItemRows())
                 {
+                    // Special parsing of investment transactions
+                    if (transactionRow.AccountRow.Type == EAccountType.Investment)
+                    {
+                        var investmentTransactionRow = transactionRow.GetInvestmentTransaction();
+                        string explanation = null;
+                        Dictionary<CategoryItem, decimal> dico = null;
 
-                }
-                else
-                {
+                        switch (investmentTransactionRow.Type)
+                        {
+                            case EInvestmentTransactionType.CashIn:
+                                dico = revenues;
+                                explanation = "Added cash";
+                                break;
+                            case EInvestmentTransactionType.CashOut:
+                                dico = expenses;
+                                explanation = "Removed cash";
+                                break;
+                            case EInvestmentTransactionType.TransferCashIn:
+                            case EInvestmentTransactionType.TransferCashOut:
+                                break;
+                            case EInvestmentTransactionType.InterestIncome:
+                                dico = revenues;
+                                explanation = "Interest Inc.";
+                                break;
+
+                            case EInvestmentTransactionType.SharesIn:
+                            case EInvestmentTransactionType.SharesOut:
+                                // Used for share exchange, revenue-neutral
+                                break;
+
+                            case EInvestmentTransactionType.Buy:
+                            case EInvestmentTransactionType.BuyFromTransferredCash:
+                                // Buying shares is revenue-neutral
+                                break;
+
+                            case EInvestmentTransactionType.Sell:
+                            case EInvestmentTransactionType.SellAndTransferCash:
+                                var cg = Portfolio.ComputeSaleCapitalGains(household, transactionRow.ID, false);
+                                if (cg.LongTermGain != 0)
+                                {
+                                    var catItem = new CategoryItem("Long term capital gains from sale of " + investmentTransactionRow.SecurityRow.Symbol);
+                                    if (!revenues.ContainsKey(catItem))
+                                    {
+                                        revenues[catItem] = 0;
+                                    }
+                                    revenues[catItem] += cg.LongTermGain;
+                                }
+                                if (cg.ShortTermGain != 0)
+                                {
+                                    var catItem = new CategoryItem("Short term capital gains from sale of " + investmentTransactionRow.SecurityRow.Symbol);
+                                    if (!revenues.ContainsKey(catItem))
+                                    {
+                                        revenues[catItem] = 0;
+                                    }
+                                    revenues[catItem] += cg.ShortTermGain;
+                                }
+                                break;
+
+                            case EInvestmentTransactionType.Dividends:
+                            case EInvestmentTransactionType.TransferDividends:
+                            case EInvestmentTransactionType.ReinvestDividends:
+                                dico = revenues;
+                                explanation = "Dividends";
+                                break;
+
+                            case EInvestmentTransactionType.ShortTermCapitalGains:
+                            case EInvestmentTransactionType.TransferShortTermCapitalGains:
+                            case EInvestmentTransactionType.ReinvestShortTermCapitalGains:
+                                dico = revenues;
+                                explanation = "Short-term capital gains";
+                                break;
+
+                            case EInvestmentTransactionType.LongTermCapitalGains:
+                            case EInvestmentTransactionType.TransferLongTermCapitalGains:
+                            case EInvestmentTransactionType.ReinvestMediumTermCapitalGains:
+                            case EInvestmentTransactionType.ReinvestLongTermCapitalGains:
+                                dico = revenues;
+                                explanation = "Long-term capital gains";
+                                break;
+
+                            case EInvestmentTransactionType.ReturnOnCapital:
+                                dico = revenues;
+                                explanation = "Return on capital";
+                                break;
+                        }
+
+                        if (dico != null && explanation != null)
+                        {
+                            var catItem = new CategoryItem(explanation);
+                            if (!dico.ContainsKey(catItem))
+                            {
+                                dico.Add(catItem, 0);
+                            }
+                            dico[catItem] += Math.Abs(transactionRow.GetAmount());
+                        }
+                    }
+
+                    //
+                    // Process category-based income and expense
+                    //
+                    if (li.GetLineItemCategoryRow() is Household.LineItemCategoryRow lic)
+                    {
+                        // Get to top-level category
+                        var cat = lic.CategoryRow;
+                        while (!cat.IsParentIDNull())
+                        {
+                            cat = household.Category.FindByID(cat.ParentID);
+                        }
+                        var catItem = new CategoryItem(cat.Name);
+
+                        if (cat.IsIncome)
+                        {
+                            if (!revenues.ContainsKey(catItem))
+                            {
+                                revenues.Add(catItem, 0);
+                            }
+                            revenues[catItem] += li.Amount;
+                        }
+                        else
+                        {
+                            if (!expenses.ContainsKey(catItem))
+                            {
+                                expenses.Add(catItem, 0);
+                            }
+                            expenses[catItem] -= li.Amount;
+                        }
+                    }
+                    //
+                    // Process transfer-based income and expense
+                    //
+                    else if (li.GetLineItemTransferRow() is Household.LineItemTransferRow lit)
+                    {
+                        // Transfer to self does not count
+                        if (member == null || (!lit.AccountRow.IsPersonIDNull() && lit.AccountRow.PersonRow == member))
+                        {
+                            continue;
+                        }
+
+                        string transferee = lit.AccountRow.IsPersonIDNull() ? "Unknown person" : lit.AccountRow.PersonRow.Name;
+                        if (li.Amount < 0)
+                        {
+                            var catItem = new CategoryItem($"Transfer(s) to {transferee}");
+                            if (!expenses.ContainsKey(catItem))
+                            {
+                                expenses.Add(catItem, 0);
+                            }
+                            expenses[catItem] -= li.Amount;
+                        }
+                        else
+                        {
+                            var catItem = new CategoryItem($"Transfer(s) from {transferee}");
+                            if (!revenues.ContainsKey(catItem))
+                            {
+                                revenues.Add(catItem, 0);
+                            }
+                            revenues[catItem] += li.Amount;
+                        }
+                    }
                 }
             }
 
 
-            // Add necessary titles
-            if (hasRevenues)
+            // Build income and expense
+            if (revenues.Keys.Count != 0)
             {
                 statements.Add(IncomeStatementItem.GetTitle("Revenue", "100Revenue"));
+                foreach(var cat in revenues.Keys)
+                {
+                    decimal amount = revenues[cat];
+                    statements.Add(IncomeStatementItem.GetItem(cat.Name, null, "101Revenues", amount));
+                    totalRevenues += amount;
+                }
+                statements.Add(IncomeStatementItem.GetTotal("Total revenues", "190Revenue", totalRevenues));
             }
-            if (hasExpenses)
+            if (expenses.Keys.Count != 0)
             {
                 statements.Add(IncomeStatementItem.GetTitle("Expenses", "200Expenses"));
+                foreach (var cat in expenses.Keys)
+                {
+                    decimal amount = expenses[cat];
+                    statements.Add(IncomeStatementItem.GetItem(cat.Name, null, "201Expenses", amount));
+                    totalExpenses += amount;
+                }
+                statements.Add(IncomeStatementItem.GetTotal("Total expenses", "290Expenses", totalExpenses));
             }
 
             // Compute and add net income before taxes
-            statements.Add(IncomeStatementItem.GetTitle("Net Worth", "600NetIncomeBeforeTaxes"));
-            statements.Add(IncomeStatementItem.GetItem("Equity", "Equity", "601NetIncomeBeforeTaxes", totalRevenues - totalExpenses));
+            statements.Add(IncomeStatementItem.GetTitle("Net income", "600NetIncomeBeforeTaxes"));
+            statements.Add(IncomeStatementItem.GetTotal("Net taxable income", "601TaxableIncome", totalRevenues - totalExpenses));
+
+            //
+            // Now compute change in investment value
+            //
+            statements.Add(IncomeStatementItem.GetTitle("Other comprehensive income", "700OtherComprehensiveIncome"));
+
+            // Compute portfolio at end date
+            decimal changeInInvestmentValue = 0;
+            foreach (var accountRow in household.Account
+                .Where(acct => acct.Type == EAccountType.Investment && (member == null || (!acct.IsPersonIDNull() && acct.PersonRow == member))))
+            {
+                var portfolio = accountRow.GetPortfolio(endDate);
+                decimal endDateValue = portfolio.GetValuation(endDate);
+                decimal startDateValue = portfolio.GetValuation(startDate);
+                changeInInvestmentValue += endDateValue - startDateValue;
+            }
+            statements.Add(IncomeStatementItem.GetItem("Change in investment value", null, "701ChangeInInvestmentValue", changeInInvestmentValue));
+
+            // Compute and add net income before taxes
+            statements.Add(IncomeStatementItem.GetTitle("Total income", "800TotalIncome"));
+            statements.Add(IncomeStatementItem.GetTotal("Total income", "801TotalIncome", totalRevenues - totalExpenses + changeInInvestmentValue));
         }
 
         #endregion
@@ -155,11 +346,8 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
             static public IncomeStatementItem GetItem(string name, string tip, string group, decimal value)
                 => new IncomeStatementItem(name, tip, group, value, false, true, true);
 
-            static public IncomeStatementItem GetTotal(string group, decimal value)
-                => new IncomeStatementItem("Total:", null, group, value, true, true, false);
-
-            static public IncomeStatementItem GetFiller(string group)
-                => new IncomeStatementItem("", null, group, 0, false, false, false);
+            static public IncomeStatementItem GetTotal(string total, string group, decimal value)
+                => new IncomeStatementItem(total, null, group, value, true, true, true);
 
             public string Name { get; }
             public string Tip { get; }
@@ -185,6 +373,28 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
             public override string ToString()
             {
                 return Member == null ? "Everybody" : Member.Name;
+            }
+        }
+
+        //
+        // Simplified category
+        //
+        class CategoryItem
+        {
+            public CategoryItem(string name) => Name = name;
+
+            public readonly string Name;
+
+            public override bool Equals(object obj)
+            {
+                return 
+                    obj is CategoryItem o &&
+                    Name.Equals(o.Name);
+            }
+
+            public override int GetHashCode()
+            {
+                return Name.GetHashCode();
             }
         }
 

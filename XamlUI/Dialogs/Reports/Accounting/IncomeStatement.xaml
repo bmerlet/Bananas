@@ -11,7 +11,7 @@
         mc:Ignorable="d"
         Icon="/XamlUI;component/Images/Bananas.ico"
         WindowStartupLocation="CenterOwner"
-        Title="Income statement" Height="450" Width="500">
+        Title="Income statement" Height="450" Width="490">
     <DockPanel>
 
         <DockPanel.Resources>
@@ -74,7 +74,10 @@
                     <GridViewColumn Header="Amount" Width="80">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Value, Converter={StaticResource amountToStringConverter}}" TextAlignment="Right"/>
+                                <TextBlock 
+                                    Text="{Binding Value, Converter={StaticResource amountToStringConverter}}" 
+                                    Foreground="{Binding Value, Converter={StaticResource amountToColorConverter}}"
+                                    TextAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
