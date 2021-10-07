@@ -128,7 +128,7 @@
             <Setter Property="ItemTemplate">
                 <Setter.Value>
                     <DataTemplate>
-                        <TextBlock Text="{Binding IndentedName}" FontWeight="{Binding FontWeight, Converter={StaticResource fontWeightConverter}}" />
+                        <TextBlock Text="{Binding FullName}" FontWeight="{Binding FontWeight, Converter={StaticResource fontWeightConverter}}" />
                     </DataTemplate>
                 </Setter.Value>
             </Setter>
