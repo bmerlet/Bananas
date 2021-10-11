@@ -77,6 +77,7 @@
                     <MenuItem Header="Accounting">
                         <MenuItem Header="Balance sheet..." Command="{Binding ShowBalanceSheet}"/>
                         <MenuItem Header="Income statement..." Command="{Binding ShowIncomeStatement}"/>
+                        <MenuItem Header="Journal..." Command="{Binding ShowJournal}"/>
                     </MenuItem>
                     <MenuItem Header="Show holdings..." Command="{Binding ShowHoldings}"/>
                     <MenuItem Header="Show household members holdings..." Command="{Binding ShowHoldingsPerPerson}"/>

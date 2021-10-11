@@ -257,6 +257,10 @@ namespace XamlUI
             {
                 dialog = new IncomeStatement(incomeStatementLogic);
             }
+            else if (logic is JournalLogic journalLogic)
+            {
+                dialog = new Journal(journalLogic);
+            }
             else
             {
                 throw new NotImplementedException();

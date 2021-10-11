@@ -98,6 +98,7 @@
     <Compile Include="Logic\Dialogs\Pickers\PayeeListPickerLogic.cs" />
     <Compile Include="Logic\Dialogs\Reports\Accounting\IncomeStatementLogic.cs" />
     <Compile Include="Logic\Dialogs\Reports\Accounting\BalanceSheetLogic.cs" />
+    <Compile Include="Logic\Dialogs\Reports\Accounting\JournalLogic.cs" />
     <Compile Include="Logic\Dialogs\Reports\SearchResultLogic.cs" />
     <Compile Include="Logic\Dialogs\Reports\ShowCapitalGainsLogic.cs" />
     <Compile Include="Logic\Dialogs\Reports\ShowCashFlowBetweenPersonsLogic.cs" />

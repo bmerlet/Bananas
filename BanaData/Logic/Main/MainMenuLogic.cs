@@ -66,6 +66,7 @@ namespace BanaData.Logic.Main
             ShowCashFlowBetweenPersons = new CommandBase(OnShowCashFlowBetweenPersons);
             ShowBalanceSheet = new CommandBase(OnShowBalanceSheet);
             ShowIncomeStatement = new CommandBase(OnShowIncomeStatement);
+            ShowJournal = new CommandBase(OnShowJournal);
 
             TransactionReportsSource = (CollectionView)CollectionViewSource.GetDefaultView(transactionReports);
             TransactionReportsSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
@@ -556,6 +557,16 @@ namespace BanaData.Logic.Main
         private void OnShowIncomeStatement()
         {
             mainWindow.GuiServices.ShowDialog(new IncomeStatementLogic(mainWindow));
+        }
+
+        //
+        // Journal
+        //
+        public CommandBase ShowJournal { get; }
+
+        private void OnShowJournal()
+        {
+            mainWindow.GuiServices.ShowDialog(new JournalLogic(mainWindow));
         }
 
         #endregion

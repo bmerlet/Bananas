@@ -13,7 +13,7 @@ using Toolbox.UILogic;
 
 namespace BanaData.Logic.Dialogs.Reports.Accounting
 {
-    public class IncomeStatementLogic : LogicBase
+    public class JournalLogic : LogicBase
     {
         #region Private members
 
@@ -23,14 +23,14 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
 
         #region Constructor
 
-        public IncomeStatementLogic(MainWindowLogic _mainWindowLogic)
+        public JournalLogic(MainWindowLogic _mainWindowLogic)
         {
             mainWindowLogic = _mainWindowLogic;
 
             // Setup date range
             DateRangeLogic = new DateRangeLogic(DateRangeLogic.ERange.YearToDate,
                 () => mainWindowLogic.Household.RegularTransactions.Select(tr => tr.Date).Min());
-            DateRangeLogic.DateRangeChanged += (s, e) => ComputeIncomeStatement();
+            DateRangeLogic.DateRangeChanged += (s, e) => ComputeJournal();
 
             // Setup members
             foreach (var person in mainWindowLogic.Household.Person)
@@ -45,12 +45,12 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
             PrintCommand = new CommandBase(() => mainWindowLogic.ErrorMessage("Not yet implemented"));
 
             // Give the list to the UI
-            StatementsSource = (CollectionView)CollectionViewSource.GetDefaultView(statements);
-            StatementsSource.SortDescriptions.Add(new SortDescription("Group", ListSortDirection.Ascending));
-            StatementsSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
+            EntriesSource = (CollectionView)CollectionViewSource.GetDefaultView(entries);
+            //EntriesSource.SortDescriptions.Add(new SortDescription("Group", ListSortDirection.Ascending));
+            //EntriesSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
 
             // Compute!
-            ComputeIncomeStatement();
+            ComputeJournal();
         }
 
         #endregion
@@ -63,31 +63,26 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
         // Person
         public List<MemberItem> MembersSource { get; } = new List<MemberItem>();
         private MemberItem selectedMember;
-        public MemberItem SelectedMember { get => selectedMember; set { selectedMember = value; ComputeIncomeStatement(); } }
+        public MemberItem SelectedMember { get => selectedMember; set { selectedMember = value; ComputeJournal(); } }
 
         // Print command
         public CommandBase PrintCommand { get; }
 
         // Income statements
-        private readonly ObservableCollection<IncomeStatementItem> statements = new ObservableCollection<IncomeStatementItem>();
-        public CollectionView StatementsSource { get; }
+        private readonly ObservableCollection<JournalEntry> entries = new ObservableCollection<JournalEntry>();
+        public CollectionView EntriesSource { get; }
 
         #endregion
 
         #region Actions
 
-        private void ComputeIncomeStatement()
+        private void ComputeJournal()
         {
             var household = mainWindowLogic.Household;
             var startDate = DateRangeLogic.StartDate;
             var endDate = DateRangeLogic.EndDate;
             var member = selectedMember.Member;
-            statements.Clear();
-
-            decimal totalRevenues = 0;
-            decimal totalExpenses = 0;
-            var revenues = new Dictionary<CategoryItem, decimal>();
-            var expenses = new Dictionary<CategoryItem, decimal>();
+            entries.Clear();
 
             // Loop on all transaction for the selected period and selected member
             foreach (var transactionRow in household.RegularTransactions
@@ -95,6 +90,7 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
             {
                 foreach (var li in transactionRow.GetLineItemRows())
                 {
+                    /*
                     // Special parsing of investment transactions
                     if (transactionRow.AccountRow.Type == EAccountType.Investment)
                     {
@@ -190,36 +186,35 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
                             }
                             dico[catItem] += Math.Abs(transactionRow.GetAmount());
                         }
-                    }
+                    }*/
 
                     //
                     // Process category-based income and expense
                     //
                     if (li.GetLineItemCategoryRow() is Household.LineItemCategoryRow lic)
                     {
+                        // Get description
+                        string description = li.IsMemoNull() ? (transactionRow.IsMemoNull() ? "" : transactionRow.Memo) : li.Memo;
+
                         // Get to top-level category
                         var cat = lic.CategoryRow;
                         while (!cat.IsParentIDNull())
                         {
                             cat = household.Category.FindByID(cat.ParentID);
                         }
-                        var catItem = new CategoryItem(cat.Name);
+                        //var catItem = new CategoryItem(cat.Name);
 
                         if (cat.IsIncome)
                         {
-                            if (!revenues.ContainsKey(catItem))
-                            {
-                                revenues.Add(catItem, 0);
-                            }
-                            revenues[catItem] += li.Amount;
+                            // Regular income. credit the income "account" (increase of asset) and debit the account the money is going to (increase of equity)
+                            entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Receipt, description, cat.Name, 0, li.Amount));
+                            entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Receipt, description, transactionRow.AccountRow.Name, li.Amount, 0));
                         }
                         else
                         {
-                            if (!expenses.ContainsKey(catItem))
-                            {
-                                expenses.Add(catItem, 0);
-                            }
-                            expenses[catItem] -= li.Amount;
+                            // Regular expense. Debit the expense "account" (increase of asset) and credit the account the money is coming from (reduction of assets)
+                            entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Purchase, description, cat.Name, -li.Amount, 0));
+                            entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Purchase, description, transactionRow.AccountRow.Name, 0, -li.Amount));
                         }
                     }
                     //
@@ -233,6 +228,7 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
                             continue;
                         }
 
+                        /*
                         string transferee = lit.AccountRow.IsPersonIDNull() ? "Unknown person" : lit.AccountRow.PersonRow.Name;
                         if (li.Amount < 0)
                         {
@@ -251,72 +247,10 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
                                 revenues.Add(catItem, 0);
                             }
                             revenues[catItem] += li.Amount;
-                        }
+                        }*/
                     }
                 }
             }
-
-
-            // Build income and expense
-            if (revenues.Keys.Count != 0)
-            {
-                statements.Add(IncomeStatementItem.GetTitle("Revenue", "100Revenue"));
-                foreach(var cat in revenues.Keys)
-                {
-                    decimal amount = revenues[cat];
-                    statements.Add(IncomeStatementItem.GetItem(cat.Name, null, "101Revenues", amount));
-                    totalRevenues += amount;
-                }
-                statements.Add(IncomeStatementItem.GetTotal("Total revenues", "190Revenue", totalRevenues));
-            }
-            if (expenses.Keys.Count != 0)
-            {
-                statements.Add(IncomeStatementItem.GetTitle("Expenses", "200Expenses"));
-                foreach (var cat in expenses.Keys)
-                {
-                    decimal amount = expenses[cat];
-                    statements.Add(IncomeStatementItem.GetItem(cat.Name, null, "201Expenses", amount));
-                    totalExpenses += amount;
-                }
-                statements.Add(IncomeStatementItem.GetTotal("Total expenses", "290Expenses", totalExpenses));
-            }
-
-            // Compute and add net income before taxes
-            statements.Add(IncomeStatementItem.GetTitle("Net income", "600NetIncomeBeforeTaxes"));
-            statements.Add(IncomeStatementItem.GetTotal("Net taxable income", "601TaxableIncome", totalRevenues - totalExpenses));
-
-            //
-            // Now compute change in investment value
-            //
-            statements.Add(IncomeStatementItem.GetTitle("Other comprehensive income", "700OtherComprehensiveIncome"));
-
-            // Compute portfolio at end date for all investment accounts belonging to member
-            decimal changeInInvestmentValue = 0;
-            foreach (var accountRow in household.Account
-                .Where(acct => acct.Type == EAccountType.Investment && (member == null || (!acct.IsPersonIDNull() && acct.PersonRow == member))))
-            {
-                var portfolio = accountRow.GetPortfolio(endDate);
-
-                // Compute portfolio value at end date
-                decimal endDateValue = portfolio.GetValuation(endDate);
-
-                // Compute base portfolio value: value of lots at start date for lots that are older than start date,
-                // and value of lot when acquired for lots acquired after start date
-                decimal startDateValue = 0;
-                foreach(var lot in portfolio.Lots)
-                {
-                    decimal securityPrice = lot.Date < startDate ? lot.Security.GetMostRecentPrice(startDate) : securityPrice = lot.SecurityPrice;
-                    decimal lotValue = securityPrice * lot.Quantity;
-                    startDateValue += lotValue;
-                }
-
-                changeInInvestmentValue += endDateValue - startDateValue;
-            }
-            statements.Add(IncomeStatementItem.GetItem("Change in investment value", null, "701ChangeInInvestmentValue", changeInInvestmentValue));
-
-            // Compute and add net income before taxes
-            statements.Add(IncomeStatementItem.GetTitle("Total income", "800TotalIncome"));
-            statements.Add(IncomeStatementItem.GetTotal("Total income", "801TotalIncome", totalRevenues - totalExpenses + changeInInvestmentValue));
         }
 
         #endregion
@@ -324,28 +258,20 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
         #region Support classes
 
         //
-        // One balance sheet item
+        // One journal entry
         //
-        public class IncomeStatementItem
+        public class JournalEntry
         {
-            private IncomeStatementItem(string name, string tip, string group, decimal value, bool bold, bool showValue, bool indented)
-                => (Name, Tip, Group, Value, Bold, ShowValue) = ((indented ? "\t" : "") + name, tip, group, value, bold, showValue);
+            public enum EType { Receipt, Payment, Sales, Purchase, Transfer, General };
+            public JournalEntry(DateTime date, EType type, string description, string accountName, decimal debit, decimal credit) =>
+                (Date, Type, Description, AccountName, Debit, Credit) = (date, type, description, accountName, debit, credit);
 
-            static public IncomeStatementItem GetTitle(string name, string group)
-                => new IncomeStatementItem(name, null, group, 0, true, false, false);
-
-            static public IncomeStatementItem GetItem(string name, string tip, string group, decimal value)
-                => new IncomeStatementItem(name, tip, group, value, false, true, true);
-
-            static public IncomeStatementItem GetTotal(string total, string group, decimal value)
-                => new IncomeStatementItem(total, null, group, value, true, true, true);
-
-            public string Name { get; }
-            public string Tip { get; }
-            public string Group { get; }
-            public decimal Value { get; }
-            public bool ShowValue { get; }
-            public bool Bold { get; }
+            public DateTime Date { get; }
+            public EType Type { get; }
+            public string Description { get; }
+            public string AccountName { get; }
+            public decimal Debit { get; }
+            public decimal Credit { get; }
         }
 
         //
@@ -370,6 +296,7 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
         //
         // Simplified category
         //
+        /*
         class CategoryItem
         {
             public CategoryItem(string name) => Name = name;
@@ -378,7 +305,7 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
 
             public override bool Equals(object obj)
             {
-                return 
+                return
                     obj is CategoryItem o &&
                     Name.Equals(o.Name);
             }
@@ -387,7 +314,7 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
             {
                 return Name.GetHashCode();
             }
-        }
+        }*/
 
         #endregion
     }

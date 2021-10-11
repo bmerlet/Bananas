@@ -137,6 +137,9 @@
     <Compile Include="Dialogs\Reports\Accounting\IncomeStatement.xaml.cs">
       <DependentUpon>IncomeStatement.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\Reports\Accounting\Journal.xaml.cs">
+      <DependentUpon>Journal.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\Reports\SearchResult.xaml.cs">
       <DependentUpon>SearchResult.xaml</DependentUpon>
     </Compile>
@@ -314,6 +317,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\Reports\Accounting\IncomeStatement.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Reports\Accounting\Journal.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
