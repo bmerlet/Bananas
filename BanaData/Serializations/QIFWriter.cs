@@ -573,7 +573,8 @@ namespace BanaData.Serializations
 
         private void ExportDate(StreamWriter sw, DateTime date)
         {
-            sw.WriteLine("D" + GetDateString(date));
+            //sw.WriteLine("D" + GetDateString(date));
+            sw.WriteLine($"D{date:MM/dd/yy}");
         }
 
         private string GetDateString(DateTime date)

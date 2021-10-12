@@ -90,30 +90,31 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
             {
                 foreach (var li in transactionRow.GetLineItemRows())
                 {
-                    /*
                     // Special parsing of investment transactions
                     if (transactionRow.AccountRow.Type == EAccountType.Investment)
                     {
                         var investmentTransactionRow = transactionRow.GetInvestmentTransaction();
-                        string explanation = null;
-                        Dictionary<CategoryItem, decimal> dico = null;
+                        string description = null;
 
                         switch (investmentTransactionRow.Type)
                         {
                             case EInvestmentTransactionType.CashIn:
-                                dico = revenues;
-                                explanation = "Added cash";
+                                description = "Added cash";
+                                entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Receipt, description, description, 0, li.Amount));
+                                entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Receipt, description, transactionRow.AccountRow.Name, li.Amount, 0));
                                 break;
                             case EInvestmentTransactionType.CashOut:
-                                dico = expenses;
-                                explanation = "Removed cash";
+                                description = "Removed cash";
+                                entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Purchase, description, description, -li.Amount, 0));
+                                entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Purchase, description, transactionRow.AccountRow.Name, 0, -li.Amount));
                                 break;
                             case EInvestmentTransactionType.TransferCashIn:
                             case EInvestmentTransactionType.TransferCashOut:
                                 break;
                             case EInvestmentTransactionType.InterestIncome:
-                                dico = revenues;
-                                explanation = "Interest Inc.";
+                                description = "Interest Inc.";
+                                entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Receipt, description, description, 0, li.Amount));
+                                entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Receipt, description, transactionRow.AccountRow.Name, li.Amount, 0));
                                 break;
 
                             case EInvestmentTransactionType.SharesIn:
@@ -131,62 +132,65 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
                                 var cg = Portfolio.ComputeSaleCapitalGains(household, transactionRow.ID, false);
                                 if (cg.LongTermGain != 0)
                                 {
-                                    var catItem = new CategoryItem("Long term capital gains from sale of " + investmentTransactionRow.SecurityRow.Symbol);
-                                    if (!revenues.ContainsKey(catItem))
-                                    {
-                                        revenues[catItem] = 0;
-                                    }
-                                    revenues[catItem] += cg.LongTermGain;
+                                    description = "Long term capital gains from sale of " + investmentTransactionRow.SecurityRow.Symbol;
+                                    entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Sales, description, "LTCG", 0, li.Amount));
+                                    entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Sales, description, transactionRow.AccountRow.Name, li.Amount, 0));
                                 }
                                 if (cg.ShortTermGain != 0)
                                 {
-                                    var catItem = new CategoryItem("Short term capital gains from sale of " + investmentTransactionRow.SecurityRow.Symbol);
-                                    if (!revenues.ContainsKey(catItem))
-                                    {
-                                        revenues[catItem] = 0;
-                                    }
-                                    revenues[catItem] += cg.ShortTermGain;
+                                    description = "Short term capital gains from sale of " + investmentTransactionRow.SecurityRow.Symbol;
+                                    entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Sales, description, "STCG", 0, li.Amount));
+                                    entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Sales, description, transactionRow.AccountRow.Name, li.Amount, 0));
                                 }
                                 break;
 
                             case EInvestmentTransactionType.Dividends:
-                            case EInvestmentTransactionType.TransferDividends:
                             case EInvestmentTransactionType.ReinvestDividends:
-                                dico = revenues;
-                                explanation = "Dividends";
+                                description = "Dividends";
+                                entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Receipt, description, description, 0, li.Amount));
+                                entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Receipt, description, transactionRow.AccountRow.Name, li.Amount, 0));
+                                break;
+
+                            case EInvestmentTransactionType.TransferDividends:
+                                description = "Dividends";
+                                entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Receipt, description, description, 0, -li.Amount));
+                                entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Receipt, description, transactionRow.AccountRow.Name, -li.Amount, 0));
                                 break;
 
                             case EInvestmentTransactionType.ShortTermCapitalGains:
-                            case EInvestmentTransactionType.TransferShortTermCapitalGains:
                             case EInvestmentTransactionType.ReinvestShortTermCapitalGains:
-                                dico = revenues;
-                                explanation = "Short-term capital gains";
+                                description = "Short-term capital gains";
+                                entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Receipt, description, description, 0, li.Amount));
+                                entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Receipt, description, transactionRow.AccountRow.Name, li.Amount, 0));
+                                break;
+
+                            case EInvestmentTransactionType.TransferShortTermCapitalGains:
+                                description = "Short-term capital gains";
+                                entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Receipt, description, description, 0, -li.Amount));
+                                entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Receipt, description, transactionRow.AccountRow.Name, -li.Amount, 0));
                                 break;
 
                             case EInvestmentTransactionType.LongTermCapitalGains:
-                            case EInvestmentTransactionType.TransferLongTermCapitalGains:
                             case EInvestmentTransactionType.ReinvestMediumTermCapitalGains:
                             case EInvestmentTransactionType.ReinvestLongTermCapitalGains:
-                                dico = revenues;
-                                explanation = "Long-term capital gains";
+                                description = "Long-term capital gains";
+                                entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Receipt, description, description, 0, li.Amount));
+                                entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Receipt, description, transactionRow.AccountRow.Name, li.Amount, 0));
+                                break;
+
+                            case EInvestmentTransactionType.TransferLongTermCapitalGains:
+                                description = "Long-term capital gains";
+                                entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Receipt, description, description, 0, -li.Amount));
+                                entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Receipt, description, transactionRow.AccountRow.Name, -li.Amount, 0));
                                 break;
 
                             case EInvestmentTransactionType.ReturnOnCapital:
-                                dico = revenues;
-                                explanation = "Return on capital";
+                                description = "Return on capital";
+                                entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Receipt, description, description, 0, li.Amount));
+                                entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Receipt, description, transactionRow.AccountRow.Name, li.Amount, 0));
                                 break;
                         }
-
-                        if (dico != null && explanation != null)
-                        {
-                            var catItem = new CategoryItem(explanation);
-                            if (!dico.ContainsKey(catItem))
-                            {
-                                dico.Add(catItem, 0);
-                            }
-                            dico[catItem] += Math.Abs(transactionRow.GetAmount());
-                        }
-                    }*/
+                    }
 
                     //
                     // Process category-based income and expense
@@ -228,26 +232,19 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
                             continue;
                         }
 
-                        /*
                         string transferee = lit.AccountRow.IsPersonIDNull() ? "Unknown person" : lit.AccountRow.PersonRow.Name;
                         if (li.Amount < 0)
                         {
-                            var catItem = new CategoryItem($"Transfer(s) to {transferee}");
-                            if (!expenses.ContainsKey(catItem))
-                            {
-                                expenses.Add(catItem, 0);
-                            }
-                            expenses[catItem] -= li.Amount;
+                            string description = $"Transfer(s) to {transferee}";
+                            entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Transfer, description, transferee, -li.Amount, 0));
+                            entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Transfer, description, transactionRow.AccountRow.Name, 0, -li.Amount));
                         }
                         else
                         {
-                            var catItem = new CategoryItem($"Transfer(s) from {transferee}");
-                            if (!revenues.ContainsKey(catItem))
-                            {
-                                revenues.Add(catItem, 0);
-                            }
-                            revenues[catItem] += li.Amount;
-                        }*/
+                            string description = $"Transfer(s) from {transferee}";
+                            entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Receipt, description, transferee, 0, li.Amount));
+                            entries.Add(new JournalEntry(transactionRow.Date, JournalEntry.EType.Receipt, description, transactionRow.AccountRow.Name, li.Amount, 0));
+                        }
                     }
                 }
             }
