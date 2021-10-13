@@ -446,13 +446,13 @@ namespace BanaData.Logic.Main
             UpdateTitle();
         }
 
-        public void ExportQIF(string file)
+        public void ExportQIF(string file, QIFWriter.EContents contents, IEnumerable<Household.AccountRow> transactionAccounts)
         {
             GuiServices.SetCursor(true);
 
             var exporter = new QIFWriter(this);
-            exporter.ExportToQIF(file);
-            ErrorMessage("Export completed", "Export results");
+            var result = exporter.Export(file, contents, transactionAccounts);
+            ErrorMessage(result, "Export results");
 
             GuiServices.SetCursor(false);
         }

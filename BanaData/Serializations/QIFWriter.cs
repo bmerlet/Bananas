@@ -13,7 +13,7 @@ namespace BanaData.Serializations
     /// <summary>
     /// Writes out the database in QIF format
     /// </summary>
-    class QIFWriter
+    public class QIFWriter
     {
         #region private member
 
@@ -31,6 +31,9 @@ namespace BanaData.Serializations
 
         #region Entry points
 
+        //
+        // Export the whole thing
+        //
         public void ExportToQIF(string filename)
         {
             using (var sw = new StreamWriter(filename, false))
@@ -38,10 +41,66 @@ namespace BanaData.Serializations
                 ExportCategories(sw);
                 ExportAccounts(sw);
                 ExportSecurities(sw);
-                ExportTransactions(sw);
+                ExportTransactions(sw, household.Account.Rows.Cast<Household.AccountRow>());
                 ExportMemorizedPayees(sw);
                 ExportSecurityPrices(sw);
             }
+        }
+
+        //
+        // Export bits and pieces
+        //
+        [Flags]
+        public enum EContents
+        {
+            Categories = 0x01,
+            Accounts = 0x02,
+            Securities = 0x04,
+            Transactions = 0x08,
+            MemorizedPayees = 0x10,
+
+            All = Categories | Accounts | Securities | Transactions | MemorizedPayees
+        }
+
+        public string Export(string filename, EContents contents, IEnumerable<Household.AccountRow> transactionAccounts)
+        {
+            string result = "Export completed.";
+
+            using (var sw = new StreamWriter(filename, false))
+            {
+                if (contents.HasFlag(EContents.Categories))
+                {
+                    ExportCategories(sw);
+                }
+
+                if (contents.HasFlag(EContents.Accounts))
+                {
+                    ExportAccounts(sw);
+                }
+
+                if (contents.HasFlag(EContents.Securities))
+                {
+                    ExportSecurities(sw);
+                }
+
+                if (contents.HasFlag(EContents.Transactions))
+                {
+                    (int numAccounts, int numTransactions)  = ExportTransactions(sw, transactionAccounts);
+                    result = $"Exported {numTransactions} transactions in {numAccounts} accounts.";
+                }
+
+                if (contents.HasFlag(EContents.MemorizedPayees))
+                {
+                    ExportMemorizedPayees(sw);
+                }
+
+                if (contents.HasFlag(EContents.Securities))
+                {
+                    ExportSecurityPrices(sw);
+                }
+            }
+
+            return result;
         }
 
         //
@@ -56,7 +115,7 @@ namespace BanaData.Serializations
 
             using (var sw = new StreamWriter(filename, false))
             {
-                (numAccounts, numTransactions) = ExportTransactions(sw, checkpointRow);
+                (numAccounts, numTransactions) = ExportTransactions(sw, household.Account.Rows.Cast<Household.AccountRow>(), checkpointRow);
             }
 
             // Create a new checkpoint
@@ -196,13 +255,13 @@ namespace BanaData.Serializations
 
         #region Write QIF transactions
 
-        private (int numAccounts, int numTransactions) ExportTransactions(StreamWriter sw, Household.CheckpointRow checkpointRow = null)
+        private (int numAccounts, int numTransactions) ExportTransactions(StreamWriter sw, IEnumerable<Household.AccountRow> accounts, Household.CheckpointRow checkpointRow = null)
         {
             sw.WriteLine("!Option:AutoSwitch");
             int numAccounts = 0;
             int numTransactions = 0;
 
-            foreach (Household.AccountRow accountRow in household.Account.Rows)
+            foreach (Household.AccountRow accountRow in accounts)
             {
                 bool accountWritten = false;
 

@@ -16,6 +16,7 @@ using BanaData.Web;
 using BanaData.Logic.Items;
 using BanaData.Collections;
 using BanaData.Logic.Dialogs.Reports.Accounting;
+using BanaData.Logic.Dialogs.Pickers;
 
 namespace BanaData.Logic.Main
 {
@@ -41,7 +42,6 @@ namespace BanaData.Logic.Main
             SetPassword = new CommandBase(OnSetPassword);
             Import = new CommandBase(OnImport);
             Export = new CommandBase(OnExport);
-            DifferentialExport = new CommandBase(OnDifferentialExport);
             Exit = new CommandBase(OnExit);
 
             EditAccounts = new CommandBase(OnEditAccounts);
@@ -173,24 +173,18 @@ namespace BanaData.Logic.Main
 
         private void OnExport()
         {
-            var logic = new SaveFileLogic(GetSuggestionForQIFFile(), "Quicken Interchange Format files (*.QIF)|*.QIF|Any file (*.*)|*.*", "Export to file");
+            var logic = new QIFExportPickerLogic(mainWindow);
             if (mainWindow.GuiServices.ShowDialog(logic))
             {
-                mainWindow.ExportQIF(logic.File);
-            }
-        }
-
-        //
-        // Differential Export
-        //
-        public CommandBase DifferentialExport { get; }
-
-        private void OnDifferentialExport()
-        {
-            var logic = new SaveFileLogic(GetSuggestionForQIFFile(), "Quicken Interchange Format files (*.QIF)|*.QIF|Any file (*.*)|*.*", "Export to file");
-            if (mainWindow.GuiServices.ShowDialog(logic))
-            {
-                mainWindow.DifferentialExportQIF(logic.File);
+                var exportSpec = logic.Export;
+                if (exportSpec.Differential)
+                {
+                    mainWindow.DifferentialExportQIF(exportSpec.Filename);
+                }
+                else
+                {
+                    mainWindow.ExportQIF(exportSpec.Filename, exportSpec.Contents, exportSpec.TransactionAccounts);
+                }
             }
         }
 

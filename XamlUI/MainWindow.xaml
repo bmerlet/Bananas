@@ -44,7 +44,6 @@
                     <Separator/>
                     <MenuItem Header="Import..." Command="{Binding Import}"/>
                     <MenuItem Header="Export..." Command="{Binding Export}"/>
-                    <MenuItem Header="Differential Export..." Command="{Binding DifferentialExport}"/>
                     <Separator/>
                     <MenuItem Header="Exit" Command="{Binding Exit}"/>
                 </MenuItem>

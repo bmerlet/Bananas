@@ -131,6 +131,9 @@
     <Compile Include="Dialogs\Pickers\PayeeListPicker.xaml.cs">
       <DependentUpon>PayeeListPicker.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\Pickers\QIFExportPicker.xaml.cs">
+      <DependentUpon>QIFExportPicker.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\Reports\Accounting\BalanceSheet.xaml.cs">
       <DependentUpon>BalanceSheet.xaml</DependentUpon>
     </Compile>
@@ -309,6 +312,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\Pickers\PayeeListPicker.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Pickers\QIFExportPicker.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
