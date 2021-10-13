@@ -559,8 +559,7 @@ namespace BanaData.Serializations
                 if (securityRow.Symbol != Household.SecurityRow.SYMBOL_NONE)
                 {
                     sw.WriteLine("!Type:Prices");
-                    var dateString = GetDateString(spr.Date);
-                    sw.WriteLine($"\"{securityRow.Symbol}\",{spr.Value:N2},\"{dateString}\"");
+                    sw.WriteLine($"\"{securityRow.Symbol}\",{spr.Value:N2},\"{spr.Date:MM/dd/yyyy}\"");
                     sw.WriteLine("^");
                 }
 
@@ -573,15 +572,7 @@ namespace BanaData.Serializations
 
         private void ExportDate(StreamWriter sw, DateTime date)
         {
-            //sw.WriteLine("D" + GetDateString(date));
-            sw.WriteLine($"D{date:MM/dd/yy}");
-        }
-
-        private string GetDateString(DateTime date)
-        {
-            var dayStr = string.Format("{0,2:##}", date.Day);
-            var yearStr = string.Format("{0,2:##}", date.Year - 2000);
-            return $"{date.Month}/{dayStr}'{yearStr}";
+            sw.WriteLine($"D{date:MM/dd/yyyy}");
         }
 
         #endregion`

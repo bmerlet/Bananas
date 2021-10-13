@@ -1090,20 +1090,26 @@ namespace BanaData.Serializations
             var comps = str.Split('/');
             if (comps.Length == 3)
             {
-                // pre-2000
+                // Either MM/dd/yy (pre-2000) or MM/dd/yyyy
                 int.TryParse(comps[0], out month);
                 int.TryParse(comps[1], out day);
                 int.TryParse(comps[2], out year);
-                year += 1900;
+                if (year < 1900)
+                {
+                    year += 1900;
+                }
             }
             else if (comps.Length == 2)
             {
-                // 2000 and afterwards
+                // 2000 and afterwards: MM/dd'yy. Also allow for MM/dd/yyyy.
                 int.TryParse(comps[0], out month);
                 var subComps = comps[1].Split('\'');
                 int.TryParse(subComps[0], out day);
                 int.TryParse(subComps[1], out year);
-                year += 2000;
+                if (year < 2000)
+                {
+                    year += 2000;
+                }
             }
 
             return new DateTime(year, month, day);
