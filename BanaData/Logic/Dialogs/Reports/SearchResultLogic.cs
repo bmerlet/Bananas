@@ -179,7 +179,7 @@ namespace BanaData.Logic.Dialogs.Reports
             public string Memo => TransRow.IsMemoNull() ? "" : TransRow.Memo;
             public string Category => TransRow.GetLineItemRows().Length > 1 ? "<Split>" :
                 (TransRow.GetLineItemRows().Single().GetLineItemCategoryRow() != null ? TransRow.GetLineItemRows().Single().GetLineItemCategoryRow().CategoryRow.FullName :
-                (TransRow.GetLineItemRows().Single().GetLineItemTransferRow() != null ? TransRow.GetLineItemRows().Single().GetLineItemTransferRow().AccountRow.Name : ""));
+                (TransRow.GetLineItemRows().Single().GetLineItemTransferRow() != null ? $"[{TransRow.GetLineItemRows().Single().GetLineItemTransferRow().AccountRow.Name}]" : ""));
             public decimal Amount => TransRow.GetLineItemRows().Sum(li => li.Amount);
         }
 

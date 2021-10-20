@@ -46,10 +46,10 @@ namespace BanaData.Logic.Dialogs.Basics
             [EnumDescription("Year-to-date")]
             YearToDate,
 
-            [EnumDescription("Last year")]
+            [EnumDescription("Last 12 months")]
             LastYear,
 
-            [EnumDescription("Prior year")]
+            [EnumDescription("Last calendar year")]
             PriorYear,
 
             [EnumDescription("Last five years")]

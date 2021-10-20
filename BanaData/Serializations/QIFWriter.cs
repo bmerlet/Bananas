@@ -32,22 +32,6 @@ namespace BanaData.Serializations
         #region Entry points
 
         //
-        // Export the whole thing
-        //
-        public void ExportToQIF(string filename)
-        {
-            using (var sw = new StreamWriter(filename, false))
-            {
-                ExportCategories(sw);
-                ExportAccounts(sw);
-                ExportSecurities(sw);
-                ExportTransactions(sw, household.Account.Rows.Cast<Household.AccountRow>());
-                ExportMemorizedPayees(sw);
-                ExportSecurityPrices(sw);
-            }
-        }
-
-        //
         // Export bits and pieces
         //
         [Flags]
