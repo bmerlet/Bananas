@@ -1019,7 +1019,12 @@ namespace BanaData.Serializations
 
                 // "BALCX",19.79," 6/29' 7"
                 var comps = l.Split(',');
-                if (comps.Length != 3)
+                if (comps.Length == 4)
+                {
+                    comps[1] += "," + comps[2];
+                    comps[2] = comps[3];
+                }
+                else if (comps.Length != 3)
                 {
                     throw new InvalidDataException("Malformed security price: " + l);
                 }

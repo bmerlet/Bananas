@@ -14,27 +14,19 @@ namespace BanaData.Database
     {
         partial class CategoryRow
         {
-            private string fullName = null;
-
             public string FullName => GetFullName();
 
             private string GetFullName()
             {
-                if (fullName == null)
-                {
-                    if (IsParentIDNull())
-                    {
-                        // no parent, done
-                        fullName = Name;
-                    }
-                    else
-                    {
-                        // Get parent
-                        var parentRow = (Table as CategoryDataTable).Single(c => c.ID == ParentID);
+                string fullName = Name;
 
-                        // Recurse
-                        fullName = parentRow.FullName + ":" + Name;
-                    }
+                if (!IsParentIDNull())
+                {
+                    // Get parent
+                    var parentRow = (Table as CategoryDataTable).Single(c => c.ID == ParentID);
+
+                    // Recurse
+                    fullName = parentRow.FullName + ":" + fullName;
                 }
 
                 return fullName;
