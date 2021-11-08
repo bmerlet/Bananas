@@ -450,6 +450,9 @@ namespace BanaData.Logic.Main
                 logicIsChangingSelection = true;
                 SelectedTransaction = transactionToSelect;
                 logicIsChangingSelection = false;
+
+                // Update the accounts on the left
+                mainWindowLogic.UpdateAccountNamesAndBalances(new int[] { accountRow.ID, logic.PickedAccount.ID });
             }
         }
 
