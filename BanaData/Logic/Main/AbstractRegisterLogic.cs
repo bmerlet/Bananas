@@ -426,6 +426,12 @@ namespace BanaData.Logic.Main
             var logic = new AccountPickerLogic(mainWindowLogic, accountRow);
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
             {
+                // Get transaction and basic info
+                var household = mainWindowLogic.Household;
+                var transRow = household.Transaction.FindByID(atl.TransID);
+                int oldAccount = transRow.AccountID;
+                int newAccount = logic.PickedAccount.ID;
+
                 // Cancel all changes
                 atl.CancelEdit();
 
@@ -433,10 +439,27 @@ namespace BanaData.Logic.Main
                 var transactionToSelect = GetNextTransaction(atl) as AbstractTransactionLogic;
 
                 // Do move the transaction in the DB
-                var household = mainWindowLogic.Household;
-                var transRow = household.Transaction.FindByID(atl.TransID);
-                transRow.AccountID = logic.PickedAccount.ID;
+                transRow.AccountID = newAccount;
                 transRow.CheckpointRow = household.Checkpoint.GetMostRecentCheckpoint();
+
+                // For transfers, update the peer transaction's target account
+                foreach(var li in transRow.GetLineItemRows())
+                {
+                    if (li.GetLineItemTransferRow() is Household.LineItemTransferRow litr)
+                    {
+                        var peerTransRow = litr.TransactionRow;
+                        foreach (var peerLi in peerTransRow.GetLineItemRows())
+                        {
+                            if (peerLi.GetLineItemTransferRow() is Household.LineItemTransferRow peerLitr && peerLitr.AccountID == oldAccount)
+                            {
+                                peerLitr.AccountID = newAccount;
+                                peerTransRow.CheckpointRow = household.Checkpoint.GetMostRecentCheckpoint();
+                            }
+                        }
+                    }
+                }
+
+                // Commit to DB
                 mainWindowLogic.CommitChanges();
 
                 // Delete from list

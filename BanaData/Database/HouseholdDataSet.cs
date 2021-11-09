@@ -85,8 +85,8 @@ namespace BanaData.Database
                     lineItemTransfer.AccountRow != lineItemTransfer.TransactionRow.AccountRow)
                 {
                     error +=
-                        $"Line item transfer revord points to account {lineItemTransfer.AccountRow.Name}" + eol
-                        + "  while the peer transaction points to account {lineItemTransfer.TransactionRow.AccountRow}" + eol;
+                        $"Line item transfer record points to account {lineItemTransfer.AccountRow.Name}" + eol +
+                        $"  while the peer transaction points to account {lineItemTransfer.TransactionRow.AccountRow.Name}" + eol;
                 }
             }
 
