@@ -475,6 +475,12 @@ namespace BanaData.Logic.Main
             }
         }
 
+        public void UpdateCategoryNames()
+        {
+            data.LineItems.ForEach(li => li.UpdateCategoryName());
+            OnPropertyChanged(() => Category);
+        }
+
         #endregion
 
         #region Supporting class

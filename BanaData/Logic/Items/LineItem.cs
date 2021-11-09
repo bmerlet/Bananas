@@ -93,6 +93,27 @@ namespace BanaData.Logic.Items
             return (categoryID, categoryAccountID);
         }
 
+        // Update after category name has been edited
+        public void UpdateCategoryName()
+        {
+            if (CategoryID >= 0)
+            {
+                var cat = mainWindowLogic.CategoriesAndTransfers.FirstOrDefault(c => c.ID == CategoryID);
+                if (cat != null)
+                {
+                    category = cat.FullName;
+                }
+            }
+            else if (CategoryAccountID >= 0)
+            {
+                var cat = mainWindowLogic.CategoriesAndTransfers.FirstOrDefault(c => c.AccountID == CategoryAccountID);
+                if (cat != null)
+                {
+                    category = cat.FullName;
+                }
+            }
+        }
+
         #endregion
 
         #region Logic properties
@@ -116,7 +137,7 @@ namespace BanaData.Logic.Items
             }
         }
 
-        // Category ids dervide from category string
+        // Category ids derived from category string
         public int CategoryID { get; private set; }
         public int CategoryAccountID { get; private set; }
 

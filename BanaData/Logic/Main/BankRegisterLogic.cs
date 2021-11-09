@@ -106,6 +106,10 @@ namespace BanaData.Logic.Main
         private void UpdateCategoriesAndTransfers()
         {
             categoriesAndTransfers.ReplaceRange(mainWindowLogic.CategoriesAndTransfers);
+            foreach(BankingTransactionLogic transaction in transactions)
+            {
+                transaction.UpdateCategoryNames();
+            }
         }
 
         #endregion

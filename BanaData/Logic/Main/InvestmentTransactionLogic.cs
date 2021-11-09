@@ -574,6 +574,8 @@ namespace BanaData.Logic.Main
         {
             categories.ReplaceRange(mainWindowLogic.Categories);
             transfers.ReplaceRange(mainWindowLogic.Transfers);
+            data.LineItem.UpdateCategoryName();
+            OnPropertyChanged(() => Category);
         }
 
         private void CommitTransactionToDataSet()
