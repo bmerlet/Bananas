@@ -100,7 +100,7 @@ namespace BanaData.Database
                         break;
 
                     case EInvestmentTransactionType.CashOut:
-                        desc = $"Removed {-amount:C2}";
+                        desc = $"Removed {amount:C2}";
                         break;
 
                     case EInvestmentTransactionType.TransferCashIn:
@@ -108,7 +108,7 @@ namespace BanaData.Database
                         break;
 
                     case EInvestmentTransactionType.TransferCashOut:
-                        desc = $"Transfered {-amount:C2} out";
+                        desc = $"Transfered {amount:C2} out";
                         break;
 
                     case EInvestmentTransactionType.InterestIncome:
@@ -139,7 +139,7 @@ namespace BanaData.Database
                         break;
 
                     case EInvestmentTransactionType.TransferDividends:
-                        desc = $"Received {-amount:C2} in dividends from {symbol}";
+                        desc = $"Received {amount:C2} in dividends from {symbol}";
                         break;
 
                     case EInvestmentTransactionType.ReinvestDividends:
@@ -154,7 +154,7 @@ namespace BanaData.Database
                         break;
 
                     case EInvestmentTransactionType.TransferShortTermCapitalGains:
-                        desc = $"Received {-amount:C2} in ST CG from {symbol}";
+                        desc = $"Received {amount:C2} in ST CG from {symbol}";
                         break;
 
                     case EInvestmentTransactionType.LongTermCapitalGains:
@@ -162,7 +162,7 @@ namespace BanaData.Database
                         break;
 
                     case EInvestmentTransactionType.TransferLongTermCapitalGains:
-                        desc = $"Received {-amount:C2} in LT CG from {symbol}";
+                        desc = $"Received {amount:C2} in LT CG from {symbol}";
                         break;
 
                     case EInvestmentTransactionType.Grant:
