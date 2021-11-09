@@ -289,6 +289,9 @@ namespace BanaData.Logic.Main
             // Update goto context menu status
             GotoOtherSideOfTransfer.SetCanExecute(data.LineItems.Find(li => li.CategoryAccountID >= 0) != null);
 
+            // Re-sort if needed
+            bankRegisterLogic.RegisterItems.Refresh();
+
             // Clear the backup
             backup = null;
         }

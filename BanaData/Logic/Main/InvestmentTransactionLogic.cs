@@ -19,6 +19,9 @@ namespace BanaData.Logic.Main
     {
         #region Private fields
 
+        // Parent logic
+        private readonly InvestmentRegisterLogic investmentRegisterLogic;
+
         // Our data
         private new readonly InvestmentTransactionData data;
 
@@ -31,12 +34,13 @@ namespace BanaData.Logic.Main
 
         public InvestmentTransactionLogic(
             MainWindowLogic _mainWindowLogic,
-             Household.AccountRow accountRow,
+            InvestmentRegisterLogic _investmentRegisterLogic,
+            Household.AccountRow accountRow,
             int transID,
             InvestmentTransactionData _data)
-            : base(_mainWindowLogic, accountRow, transID, _data)
+            : base(_mainWindowLogic,  accountRow, transID, _data)
         {
-            data = _data;
+            (investmentRegisterLogic, data) = (_investmentRegisterLogic, _data);
 
             ShowCapitalGains = new CommandBase(OnShowCapitalGains);
             ShowCapitalGains.SetCanExecute(data.Type == EInvestmentTransactionType.Sell || data.Type == EInvestmentTransactionType.SellAndTransferCash);
@@ -61,8 +65,9 @@ namespace BanaData.Logic.Main
 
         public InvestmentTransactionLogic(
             MainWindowLogic mainWindowLogic,
+            InvestmentRegisterLogic investmentRegisterLogic,
              Household.AccountRow accountRow)
-            : this(mainWindowLogic, accountRow, TRANSID_NOT_COMMITTED,
+            : this(mainWindowLogic, investmentRegisterLogic, accountRow, TRANSID_NOT_COMMITTED,
                   new InvestmentTransactionData(DateTime.Today, "", "", ETransactionStatus.Pending, new LineItem(mainWindowLogic, -1, "", -1, -1, "", 0, false),
                     EInvestmentTransactionType.Dividends, -1, 0, 0, 0)) { }
 
@@ -421,6 +426,9 @@ namespace BanaData.Logic.Main
             // Update context menu commands
             GotoOtherSideOfTransfer.SetCanExecute(data.LineItem.CategoryAccountID != -1);
             ShowCapitalGains.SetCanExecute(data.Type == EInvestmentTransactionType.Sell || data.Type == EInvestmentTransactionType.SellAndTransferCash);
+
+            // Re-sort if needed
+            investmentRegisterLogic.RegisterItems.Refresh();
 
             // Clear the backup
             //Console.WriteLine("backup = null from END EDIT");

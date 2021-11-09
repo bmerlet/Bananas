@@ -62,14 +62,14 @@ namespace BanaData.Logic.Main
                 investmentTransRow.IsSecurityQuantityNull() ? 0 : investmentTransRow.SecurityQuantity,
                 investmentTransRow.Commission);
 
-            var investmentTransaction = new InvestmentTransactionLogic(mainWindowLogic, accountRow, transRow.ID, transactionData);
+            var investmentTransaction = new InvestmentTransactionLogic(mainWindowLogic, this, accountRow, transRow.ID, transactionData);
 
             return investmentTransaction;
         }
 
         protected override AbstractTransactionLogic CreateEmptyTransaction()
         {
-            return new InvestmentTransactionLogic(mainWindowLogic, accountRow);
+            return new InvestmentTransactionLogic(mainWindowLogic, this, accountRow);
         }
 
         // Override to compute share balances in addition to cash balance
