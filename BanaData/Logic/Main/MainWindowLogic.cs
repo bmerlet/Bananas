@@ -238,19 +238,8 @@ namespace BanaData.Logic.Main
         //
         public void NewFile()
         {
-            // Save the existing file
-            SaveFile();
-
-            // Close the existing file
-            if (fileStream != null)
-            {
-                fileStream.Close();
-                fileStream = null;
-            }
-
-            // Zap the DB
-            Household.Clear();
-            Household.AcceptChanges();
+            // Zap existing
+            PrepareForNewFile();
 
             // Setup new file
             UserSettings.LastFileOpened = null;
@@ -264,6 +253,15 @@ namespace BanaData.Logic.Main
         //
         public void OpenFile(string file)
         {
+            // Zap existing
+            PrepareForNewFile();
+
+            // Assume the open is going to work
+            UserSettings.LastFileOpened = file;
+            Dirty = false;
+            UpdateTitle();
+            UpdateAll();
+
             // Try to open the file
             try
             {
@@ -335,9 +333,6 @@ namespace BanaData.Logic.Main
                 }
 
             }
-
-            UserSettings.LastFileOpened = file;
-            Dirty = false;
 
             UpdateTitle();
             UpdateAll();
@@ -425,6 +420,23 @@ namespace BanaData.Logic.Main
                 SaveToFile();
                 UpdateTitle();
             }
+        }
+
+        private void PrepareForNewFile()
+        {
+            // Save and close the existing file
+            if (fileStream != null)
+            {
+                SaveFile();
+
+                fileStream.Close();
+                fileStream = null;
+            }
+
+            // Zap the DB
+            Household.Clear();
+            Household.AcceptChanges();
+
         }
 
         public void ImportQIF(string file)
