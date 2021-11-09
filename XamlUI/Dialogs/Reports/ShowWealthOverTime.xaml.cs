@@ -28,6 +28,7 @@ namespace XamlUI.Dialogs.Reports
 
             logic.PropertyChanged += OnPropertyChanged;
             Loaded += (s, e) => BuildGraph();
+            SizeChanged += (s, e) => BuildGraph();
         }
 
         private void OnPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
