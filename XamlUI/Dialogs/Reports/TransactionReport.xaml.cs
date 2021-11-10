@@ -156,14 +156,21 @@ namespace XamlUI.Dialogs.Reports
             {
                 double startArcX = radius * Math.Sin(angle);
                 double startArcY = -radius * Math.Cos(angle);
-                angle += 2.0 * Math.PI * (double)(Math.Abs(pieSlice.Amount) / total);
+                double pieAngle = 2.0 * Math.PI * (double)(Math.Abs(pieSlice.Amount) / total);
+                angle += pieAngle;
                 double endArcX = radius * Math.Sin(angle);
                 double endArcY = -radius * Math.Cos(angle);
 
                 var pathFigure = new PathFigure() { IsClosed = true, StartPoint = new Point(startArcX, startArcY) };
                 pathFigure.Segments.Add(new LineSegment() { Point = new Point(0, 0) });
                 pathFigure.Segments.Add(new LineSegment() { Point = new Point(endArcX, endArcY) });
-                pathFigure.Segments.Add(new ArcSegment() { SweepDirection = SweepDirection.Counterclockwise, Size = new Size(radius, radius), Point = new Point(startArcX, startArcY) });
+                pathFigure.Segments.Add(new ArcSegment() 
+                { 
+                    SweepDirection = SweepDirection.Counterclockwise,
+                    Size = new Size(radius, radius),
+                    Point = new Point(startArcX, startArcY),
+                    IsLargeArc = pieAngle >= Math.PI
+                });
 
                 var pathGeometry = new PathGeometry();
                 pathGeometry.Figures.Add(pathFigure);
