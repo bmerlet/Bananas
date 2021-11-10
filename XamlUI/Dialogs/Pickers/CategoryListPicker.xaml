@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:XamlUI.Dialogs"
+        xmlns:local="clr-namespace:XamlUI.Dialogs.Pickers"
         xmlns:w="clr-namespace:XamlUI.UserControls" 
         xmlns:pickers="clr-namespace:BanaData.Logic.Dialogs.Pickers;assembly=BanaData"
         d:DataContext="{d:DesignInstance Type=pickers:CategoryListPickerLogic}"
@@ -36,37 +36,23 @@
 
         </Grid>
 
-        <!-- Main panel: Listview of categories -->
-        <ListView
-            SelectionMode="Single"
-            ItemsSource="{Binding Categories}">
-
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="Sel" Width="40">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Name" Width="200">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding CategoryItem.IndentedName}" FontWeight="{Binding CategoryItem.FontWeight, Converter={StaticResource fontWeightConverter}}" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Type" Width="70">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding CategoryItem.TypeString}" Foreground="Blue" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Description" Width="220" DisplayMemberBinding="{Binding CategoryItem.Description}"/>
-                </GridView>
-            </ListView.View>
-        </ListView>
+        <!-- Main panel: Treeview of categories -->
+        <TreeView ItemsSource="{Binding Categories}" Width="400">
+            <TreeView.Resources>
+                <Style TargetType="CheckBox" BasedOn="{StaticResource FormCheckBox}"/>
+                <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}"/>
+                <HierarchicalDataTemplate
+                    DataType="{x:Type pickers:CategoryPickerNode}" 
+                    ItemsSource="{Binding Children}">
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox IsChecked="{Binding IsChecked}"/>
+                        <TextBlock 
+                            Text="{Binding CategoryItem.Name}"
+                            FontWeight="{Binding CategoryItem.FontWeight, Converter={StaticResource fontWeightConverter}}"
+                            ToolTip="{Binding CategoryItem.Description}"/>
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+            </TreeView.Resources>
+        </TreeView>
     </DockPanel>
 </Window>

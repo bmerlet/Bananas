@@ -15,12 +15,14 @@ using Toolbox.UILogic.Dialogs;
 
 namespace BanaData.Logic.Dialogs.Pickers
 {
+    /// <summary>
+    /// Category list picker
+    /// </summary>
     public class CategoryListPickerLogic : LogicDialogBase
     {
-        #region Private memebers
+        #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
-        private readonly IEnumerable<Household.CategoryRow> oldPickedCategories;
 
         #endregion
 
@@ -28,15 +30,26 @@ namespace BanaData.Logic.Dialogs.Pickers
 
         public CategoryListPickerLogic(MainWindowLogic _mainWindowLogic, IEnumerable<Household.CategoryRow> pickedCategories)
         {
-            (mainWindowLogic, oldPickedCategories) = (_mainWindowLogic, pickedCategories);
+            mainWindowLogic = _mainWindowLogic;
 
-            foreach (Household.CategoryRow categoryRow in mainWindowLogic.Household.Category)
+            // Create category tree
+            var categoryTable = mainWindowLogic.Household.Category;
+            foreach (Household.CategoryRow categoryRow in categoryTable)
             {
-                var pickerItem = new CategoryPickerItem(categoryRow, mainWindowLogic.Categories, oldPickedCategories.Contains(categoryRow));
-                if (!pickerItem.CategoryItem.Hidden)
+                if (categoryRow.IsParentIDNull())
                 {
-                    categories.Add(pickerItem);
+                    var categoryNode = new CategoryPickerNode(categoryTable, categoryRow, null);
+                    if (!categoryNode.CategoryItem.Hidden)
+                    {
+                        categories.Add(categoryNode);
+                    }
                 }
+            }
+
+            // Setup initial selection
+            foreach(var node in categories)
+            {
+                node.SetInitialSelection(pickedCategories);
             }
 
             // Setup categories view
@@ -57,7 +70,7 @@ namespace BanaData.Logic.Dialogs.Pickers
         //
         // List of categories
         //
-        private readonly ObservableCollection<CategoryPickerItem> categories = new ObservableCollection<CategoryPickerItem>();
+        private readonly ObservableCollection<CategoryPickerNode> categories = new ObservableCollection<CategoryPickerNode>();
         public CollectionView Categories { get; }
 
         //
@@ -81,7 +94,8 @@ namespace BanaData.Logic.Dialogs.Pickers
 
             foreach (var cat in categories)
             {
-                if (cat.IsSelected == true)
+                cat.AddToListIfChecked(pickedCategories);
+                if (cat.IsChecked == true)
                 {
                     pickedCategories.Add(cat.CategoryRow);
                 }
@@ -97,15 +111,15 @@ namespace BanaData.Logic.Dialogs.Pickers
         {
             foreach (var cat in categories)
             {
-                cat.IsSelected = false;
-            }
+                cat.IsChecked = false;
+            };
         }
 
         private void OnSelectAllCommand()
         {
             foreach (var cat in categories)
             {
-                cat.IsSelected = true;
+                cat.IsChecked = true;
             }
         }
 
@@ -113,7 +127,7 @@ namespace BanaData.Logic.Dialogs.Pickers
         {
             foreach (var cat in categories)
             {
-                cat.IsSelected = cat.CategoryRow.IsIncome;
+                cat.IsChecked = cat.CategoryRow.IsIncome;
             }
         }
 
@@ -121,36 +135,145 @@ namespace BanaData.Logic.Dialogs.Pickers
         {
             foreach (var cat in categories)
             {
-                cat.IsSelected = !cat.CategoryRow.IsIncome;
+                cat.IsChecked = !cat.CategoryRow.IsIncome;
             }
         }
 
         #endregion
+    }
 
-        #region Supporting class
+    /// <summary>
+    /// Node class for the category list picker 
+    /// (should be nested into above, but treeview does not support nested classes)
+    /// </summary>
+    public class CategoryPickerNode : LogicBase
+    {
+        #region Constructor
 
-        public class CategoryPickerItem : LogicBase
+        public CategoryPickerNode(Household.CategoryDataTable categoryTable, Household.CategoryRow categoryRow, CategoryPickerNode _parent)
         {
-            public CategoryPickerItem(Household.CategoryRow categoryRow, IEnumerable<CategoryItem> parents, bool selected) =>
-                (CategoryRow, CategoryItem, isSelected) = (categoryRow, CategoryItem.CreateFromDB(categoryRow, parents), selected);
+            // Memo input
+            CategoryRow = categoryRow;
+            parent = _parent;
 
-            public readonly Household.CategoryRow CategoryRow;
+            CategoryItem = CategoryItem.CreateFromDB(
+                categoryRow,
+                parent == null ? null : new CategoryItem[] { parent.CategoryItem });
 
-            public CategoryItem CategoryItem { get; }
-
-            private bool? isSelected;
-            public bool? IsSelected
+            // Build children
+            foreach (var cat in categoryTable)
             {
-                get => isSelected;
-                set
+                if (!cat.IsParentIDNull() && cat.ParentID == categoryRow.ID)
                 {
-                    if (isSelected != value)
-                    {
-                        isSelected = value;
-                        OnPropertyChanged(() => IsSelected);
-                    }
+                    children.Add(new CategoryPickerNode(categoryTable, cat, this));
                 }
             }
+
+            Children = (CollectionView)CollectionViewSource.GetDefaultView(children);
+            Children.SortDescriptions.Add(new SortDescription("CategoryItem.FullName", ListSortDirection.Ascending));
+        }
+
+        #endregion
+
+        #region Logic properties
+
+        private readonly CategoryPickerNode parent;
+        public readonly Household.CategoryRow CategoryRow;
+
+        #endregion
+
+        #region UI properties
+
+        // This category
+        public CategoryItem CategoryItem { get; }
+
+        // If it is selected
+        private bool? isChecked;
+        public bool? IsChecked
+        {
+            get => isChecked;
+            set
+            {
+                if (isChecked != value)
+                {
+                    // Set my value
+                    SetIsCheckedNonRecursively(value);
+
+                    // Propagate down
+                    PropagateDown(value);
+
+                    // Propagate up
+                    PropagateUp(value);
+                }
+            }
+        }
+
+        // Category children
+        private readonly ObservableCollection<CategoryPickerNode> children = new ObservableCollection<CategoryPickerNode>();
+        public CollectionView Children { get; }
+
+        #endregion
+
+        #region Action
+
+        // Initial selection
+        public void SetInitialSelection(IEnumerable<Household.CategoryRow> pickedCategories)
+        {
+            IsChecked = pickedCategories.Contains(CategoryRow);
+            foreach(var child in children)
+            {
+                child.SetInitialSelection(pickedCategories);
+            }
+        }
+
+        // Commit
+        public void AddToListIfChecked(List<Household.CategoryRow> pickedCategories)
+        {
+            // If this category is fully checked, add it to the list
+            if (IsChecked == true)
+            {
+                pickedCategories.Add(CategoryRow);
+            }
+
+            // Always recurse to be sure to get all checked categories
+            foreach (var child in children)
+            {
+                child.AddToListIfChecked(pickedCategories);
+            }
+        }
+
+        // Set children value
+        private void PropagateDown(bool? value)
+        {
+            foreach (var child in children)
+            {
+                if (child.IsChecked != value)
+                {
+                    child.SetIsCheckedNonRecursively(value);
+                    child.PropagateDown(value);
+                }
+            }
+        }
+
+        // Set parent value
+        private void PropagateUp(bool? value)
+        {
+            if (parent != null && parent.IsChecked != value)
+            {
+                if (!parent.children.All(c => c.IsChecked == value))
+                {
+                    // Mix of checked and unchecked
+                    value = null;
+                }
+                parent.SetIsCheckedNonRecursively(value);
+                parent.PropagateUp(value);
+            }
+        }
+
+        private void SetIsCheckedNonRecursively(bool? value)
+        {
+            isChecked = value;
+            OnPropertyChanged(() => IsChecked);
         }
 
         #endregion
