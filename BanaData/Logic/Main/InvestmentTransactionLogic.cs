@@ -457,10 +457,22 @@ namespace BanaData.Logic.Main
                 return;
             }
 
+            decimal oldAmountSign = data.AmountSign;
+
+            // Set new type
             data.Type = value;
+
+            // Get a helper based on transaction type
             investmentTransactionType = InvestmentTransactionType.GetInvestmentTransactionType(value);
 
+            // Securities filtered/unfiltered
             UpdateSecurities();
+
+            // Account for change of amount sign
+            if (data.AmountSign != oldAmountSign)
+            {
+                data.PositiveAmount *= -1;
+            }
             OnPropertyChanged(() => Amount);
 
             // If switching from transfers to categories or vice versa
@@ -692,7 +704,7 @@ namespace BanaData.Logic.Main
             }
 
             // transaction types that have negative amounts in the line item
-            private decimal AmountSign =>
+            public decimal AmountSign =>
                 Type == EInvestmentTransactionType.CashOut ||
                 Type == EInvestmentTransactionType.TransferCashOut ||
                 Type == EInvestmentTransactionType.SellAndTransferCash ||
