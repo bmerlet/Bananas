@@ -12,7 +12,7 @@
         Title="{Binding Title}"
         Icon="/XamlUI;component/Images/Bananas.ico"
         WindowStartupLocation="CenterOwner"
-        SizeToContent="WidthAndHeight">
+        Width="720" Height="420">
     <DockPanel>
 
         <!-- Done panel -->
@@ -49,8 +49,6 @@
 
         <!-- Main listview -->
         <ListView 
-            Width="700"
-            Height="400"
             x:Name="listView"
             ItemsSource="{Binding TransactionsSource}"
             MouseDoubleClick="OnListViewMouseDoubleClick"/>
