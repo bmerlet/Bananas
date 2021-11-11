@@ -206,6 +206,9 @@ namespace BanaData.Logic.Dialogs.Reports
                     decimal diff = (si.Actual - si.Target) * TotalValue;
                     decimal numShares = diff / si.SecurityPrice;
 
+                    // Ward off against rounding errors when target is 0%
+                    numShares = Math.Min(numShares, si.SecurityQuantity);
+
                     if (Math.Abs(si.Actual - si.Target) >= Threshold)
                     {
                         if (si.Actual > si.Target)
