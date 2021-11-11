@@ -19,6 +19,24 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
 
         private readonly MainWindowLogic mainWindowLogic;
 
+        // Strings for top nodes
+        private const string REVENUE_NAME = "Revenue";
+        private const string REVENUE_GROUP = "100Revenue";
+        private const string EXPENSE_NAME = "Expenses";
+        private const string EXPENSE_GROUP = "200Expenses";
+
+        // Strings for 2nd level nodes
+
+        // Strings for revenue categories
+        private const string INTERESTS_NAME = "Interest";
+        private const string INTERESTS_GROUP = "101Interest";
+        private const string DIVIDENDS_NAME = "Dividends";
+        private const string DIVIDENDS_GROUP = "102Dividends";
+        private const string LTCG_NAME = "Long-term capital gains";
+        private const string LTCG_GROUP = "103Long-term capital gains";
+        private const string STCG_NAME = "Short-term capital gains";
+        private const string STCG_GROUP = "104Short-term capital gains";
+
         #endregion
 
         #region Constructor
@@ -49,6 +67,11 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
             StatementsSource.SortDescriptions.Add(new SortDescription("Group", ListSortDirection.Ascending));
             StatementsSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
 
+            // Give the nodes to the UI
+            NodesSource = (CollectionView)CollectionViewSource.GetDefaultView(nodes);
+            NodesSource.SortDescriptions.Add(new SortDescription("Group", ListSortDirection.Ascending));
+            NodesSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
+
             // Compute!
             ComputeIncomeStatement();
         }
@@ -72,11 +95,275 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
         private readonly ObservableCollection<IncomeStatementItem> statements = new ObservableCollection<IncomeStatementItem>();
         public CollectionView StatementsSource { get; }
 
+        // Income nodes
+        private readonly ObservableCollection<IncomeStatementNode> nodes = new ObservableCollection<IncomeStatementNode>();
+        public CollectionView NodesSource { get; }
+
         #endregion
 
         #region Actions
 
         private void ComputeIncomeStatement()
+        {
+            OldComputeIncomeStatement();
+
+            var household = mainWindowLogic.Household;
+            var startDate = DateRangeLogic.StartDate;
+            var endDate = DateRangeLogic.EndDate;
+            var member = selectedMember.Member;
+            nodes.Clear();
+
+            // Setup dictionaries to group the transactions
+            var revenues = new Dictionary<CategoryItem, IncomeStatementNode>();
+            var expenses = new Dictionary<CategoryItem, IncomeStatementNode>();
+
+            // Loop on all transaction for the selected period and selected member
+            foreach (var transactionRow in household.RegularTransactions
+                .Where(tr => tr.Date >= startDate && tr.Date <= endDate && (member == null || (!tr.AccountRow.IsPersonIDNull() && tr.AccountRow.PersonRow == member))))
+            {
+                string sortableDate = $"{transactionRow.Date:yyyy/MM/dd}";
+                string transTip = $"{transactionRow.AccountRow.Name} on {transactionRow.Date:MM/dd/yyyy}";
+
+                foreach (var li in transactionRow.GetLineItemRows())
+                {
+                    // Special parsing of investment transactions
+                    if (transactionRow.AccountRow.Type == EAccountType.Investment)
+                    {
+                        var investmentTransactionRow = transactionRow.GetInvestmentTransaction();
+                        IncomeStatementNode parentNode = null;
+                        IncomeStatementNode transactionNode = null;
+                        decimal amount = Math.Abs(transactionRow.GetAmount());
+
+                        switch (investmentTransactionRow.Type)
+                        {
+                            case EInvestmentTransactionType.CashIn:
+                                parentNode = GetNodeByName(RevenueNode, "Added cash", null, "Added Cash");
+                                transactionNode = IncomeStatementNode.GetLeaf("Added cash", transTip, sortableDate, amount);
+                                break;
+
+                            case EInvestmentTransactionType.CashOut:
+                                parentNode = GetNodeByName(ExpenseNode, "Removed cash", null, "Removed Cash");
+                                transactionNode = IncomeStatementNode.GetLeaf("Removed cash", transTip, sortableDate, amount);
+                                break;
+
+                            case EInvestmentTransactionType.TransferCashIn:
+                            case EInvestmentTransactionType.TransferCashOut:
+                                // Transfers are processed below
+                                break;
+
+                            case EInvestmentTransactionType.InterestIncome:
+                                parentNode = GetNodeByName(RevenueNode, INTERESTS_NAME, null, INTERESTS_GROUP);
+                                transactionNode = IncomeStatementNode.GetLeaf("Interest", transTip, sortableDate, amount);
+                                break;
+
+                            case EInvestmentTransactionType.SharesIn:
+                            case EInvestmentTransactionType.SharesOut:
+                                // Used for share exchange, revenue-neutral
+                                break;
+
+                            case EInvestmentTransactionType.Buy:
+                            case EInvestmentTransactionType.BuyFromTransferredCash:
+                                // Buying shares is revenue-neutral
+                                break;
+
+                            case EInvestmentTransactionType.Sell:
+                            case EInvestmentTransactionType.SellAndTransferCash:
+                                var cg = Portfolio.ComputeSaleCapitalGains(household, transactionRow.ID, false);
+                                if (cg.LongTermGain != 0)
+                                {
+                                    var LTCGNode = LongTermCapitalGainsNode;
+                                    var symbol = investmentTransactionRow.SecurityRow.Symbol;
+                                    var symbolNode = GetNodeByName(LTCGNode, symbol, $"Sale of {symbol}", symbol);
+                                    var transNode = IncomeStatementNode.GetLeaf(
+                                        investmentTransactionRow.GetDescription(),
+                                        transTip,
+                                        sortableDate,
+                                        cg.LongTermGain);
+                                    symbolNode.AddChild(transNode);
+                                }
+                                if (cg.ShortTermGain != 0)
+                                {
+                                    var STCGNode = ShortTermCapitalGainsNode;
+                                    var symbol = investmentTransactionRow.SecurityRow.Symbol;
+                                    var symbolNode = GetNodeByName(STCGNode, symbol, $"Sale of {symbol}", symbol);
+                                    var transNode = IncomeStatementNode.GetLeaf(
+                                        investmentTransactionRow.GetDescription(),
+                                        transTip ,
+                                        sortableDate,
+                                        cg.ShortTermGain);
+                                    symbolNode.AddChild(transNode);
+                                }
+                                break;
+
+                            case EInvestmentTransactionType.Dividends:
+                            case EInvestmentTransactionType.TransferDividends:
+                            case EInvestmentTransactionType.ReinvestDividends:
+                                {
+                                    var dividendNode = GetNodeByName(RevenueNode, DIVIDENDS_NAME, null, DIVIDENDS_GROUP);
+                                    var symbol = investmentTransactionRow.SecurityRow.Symbol;
+                                    parentNode = GetNodeByName(dividendNode, symbol, $"Dividend from {symbol}", symbol);
+                                    transactionNode = IncomeStatementNode.GetLeaf(investmentTransactionRow.GetDescription(), transTip, sortableDate, amount);
+                                }
+                                break;
+
+                            case EInvestmentTransactionType.ShortTermCapitalGains:
+                            case EInvestmentTransactionType.TransferShortTermCapitalGains:
+                            case EInvestmentTransactionType.ReinvestShortTermCapitalGains:
+                                {
+                                    var STCGNode = ShortTermCapitalGainsNode;
+                                    var symbol = investmentTransactionRow.SecurityRow.Symbol;
+                                    parentNode = GetNodeByName(STCGNode, symbol, $"STCG from {symbol}", symbol);
+                                    transactionNode = IncomeStatementNode.GetLeaf(investmentTransactionRow.GetDescription(), transTip, sortableDate, amount);
+                                }
+                                break;
+
+                            case EInvestmentTransactionType.LongTermCapitalGains:
+                            case EInvestmentTransactionType.TransferLongTermCapitalGains:
+                            case EInvestmentTransactionType.ReinvestMediumTermCapitalGains:
+                            case EInvestmentTransactionType.ReinvestLongTermCapitalGains:
+                                {
+                                    var LTCGNode = LongTermCapitalGainsNode;
+                                    var symbol = investmentTransactionRow.SecurityRow.Symbol;
+                                    parentNode = GetNodeByName(LTCGNode, symbol, $"LTCG from {symbol}", symbol);
+                                    transactionNode = IncomeStatementNode.GetLeaf(investmentTransactionRow.GetDescription(), transTip, sortableDate, amount);
+                                }
+                                break;
+
+                            case EInvestmentTransactionType.ReturnOnCapital:
+                                {
+                                    parentNode = GetNodeByName(RevenueNode, "Return on capital", "Return on capital", "Return on capital");
+                                    transactionNode = IncomeStatementNode.GetLeaf("Return on capital", transTip, sortableDate, amount);
+                                }
+                                break;
+                        }
+
+                        if (parentNode != null && transactionNode != null)
+                        {
+                            parentNode.AddChild(transactionNode);
+                        }
+                    }
+
+                    //
+                    // Process category-based income and expense
+                    //
+                    if (li.GetLineItemCategoryRow() is Household.LineItemCategoryRow lic)
+                    {
+                        // Get to top-level category
+                        var cat = lic.CategoryRow;
+                        while (!cat.IsParentIDNull())
+                        {
+                            cat = household.Category.FindByID(cat.ParentID);
+                        }
+
+                        // Sort into revenue/expense
+                        var topNode = cat.IsIncome ? RevenueNode : ExpenseNode;
+
+                        // Special case for interest, which also shows up in investment transactions
+                        bool isInterestIncome = !cat.IsTaxInfoNull() && cat.TaxInfo == "287";
+                        string catName = isInterestIncome ? INTERESTS_NAME : cat.Name;
+                        string catGroup = isInterestIncome ? INTERESTS_GROUP : cat.Name;
+
+                        // Create/get the node
+                        var catNode = GetNodeByName(topNode, catName, null, catGroup);
+
+                        decimal amount = cat.IsIncome ? li.Amount : -li.Amount;
+
+                        string payee = transactionRow.IsPayeeNull() ? "" : transactionRow.Payee;
+                        string comment = li.IsMemoNull() ? "" : li.Memo;
+                        comment = (comment == "" && !transactionRow.IsMemoNull()) ? transactionRow.Memo : "";
+                        string desc = (payee == "") ? comment : (comment == "" ? payee : $"{payee} ({comment})");
+                        desc = $"{transactionRow.Date:MM/dd/yyyy}" + (desc == "" ? "" : $": {desc}");
+                        
+                        var transNode = IncomeStatementNode.GetLeaf(desc, transTip, sortableDate, amount);
+                        catNode.AddChild(transNode);
+                    }
+                    //
+                    // Process transfer-based income and expense
+                    //
+                    else if (li.GetLineItemTransferRow() is Household.LineItemTransferRow lit)
+                    {
+                        // Transfer to self does not count
+                        if (member == null || (!lit.AccountRow.IsPersonIDNull() && lit.AccountRow.PersonRow == member))
+                        {
+                            continue;
+                        }
+
+                        string transferee = lit.AccountRow.IsPersonIDNull() ? "Unknown person" : lit.AccountRow.PersonRow.Name;
+                        string date = $"{transactionRow.Date:MM/dd/yyyy}";
+                        if (li.Amount < 0)
+                        {
+                            string title = $"Transfer(s) to {transferee}";
+                            var catNode = GetNodeByName(ExpenseNode, title, title, title);
+                            var transNode = IncomeStatementNode.GetLeaf(date, transTip, sortableDate, -li.Amount);
+                            catNode.AddChild(transNode);
+                        }
+                        else
+                        {
+                            string title = $"Transfer(s) from {transferee}";
+                            var catNode = GetNodeByName(RevenueNode, title, title, title);
+                            var transNode = IncomeStatementNode.GetLeaf(date, transTip, sortableDate, li.Amount);
+                            catNode.AddChild(transNode);
+                        }
+                    }
+                }
+            }
+
+            // Compute totals
+            foreach (var topNode in nodes)
+            {
+                ComputeTotals(topNode);
+            }
+        }
+
+        //
+        // Top nodes
+        //
+        private IncomeStatementNode RevenueNode => GetTopNodeByName(REVENUE_NAME, REVENUE_GROUP);
+        private IncomeStatementNode ExpenseNode => GetTopNodeByName(EXPENSE_NAME, EXPENSE_GROUP);
+
+        private IncomeStatementNode GetTopNodeByName(string name, string group)
+        {
+            var node = nodes.FirstOrDefault(n => n.Name == name);
+            if (node == null)
+            {
+                node = IncomeStatementNode.GetTitle(name, group);
+                nodes.Add(node);
+            }
+
+            return node;
+        }
+
+        // Investment revenue nodes
+        private IncomeStatementNode LongTermCapitalGainsNode => GetNodeByName(RevenueNode, LTCG_NAME, null, LTCG_GROUP);
+        private IncomeStatementNode ShortTermCapitalGainsNode => GetNodeByName(RevenueNode, STCG_NAME, null, STCG_GROUP);
+
+        private IncomeStatementNode GetNodeByName(IncomeStatementNode parent, string name, string tip, string group)
+        {
+            var node = parent.Children.FirstOrDefault(n => n.Name == name);
+            if (node == null)
+            {
+                node = IncomeStatementNode.GetItem(name, tip, group);
+                parent.AddChild(node);
+            }
+
+            return node;
+        }
+
+        private void ComputeTotals(IncomeStatementNode node)
+        {
+            if (node.Children.Count > 0)
+            {
+                decimal sum = 0;
+                foreach (var child in node.Children)
+                {
+                    ComputeTotals(child);
+                    sum += child.Value;
+                }
+                node.SetValue(sum);
+            }
+        }
+
+        private void OldComputeIncomeStatement()
         {
             var household = mainWindowLogic.Household;
             var startDate = DateRangeLogic.StartDate;
@@ -387,6 +674,63 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
             {
                 return Name.GetHashCode();
             }
+        }
+
+        #endregion
+    }
+
+    /// <summary>
+    /// Node in an income statement
+    /// </summary>
+    public class IncomeStatementNode : LogicBase
+    {
+        #region Constructor
+
+        private IncomeStatementNode(string name, string tip, string group, decimal value, bool bold)
+        {
+            (Name, Tip, Group, Value, Bold) = (name, tip, group, value, bold);
+
+            // Give the list to the UI
+            ChildrenSource = (CollectionView)CollectionViewSource.GetDefaultView(Children);
+            ChildrenSource.SortDescriptions.Add(new SortDescription("Group", ListSortDirection.Ascending));
+            ChildrenSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
+        }
+
+        static public IncomeStatementNode GetTitle(string name, string group)
+            => new IncomeStatementNode(name, null, group, 0, true);
+
+        static public IncomeStatementNode GetItem(string name, string tip, string group)
+            => new IncomeStatementNode(name, tip, group, 0, false);
+
+        static public IncomeStatementNode GetLeaf(string name, string tip, string group, decimal amount)
+            => new IncomeStatementNode(name, tip, group, amount, false);
+
+        #endregion
+
+        #region UI properties
+
+        public string Name { get; }
+        public string Tip { get; }
+        public string Group { get; }
+        public decimal Value { get; private set; }
+        public bool Bold { get; }
+
+        // Children nodes
+        public readonly ObservableCollection<IncomeStatementNode> Children = new ObservableCollection<IncomeStatementNode>();
+        public CollectionView ChildrenSource { get; }
+
+        #endregion
+
+        #region Actions
+
+        public void AddChild(IncomeStatementNode child)
+        {
+            Children.Add(child);
+        }
+
+        public void SetValue(decimal value)
+        {
+            Value = value;
         }
 
         #endregion
