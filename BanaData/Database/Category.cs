@@ -23,7 +23,7 @@ namespace BanaData.Database
                 if (!IsParentIDNull())
                 {
                     // Get parent
-                    var parentRow = (Table as CategoryDataTable).Single(c => c.ID == ParentID);
+                    var parentRow = GetParentCategoryRow();
 
                     // Recurse
                     fullName = parentRow.FullName + ":" + fullName;
@@ -32,38 +32,9 @@ namespace BanaData.Database
                 return fullName;
             }
 
-            public bool HasSame(string description, bool income, string taxInfo)
+            public CategoryRow GetParentCategoryRow()
             {
-                if (IsDescriptionNull())
-                {
-                    if (!string.IsNullOrWhiteSpace(description))
-                    {
-                        return false;
-                    }
-                }
-                else if (Description != description)
-                {
-                    return false;
-                }
-
-                if (IsIncome != income)
-                {
-                    return false;
-                }
-
-                if (IsTaxInfoNull())
-                {
-                    if (!string.IsNullOrWhiteSpace(taxInfo))
-                    {
-                        return false;
-                    }
-                }
-                else if (TaxInfo != taxInfo)
-                {
-                    return false;
-                }
-
-                return true;
+                return IsParentIDNull() ? null : (Table as CategoryDataTable).FindByID(ParentID);
             }
 
         }
