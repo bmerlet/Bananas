@@ -74,11 +74,11 @@
 
             <!-- Row 3: Custom start date -->
             <TextBlock Text="Start date:" Grid.Row="3"/>
-            <w:DateBox Date="{Binding DateRange.StartDate}" IsEnabled="{Binding DateRange.AreDatesEnabled}" Grid.Row="3" Grid.Column="1"/>
+            <w:DateBox Date="{Binding DateRange.StartDate, Mode=TwoWay}" IsEnabled="{Binding DateRange.AreDatesEnabled}" Grid.Row="3" Grid.Column="1"/>
 
             <!-- Row 4: Custom end date -->
             <TextBlock Text="End date:" Grid.Row="4"/>
-            <w:DateBox Date="{Binding DateRange.EndDate}" IsEnabled="{Binding DateRange.AreDatesEnabled}" Grid.Row="4" Grid.Column="1"/>
+            <w:DateBox Date="{Binding DateRange.EndDate, Mode=TwoWay}" IsEnabled="{Binding DateRange.AreDatesEnabled}" Grid.Row="4" Grid.Column="1"/>
 
             <!-- Row 5: Hidden -->
             <TextBlock Text="Also rename in memorized payees:" Grid.Row="5"/>
