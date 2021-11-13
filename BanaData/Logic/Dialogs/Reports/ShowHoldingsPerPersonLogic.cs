@@ -16,15 +16,13 @@ namespace BanaData.Logic.Dialogs.Reports
     {
         public ShowHoldingsPerPersonLogic(MainWindowLogic mainWindowLogic)
         {
-            var household = mainWindowLogic.Household;
-
-            foreach (Household.PersonRow personRow in household.Person.Rows)
+            foreach (Household.PersonRow personRow in mainWindowLogic.Household.Person.Rows)
             {
-                personItems.Add(new PersonItem(household, personRow));
+                personItems.Add(new PersonItem(mainWindowLogic, personRow));
             }
 
             // For unowned accounts
-            var unowned = new PersonItem(household, null);
+            var unowned = new PersonItem(mainWindowLogic, null);
             if (unowned.Value != 0)
             {
                 personItems.Add(unowned);
@@ -43,8 +41,10 @@ namespace BanaData.Logic.Dialogs.Reports
 
         public class PersonItem
         {
-            public PersonItem(Household household, Household.PersonRow personRow)
+            public PersonItem(MainWindowLogic mainWindowLogic, Household.PersonRow personRow)
             {
+                var household = mainWindowLogic.Household;
+
                 IEnumerable<Household.AccountRow> accounts =
                     personRow == null ?
                     household.Account.Rows.Cast<Household.AccountRow>().Where(a => a.IsPersonIDNull()) :
@@ -53,7 +53,10 @@ namespace BanaData.Logic.Dialogs.Reports
                 foreach (Household.AccountRow accountRow in accounts)
                 {
                     decimal value = accountRow.Type == EAccountType.Investment ? accountRow.GetInvestmentValue() : accountRow.GetBalance();
-                    accountItems.Add(new AccountItem(accountRow.Name, value));
+                    if (value != 0 || !mainWindowLogic.UserSettings.HideClosedAccounts || !accountRow.Hidden)
+                    {
+                        accountItems.Add(new AccountItem(accountRow.Name, value));
+                    }
                 }
 
                 Name = personRow == null ? "<Unowned>" : personRow.Name;
