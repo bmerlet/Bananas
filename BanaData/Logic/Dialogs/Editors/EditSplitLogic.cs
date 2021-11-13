@@ -216,7 +216,7 @@ namespace BanaData.Logic.Dialogs.Editors
                         // User changed selection (e.g. by clicking on a row)
                         if (editedLineItem != null && gridViewLineItems.Contains(editedLineItem))
                         {
-                            editedLineItem.CancelEdit();
+                            editedLineItem.EndEdit();
                         }
                         selectedLineItem = value;
                         editedLineItem = value;
