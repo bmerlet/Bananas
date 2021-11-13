@@ -157,6 +157,10 @@ namespace XamlUI
             {
                 dialog = new ListMemorizedPayees(listMemorizedPayeesLogic);
             }
+            else if (logic is RenamePayeeLogic renamePayeeLogic)
+            {
+                dialog = new RenamePayee(renamePayeeLogic);
+            }
             else if (logic is EditMemorizedPayeeLogic editMemorizedPayeeLogic)
             {
                 dialog = new EditMemorizedPayee(editMemorizedPayeeLogic);

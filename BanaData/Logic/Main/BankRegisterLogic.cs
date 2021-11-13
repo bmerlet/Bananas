@@ -101,6 +101,11 @@ namespace BanaData.Logic.Main
         private void UpdateMemorizedPayees()
         {
             memorizedPayees.ReplaceRange(mainWindowLogic.MemorizedPayees);
+            MemorizedPayees.Refresh();
+            foreach (BankingTransactionLogic transaction in transactions)
+            {
+                transaction.UpdatePayeeNameFromDatabase();
+            }
         }
 
         private void UpdateCategoriesAndTransfers()

@@ -481,6 +481,23 @@ namespace BanaData.Logic.Main
             OnPropertyChanged(() => Category);
         }
 
+        // Activated after payee rename
+        public void UpdatePayeeNameFromDatabase()
+        {
+            if (backup == null && TransID != TRANSID_NOT_COMMITTED)
+            {
+                var transactionRow = mainWindowLogic.Household.Transaction.FindByID(TransID);
+                if (!transactionRow.IsPayeeNull())
+                {
+                    if (data.Payee != transactionRow.Payee)
+                    {
+                        data.Payee = transactionRow.Payee;
+                        OnPropertyChanged(() => Payee);
+                    }
+                }
+            }
+        }
+
         #endregion
 
         #region Supporting class

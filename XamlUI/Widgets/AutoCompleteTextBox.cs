@@ -294,6 +294,9 @@ namespace XamlUI.Widgets
         //
         private void OnEditorTextChanged(object sender, TextChangedEventArgs e)
         {
+            // Update text
+            Text = editor.Text;
+
             // Update autocomplete list
             RefreshSelector();
         }

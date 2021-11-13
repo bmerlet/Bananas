@@ -85,6 +85,7 @@
     <Compile Include="Logic\Dialogs\Editors\ReconcileInfoLogic.cs" />
     <Compile Include="Logic\Dialogs\Editors\ReconcileInvestmentsLogic.cs" />
     <Compile Include="Logic\Dialogs\Editors\ReconcileLogic.cs" />
+    <Compile Include="Logic\Dialogs\Editors\RenamePayeeLogic.cs" />
     <Compile Include="Logic\Dialogs\Listers\ListSchedulesLogic.cs" />
     <Compile Include="Logic\Dialogs\Listers\ListSecurityPricesLogic.cs" />
     <Compile Include="Logic\Dialogs\Listers\ListTransactionReportsLogic.cs" />

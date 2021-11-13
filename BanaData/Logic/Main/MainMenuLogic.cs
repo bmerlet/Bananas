@@ -51,6 +51,7 @@ namespace BanaData.Logic.Main
             EditSecurities = new CommandBase(OnEditSecurities);
             EditTransactionReports = new CommandBase(OnEditTransactionReports);
             EditScheduledTransactions = new CommandBase(OnEditScheduledTransactions);
+            RenamePayee = new CommandBase(OnRenamePayee);
 
             Reconcile = new CommandBase(OnReconcile);
             Reconcile.SetCanExecute(false);
@@ -253,6 +254,17 @@ namespace BanaData.Logic.Main
         private void OnEditMemorizedPayees()
         {
             var logic = new ListMemorizedPayeesLogic(mainWindow);
+            mainWindow.GuiServices.ShowDialog(logic);
+        }
+
+        //
+        // Rename payee
+        //
+        public CommandBase RenamePayee { get; }
+
+        private void OnRenamePayee()
+        {
+            var logic = new RenamePayeeLogic(mainWindow);
             mainWindow.GuiServices.ShowDialog(logic);
         }
 

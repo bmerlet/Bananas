@@ -1,0 +1,88 @@
+﻿<Window x:Class="XamlUI.Dialogs.Editors.RenamePayee"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:XamlUI.Dialogs.Editors"
+        xmlns:ucs="clr-namespace:XamlUI.UserControls"
+        xmlns:w="clr-namespace:XamlUI.Widgets"
+        xmlns:editors="clr-namespace:BanaData.Logic.Dialogs.Editors;assembly=BanaData"
+        d:DataContext="{d:DesignInstance Type=editors:RenamePayeeLogic}"
+        mc:Ignorable="d"
+        Title="Rename payee"
+        Icon="/XamlUI;component/Images/Bananas.ico"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        SizeToContent="WidthAndHeight">
+    <Window.Resources>
+
+        <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}"/>
+        <Style TargetType="w:WatermarkTextBox" BasedOn="{StaticResource FormWatermarkTextBox}"/>
+        <Style TargetType="w:DateBox" BasedOn="{StaticResource FormDateBox}"/>
+        <Style TargetType="ComboBox" BasedOn="{StaticResource FormComboBox}"/>
+        <Style TargetType="CheckBox" BasedOn="{StaticResource FormCheckBox}"/>
+        <Style TargetType="w:AutoCompleteTextBox" x:Key="ExistingPayeeBoxStyle">
+            <Setter Property="Watermark" Value="Existing name"/>
+            <Setter Property="DisplayMember" Value="Payee"/>
+            <Setter Property="ListBoxHeight" Value="150"/>
+            <Setter Property="ListBoxWidth" Value="200"/>
+            <Setter Property="IsTextFromItemsSourceOnly" Value="True"/>
+            <Setter Property="ItemTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Payee}"/>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
+
+    <DockPanel>
+        <!-- OK/Cancel panel -->
+        <ucs:OKCancel DockPanel.Dock="Bottom"/>
+        <!-- Main panel -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="200"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Row 0: Existing payee name name -->
+            <TextBlock Text="Existing payee name:"/>
+            <w:AutoCompleteTextBox 
+                Text="{Binding ExistingPayeeName, Mode=TwoWay}"
+                ItemsSource="{Binding MemorizedPayees}"
+                Style="{StaticResource ExistingPayeeBoxStyle}"
+                Grid.Column="1"/>
+
+            <!-- Row 1: New payee name -->
+            <TextBlock Text="New payee name:" Grid.Row="1"/>
+            <w:WatermarkTextBox Text="{Binding NewPayeeName, Mode=TwoWay}" Watermark="New name" Grid.Row="1" Grid.Column="1"/>
+
+            <!-- Row 2: Duration -->
+            <TextBlock Text="Apply to:" Grid.Row="2"/>
+            <ComboBox ItemsSource="{Binding DateRange.DateRangesSource, Mode=OneTime}" SelectedItem="{Binding DateRange.DateRange}" Grid.Row="2" Grid.Column="1"/>
+
+            <!-- Row 3: Custom start date -->
+            <TextBlock Text="Start date:" Grid.Row="3"/>
+            <w:DateBox Date="{Binding DateRange.StartDate}" IsEnabled="{Binding DateRange.AreDatesEnabled}" Grid.Row="3" Grid.Column="1"/>
+
+            <!-- Row 4: Custom end date -->
+            <TextBlock Text="End date:" Grid.Row="4"/>
+            <w:DateBox Date="{Binding DateRange.EndDate}" IsEnabled="{Binding DateRange.AreDatesEnabled}" Grid.Row="4" Grid.Column="1"/>
+
+            <!-- Row 5: Hidden -->
+            <TextBlock Text="Also rename in memorized payees:" Grid.Row="5"/>
+            <CheckBox IsChecked="{Binding ChangeMemorizedPayees, Mode=TwoWay}" Grid.Row="5" Grid.Column="1"/>
+        </Grid>
+    </DockPanel>
+</Window>

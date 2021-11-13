@@ -98,6 +98,9 @@
     <Compile Include="Dialogs\Editors\ReconcileInvestments.xaml.cs">
       <DependentUpon>ReconcileInvestments.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\Editors\RenamePayee.xaml.cs">
+      <DependentUpon>RenamePayee.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\Listers\ListAccounts.xaml.cs">
       <DependentUpon>ListAccounts.xaml</DependentUpon>
     </Compile>
@@ -268,6 +271,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\Editors\ReconcileInvestments.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Editors\RenamePayee.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

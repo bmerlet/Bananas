@@ -24,8 +24,8 @@ namespace BanaData.Logic.Dialogs.Basics
 
         public DateRangeLogic(ERange _dateRange, Func<DateTime> _getEarliestAvailableDate)
         {
-            SetDateRange(_dateRange);
             getEarliestAvailableDate = _getEarliestAvailableDate;
+            SetDateRange(_dateRange);
         }
 
         #endregion
