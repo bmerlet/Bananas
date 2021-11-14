@@ -109,7 +109,20 @@
                             <DataTemplate>
                                 <TextBlock
                                     Text="{Binding Category}"
-                                    Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"/>
+                                    Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}">
+                                    <TextBlock.ToolTip>
+                                        <ItemsControl ItemsSource="{Binding LineItems}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding Category}" Width="120"/>
+                                                        <TextBlock Text="{Binding Amount}" TextAlignment="Right" Width="80"/>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </TextBlock.ToolTip>
+                                </TextBlock>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

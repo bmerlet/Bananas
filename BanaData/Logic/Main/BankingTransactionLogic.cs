@@ -92,6 +92,9 @@ namespace BanaData.Logic.Main
             }
         }
 
+        // Line items (to display as a category tooltip)
+        public IEnumerable<LineItem> LineItems => data.LineItems;
+
         // Amount (used to recompute balance)
         public override decimal Amount
         {
