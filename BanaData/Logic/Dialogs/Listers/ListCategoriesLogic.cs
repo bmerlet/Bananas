@@ -248,7 +248,7 @@ namespace BanaData.Logic.Dialogs.Listers
 
             var catRow = household.Category.FindByID(category.ID);
             var parentRow = category.Parent == null ? null : household.Category.FindByID(category.Parent.ID);
-            household.Category.Update(catRow, category.Name, category.Description, parentRow, category.IsIncome, category.TaxInfo);
+            household.Category.Update(catRow, category.Name, category.Description, parentRow, category.IsIncome, category.TaxInfoKey);
 
             mainWindowLogic.CommitChanges();
         }
