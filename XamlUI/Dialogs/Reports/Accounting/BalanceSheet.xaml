@@ -51,7 +51,7 @@
             <Button
                 Grid.Column="5"
                 Content="Print..."
-                Command="{Binding PrintCommand}"/>
+                Click="OnPrint"/>
         </Grid>
 
         <!-- Listviews -->

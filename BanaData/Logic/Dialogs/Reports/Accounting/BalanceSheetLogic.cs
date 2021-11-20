@@ -35,9 +35,6 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
             MembersSource.Add(everybody);
             selectedMember = everybody;
 
-            // RFU
-            PrintCommand = new CommandBase(() => mainWindowLogic.ErrorMessage("Not yet implemented"));
-
             // Give the lists to the UI
             AssetsSource = (CollectionView)CollectionViewSource.GetDefaultView(assets);
             AssetsSource.SortDescriptions.Add(new SortDescription("Group", ListSortDirection.Ascending));
@@ -63,9 +60,6 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
         public List<MemberItem> MembersSource { get; } = new List<MemberItem>();
         private MemberItem selectedMember;
         public MemberItem SelectedMember { get => selectedMember; set { selectedMember = value; ComputeBalanceSheet(); } }
-
-        // Print command
-        public CommandBase PrintCommand { get; }
 
         // Assets
         private readonly ObservableCollection<BalanceSheetItem> assets = new ObservableCollection<BalanceSheetItem>();
