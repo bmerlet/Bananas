@@ -79,12 +79,13 @@
                         <MenuItem Header="Income statement..." Command="{Binding ShowIncomeStatement}"/>
                         <MenuItem Header="Journal..." Command="{Binding ShowJournal}"/>
                     </MenuItem>
-                    <MenuItem Header="Show holdings..." Command="{Binding ShowHoldings}"/>
                     <MenuItem Header="Show household members holdings..." Command="{Binding ShowHoldingsPerPerson}"/>
                     <MenuItem Header="Show cash flow between household members..." Command="{Binding ShowCashFlowBetweenPersons}"/>
-                    <MenuItem Header="Show rebalance dashboard..." Command="{Binding ShowRebalance}"/>
                     <MenuItem Header="Show yearly capital gains and dividends..." Command="{Binding ShowYearlyCapGainsAndDividends}"/>
                     <MenuItem Header="Show wealth over time..." Command="{Binding ShowWealthOverTime}"/>
+                    <Separator/>
+                    <MenuItem Header="Show holdings..." Command="{Binding ShowHoldings}"/>
+                    <MenuItem Header="Show rebalance dashboard..." Command="{Binding ShowRebalance}"/>
                 </MenuItem>
             </Menu>
 

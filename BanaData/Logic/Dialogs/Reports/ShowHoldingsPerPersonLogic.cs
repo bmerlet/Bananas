@@ -14,34 +14,69 @@ namespace BanaData.Logic.Dialogs.Reports
 {
     public class ShowHoldingsPerPersonLogic : LogicBase
     {
-        public ShowHoldingsPerPersonLogic(MainWindowLogic mainWindowLogic)
+        #region Private members
+
+        private readonly MainWindowLogic mainWindowLogic;
+
+        #endregion
+
+        #region Constructor
+
+        public ShowHoldingsPerPersonLogic(MainWindowLogic _mainWindowLogic)
         {
+            mainWindowLogic = _mainWindowLogic;
+            Date = DateTime.Today;
+
+            PersonsSource = (CollectionView)CollectionViewSource.GetDefaultView(personItems);
+            PersonsSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
+        }
+
+        #endregion
+
+        #region UI properties
+
+        // Date to compute the holdings at
+        private DateTime date;
+        public DateTime Date { get => date; set { date = value; ComputeHoldings(); } }
+
+        // The list of persons
+        private readonly ObservableCollection<PersonItem> personItems = new ObservableCollection<PersonItem>();
+        public CollectionView PersonsSource { get; }
+
+        // Total value;
+        public decimal TotalValue { get; private set; }
+
+        #endregion
+
+        #region Actions
+
+        private void ComputeHoldings()
+        {
+            personItems.Clear();
+
             foreach (Household.PersonRow personRow in mainWindowLogic.Household.Person.Rows)
             {
-                personItems.Add(new PersonItem(mainWindowLogic, personRow));
+                personItems.Add(new PersonItem(mainWindowLogic, personRow, date));
             }
 
             // For unowned accounts
-            var unowned = new PersonItem(mainWindowLogic, null);
+            var unowned = new PersonItem(mainWindowLogic, null, date);
             if (unowned.Value != 0)
             {
                 personItems.Add(unowned);
             }
 
             TotalValue = personItems.Sum(pi => pi.Value);
-
-            PersonsSource = (CollectionView)CollectionViewSource.GetDefaultView(personItems);
-            PersonsSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
+            OnPropertyChanged(() => TotalValue);
         }
 
-        private readonly ObservableCollection<PersonItem> personItems = new ObservableCollection<PersonItem>();
-        public CollectionView PersonsSource { get; }
+        #endregion
 
-        public decimal TotalValue { get; private set; }
+        #region Person class
 
         public class PersonItem
         {
-            public PersonItem(MainWindowLogic mainWindowLogic, Household.PersonRow personRow)
+            public PersonItem(MainWindowLogic mainWindowLogic, Household.PersonRow personRow, DateTime date)
             {
                 var household = mainWindowLogic.Household;
 
@@ -52,7 +87,7 @@ namespace BanaData.Logic.Dialogs.Reports
 
                 foreach (Household.AccountRow accountRow in accounts)
                 {
-                    decimal value = accountRow.Type == EAccountType.Investment ? accountRow.GetInvestmentValue() : accountRow.GetBalance();
+                    decimal value = accountRow.Type == EAccountType.Investment ? accountRow.GetInvestmentValue(date) : accountRow.GetBalance(date);
                     if (value != 0 || !mainWindowLogic.UserSettings.HideClosedAccounts || !accountRow.Hidden)
                     {
                         accountItems.Add(new AccountItem(accountRow.Name, value));
@@ -83,5 +118,7 @@ namespace BanaData.Logic.Dialogs.Reports
             }
 
         }
+
+        #endregion
     }
 }

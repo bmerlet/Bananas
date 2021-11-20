@@ -3,8 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:XamlUI.Dialogs"
-        xmlns:w="clr-namespace:XamlUI.UserControls"
+        xmlns:local="clr-namespace:XamlUI.Dialogs.Reports"
+        xmlns:w="clr-namespace:XamlUI.Widgets"
+        xmlns:ucs="clr-namespace:XamlUI.UserControls"
         xmlns:l="clr-namespace:BanaData.Logic.Dialogs.Reports;assembly=BanaData"
         d:DataContext="{d:DesignInstance Type=l:ShowHoldingsPerPersonLogic}"
         mc:Ignorable="d"
@@ -20,8 +21,13 @@
 
                 <!-- First level -->
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{Binding Name}" Width="250"/>
-                    <TextBlock TextAlignment="Right" Text="{Binding Value, StringFormat=N2}" Width="100"/>
+                    <TextBlock Text="{Binding Name}" FontWeight="Bold" Width="250"/>
+                    <TextBlock 
+                        TextAlignment="Right" 
+                        Text="{Binding Value, StringFormat=N2}"
+                        Foreground="{Binding Value, Converter={StaticResource amountToColorConverter}}"
+                        FontWeight="Bold"
+                        Width="100"/>
                 </StackPanel>
 
                 <!-- Second level-->
@@ -29,7 +35,11 @@
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{Binding Name}" Width="231"/>
-                            <TextBlock TextAlignment="Right" Text="{Binding Value, StringFormat=N2}" Width="100"/>
+                            <TextBlock 
+                                TextAlignment="Right"
+                                Text="{Binding Value, StringFormat=N2}"
+                                Foreground="{Binding Value, Converter={StaticResource amountToColorConverter}}"
+                                Width="100"/>
                         </StackPanel>
                     </DataTemplate>
                 </HierarchicalDataTemplate.ItemTemplate>
@@ -37,18 +47,30 @@
         </DockPanel.Resources>
 
         <!-- Done panel -->
-        <w:DonePanel DockPanel.Dock="Bottom"/>
+        <ucs:DonePanel DockPanel.Dock="Bottom"/>
+
+        <!-- Point in time -->
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <TextBlock Margin="20,5,0,5" Text="Holdings as of:" Width="250"/>
+            <w:DateBox Margin="0,5" Date="{Binding Date, Mode=TwoWay}" Width="100" TextAlignment="Right"/>
+        </StackPanel>
 
         <!-- Column names -->
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
             <TextBlock Margin="20,5,0,5" Text="Household member" Width="250"/>
-            <TextBlock Margin="0,5" Text="Value" Width="100"/>
+            <TextBlock Margin="0,5" Text="Value" Width="100" TextAlignment="Center"/>
         </StackPanel>
 
         <!-- Total panel -->
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom">
-            <TextBlock Margin="20,5,0,5" Text="Total value:" Width="250"/>
-            <TextBlock Margin="0,5" Text="{Binding TotalValue, StringFormat=N2}" Width="100" TextAlignment="Right"/>
+            <TextBlock Margin="20,5,0,5" Text="Total:" FontWeight="Bold" Width="250"/>
+            <TextBlock 
+                Margin="0,5"
+                Text="{Binding TotalValue, StringFormat=N2}"
+                Foreground="{Binding TotalValue, Converter={StaticResource amountToColorConverter}}"
+                Width="100"
+                FontWeight="Bold"
+                TextAlignment="Right"/>
         </StackPanel>
 
         <!-- Main panel -->
