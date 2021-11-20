@@ -63,7 +63,7 @@
             <TreeView.Resources>
                 <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}"/>
                 <HierarchicalDataTemplate
-                    DataType="{x:Type l:IncomeStatementNode}"
+                    DataType="{x:Type l:IncomeStatementLogic+IncomeStatementNode}"
                     ItemsSource="{Binding ChildrenSource}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock 

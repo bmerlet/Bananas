@@ -456,63 +456,53 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
             }
         }
 
-        #endregion
-    }
 
-    /// <summary>
-    /// Node in an income statement
-    /// </summary>
-    public class IncomeStatementNode : LogicBase
-    {
-        #region Constructor
-
-        private IncomeStatementNode(string name, string tip, string group, decimal value, bool bold)
+        //
+        // Node in an income statement
+        //
+        public class IncomeStatementNode : LogicBase
         {
-            (Name, Tip, Group, Value, Bold) = (name, tip, group, value, bold);
+            private IncomeStatementNode(string name, string tip, string group, decimal value, bool bold)
+            {
+                (Name, Tip, Group, Value, Bold) = (name, tip, group, value, bold);
 
-            // Give the list to the UI
-            ChildrenSource = (CollectionView)CollectionViewSource.GetDefaultView(Children);
-            ChildrenSource.SortDescriptions.Add(new SortDescription("Group", ListSortDirection.Ascending));
-            ChildrenSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
+                // Give the list to the UI
+                ChildrenSource = (CollectionView)CollectionViewSource.GetDefaultView(Children);
+                ChildrenSource.SortDescriptions.Add(new SortDescription("Group", ListSortDirection.Ascending));
+                ChildrenSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
+            }
+
+            static public IncomeStatementNode GetTitle(string name, string group)
+                => new IncomeStatementNode(name, null, group, 0, true);
+
+            static public IncomeStatementNode GetItem(string name, string tip, string group)
+                => new IncomeStatementNode(name, tip, group, 0, false);
+
+            static public IncomeStatementNode GetLeaf(string name, string tip, string group, decimal amount)
+                => new IncomeStatementNode(name, tip, group, amount, false);
+
+            // UI properties
+            public string Name { get; }
+            public string Tip { get; }
+            public string Group { get; }
+            public decimal Value { get; private set; }
+            public bool Bold { get; }
+
+            // Children nodes
+            public readonly ObservableCollection<IncomeStatementNode> Children = new ObservableCollection<IncomeStatementNode>();
+            public CollectionView ChildrenSource { get; }
+
+            // Actions
+            public void AddChild(IncomeStatementNode child)
+            {
+                Children.Add(child);
+            }
+
+            public void SetValue(decimal value)
+            {
+                Value = value;
+            }
         }
-
-        static public IncomeStatementNode GetTitle(string name, string group)
-            => new IncomeStatementNode(name, null, group, 0, true);
-
-        static public IncomeStatementNode GetItem(string name, string tip, string group)
-            => new IncomeStatementNode(name, tip, group, 0, false);
-
-        static public IncomeStatementNode GetLeaf(string name, string tip, string group, decimal amount)
-            => new IncomeStatementNode(name, tip, group, amount, false);
-
-        #endregion
-
-        #region UI properties
-
-        public string Name { get; }
-        public string Tip { get; }
-        public string Group { get; }
-        public decimal Value { get; private set; }
-        public bool Bold { get; }
-
-        // Children nodes
-        public readonly ObservableCollection<IncomeStatementNode> Children = new ObservableCollection<IncomeStatementNode>();
-        public CollectionView ChildrenSource { get; }
-
-        #endregion
-
-        #region Actions
-
-        public void AddChild(IncomeStatementNode child)
-        {
-            Children.Add(child);
-        }
-
-        public void SetValue(decimal value)
-        {
-            Value = value;
-        }
-
         #endregion
     }
 }
