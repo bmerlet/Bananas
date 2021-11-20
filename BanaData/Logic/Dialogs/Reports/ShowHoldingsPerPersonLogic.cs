@@ -76,6 +76,7 @@ namespace BanaData.Logic.Dialogs.Reports
 
         public class PersonItem
         {
+            // Constructor
             public PersonItem(MainWindowLogic mainWindowLogic, Household.PersonRow personRow, DateTime date)
             {
                 var household = mainWindowLogic.Household;
@@ -85,12 +86,24 @@ namespace BanaData.Logic.Dialogs.Reports
                     household.Account.Rows.Cast<Household.AccountRow>().Where(a => a.IsPersonIDNull()) :
                     personRow.GetAccountRows();
 
+                decimal value;
+                Portfolio portfolio = null;
+
                 foreach (Household.AccountRow accountRow in accounts)
                 {
-                    decimal value = accountRow.Type == EAccountType.Investment ? accountRow.GetInvestmentValue(date) : accountRow.GetBalance(date);
+                    if (accountRow.Type == EAccountType.Investment)
+                    {
+                        portfolio = accountRow.GetPortfolio(date);
+                        value = portfolio.GetValuation(date);
+                    }
+                    else
+                    {
+                        value = accountRow.GetBalance(date);
+                    }
+
                     if (value != 0 || !mainWindowLogic.UserSettings.HideClosedAccounts || !accountRow.Hidden)
                     {
-                        accountItems.Add(new AccountItem(accountRow.Name, value));
+                        accountItems.Add(new AccountItem(accountRow.Name, value, portfolio, date));
                     }
                 }
 
@@ -101,6 +114,7 @@ namespace BanaData.Logic.Dialogs.Reports
                 AccountsSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
             }
 
+            // UI properties
             public string Name { get; }
             public decimal Value { get; }
 
@@ -113,8 +127,37 @@ namespace BanaData.Logic.Dialogs.Reports
                 public AccountItem(string name, decimal value) =>
                     (Name, Value) = (name, value);
 
+                public AccountItem(string name, decimal value, Portfolio portfolio, DateTime date)
+                {
+                    (Name, Value) = (name, value);
+
+                    SecuritiesSource = (CollectionView)CollectionViewSource.GetDefaultView(securities);
+                    SecuritiesSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
+                    if (portfolio != null)
+                    {
+                        foreach(var security in portfolio.GetSecuritiesRows())
+                        {
+                            var quantity = portfolio.Lots.Where(l => l.Security == security).Sum(l => l.Quantity);
+                            securities.Add(new SecurityItem(security.Symbol, quantity * security.GetMostRecentPrice(date)));
+                        }
+                    }
+                }
+
                 public string Name { get; }
                 public decimal Value { get; }
+
+                private readonly ObservableCollection<SecurityItem> securities = new ObservableCollection<SecurityItem>();
+                public CollectionView SecuritiesSource { get; }
+
+                // One security
+                public class SecurityItem
+                {
+                    public SecurityItem(string name, decimal value) =>
+                        (Name, Value) = (name, value);
+
+                    public string Name { get; }
+                    public decimal Value { get; }
+                }
             }
 
         }

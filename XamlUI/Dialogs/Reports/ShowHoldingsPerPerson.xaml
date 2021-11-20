@@ -11,9 +11,8 @@
         mc:Ignorable="d"
         Title="Holdings per household member"
         Icon="/XamlUI;component/Images/Bananas.ico"
-        ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
-        SizeToContent="WidthAndHeight">
+        Height="350" Width="430">
     <DockPanel>
 
         <DockPanel.Resources>
@@ -32,16 +31,29 @@
 
                 <!-- Second level-->
                 <HierarchicalDataTemplate.ItemTemplate>
-                    <DataTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding SecuritiesSource}">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Name}" Width="231"/>
+                            <TextBlock Text="{Binding Name}" Width="241"/>
                             <TextBlock 
                                 TextAlignment="Right"
                                 Text="{Binding Value, StringFormat=N2}"
                                 Foreground="{Binding Value, Converter={StaticResource amountToColorConverter}}"
                                 Width="100"/>
                         </StackPanel>
-                    </DataTemplate>
+                        <!-- Third level -->
+                        <HierarchicalDataTemplate.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Name}" Width="232"/>
+                                    <TextBlock 
+                                    TextAlignment="Right"
+                                    Text="{Binding Value, StringFormat=N2}"
+                                    Foreground="{Binding Value, Converter={StaticResource amountToColorConverter}}"
+                                    Width="100"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </HierarchicalDataTemplate.ItemTemplate>
+                    </HierarchicalDataTemplate>
                 </HierarchicalDataTemplate.ItemTemplate>
             </HierarchicalDataTemplate>
         </DockPanel.Resources>
@@ -74,7 +86,7 @@
         </StackPanel>
 
         <!-- Main panel -->
-        <TreeView Height="200" Width="400" ItemsSource="{Binding PersonsSource}"/>
+        <TreeView ItemsSource="{Binding PersonsSource}"/>
 
     </DockPanel>
 </Window>
