@@ -41,9 +41,6 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
             MembersSource.Add(everybody);
             selectedMember = everybody;
 
-            // RFU
-            PrintCommand = new CommandBase(() => mainWindowLogic.ErrorMessage("Not yet implemented"));
-
             // Give the list to the UI
             EntriesSource = (CollectionView)CollectionViewSource.GetDefaultView(entries);
             //EntriesSource.SortDescriptions.Add(new SortDescription("Group", ListSortDirection.Ascending));
@@ -64,9 +61,6 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
         public List<MemberItem> MembersSource { get; } = new List<MemberItem>();
         private MemberItem selectedMember;
         public MemberItem SelectedMember { get => selectedMember; set { selectedMember = value; ComputeJournal(); } }
-
-        // Print command
-        public CommandBase PrintCommand { get; }
 
         // Income statements
         private readonly ObservableCollection<JournalEntry> entries = new ObservableCollection<JournalEntry>();

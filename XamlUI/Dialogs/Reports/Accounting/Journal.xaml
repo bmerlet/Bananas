@@ -53,10 +53,12 @@
                 Padding="0"
                 ItemsSource="{Binding MembersSource}"
                 SelectedItem="{Binding SelectedMember, Mode=TwoWay}"/>
+            <!--
             <Button
                 Grid.Column="9"
                 Content="Print..."
-                Command="{Binding PrintCommand}"/>
+                Click="OnPrint"/>
+            -->
         </Grid>
 
         <!-- Listview -->

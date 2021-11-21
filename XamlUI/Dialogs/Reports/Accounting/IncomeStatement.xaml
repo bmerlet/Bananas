@@ -56,7 +56,7 @@
             <Button
                 Grid.Column="9"
                 Content="Print..."
-                Command="{Binding PrintCommand}"/>
+                Click="OnPrint"/>
         </Grid>
 
         <TreeView ItemsSource="{Binding NodesSource}">

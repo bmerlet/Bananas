@@ -77,9 +77,11 @@ namespace XamlUI.Dialogs.Reports.Accounting
                 }
                 else
                 {
-                    row = new List<PrintHelper.Cell>();
-                    row.Add(new PrintHelper.Cell(""));
-                    row.Add(new PrintHelper.Cell(""));
+                    row = new List<PrintHelper.Cell>
+                    {
+                        new PrintHelper.Cell(""),
+                        new PrintHelper.Cell("")
+                    };
                     rows.Add(row);
                 }
 

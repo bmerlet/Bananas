@@ -67,9 +67,6 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
             MembersSource.Add(everybody);
             selectedMember = everybody;
 
-            // RFU
-            PrintCommand = new CommandBase(() => mainWindowLogic.ErrorMessage("Not yet implemented"));
-
             // Give the nodes to the UI
             NodesSource = (CollectionView)CollectionViewSource.GetDefaultView(nodes);
             NodesSource.SortDescriptions.Add(new SortDescription("Group", ListSortDirection.Ascending));
@@ -90,9 +87,6 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
         public List<MemberItem> MembersSource { get; } = new List<MemberItem>();
         private MemberItem selectedMember;
         public MemberItem SelectedMember { get => selectedMember; set { selectedMember = value; ComputeIncomeStatement(); } }
-
-        // Print command
-        public CommandBase PrintCommand { get; }
 
         // Income nodes
         private readonly ObservableCollection<IncomeStatementNode> nodes = new ObservableCollection<IncomeStatementNode>();
