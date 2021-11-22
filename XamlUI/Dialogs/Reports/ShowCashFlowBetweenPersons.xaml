@@ -10,7 +10,7 @@
         mc:Ignorable="d"
         Icon="/XamlUI;component/Images/Bananas.ico"
         WindowStartupLocation="CenterOwner"
-        Title="Cash flow between household members" Height="450" Width="800">
+        Title="Cash flow between household members" Height="450" Width="980">
     <DockPanel>
         <DockPanel.Resources>
             <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}"/>
@@ -63,7 +63,7 @@
         <!-- Main list -->
         <ListView
             View="{Binding ColumnDescriptions, Converter={StaticResource PersonsToDynamicGridViewConverter}}"
-            ItemsSource="{Binding CashFlowItems}">
+            ItemsSource="{Binding CashFlowItemsSource}">
 
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
