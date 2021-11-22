@@ -42,6 +42,7 @@
             <!-- Neutralize the change of colrs when the mouse is over a row -->
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     <Style.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Background" Value="Transparent" />
@@ -65,7 +66,7 @@
                                 <TextBlock
                                     Text="{Binding Path=Status}"
                                     Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"
-                                    HorizontalAlignment="Center"
+                                    TextAlignment="Center"
                                     FontWeight="Bold"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
@@ -151,7 +152,7 @@
                                 <TextBlock 
                                     Text="{Binding Path=SecurityQuantity, Converter={StaticResource amountToStringConverter}, ConverterParameter=N4}"
                                     Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"
-                                    HorizontalAlignment="Right"/>
+                                    TextAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -166,7 +167,7 @@
                                 <TextBlock 
                                     Text="{Binding Path=SecurityPrice, Converter={StaticResource amountToStringConverter}, ConverterParameter=N4}"
                                     Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"
-                                    HorizontalAlignment="Right"/>
+                                    TextAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -181,7 +182,7 @@
                                 <TextBlock 
                                     Text="{Binding Path=Commission, Converter={StaticResource amountToStringConverter}}"
                                     Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"
-                                    HorizontalAlignment="Right"/>
+                                    TextAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -193,7 +194,7 @@
                                 <TextBlock 
                                     Text="{Binding Path=ShareBalanceString}"
                                     Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"
-                                    HorizontalAlignment="Right"/>
+                                    TextAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -208,7 +209,7 @@
                                 <TextBlock 
                                     Text="{Binding Path=Amount, Converter={StaticResource amountToStringConverter}}"
                                     Foreground="{Binding AmountState, Converter={StaticResource transactionStateToBrushConverter}}"
-                                    HorizontalAlignment="Right"/>
+                                    TextAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -220,7 +221,7 @@
                                 <TextBlock
                                     Text="{Binding BalanceString, Mode=OneWay}"
                                     Foreground="{Binding BalanceState, Converter={StaticResource transactionStateToBrushConverter}}"
-                                    HorizontalAlignment="Right"/>
+                                    TextAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

@@ -81,6 +81,9 @@ namespace BanaData.Logic.Dialogs.Reports
         public CommandBase PickMembersCommand { get; }
         public Household.PersonRow[] Members { get;  }
 
+        // Description of the columns
+        public IEnumerable<ColumnDescription> ColumnDescriptions => GetColumnDescriptions();
+
         // First line
         public CashFlowItem CashFlowFirstItem { get; private set; }
 
@@ -488,6 +491,23 @@ namespace BanaData.Logic.Dialogs.Reports
             CashFlowItems.Add(new CashFlowItem(new DateTime(YearPickerLogic.SelectedYear, 12, 31), "EXPECTED BALANCES", mis.ToArray()));
         }
 
+        private IEnumerable<ColumnDescription> GetColumnDescriptions()
+        {
+            var cols = new List<ColumnDescription>()
+            {
+                new ColumnDescription("Date", "Date", "MM/dd/yyyy", 80, false),
+                new ColumnDescription("Description", "Description", null, 0, false)
+            };
+
+            for(int i = 0; i < Members.Length; i++)
+            {
+                cols.Add(new ColumnDescription(Members[i].Name + "\nAmount" , $"MemberItems[{i}].Amount", "N2", 90, true));
+                cols.Add(new ColumnDescription("\nBalance", $"MemberItems[{i}].Balance", "N2", 90, true));
+            }
+
+            return cols;
+        }
+
         #endregion
 
         #region Support classes
@@ -530,6 +550,17 @@ namespace BanaData.Logic.Dialogs.Reports
             public bool ShowAmount { get; }
             public decimal Balance { get; private set; }
             public bool ShowBalance { get; private set; }
+        }
+
+        public class ColumnDescription
+        {
+            public ColumnDescription(string column, string value, string format, double width, bool isAmount) =>
+                (ColumnName, ValueName, Format, Width, IsAmount) = (column, value, format, width, isAmount);
+            public readonly string ColumnName;
+            public readonly string ValueName;
+            public readonly string Format;
+            public readonly double Width;
+            public readonly bool IsAmount;
         }
 
         #endregion

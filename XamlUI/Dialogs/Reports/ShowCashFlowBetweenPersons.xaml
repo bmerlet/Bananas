@@ -17,6 +17,7 @@
             <Style TargetType="ComboBox" BasedOn="{StaticResource FormComboBox}"/>
             <Style TargetType="CheckBox" BasedOn="{StaticResource FormCheckBox}"/>
             <Style TargetType="Button" BasedOn="{StaticResource FormButton}"/>
+            <local:PersonsToDynamicGridViewConverter x:Key="PersonsToDynamicGridViewConverter"/>
         </DockPanel.Resources>
 
         <!-- Done panel -->
@@ -59,10 +60,18 @@
                 Command="{Binding PickMembersCommand}"/>
         </Grid>
 
-        <!-- Main table -->
-        <ScrollViewer>
-            <Grid x:Name="grid"/>
-        </ScrollViewer>
+        <!-- Main list -->
+        <ListView
+            View="{Binding ColumnDescriptions, Converter={StaticResource PersonsToDynamicGridViewConverter}}"
+            ItemsSource="{Binding CashFlowItems}">
+
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListView.ItemContainerStyle>
+
+        </ListView>
 
     </DockPanel>
 </Window>

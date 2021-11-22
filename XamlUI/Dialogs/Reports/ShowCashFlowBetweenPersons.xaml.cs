@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using BanaData.Logic.Dialogs.Reports;
+using XamlUI.Tools;
 
 namespace XamlUI.Dialogs.Reports
 {
@@ -25,147 +27,68 @@ namespace XamlUI.Dialogs.Reports
             DataContext = logic;
 
             InitializeComponent();
-
-            Loaded += OnLoaded;
-
-            logic.PropertyChanged += OnPropertyChanged;
         }
+    }
 
-        private void OnLoaded(object sender, RoutedEventArgs e)
+    /// <summary>
+    /// Converts a set of column descriptors to a gridview hosting those columns
+    /// </summary>
+    public class PersonsToDynamicGridViewConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            BuildGrid();
-        }
-
-        private void OnPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == "RebuildTableSignal")
+            if (value is IEnumerable<ShowCashFlowBetweenPersonsLogic.ColumnDescription> columns)
             {
-                BuildGrid();
-            }
-        }
+                var gridView = new GridView();
+                var amountToString = new AmountToStringConverter();
+                var amountToColor = new AmountToColorConverter();
 
-        private void BuildGrid()
-        {
-            var logic = DataContext as ShowCashFlowBetweenPersonsLogic;
-            grid.Children.Clear();
-            grid.ColumnDefinitions.Clear();
-            grid.RowDefinitions.Clear();
-
-            //
-            // Define columns
-            //
-            // Date
-            grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(80) });
-            // Description
-            grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
-            // Amount/Balance
-            for (int i = 0; i < logic.Members.Length; i++)
-            {
-                grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(80) });
-                grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(80) });
-            }
-
-            //
-            // First line
-            //
-            grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
-            // Date
-            var txt = new TextBlock() { Text = "Date", FontWeight = FontWeights.Bold };
-            grid.Children.Add(txt);
-            // Description
-            txt = new TextBlock() { Text = "Description", FontWeight = FontWeights.Bold };
-            Grid.SetColumn(txt, 1);
-            grid.Children.Add(txt);
-            // Member names
-            for (int i = 0; i < logic.Members.Length; i++)
-            {
-                txt = new TextBlock() { Text = logic.Members[i].Name, FontWeight = FontWeights.Bold };
-                Grid.SetColumn(txt, 2 + i * 2);
-                Grid.SetColumnSpan(txt, 2);
-                grid.Children.Add(txt);
-            }
-
-            //
-            // Second line
-            //
-            grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
-            for (int i = 0; i < logic.Members.Length; i++)
-            {
-                txt = new TextBlock() { Text = "Amount", FontWeight = FontWeights.Bold };
-                Grid.SetColumn(txt, 2 + i * 2);
-                Grid.SetRow(txt, 1);
-                grid.Children.Add(txt);
-                txt = new TextBlock() { Text = "Balance", FontWeight = FontWeights.Bold };
-                Grid.SetColumn(txt, 2 + i * 2 + 1);
-                Grid.SetRow(txt, 1);
-                grid.Children.Add(txt);
-            }
-
-            //
-            // First cash flow item
-            //
-            int row = 2;
-            BuildGridLine(logic.CashFlowFirstItem, row++);
-
-            //
-            // Other lines
-            //
-            foreach(var item in logic.CashFlowItems)
-            {
-                BuildGridLine(item, row++);
-            }
-
-            //
-            // Last cash flow item
-            //
-            BuildGridLine(logic.CashFlowLastItem, row++);
-        }
-
-        private void BuildGridLine(ShowCashFlowBetweenPersonsLogic.CashFlowItem item, int row)
-        {
-            // Add row definition
-            grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
-
-            // Add date
-            var txt = new TextBlock() { Text = $"{item.Date:MM/dd/yyyy}", TextAlignment=TextAlignment.Right };
-            Grid.SetRow(txt, row);
-            grid.Children.Add(txt);
-
-            // Add description
-            txt = new TextBlock() { Text = $"{item.Description}" };
-            Grid.SetRow(txt, row);
-            Grid.SetColumn(txt, 1);
-            grid.Children.Add(txt);
-
-            // Add all members
-            int col = 2;
-            foreach(var member in item.MemberItems)
-            {
-                if (member.ShowAmount)
+                foreach(var column in columns)
                 {
-                    txt = BuilAmountBox(member.Amount);
-                    Grid.SetRow(txt, row);
-                    Grid.SetColumn(txt, col);
-                    grid.Children.Add(txt);
+                    var binding = new Binding(column.ValueName);
+                    if (column.Format != null)
+                    {
+                        binding.StringFormat = column.Format;
+                    }
+
+                    GridViewColumn gridViewColumn;
+                    if (column.IsAmount)
+                    {
+                        binding.Converter = amountToString;
+
+                        var textBlockFactory = new FrameworkElementFactory(typeof(TextBlock)) { Name = "AmountTextBoxFactory" };
+                        textBlockFactory.SetValue(TextBlock.TextAlignmentProperty, TextAlignment.Right);
+                        textBlockFactory.SetBinding(TextBlock.TextProperty, binding);
+
+                        var foregroundBinding = new Binding(column.ValueName) { Converter = amountToColor };
+                        textBlockFactory.SetBinding(TextBlock.ForegroundProperty, foregroundBinding);
+
+                        var cellTemplate = new DataTemplate() { VisualTree = textBlockFactory };
+
+                        gridViewColumn = new GridViewColumn { Header = column.ColumnName, CellTemplate = cellTemplate };
+                    }
+                    else
+                    {
+                        // Simple case, just a column name and a DisplayMemberBinding
+                        gridViewColumn = new GridViewColumn { Header = column.ColumnName, DisplayMemberBinding = binding };
+                    }
+
+                    if (column.Width != 0)
+                    {
+                        gridViewColumn.Width = column.Width;
+                    }
+                    gridView.Columns.Add(gridViewColumn);
                 }
 
-                col++;
-
-                if (member.ShowBalance)
-                {
-                    txt = BuilAmountBox(member.Balance);
-                    Grid.SetRow(txt, row);
-                    Grid.SetColumn(txt, col);
-                    grid.Children.Add(txt);
-                }
-
-                col++;
+                return gridView;
             }
+
+            return Binding.DoNothing;
         }
 
-        private TextBlock BuilAmountBox(decimal amount)
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return new TextBlock() { Text = $"{amount:N2}", TextAlignment = TextAlignment.Right, Foreground = amount >= 0 ? Brushes.Black : Brushes.Red };
+            throw new NotSupportedException();
         }
     }
 }

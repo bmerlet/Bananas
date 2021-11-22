@@ -28,9 +28,10 @@
             ScrollViewer.ScrollChanged="OnListViewScrollChanged"
             ItemsSource="{Binding RegisterItems, IsAsync=True}">
 
-            <!-- Neutralize the change of colrs when the mouse is over a row -->
+            <!-- Neutralize the change of colors when the mouse is over a row -->
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     <Style.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Background" Value="Transparent" />
@@ -137,7 +138,7 @@
                                 <TextBlock
                                     Text="{Binding Path=Payment, Converter={StaticResource amountToStringNoNegativeConverter}}"
                                     Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"
-                                    HorizontalAlignment="Right"/>
+                                    TextAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -168,7 +169,7 @@
                                 <TextBlock 
                                     Text="{Binding Path=Deposit, Converter={StaticResource amountToStringNoNegativeConverter}}"
                                     Foreground="{Binding TransactionState, Converter={StaticResource transactionStateToBrushConverter}}"
-                                    HorizontalAlignment="Right"/>
+                                    TextAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
