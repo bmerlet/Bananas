@@ -142,8 +142,8 @@ namespace BanaData.Logic.Dialogs.Reports
             {
                 decimal value = household.Account
                     .Where(accnt => !accnt.IsPersonIDNull() && accnt.PersonRow == member)
-                    //.Select(accnt => accnt.Type == EAccountType.Investment ? accnt.GetInvestmentValue(date) : accnt.GetBalance(date))
-                    .Select(accnt => accnt.Type == EAccountType.OtherAsset || accnt.Type == EAccountType.OtherLiability ? 0 : accnt.GetBalance(date))
+                    .Select(accnt => accnt.Type == EAccountType.Investment ? accnt.GetInvestmentValue(date) : accnt.GetBalance(date))
+                    //.Select(accnt => accnt.Type == EAccountType.OtherAsset || accnt.Type == EAccountType.OtherLiability ? 0 : accnt.GetBalance(date))
                     .Sum();
                 mis.Add(MemberItem.GetBalanceMemberItem(member, value));
             }
@@ -165,7 +165,7 @@ namespace BanaData.Logic.Dialogs.Reports
                         lineItemRow.GetLineItemTransferRow() is Household.LineItemTransferRow tx &&
                         !tx.AccountRow.IsPersonIDNull() && tx.AccountRow.PersonRow != transactionRow.AccountRow.PersonRow)
                     {
-                        // Gotcha
+                        // This is a transfer - Create the transfer cash flow item
                         var mis = new List<MemberItem>();
                         foreach (var m in Members)
                         {
@@ -184,7 +184,74 @@ namespace BanaData.Logic.Dialogs.Reports
                         }
                         var desc = transactionRow.IsMemoNull() ? $"{tx.AccountRow.Name} -> {transactionRow.AccountRow.Name}" : transactionRow.Memo;
                         CashFlowItems.Add(new CashFlowItem(transactionRow.Date, desc, mis.ToArray()));
+
+                        // If this is a compound operations (divx, soldx, ..), create a cash flow item explaining that
+                        // the money was first received before being transfered (or was first received then spent, for a boughtx)
+                        CreateCashFlowItemForCompoundTransaction(transactionRow, lineItemRow.Amount);
+                        CreateCashFlowItemForCompoundTransaction(tx.TransactionRow, -lineItemRow.Amount);
                     }
+                }
+            }
+        }
+
+        private void CreateCashFlowItemForCompoundTransaction(Household.TransactionRow transactionRow, decimal amount)
+        {
+            if (transactionRow.AccountRow.Type == EAccountType.Investment &&
+                transactionRow.GetInvestmentTransaction() is Household.InvestmentTransactionRow investmentTransactionRow)
+            {
+                bool compound = false;
+                if (investmentTransactionRow.Type == EInvestmentTransactionType.BuyFromTransferredCash)
+                {
+                    compound = true;
+                }
+                else if (investmentTransactionRow.Type == EInvestmentTransactionType.SellAndTransferCash ||
+                    investmentTransactionRow.Type == EInvestmentTransactionType.TransferDividends ||
+                    investmentTransactionRow.Type == EInvestmentTransactionType.TransferShortTermCapitalGains ||
+                    investmentTransactionRow.Type == EInvestmentTransactionType.TransferLongTermCapitalGains)
+                {
+                    compound = true;
+                    amount = -amount;
+                }
+
+                if (compound)
+                {
+                    var mis = new List<MemberItem>();
+                    foreach (var m in Members)
+                    {
+                        if (m == transactionRow.AccountRow.PersonRow)
+                        {
+                            mis.Add(MemberItem.GetAmountMemberItem(m, amount, true));
+                        }
+                        else
+                        {
+                            mis.Add(MemberItem.GetAmountMemberItem(m, 0, false));
+                        }
+                    }
+
+                    string desc = "??";
+                    string accountName = transactionRow.AccountRow.Name;
+                    string symbol = investmentTransactionRow.SecurityRow.Symbol;
+                    if (investmentTransactionRow.Type == EInvestmentTransactionType.BuyFromTransferredCash)
+                    {
+                        desc = $"{accountName}  Bought {symbol} shares";
+                    }
+                    else if (investmentTransactionRow.Type == EInvestmentTransactionType.SellAndTransferCash)
+                    {
+                        desc = $"{accountName}  Sold {symbol} shares";
+                    }
+                    else if (investmentTransactionRow.Type == EInvestmentTransactionType.TransferDividends)
+                    {
+                        desc = $"{accountName}  Received dividends from {symbol}";
+                    }
+                    else if (investmentTransactionRow.Type == EInvestmentTransactionType.TransferShortTermCapitalGains)
+                    {
+                        desc = $"{accountName}  Received STCG from {symbol}";
+                    }
+                    else if (investmentTransactionRow.Type == EInvestmentTransactionType.TransferLongTermCapitalGains)
+                    {
+                        desc = $"{accountName}  Received LTCG from {symbol}";
+                    }
+                    CashFlowItems.Add(new CashFlowItem(transactionRow.Date, desc, mis.ToArray()));
                 }
             }
         }
@@ -323,21 +390,21 @@ namespace BanaData.Logic.Dialogs.Reports
                             // Count all income/expense
                             memberAmount[transaction.AccountRow.PersonRow] += li.Amount;
                         }
-                        else if (transaction.AccountRow.Type == EAccountType.Investment &&
-                            li.GetLineItemTransferRow() is Household.LineItemTransferRow litr)
-                        {
-                            // Also count the cash that comes in/out because of investment transactions but is transferred right away
-                            var investmentTransaction = transaction.GetInvestmentTransaction();
-                            var type = investmentTransaction.Type;
-                            if (type == EInvestmentTransactionType.BuyFromTransferredCash ||
-                                type == EInvestmentTransactionType.SellAndTransferCash ||
-                                type == EInvestmentTransactionType.TransferDividends ||
-                                type == EInvestmentTransactionType.TransferShortTermCapitalGains ||
-                                type == EInvestmentTransactionType.TransferLongTermCapitalGains)
-                            {
-                                memberAmount[transaction.AccountRow.PersonRow] -= li.Amount;
-                            }
-                        }
+                        //else if (transaction.AccountRow.Type == EAccountType.Investment &&
+                        //    li.GetLineItemTransferRow() is Household.LineItemTransferRow litr)
+                        //{
+                        //    // Also count the cash that comes in/out because of investment transactions but is transferred right away
+                        //    var investmentTransaction = transaction.GetInvestmentTransaction();
+                        //    var type = investmentTransaction.Type;
+                        //    if (type == EInvestmentTransactionType.BuyFromTransferredCash ||
+                        //        type == EInvestmentTransactionType.SellAndTransferCash ||
+                        //        type == EInvestmentTransactionType.TransferDividends ||
+                        //        type == EInvestmentTransactionType.TransferShortTermCapitalGains ||
+                        //        type == EInvestmentTransactionType.TransferLongTermCapitalGains)
+                        //    {
+                        //        memberAmount[transaction.AccountRow.PersonRow] -= li.Amount;
+                        //    }
+                        //}
                     }
 
                     moreTransactions = transactionEnum.MoveNext();
