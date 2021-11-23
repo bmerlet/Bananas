@@ -32,28 +32,14 @@ namespace BanaData.Logic.Dialogs.Reports
             YearPickerLogic.YearChanged += (s, e) => ComputeCashFlow();
 
             // Setup members
-            Members = mainWindowLogic.Household.Person.ToArray();
-            // ZZZ Reorder manually
-            if (Members.Length >= 3)
+            members = mainWindowLogic.Household.Person.ToArray();
+            var tmpList = new List<string>();
+            GenerateMemberOrder(tmpList, "", members.Select(m => m.Name).ToArray());
+            MemberOrderSource = tmpList.ToArray();
+
+            if (mainWindowLogic.UserSettings.MemberOrderForCashFlowDialog != null)
             {
-                if (Members[1].Name.StartsWith("Su"))
-                {
-                    var s = Members[1];
-                    Members[1] = Members[0];
-                    Members[0] = s;
-                }
-                else if (Members[2].Name.StartsWith("Su"))
-                {
-                    var s = Members[2];
-                    Members[2] = Members[0];
-                    Members[0] = s;
-                }
-                if (Members[2].Name.StartsWith("Be"))
-                {
-                    var s = Members[2];
-                    Members[2] = Members[1];
-                    Members[1] = s;
-                }
+                ParseMemberOrder(mainWindowLogic.UserSettings.MemberOrderForCashFlowDialog, false);
             }
 
             // Give the cash flow item list to the UI
@@ -85,8 +71,9 @@ namespace BanaData.Logic.Dialogs.Reports
         public bool? IsGroupingAccounts { get => isGroupingAccounts; set { isGroupingAccounts = value == true; ComputeCashFlow(); } }
 
         // RFU
-        public CommandBase PickMembersCommand { get; }
-        public Household.PersonRow[] Members { get;  }
+        public string[] MemberOrderSource { get; }
+        public string MemberOrder { get => String.Join(", ", members.Select(m => m.Name)); set => ParseMemberOrder(value, true); }
+        private Household.PersonRow[] members;
 
         // Description of the columns
         public IEnumerable<ColumnDescription> ColumnDescriptions => GetColumnDescriptions();
@@ -106,12 +93,6 @@ namespace BanaData.Logic.Dialogs.Reports
             var endDate = new DateTime(YearPickerLogic.SelectedYear, 12, 31);
             cashFlowItems.Clear();
 
-            // Compute member assets at beginning of year
-            //cashFlowItems.Add(ComputeMemberValueAtDate(startDate, "Initial balance", "0"));
-
-            // Compute member assets at end of year
-            //cashFlowItems.Add(ComputeMemberValueAtDate(endDate, "End balance", "9"));
-
             // Find transfers between members
             ComputeTransfersBetweenMembers(startDate, endDate);
 
@@ -126,25 +107,6 @@ namespace BanaData.Logic.Dialogs.Reports
 
             // Balances
             ComputeBalances();
-        }
-
-        // Obsolete
-        private CashFlowItem ComputeMemberValueAtDate(DateTime date, string description, string sorter)
-        {
-            var household = mainWindowLogic.Household;
-            var mis = new List<MemberItem>();
-
-            foreach (var member in Members)
-            {
-                decimal value = household.Account
-                    .Where(accnt => !accnt.IsPersonIDNull() && accnt.PersonRow == member)
-                    .Select(accnt => accnt.Type == EAccountType.Investment ? accnt.GetInvestmentValue(date) : accnt.GetBalance(date))
-                    //.Select(accnt => accnt.Type == EAccountType.OtherAsset || accnt.Type == EAccountType.OtherLiability ? 0 : accnt.GetBalance(date))
-                    .Sum();
-                mis.Add(MemberItem.GetAmountMemberItem(member, value));
-            }
-
-            return new CashFlowItem(date, description, mis.ToArray(), sorter);
         }
 
         private void ComputeTransfersBetweenMembers(DateTime startDate, DateTime endDate)
@@ -163,7 +125,7 @@ namespace BanaData.Logic.Dialogs.Reports
                     {
                         // This is a transfer - Create the transfer cash flow item
                         var mis = new List<MemberItem>();
-                        foreach (var m in Members)
+                        foreach (var m in members)
                         {
                             if (m == transactionRow.AccountRow.PersonRow)
                             {
@@ -213,7 +175,7 @@ namespace BanaData.Logic.Dialogs.Reports
                 if (compound)
                 {
                     var mis = new List<MemberItem>();
-                    foreach (var m in Members)
+                    foreach (var m in members)
                     {
                         if (m == transactionRow.AccountRow.PersonRow)
                         {
@@ -238,15 +200,27 @@ namespace BanaData.Logic.Dialogs.Reports
                     }
                     else if (investmentTransactionRow.Type == EInvestmentTransactionType.TransferDividends)
                     {
-                        desc = $"{accountName}  Received dividends from {symbol}";
+                        desc = $"{accountName}  Received dividends";
+                        if (!isGroupingAccounts)
+                        {
+                            desc += $" from {symbol}";
+                        }
                     }
                     else if (investmentTransactionRow.Type == EInvestmentTransactionType.TransferShortTermCapitalGains)
                     {
-                        desc = $"{accountName}  Received STCG from {symbol}";
+                        desc = $"{accountName}  Received STCG";
+                        if (!isGroupingAccounts)
+                        {
+                            desc += $" from {symbol}";
+                        }
                     }
                     else if (investmentTransactionRow.Type == EInvestmentTransactionType.TransferLongTermCapitalGains)
                     {
-                        desc = $"{accountName}  Received LTCG from {symbol}";
+                        desc = $"{accountName}  Received LTCG";
+                        if (!isGroupingAccounts)
+                        {
+                            desc += $" from {symbol}";
+                        }
                     }
                     cashFlowItems.Add(new CashFlowItem(transactionRow.Date, desc, mis.ToArray(), $"5{transactionRow.Date:yyyy/MM/dd}{transactionRow.AccountRow.Name}0"));
                 }
@@ -289,7 +263,7 @@ namespace BanaData.Logic.Dialogs.Reports
         {
             // Amount per member
             Dictionary<Household.PersonRow, decimal> memberAmount = new Dictionary<Household.PersonRow, decimal>();
-            foreach (var member in Members)
+            foreach (var member in members)
             {
                 memberAmount.Add(member, 0);
             }
@@ -298,7 +272,7 @@ namespace BanaData.Logic.Dialogs.Reports
             List<Household.TransactionRow> transactions;
             transactions = mainWindowLogic.Household.RegularTransactions
                 .Where(tr => tr.Date >= startDate && tr.Date <= finalEndDate)
-                .Where(tr => !tr.AccountRow.IsPersonIDNull() && Members.Contains(tr.AccountRow.PersonRow))
+                .Where(tr => !tr.AccountRow.IsPersonIDNull() && members.Contains(tr.AccountRow.PersonRow))
                 .ToList();
             transactions.Sort((t1, t2) =>
             {
@@ -348,7 +322,7 @@ namespace BanaData.Logic.Dialogs.Reports
                 {
                     // Create the item
                     var mis = new List<MemberItem>();
-                    foreach (var member in Members)
+                    foreach (var member in members)
                     {
                         mis.Add(MemberItem.GetAmountMemberItem(member, memberAmount[member]));
                         memberAmount[member] = 0;
@@ -416,12 +390,11 @@ namespace BanaData.Logic.Dialogs.Reports
             return desc;
         }
 
-        // ZZZ Sorting
         private void ComputeBalances()
         {
             // Per-member balance
             Dictionary<Household.PersonRow, decimal> memberBalance = new Dictionary<Household.PersonRow, decimal>();
-            foreach (var member in Members)
+            foreach (var member in members)
             {
                 memberBalance.Add(member, 0);
             }
@@ -451,6 +424,61 @@ namespace BanaData.Logic.Dialogs.Reports
         }
 
         //
+        // Generate possible member orders
+        //
+        private void GenerateMemberOrder(List<string> list, string partialNameList, string[] remainingNames)
+        {
+            if (remainingNames.Length == 1)
+            {
+                list.Add(partialNameList + ", " + remainingNames[0]);
+            }
+            else
+            {
+                for (int i = 0; i < remainingNames.Length; i++)
+                {
+                    var newPartialNameList = (partialNameList == "" ? "" : partialNameList + ", ") + remainingNames[i];
+                    var newRemainingNames = new string[remainingNames.Length - 1];
+                    int k = 0;
+                    for(int j = 0; j < remainingNames.Length; j++)
+                    {
+                        if (j != i)
+                        {
+                            newRemainingNames[k++] = remainingNames[j];
+                        }
+                    }
+
+                    GenerateMemberOrder(list, newPartialNameList, newRemainingNames);
+                }
+            }
+        }
+
+        //
+        // Parse member order
+        //
+        private void ParseMemberOrder(string value, bool publish)
+        {
+            var newMembers = new Household.PersonRow[members.Length];
+            int mIx = 0;
+            foreach(var name in value.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                newMembers[mIx++] = members.Where(m => m.Name == name).Single();
+            }
+
+            members = newMembers;
+
+            if (publish)
+            {
+                if (mainWindowLogic.UserSettings.MemberOrderForCashFlowDialog != value)
+                {
+                    mainWindowLogic.UserSettings.MemberOrderForCashFlowDialog = value;
+                    mainWindowLogic.SaveUserSettings();
+                }
+                OnPropertyChanged(() => ColumnDescriptions);
+                ComputeCashFlow();
+            }
+        }
+
+        //
         // Build column descriptions based on members
         //
         private IEnumerable<ColumnDescription> GetColumnDescriptions()
@@ -461,9 +489,9 @@ namespace BanaData.Logic.Dialogs.Reports
                 new ColumnDescription("Description", "Description", null, 0, false)
             };
 
-            for(int i = 0; i < Members.Length; i++)
+            for(int i = 0; i < members.Length; i++)
             {
-                cols.Add(new ColumnDescription(Members[i].Name + "\nAmount" , $"MemberItems[{i}].Amount", "N2", 90, true));
+                cols.Add(new ColumnDescription(members[i].Name + "\nAmount" , $"MemberItems[{i}].Amount", "N2", 90, true));
                 cols.Add(new ColumnDescription("\nBalance", $"MemberItems[{i}].Balance", "N2", 90, true));
             }
 

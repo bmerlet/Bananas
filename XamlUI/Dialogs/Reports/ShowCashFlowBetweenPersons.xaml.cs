@@ -39,7 +39,7 @@ namespace XamlUI.Dialogs.Reports
         {
             if (value is IEnumerable<ShowCashFlowBetweenPersonsLogic.ColumnDescription> columns)
             {
-                var gridView = new GridView();
+                var gridView = new GridView() { AllowsColumnReorder = false };
                 var amountToString = new AmountToStringConverter();
                 var amountToColor = new AmountToColorConverter();
 

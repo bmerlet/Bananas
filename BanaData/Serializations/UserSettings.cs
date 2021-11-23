@@ -55,5 +55,8 @@ namespace BanaData.Serializations
         public double InvstWidthOfAmountColumn = 90;
         public double InvstWidthOfBalanceColumn = 90;
         public double InvstWidthOfCategoryColumn = 140;
+
+        // Order of members in show cash flow between household members
+        public string MemberOrderForCashFlowDialog;
     }
 }

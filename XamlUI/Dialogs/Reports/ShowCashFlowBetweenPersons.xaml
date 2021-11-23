@@ -31,8 +31,9 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="120"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="200"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -50,14 +51,16 @@
                 Grid.Column="3"
                 ItemsSource="{Binding FrequencySource}"
                 SelectedItem="{Binding SelectedFrequency, Mode=TwoWay}"/>
+            <TextBlock
+                Grid.Column="4" Text="Member order:"/>
+            <ComboBox
+                Grid.Column="5"
+                ItemsSource="{Binding MemberOrderSource}"
+                SelectedItem="{Binding MemberOrder, Mode=TwoWay}"/>
             <CheckBox
-                Grid.Column="4"
-                Content="Group accounts"
+                Grid.Column="6"
+                Content="Group dividends"
                 IsChecked="{Binding IsGroupingAccounts, Mode=TwoWay}"/>
-            <Button
-                Grid.Column="6" Width="100"
-                Content="Pick members..."
-                Command="{Binding PickMembersCommand}"/>
         </Grid>
 
         <!-- Main list -->
