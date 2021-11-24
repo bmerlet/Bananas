@@ -429,8 +429,8 @@ namespace BanaData.Logic.Main
                 // Get transaction and basic info
                 var household = mainWindowLogic.Household;
                 var transRow = household.Transaction.FindByID(atl.TransID);
-                int oldAccount = transRow.AccountID;
-                int newAccount = logic.PickedAccount.ID;
+                var oldAccountRow = transRow.AccountRow;
+                var newAccountRow = logic.PickedAccount;
 
                 // Cancel all changes
                 atl.CancelEdit();
@@ -439,7 +439,7 @@ namespace BanaData.Logic.Main
                 var transactionToSelect = GetNextTransaction(atl) as AbstractTransactionLogic;
 
                 // Do move the transaction in the DB
-                transRow.AccountID = newAccount;
+                transRow.AccountRow = newAccountRow;
                 transRow.CheckpointRow = household.Checkpoint.GetMostRecentCheckpoint();
 
                 // For transfers, update the peer transaction's target account
@@ -450,13 +450,23 @@ namespace BanaData.Logic.Main
                         var peerTransRow = litr.TransactionRow;
                         foreach (var peerLi in peerTransRow.GetLineItemRows())
                         {
-                            if (peerLi.GetLineItemTransferRow() is Household.LineItemTransferRow peerLitr && peerLitr.AccountID == oldAccount)
+                            if (peerLi.GetLineItemTransferRow() is Household.LineItemTransferRow peerLitr && peerLitr.AccountID == oldAccountRow.ID)
                             {
-                                peerLitr.AccountID = newAccount;
+                                peerLitr.AccountRow = newAccountRow;
                                 peerTransRow.CheckpointRow = household.Checkpoint.GetMostRecentCheckpoint();
                             }
                         }
                     }
+                }
+
+                // Create or delete banking transaction if needed
+                if (oldAccountRow.Type == EAccountType.Bank && newAccountRow.Type != EAccountType.Bank)
+                {
+                    transRow.GetBankingTransaction().Delete();
+                }
+                else if (oldAccountRow.Type != EAccountType.Bank && newAccountRow.Type == EAccountType.Bank)
+                {
+                    household.BankingTransaction.Add(transRow, ETransactionMedium.None, 0);
                 }
 
                 // Commit to DB
