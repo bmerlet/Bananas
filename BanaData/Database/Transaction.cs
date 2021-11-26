@@ -63,7 +63,7 @@ namespace BanaData.Database
                     "",
                     IsMemoNull() ? null : Memo,
                     ETransactionStatus.Pending,
-                    household.Checkpoint.GetMostRecentCheckpoint(),
+                    household.Checkpoint.GetCurrentCheckpoint(),
                     ETransactionType.Regular);
                 var peerLiRow = household.LineItem.Add(peerTransactionRow, null, peerAmount);
 

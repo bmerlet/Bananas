@@ -238,7 +238,7 @@ namespace BanaData.Logic.Dialogs.Editors
         private void UpdateAllMarkedTransactionsTo(ETransactionStatus newStatus)
         {
             var household = mainWindowLogic.Household;
-            var latestCheckpoint = household.Checkpoint.GetMostRecentCheckpoint();
+            var latestCheckpoint = household.Checkpoint.GetCurrentCheckpoint();
 
             foreach (TransactionToReconcile tr in Transactions.Transactions)
             {

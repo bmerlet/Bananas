@@ -619,7 +619,7 @@ namespace BanaData.Logic.Main
                     data.Payee,
                     data.Memo,
                     data.Status, 
-                    household.Checkpoint.GetMostRecentCheckpoint(),
+                    household.Checkpoint.GetCurrentCheckpoint(),
                     ETransactionType.Regular);
                 TransID = transactionRow.ID;
 
@@ -639,7 +639,7 @@ namespace BanaData.Logic.Main
                     data.Memo,
                     data.Payee,
                     data.Status, 
-                    household.Checkpoint.GetMostRecentCheckpoint(),
+                    household.Checkpoint.GetCurrentCheckpoint(),
                     ETransactionType.Regular);
 
                 // Update the line item

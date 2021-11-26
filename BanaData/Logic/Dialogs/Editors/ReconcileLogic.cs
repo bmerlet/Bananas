@@ -241,7 +241,7 @@ namespace BanaData.Logic.Dialogs.Editors
         private void UpdateAllMarkedTransactionsTo(ETransactionStatus newStatus)
         {
             var household = mainWindowLogic.Household;
-            var latestCheckpoint = household.Checkpoint.GetMostRecentCheckpoint();
+            var latestCheckpoint = household.Checkpoint.GetCurrentCheckpoint();
 
             foreach (var trList in new ReconcileGridLogic[] { Payments, Deposits })
             {
@@ -265,7 +265,7 @@ namespace BanaData.Logic.Dialogs.Editors
                 "Interest Earned",
                 null, 
                 ETransactionStatus.Reconciled, 
-                household.Checkpoint.GetMostRecentCheckpoint(),
+                household.Checkpoint.GetCurrentCheckpoint(),
                 ETransactionType.Regular);
 
             // Create new banking transaction row

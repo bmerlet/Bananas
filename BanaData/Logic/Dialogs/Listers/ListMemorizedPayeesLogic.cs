@@ -129,7 +129,7 @@ namespace BanaData.Logic.Dialogs.Listers
                 newPayee.Payee,
                 newPayee.Memo,
                 ETransactionStatus.Pending,
-                household.Checkpoint.GetMostRecentCheckpoint(), 
+                household.Checkpoint.GetCurrentCheckpoint(), 
                 ETransactionType.MemorizedPayee);
 
             // Commit all line items
@@ -170,7 +170,7 @@ namespace BanaData.Logic.Dialogs.Listers
                 newPayee.Payee,
                 newPayee.Memo,
                 ETransactionStatus.Pending,
-                household.Checkpoint.GetMostRecentCheckpoint(),
+                household.Checkpoint.GetCurrentCheckpoint(),
                 ETransactionType.MemorizedPayee);
 
             // Get existing line items

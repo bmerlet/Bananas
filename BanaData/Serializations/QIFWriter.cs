@@ -93,7 +93,7 @@ namespace BanaData.Serializations
         //
         public (int numAccounts, int numTransactions) DifferentialExportToQIF(string filename)
         {
-            var checkpointRow = household.Checkpoint.GetMostRecentCheckpoint();
+            var checkpointRow = household.Checkpoint.GetCurrentCheckpoint();
             int numAccounts;
             int numTransactions;
 

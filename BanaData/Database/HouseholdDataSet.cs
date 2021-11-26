@@ -33,41 +33,111 @@ namespace BanaData.Database
 
         partial class CheckpointDataTable
         {
-            // Get the most recent checkpoint ID
-            public CheckpointRow GetMostRecentCheckpoint()
+            // Get the current checkpoint ID
+            public CheckpointRow GetCurrentCheckpoint()
             {
-                CheckpointRow mostRecent = null;
-
-                if (Rows.Count == 0)
+                // First time around, or if we are dealing with an older database
+                if (Rows.Count != 2)
                 {
-                    return CreateNewCheckpoint();
+                    InitializeCheckpoints();
                 }
 
-                foreach (CheckpointRow checkpointRow in Rows)
+                // Find base and current row
+                CheckpointRow curRow;
+                try
                 {
-                    if (mostRecent == null || checkpointRow.Date.CompareTo(mostRecent.Date) > 0)
-                    {
-                        mostRecent = checkpointRow;
-                    }
+                    var baseRow = this.Where(c => c.Date == DateTime.MinValue).Single();
+                    curRow = this.Where(c => c.Date != DateTime.MinValue).Single();
+                }
+                catch (Exception)
+                {
+                    // Older database. Fix up and retry
+                    InitializeCheckpoints();
+                    return GetCurrentCheckpoint();
                 }
 
-                return mostRecent;
+                return curRow;
             }
 
             // Create new checkpoint
-            public CheckpointRow CreateNewCheckpoint()
+            public void CreateNewCheckpoint()
             {
-                // Make sure we don't create a duplicate
-                if (Rows.Count > 0)
+                // First time around, or if we are dealing with an older database
+                if (Rows.Count != 2)
                 {
-                    CheckpointRow mostRecent = GetMostRecentCheckpoint();
-                    while (DateTime.Now.Equals(mostRecent.Date))
+                    InitializeCheckpoints();
+                }
+
+                CheckpointRow baseRow;
+                CheckpointRow curRow;
+
+                // Find base and current row
+                try
+                {
+                    baseRow = this.Where(c => c.Date == DateTime.MinValue).Single();
+                    curRow = this.Where(c => c.Date != DateTime.MinValue).Single();
+                }
+                catch(Exception)
+                {
+                    InitializeCheckpoints();
+                    CreateNewCheckpoint();
+                    return;
+                }
+
+                // Move all transactions to base row
+                foreach (var transactionRow in ((Household)DataSet).RegularTransactions)
+                {
+                    transactionRow.CheckpointRow = baseRow;
+                }
+
+                // Time-stamp current row
+                curRow.Date = DateTime.Now;
+            }
+
+            public void InitializeCheckpoints()
+            {
+                // See if in correct format
+                bool doInit = Rows.Count != 2;
+                if (!doInit)
+                {
+                    try
                     {
-                        _ = System.Threading.Thread.Yield();
+                        this.Where(c => c.Date == DateTime.MinValue).Single();
+                        this.Where(c => c.Date != DateTime.MinValue).Single();
+                    }
+                    catch (Exception)
+                    {
+                        doInit = true;
                     }
                 }
 
-                return AddCheckpointRow(DateTime.Now);
+                if (doInit)
+                {
+                    var household = (Household)DataSet;
+
+                    // Create the base and current rows
+                    var baseRow = AddCheckpointRow(DateTime.MinValue);
+                    var curRow = AddCheckpointRow(DateTime.Now);
+
+                    // Support for older databases:
+                    // Migrate all existing transactions to the base row
+                    foreach (var transactionRow in household.Transaction.Rows.Cast<Household.TransactionRow>())
+                    {
+                        transactionRow.CheckpointRow = baseRow;
+                    }
+
+                    // Support for older databases:
+                    // Delete all old checkpoints
+                    foreach (CheckpointRow row in Rows)
+                    {
+                        if (row != baseRow && row != curRow)
+                        {
+                            row.Delete();
+                        }
+                    }
+
+                    household.AcceptChanges();
+                }
             }
         }
 

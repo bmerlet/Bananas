@@ -311,6 +311,9 @@ namespace BanaData.Logic.Main
                         ErrorMessage("File extension not supported");
                         return;
                     }
+
+                    // Fixup checkpoints for older databases
+                    Household.Checkpoint.InitializeCheckpoints();
                 }
                 catch (Exception e)
                 {
@@ -433,10 +436,13 @@ namespace BanaData.Logic.Main
                 fileStream = null;
             }
 
+            // Close registers
+            BankRegister.SetAccount(-1, -1);
+            InvestmentRegister.SetAccount(-1, -1);
+
             // Zap the DB
             Household.Clear();
             Household.AcceptChanges();
-
         }
 
         public void ImportQIF(string file)
@@ -570,7 +576,7 @@ namespace BanaData.Logic.Main
                             str.IsPayeeNull() ? null : str.Payee,
                             str.IsMemoNull() ? null : str.Memo,
                             ETransactionStatus.Pending,
-                            Household.Checkpoint.GetMostRecentCheckpoint(),
+                            Household.Checkpoint.GetCurrentCheckpoint(),
                             ETransactionType.Regular);
 
                         // Banking transaction if needed

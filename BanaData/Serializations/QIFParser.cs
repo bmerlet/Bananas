@@ -89,7 +89,7 @@ namespace BanaData.Serializations
             household.AcceptChanges();
 
             // Create a checkpoint - all transactions are created under this checkpoint
-            checkpointRow = household.Checkpoint.CreateNewCheckpoint();
+            household.Checkpoint.CreateNewCheckpoint();
 
             // Parse the file
             ParseFile(fileName);
@@ -111,11 +111,11 @@ namespace BanaData.Serializations
                 ApplySupplementalInfo(supplementalInfo);
             }
 
-            household.AcceptChanges();
-
             // Create a new checkpoint, all transactions created by the user henceforth
             // will be associated with this new checkpoint
             household.Checkpoint.CreateNewCheckpoint();
+
+            household.AcceptChanges();
         }
 
         #endregion

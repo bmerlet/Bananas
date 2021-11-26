@@ -81,6 +81,16 @@ namespace BanaData.Logic.Main
         // Set the account to display
         public void SetAccount(int accountID, int transactionID)
         {
+            // Reset everything if asked
+            if (accountID == -1)
+            {
+                transactions.Clear();
+                accountRow = null;
+                AccountName = "";
+                OnPropertyChanged(() => AccountName);
+                return;
+            }
+
             // Get the account details
             var household = mainWindowLogic.Household;
             accountRow = household.Account.FindByID(accountID);
@@ -440,7 +450,7 @@ namespace BanaData.Logic.Main
 
                 // Do move the transaction in the DB
                 transRow.AccountRow = newAccountRow;
-                transRow.CheckpointRow = household.Checkpoint.GetMostRecentCheckpoint();
+                transRow.CheckpointRow = household.Checkpoint.GetCurrentCheckpoint();
 
                 // For transfers, update the peer transaction's target account
                 foreach(var li in transRow.GetLineItemRows())
@@ -453,7 +463,7 @@ namespace BanaData.Logic.Main
                             if (peerLi.GetLineItemTransferRow() is Household.LineItemTransferRow peerLitr && peerLitr.AccountID == oldAccountRow.ID)
                             {
                                 peerLitr.AccountRow = newAccountRow;
-                                peerTransRow.CheckpointRow = household.Checkpoint.GetMostRecentCheckpoint();
+                                peerTransRow.CheckpointRow = household.Checkpoint.GetCurrentCheckpoint();
                             }
                         }
                     }
