@@ -542,7 +542,7 @@ namespace BanaData.Logic.Main
                 data.Type == EInvestmentTransactionType.Sell || data.Type == EInvestmentTransactionType.SellAndTransferCash)
             {
                 // Compute amount
-                data.PositiveAmount = data.SecurityQuantity * data.SecurityPrice - data.Commission;
+                data.PositiveAmount = Math.Round(data.SecurityQuantity * data.SecurityPrice, 2, MidpointRounding.AwayFromZero) - data.Commission;
                 OnPropertyChanged(() => Amount);
             }
         }

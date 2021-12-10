@@ -90,6 +90,7 @@ namespace BanaData.Serializations
 
             // Create a checkpoint - all transactions are created under this checkpoint
             household.Checkpoint.CreateNewCheckpoint();
+            checkpointRow = household.Checkpoint.GetCurrentCheckpoint();
 
             // Parse the file
             ParseFile(fileName);
