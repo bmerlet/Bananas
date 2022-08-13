@@ -37,12 +37,12 @@ namespace PdfParser
             {
                 if (parseContext.IsCommentStart)
                 {
-                    Console.WriteLine($"Found comment");
+                    //Console.WriteLine($"Found comment");
                     parseContext.SkipUntilCRLF();
                 }
                 else if (parseContext.IsObjectStart(out int objId, out int objGen, out int objLen))
                 {
-                    Console.WriteLine($"Found object {objId}/{objGen}");
+                    //Console.WriteLine($"Found object {objId}/{objGen}");
 
                     var pdfObjectId = new PdfObjectId(objId, objGen);
 
@@ -56,14 +56,14 @@ namespace PdfParser
                 //}
                 else if (parseContext.IsXrefStart(out int xrefLength))
                 {
-                    Console.WriteLine($"Found xref start - looking for trailer");
+                    //Console.WriteLine($"Found xref start - looking for trailer");
                     parseContext.Skip(xrefLength);
 
                     while (!parseContext.IsTrailerStart(out xrefLength))
                     {
                         parseContext.Skip(1);
                     }
-                    Console.WriteLine($"Found trailer");
+                    //Console.WriteLine($"Found trailer");
                     parseContext.Skip(xrefLength);
                     ParseTrailer(parseContext, pdfData);
                     break;
@@ -76,6 +76,10 @@ namespace PdfParser
 
             return pdfData;
         }
+
+        #endregion
+
+        #region Object parser
 
         private void ReadObject(ParseContext parseContext, PdfData pdfData, PdfObjectId pdfObjectId)
         {
@@ -111,35 +115,9 @@ namespace PdfParser
             }
         }
 
-        private PdfDictionary ParseDictionary(ParseContext parseContext, PdfData pdfData, PdfObjectId pdfObjectId)
-        {
-            var pdfDictionary = new PdfDictionary(pdfObjectId);
+        #endregion
 
-            while (true)
-            {
-                parseContext.SkipWhiteSpaces();
-
-                // End of dictionary
-                if (parseContext.IsDictionaryEnd)
-                {
-                    parseContext.Skip(2); // skip >>
-                    parseContext.SkipWhiteSpaces();
-                    return pdfDictionary;
-                }
-
-                // Read key
-                if (parseContext.ReadByte() != '/')
-                {
-                    throw new FormatException($"Malformed dictionary key {parseContext.GetAsString(16)}");
-                }
-                var key = parseContext.ReadNameString();
-
-                // Read value
-                var value = ParsePdfElement(parseContext, pdfData, pdfObjectId);
-
-                pdfDictionary.Add(key, value);
-            }
-        }
+        #region Basic Pdf elements parsers
 
         private PdfObject ParsePdfElement(ParseContext parseContext, PdfData pdfData, PdfObjectId pdfObjectId)
         {
@@ -196,6 +174,36 @@ namespace PdfParser
             }
 
             return result;
+        }
+
+        private PdfDictionary ParseDictionary(ParseContext parseContext, PdfData pdfData, PdfObjectId pdfObjectId)
+        {
+            var pdfDictionary = new PdfDictionary(pdfObjectId);
+
+            while (true)
+            {
+                parseContext.SkipWhiteSpaces();
+
+                // End of dictionary
+                if (parseContext.IsDictionaryEnd)
+                {
+                    parseContext.Skip(2); // skip >>
+                    parseContext.SkipWhiteSpaces();
+                    return pdfDictionary;
+                }
+
+                // Read key
+                if (parseContext.ReadByte() != '/')
+                {
+                    throw new FormatException($"Malformed dictionary key {parseContext.GetAsString(16)}");
+                }
+                var key = parseContext.ReadNameString();
+
+                // Read value
+                var value = ParsePdfElement(parseContext, pdfData, pdfObjectId);
+
+                pdfDictionary.Add(key, value);
+            }
         }
 
         private PdfArray ParseArray(ParseContext parseContext, PdfData pdfData, PdfObjectId pdfObjectId)
@@ -328,6 +336,10 @@ namespace PdfParser
 
             return pdfStream;
         }
+
+        #endregion
+        
+        #region Trailer parser
 
         private void ParseTrailer(ParseContext parseContext, PdfData pdfData)
         {

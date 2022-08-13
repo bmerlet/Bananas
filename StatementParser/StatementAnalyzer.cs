@@ -10,7 +10,7 @@ namespace StatementParser
     {
         #region Account descriptions
 
-        static AccountSpec[] accountSpecsVanguard = new AccountSpec[]
+        static readonly AccountSpec[] accountSpecsVanguard = new AccountSpec[]
         {
             new AccountSpec("SVanguard Brokerage", new AccountHint[] { new AccountHint(2, 2, new string[] { "Vanguard", "Susan", "brokerage" }) }),
             new AccountSpec("BVanguard Brokerage", new AccountHint[] { new AccountHint(2, 2, new string[] { "Vanguard", "Benoit", "brokerage" }) }),
@@ -84,7 +84,7 @@ namespace StatementParser
 
         #region Holdings description
 
-        static HoldingHint[] vanguardBrokerageHodingHints = new HoldingHint[]
+        static readonly HoldingHint[] vanguardBrokerageHodingHints = new HoldingHint[]
         {
             new HoldingHint(4, 5, "VANGUARD FEDERAL MONEY", -4, "VMFXX"),
             new HoldingHint(4, 5, "VNQ", 2, "VNQ"),
@@ -148,6 +148,21 @@ namespace StatementParser
         {
             var trans = new List<VanguardTransaction>();
 
+            // Find the year - First page: July 31, 2022, monthly transaction statement
+            string year = "/2100";
+            {
+                var strs = data.ExtractTextFromPage(0);
+                foreach(var str in strs)
+                {
+                    int ix = str.IndexOf(", monthly transaction statement");
+                    if (ix > 4)
+                    {
+                        year = "/" + str.Substring(ix - 4, 4);
+                        break;
+                    }
+                }
+            }
+
             // Start at page 5 "Completed Transactions", stop at page containing "Disclosures"
             bool foundCompletedTransactions = false;
             for (int page = 4; page < data.NumberOfPages; page++)
@@ -172,15 +187,13 @@ namespace StatementParser
                     // We are after Completed Transactions" and before "Disclosures"
                     if (strs[i] == "VANGUARD FEDERAL MONEY" && strs[i + 1] == "Reinvestment")
                     {
-                        var vg = new VanguardTransaction()
-                        {
-                            Date = strs[i - 3],
-                            Ticker = "VFMXX",
-                            Type = strs[i + 1],
-                            Quantity = -decimal.Parse(strs[i + 6]),
-                            Price = 1,
-                            Amount = -decimal.Parse(strs[i + 6])
-                        };
+                        var vg = new VanguardTransaction(
+                            strs[i - 3] + year,
+                            "VMFXX", 
+                            strs[i + 1],
+                            -decimal.Parse(strs[i + 6]),
+                            1,
+                            -decimal.Parse(strs[i + 6]));
                         trans.Add(vg);
                     }
                     else
@@ -192,16 +205,15 @@ namespace StatementParser
                                 // Found transaction
                                 var quantity = strs[i + 4];
                                 var price = RemoveDollarSign(strs[i + 5]);
-                                var amount = RemoveDollarSign(strs[i + 7]);
-                                var vg = new VanguardTransaction()
-                                {
-                                    Date = strs[i - 2],
-                                    Ticker = ticker,
-                                    Type = strs[i + 2],
-                                    Quantity = quantity == "-" ? 0 : decimal.Parse(quantity),
-                                    Price = price == "-" ? 0 : decimal.Parse(price),
-                                    Amount = amount == "-" ? 0 : decimal.Parse(amount)
-                                };
+                                var amount = RemoveNegativeSign(RemoveDollarSign(strs[i + 7]));
+                                var vg = new VanguardTransaction(
+                                    strs[i - 2] + year,
+                                    ticker,
+                                    strs[i + 2],
+                                    quantity == "-" ? 0 : decimal.Parse(quantity),
+                                    price == "-" ? 0 : decimal.Parse(price),
+                                    amount == "-" ? 0 : decimal.Parse(amount)
+                                );
                                 trans.Add(vg);
                             }
                         }
@@ -209,11 +221,81 @@ namespace StatementParser
                 }
             }
 
-            foreach(var vg in trans)
+            // Remove extraneous transactions
+            var tmpTrans = trans;
+            trans = new List<VanguardTransaction>();
+            for(int i = 0; i < tmpTrans.Count;i++)
             {
-                // ZZZ
+                if (i < tmpTrans.Count - 1 &&
+                    tmpTrans[i].Ticker == tmpTrans[i+1].Ticker &&
+                    tmpTrans[i].Type == "Dividend" &&
+                    tmpTrans[i+1].Type == "Reinvestment" &&
+                    tmpTrans[i].Amount == tmpTrans[i+1].Amount)
+                {
+                    continue;
+                }
+                trans.Add(tmpTrans[i]);
+            }
+
+            // ZZZ Debug
+            foreach (var vg in trans)
+            {
                 Console.WriteLine($"{vg.Date}\t{vg.Ticker}\t{vg.Type}\t{vg.Quantity}\t{vg.Price}\t{vg.Amount}");
             }
+
+            // Produce QIF output
+            var eol = Environment.NewLine;
+            string qif =
+                "!Option:AutoSwitch" + eol +
+                "!Account" + eol +
+                "N" + accountName + eol +
+                "TInvst" + eol +
+                "^" + eol +
+                "!Type:Invst" + eol;
+
+            foreach (var vg in trans)
+            {
+                var amount = vg.Amount.ToString();
+                qif +=
+                    "D" + vg.Date + eol +
+                    "N" + GetVanguardQIFType(vg.Type) + eol +
+                    "Y" + GetNameForTicker(vg.Ticker) + eol +
+                    $"I{vg.Price}" + eol +
+                    $"Q{vg.Quantity}" + eol +
+                    "C" + eol +
+                    "U" + amount + eol +
+                    "T" + amount + eol +
+                    "$" + amount + eol +
+                    "^" + eol;
+            }
+
+            Console.WriteLine(qif);
+
+        }
+
+        private string GetVanguardQIFType(string vgType)
+        {
+            switch(vgType)
+            {
+                case "Dividend": return "Div";
+                case "Reinvestment": return "ReinvDiv";
+            }
+            throw new FormatException("Unknown vanguard type " + vgType);
+        }
+
+        private string GetNameForTicker(string ticker)
+        {
+            switch (ticker)
+            {
+                case "VMFXX": return "Vanguard Federal Money Market Fund Investor Shares";
+                case "BND": return "VANGUARD TOTAL BOND MARKET ETF";
+                case "BNDX": return "VANGUARD TOTAL INTL BOND INDEX ETF";
+                case "VNQ": return "VANGUARD REIT INDEX ETF";
+                case "VXUS": return "VANGUARD TOTAL INTL STOCK INDEX FUND ETF";
+                case "VTI": return "VANGUARD TOTAL STOCK MARKET ETF";
+                case "VGIT": return "Vanguard Intermediate-Term Treasury Index Fund ETF Shares";
+            }
+            throw new FormatException("Unknown ticker " + ticker);
         }
 
         private string RemoveDollarSign(string str)
@@ -221,14 +303,21 @@ namespace StatementParser
             return str[0] == '$' ? str.Substring(1) : str;
         }
 
+        private string RemoveNegativeSign(string str)
+        {
+            return str[0] == '-' ? str.Substring(1) : str;
+        }
+
         class VanguardTransaction
         {
-            public string Date;
-            public string Ticker;
-            public string Type;
-            public decimal Quantity;
-            public decimal Price;
-            public decimal Amount;
+            public VanguardTransaction(string date, string ticker, string type, decimal quantity, decimal price, decimal amount) =>
+                (Date, Ticker, Type, Quantity, Price, Amount) = (date, ticker, type, quantity, price, amount);
+            public readonly string Date;
+            public readonly string Ticker;
+            public readonly string Type;
+            public readonly decimal Quantity;
+            public readonly decimal Price;
+            public readonly decimal Amount;
         }
 
         #endregion
