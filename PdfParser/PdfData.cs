@@ -256,6 +256,30 @@ namespace PdfParser
     }
 
     //
+    // Pdf hex string
+    //
+    public class PdfHexString : PdfObject
+    {
+        // Constructor
+        public PdfHexString(PdfObjectId pdfObjectId, byte[] value) : base(pdfObjectId) => Value = value;
+
+        // Byte array
+        public readonly byte[] Value;
+    }
+
+    //
+    // Pdf boolean
+    //
+    public class PdfBool : PdfObject
+    {
+        // Constructor
+        public PdfBool(PdfObjectId pdfObjectId, bool value) : base(pdfObjectId) => Value = value;
+
+        // Bool value
+        public readonly bool Value;
+    }
+
+    //
     // Pdf integer
     //
     public class PdfInt : PdfObject
@@ -265,6 +289,18 @@ namespace PdfParser
 
         // Int value
         public readonly int Value;
+    }
+
+    //
+    // Pdf real
+    //
+    public class PdfReal : PdfObject
+    {
+        // Constructor
+        public PdfReal(PdfObjectId pdfObjectId, decimal value) : base(pdfObjectId) => Value = value;
+
+        // Int value
+        public readonly decimal Value;
     }
 
     //

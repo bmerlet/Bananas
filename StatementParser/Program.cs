@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using PdfParser;
+using System.IO;
 
 namespace StatementParser
 {
@@ -8,23 +8,64 @@ namespace StatementParser
     {
         static void Main(string[] args)
         {
-            var parser = new PdfParser.PdfParser();
-            var data = parser.Parse(@"C:\Users\bmerlet\Downloads\statement.pdf");
+            string directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+            directory = Path.Combine(directory, "StatementParser");
 
-            for(int i = 0; i < data.NumberOfPages; i++)
+            if (!Directory.Exists(directory))
             {
-                Console.WriteLine($"================================= Page {i + 1} ==================================");
-                var strs = data.ExtractTextFromPage(i);
-
-                foreach(var str in strs)
+                Console.WriteLine($"Error: Directory {directory} does not exist");
+                Explain(directory);
+            }
+            else
+            {
+                var files = new List<string>();
+                files.AddRange(Directory.GetFiles(directory, "*.pdf"));
+                if (files.Count == 0)
                 {
-                    Console.WriteLine(str);
+                    Console.WriteLine($"Error: Directory {directory} does not contain any .pdf file");
+                    Explain(directory);
+                }
+                else
+                {
+                    var parser = new PdfParser.PdfParser();
+                    var analyzer = new StatementAnalyzer();
+                    var targetFile = Path.Combine(directory, "StatementParser.QIF");
+                    if (File.Exists(targetFile))
+                    {
+                        File.Delete(targetFile);
+                    }
+
+                    foreach (var f in files)
+                    {
+                        Console.WriteLine($"=== Processing {f}");
+                        var data = parser.Parse(f);
+
+                        // Debug
+                        for (int i = 0; i < data.NumberOfPages; i++)
+                        {
+                            Console.WriteLine($"================================= Page {i + 1} ==================================");
+                            var strs = data.ExtractTextFromPage(i);
+
+                            foreach (var str in strs)
+                            {
+                                Console.WriteLine(str);
+                            }
+                        }
+
+                        analyzer.AnalyzeStatement(data, targetFile);
+                    }
                 }
             }
+        }
 
-            var analyzer = new StatementAnalyzer();
-
-            analyzer.AnalyzeStatement(data, @"C:\Users\bmerlet\Downloads"); // ZZZ do something about the direectory name
+        private static void Explain(string directory)
+        {
+            Console.WriteLine("");
+            Console.WriteLine($"Put the statement(s) you want to parse in {directory}.");
+            Console.WriteLine("They must be in pdf format.");
+            Console.WriteLine("The program will parse all of them and produce a StatementParser.QIF file");
+            Console.WriteLine("that can then be imported into Bananas (or Quicken)");
+            Console.WriteLine("");
         }
     }
 }

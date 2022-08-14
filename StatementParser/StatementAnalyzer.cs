@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.IO;
 using PdfParser;
 
 namespace StatementParser
@@ -9,6 +9,8 @@ namespace StatementParser
     class StatementAnalyzer
     {
         #region Account descriptions
+
+        public enum EInstitution { None, Vanguard, Chase }
 
         static readonly AccountSpec[] accountSpecsVanguard = new AccountSpec[]
         {
@@ -33,9 +35,10 @@ namespace StatementParser
             public readonly string[] Required;
         }
 
-        static string DetermineAccount(PdfData data)
+        static (EInstitution, string) DetermineAccount(PdfData data)
         {
-            string result = null;
+            EInstitution institution = EInstitution.None;
+            string accountName = "?";
 
             foreach (var spec in accountSpecsVanguard)
             {
@@ -72,12 +75,13 @@ namespace StatementParser
 
                 if (pass)
                 {
-                    result = spec.BananaAccountName;
+                    accountName = spec.BananaAccountName;
+                    institution = EInstitution.Vanguard;
                     break;
                 }
             }
 
-            return result;
+            return (institution, accountName);
         }
 
         #endregion
@@ -125,26 +129,31 @@ namespace StatementParser
 
         #region Statement analyzer
 
-        public void AnalyzeStatement(PdfData data, string directory)
+        public void AnalyzeStatement(PdfData data, string qifFileName)
         {
-            string bananaAccountName = DetermineAccount(data);
+            (EInstitution institution, string bananaAccountName) = DetermineAccount(data);
+
+            Console.WriteLine($"Institution: {institution}");
             Console.WriteLine($"Banana account name: {bananaAccountName}");
 
-            Console.WriteLine("\n=== Holdings:\n");
-            foreach (var hint in vanguardBrokerageHodingHints)
+            if (institution == EInstitution.Vanguard)
             {
-                var holding = DetermineHolding(data, hint);
-                if (holding != null)
+                Console.WriteLine("\n=== Holdings:\n");
+                foreach (var hint in vanguardBrokerageHodingHints)
                 {
-                    Console.WriteLine($"{hint.Ticker}  \t{holding}");
+                    var holding = DetermineHolding(data, hint);
+                    if (holding != null)
+                    {
+                        Console.WriteLine($"{hint.Ticker}  \t{holding}");
+                    }
                 }
             }
 
             Console.WriteLine("\n=== Transactions:\n");
-            AnalizeVanguardTransactions(data, bananaAccountName, directory);
+            AnalizeVanguardTransactions(data, bananaAccountName, qifFileName);
         }
 
-        private void AnalizeVanguardTransactions(PdfData data, string accountName, string directory)
+        private void AnalizeVanguardTransactions(PdfData data, string accountName, string qifFileName)
         {
             var trans = new List<VanguardTransaction>();
 
@@ -269,8 +278,7 @@ namespace StatementParser
                     "^" + eol;
             }
 
-            Console.WriteLine(qif);
-
+            File.AppendAllText(qifFileName, qif);
         }
 
         private string GetVanguardQIFType(string vgType)
@@ -298,15 +306,9 @@ namespace StatementParser
             throw new FormatException("Unknown ticker " + ticker);
         }
 
-        private string RemoveDollarSign(string str)
-        {
-            return str[0] == '$' ? str.Substring(1) : str;
-        }
+        private string RemoveDollarSign(string str) => str[0] == '$' ? str[1..] : str;
 
-        private string RemoveNegativeSign(string str)
-        {
-            return str[0] == '-' ? str.Substring(1) : str;
-        }
+        private string RemoveNegativeSign(string str) => str[0] == '-' ? str[1..] : str;
 
         class VanguardTransaction
         {

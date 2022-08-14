@@ -70,11 +70,12 @@ namespace PdfParser
         public bool IsCommentStart => Bytes[BytePos] == '%';
         public bool IsDictionaryStart => Bytes[BytePos] == '<' && Bytes[BytePos + 1] == '<';
         public bool IsDictionaryEnd => Bytes[BytePos] == '>' && Bytes[BytePos + 1] == '>';
+        public bool IsHexStringStart => Bytes[BytePos] == '<' && Bytes[BytePos + 1] != '<';
         public bool IsStreamStart(out int length) => IsToken(0, "stream", true, out length);
         public bool IsStreamEnd(out int length) => IsToken(0, "endstream", true, out length);
 
         public bool IsBeginText => Bytes[BytePos] == 'B' && Bytes[BytePos + 1] == 'T';
-        public bool IsEndText => Bytes[BytePos] == 'E' && Bytes[BytePos + 1] == 'T';
+        public bool IsEndText => BytePos >= Bytes.Length - 1 || (Bytes[BytePos] == 'E' && Bytes[BytePos + 1] == 'T');
         public bool IsTextOperator1 => Bytes[BytePos] == '\'' || Bytes[BytePos] == '"';
         public bool IsTextOperator2 => 
             Bytes[BytePos] == 'T' && 
@@ -205,6 +206,27 @@ namespace PdfParser
             return result;
         }
 
+        public bool IsBool(out bool val, out int length)
+        {
+            if (GetAsString(4) == "true")
+            {
+                val = true;
+                length = 4;
+                return true;
+            }
+            
+            if (GetAsString(5) == "false")
+            {
+                val = false;
+                length = 5;
+                return true;
+            }
+
+            val = false;
+            length = 0;
+            return false;
+        }
+
         public string ReadNameString()
         {
             var str = new StringBuilder();
@@ -259,6 +281,21 @@ namespace PdfParser
             return str.ToString();
         }
 
+        public byte[] ReadHexString()
+        {
+            var data = new List<byte>();
+
+            while(CurrentByte != '>')
+            {
+                var b = CharToNibble(ReadByte()) * 16 + CharToNibble(ReadByte());
+                data.Add((byte)b);
+            }
+
+            Skip(1);
+
+            return data.ToArray();
+        }
+
         public bool SkipToNextTextBlock()
         {
             while(!IsBeginText)
@@ -282,6 +319,26 @@ namespace PdfParser
             }
 
             return str.ToString();
+        }
+
+        private byte CharToNibble(byte b)
+        {
+            if (b >= '0' && b <= '9')
+            {
+                return (byte)(b - '0');
+            }
+
+            if (b >= 'a' && b <= 'f')
+            {
+                return (byte)(b - 'a' + 10);
+            }
+
+            if (b >= 'A' && b <= 'F')
+            {
+                return (byte)(b - 'A' + 10);
+            }
+
+            throw new FormatException("Malformed hex number");
         }
     }
 }

@@ -25,7 +25,7 @@ namespace PdfParser
             }
 
             char ver = (char)bytes[7];
-            if (ver < '1' || ver > '5')
+            if (ver < '1' || ver > '7')
             {
                 throw new FormatException($"Unsupported PDF version: 1.{ver}");
             }
@@ -106,7 +106,13 @@ namespace PdfParser
                     parseContext.Skip(streamLength);
                     var pdfStream = ParseStream(parseContext, pdfData, pdfObjectId);
                     pdfData.Add(pdfStream);
-
+                }
+                else if (parseContext.CurrentByte == '[')
+                {
+                    parseContext.Skip(1);
+                    var array = ParseArray(parseContext, pdfData, pdfObjectId);
+                    pdfData.Add(array);
+                    parseContext.SkipWhiteSpaces();
                 }
                 else
                 {
@@ -156,6 +162,13 @@ namespace PdfParser
                 parseContext.Skip(streamLength);
                 result = ParseStream(parseContext, pdfData, pdfObjectId);
             }
+            else if (parseContext.IsHexStringStart)
+            {
+                // Hex string
+                parseContext.Skip(1); // skip <
+                var data = parseContext.ReadHexString();
+                result = new PdfHexString(pdfObjectId, data);
+            }
             else if (parseContext.IsObjectRef(out int refId, out int refGen, out int refLength))
             {
                 // Object reference
@@ -166,7 +179,30 @@ namespace PdfParser
             {
                 // Int value
                 parseContext.Skip(intLength);
-                result = new PdfInt(pdfObjectId, intVal);
+                if (parseContext.CurrentByte == '.')
+                {
+                    // Real value
+                    parseContext.Skip(1);
+                    if (parseContext.IsInteger(0, false, out int fracVal, out int fracLength))
+                    {
+                        parseContext.Skip(fracLength);
+                        decimal val = (decimal)intVal + ((decimal)fracVal / (decimal)Math.Pow(10, fracLength));
+                        result = new PdfReal(pdfObjectId, val);
+                    }
+                    else
+                    {
+                        throw new FormatException($"Malformed integer {parseContext.GetAsString(16)}");
+                    }
+                }
+                else
+                {
+                    result = new PdfInt(pdfObjectId, intVal);
+                }
+            }
+            else if (parseContext.IsBool(out bool val, out int boolLength))
+            {
+                parseContext.Skip(boolLength);
+                result = new PdfBool(pdfObjectId, val);
             }
             else
             {
@@ -269,6 +305,10 @@ namespace PdfParser
                             {
                                 // DCTDecode - for now jusst do notthing
                             }
+                            else if (filterStr.Value == "CCITTFaxDecode")
+                            {
+                                // CCITTFaxDecode - do nothing
+                            }
                             else
                             {
                                 throw new FormatException($"Unknown filter {filterStr.Value}");
@@ -288,19 +328,43 @@ namespace PdfParser
             // Decompress if needed
             if (deflate)
             {
+                var inflater = new ICSharpCode.SharpZipLib.Zip.Compression.Inflater();
+                inflater.SetInput(data);
+                var inflated = new byte[65536];
+                int inflatedLen = inflater.Inflate(inflated);
+
                 var compressedStream = new MemoryStream(data);
 
                 // Drop zlib header
-                compressedStream.ReadByte();
-                compressedStream.ReadByte();
+                if (data[0] == 0x78 && ((data[0] * 256 + data[1]) % 31) == 0)
+                {
+                    compressedStream.ReadByte();
+                    compressedStream.ReadByte();
+                    if ((data[1] & 0x20) == 0x20) // FDICT
+                    {
+                        compressedStream.ReadByte();
+                        compressedStream.ReadByte();
+                        compressedStream.ReadByte();
+                        compressedStream.ReadByte();
+                    }
+                }
 
                 var decompressedStream = new MemoryStream();
                 var deflater = new DeflateStream(compressedStream, CompressionMode.Decompress);
                 //var deflater = new GZipStream(compressedStream, CompressionMode.Decompress);
-                deflater.CopyTo(decompressedStream);
 
-                data = decompressedStream.GetBuffer();
+                try
+                {
+                    deflater.CopyTo(decompressedStream);
+                    data = decompressedStream.GetBuffer();
+                    Console.WriteLine("Success decompress");
+                }
+                catch (InvalidDataException) 
+                {
+                    Console.WriteLine("Failed decompress");
+                }
             }
+
 
             // Add content to pdf data as a string
             string content = null;
