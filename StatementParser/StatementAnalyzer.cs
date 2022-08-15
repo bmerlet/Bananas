@@ -306,9 +306,9 @@ namespace StatementParser
             throw new FormatException("Unknown ticker " + ticker);
         }
 
-        private string RemoveDollarSign(string str) => str[0] == '$' ? str[1..] : str;
+        private string RemoveDollarSign(string str) => str[0] == '$' ? str.Substring(1) : str;
 
-        private string RemoveNegativeSign(string str) => str[0] == '-' ? str[1..] : str;
+        private string RemoveNegativeSign(string str) => str[0] == '-' ? str.Substring(1) : str;
 
         class VanguardTransaction
         {

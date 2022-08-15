@@ -8,80 +8,11 @@ using System.Threading.Tasks;
 
 namespace PdfParser
 {
-    public class PdfParser
+    static public class PdfParser
     {
-        #region Main parser
-
-        public PdfData Parse(string file)
-        {
-            var pdfData = new PdfData();
-            var bytes = File.ReadAllBytes(file);
-
-            // Get and check header
-            string magic = System.Text.Encoding.UTF8.GetString(bytes, 0, 7);
-            if (magic != "%PDF-1.")
-            {
-                throw new FormatException($"Bad magic: {magic}");
-            }
-
-            char ver = (char)bytes[7];
-            if (ver < '1' || ver > '7')
-            {
-                throw new FormatException($"Unsupported PDF version: 1.{ver}");
-            }
-
-            var parseContext = new ParseContext(bytes);
-            parseContext.Skip(9);
-
-            while (true)
-            {
-                if (parseContext.IsCommentStart)
-                {
-                    //Console.WriteLine($"Found comment");
-                    parseContext.SkipUntilCRLF();
-                }
-                else if (parseContext.IsObjectStart(out int objId, out int objGen, out int objLen))
-                {
-                    //Console.WriteLine($"Found object {objId}/{objGen}");
-
-                    var pdfObjectId = new PdfObjectId(objId, objGen);
-
-                    parseContext.Skip(objLen);
-                    ReadObject(parseContext, pdfData, pdfObjectId);
-                }
-                //else if (parseContext.IsDictionaryStart)
-                //{
-                //    Console.WriteLine($"Found dictionary");
-                //    ParseDictionary(parseContext);
-                //}
-                else if (parseContext.IsXrefStart(out int xrefLength))
-                {
-                    //Console.WriteLine($"Found xref start - looking for trailer");
-                    parseContext.Skip(xrefLength);
-
-                    while (!parseContext.IsTrailerStart(out xrefLength))
-                    {
-                        parseContext.Skip(1);
-                    }
-                    //Console.WriteLine($"Found trailer");
-                    parseContext.Skip(xrefLength);
-                    ParseTrailer(parseContext, pdfData);
-                    break;
-                }
-                else
-                {
-                    throw new FormatException($"Unknown token {parseContext.GetAsString(16)}");
-                }
-            }
-
-            return pdfData;
-        }
-
-        #endregion
-
         #region Object parser
 
-        private void ReadObject(ParseContext parseContext, PdfData pdfData, PdfObjectId pdfObjectId)
+        static public void ParseObject(ParseContext parseContext, PdfData pdfData, PdfObjectId pdfObjectId)
         {
             while (true)
             {
@@ -125,7 +56,7 @@ namespace PdfParser
 
         #region Basic Pdf elements parsers
 
-        private PdfObject ParsePdfElement(ParseContext parseContext, PdfData pdfData, PdfObjectId pdfObjectId)
+        static public PdfObject ParsePdfElement(ParseContext parseContext, PdfData pdfData, PdfObjectId pdfObjectId)
         {
             PdfObject result;
 
@@ -179,7 +110,7 @@ namespace PdfParser
             {
                 // Int value
                 parseContext.Skip(intLength);
-                if (parseContext.CurrentByte == '.')
+                if (!parseContext.EOF && parseContext.CurrentByte == '.')
                 {
                     // Real value
                     parseContext.Skip(1);
@@ -212,7 +143,7 @@ namespace PdfParser
             return result;
         }
 
-        private PdfDictionary ParseDictionary(ParseContext parseContext, PdfData pdfData, PdfObjectId pdfObjectId)
+        static public PdfDictionary ParseDictionary(ParseContext parseContext, PdfData pdfData, PdfObjectId pdfObjectId)
         {
             var pdfDictionary = new PdfDictionary(pdfObjectId);
 
@@ -242,7 +173,7 @@ namespace PdfParser
             }
         }
 
-        private PdfArray ParseArray(ParseContext parseContext, PdfData pdfData, PdfObjectId pdfObjectId)
+        static private PdfArray ParseArray(ParseContext parseContext, PdfData pdfData, PdfObjectId pdfObjectId)
         {
             var pdfArray = new PdfArray(pdfObjectId);
 
@@ -260,7 +191,7 @@ namespace PdfParser
             return pdfArray;
         }
 
-        private PdfStream ParseStream(ParseContext parseContext, PdfData pdfData, PdfObjectId pdfObjectId)
+        static private PdfStream ParseStream(ParseContext parseContext, PdfData pdfData, PdfObjectId pdfObjectId)
         {
             // Find dictionary for this object id
             //var dic = parseContext.PdfData.PdfObjects.FirstOrDefault(p => pdfObjectId.Equals(p.PdfObjectId) && p is PdfDictionary) as PdfDictionary;
@@ -326,12 +257,13 @@ namespace PdfParser
             byte[] data = parseContext.ReadArray(len);
 
             // Decompress if needed
-            if (deflate)
+            if (deflate && !image)
             {
-                var inflater = new ICSharpCode.SharpZipLib.Zip.Compression.Inflater();
-                inflater.SetInput(data);
-                var inflated = new byte[65536];
-                int inflatedLen = inflater.Inflate(inflated);
+                // ZZZ Remove ICsharp
+                //var inflater = new ICSharpCode.SharpZipLib.Zip.Compression.Inflater(true);
+                //inflater.SetInput(data);
+                //var inflated = new byte[65536*4];
+                //int inflatedLen = inflater.Inflate(inflated);
 
                 var compressedStream = new MemoryStream(data);
 
@@ -403,25 +335,5 @@ namespace PdfParser
 
         #endregion
         
-        #region Trailer parser
-
-        private void ParseTrailer(ParseContext parseContext, PdfData pdfData)
-        {
-            // Parse the trailer dictionary
-            var trailerDictionary = ParsePdfElement(parseContext, pdfData, null) as PdfDictionary;
-
-            // Look for the size (Number of objects in the xref)
-            int size = trailerDictionary.Find<PdfInt>("Size").Value;
-
-            // Look for the catalog node
-            var catalog = trailerDictionary.Find<PdfReference>("Root").Value;
-
-            // Look for the info node
-            var info = trailerDictionary.Find<PdfReference>("Root").Value;
-
-            pdfData.SetPdfTrailer(size, catalog, info);
-        }
-
-        #endregion
     }
 }

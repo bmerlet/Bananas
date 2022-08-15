@@ -11,14 +11,27 @@ namespace PdfParser
     //
     public class ParseContext
     {
+        #region Constructor
+
         // Constructor
-        public ParseContext(byte[] bytes) => Bytes = bytes;
+        public ParseContext(byte[] bytes, int offset = 0)
+        {
+            Bytes = bytes;
+            BytePos = offset;
+            BackwardBytePos = bytes.Length - 1;
+        }
+
+        #endregion
+
+        #region Forward parsing properties and services
 
         // File
         public readonly byte[] Bytes;
 
-        // Position in file
+        // Position in file, going forward
         public int BytePos { get; private set; }
+
+        public bool EOF => BytePos >= BackwardBytePos;
 
         public byte CurrentByte => Bytes[BytePos];
         public byte ReadByte() => Bytes[BytePos++];
@@ -37,12 +50,13 @@ namespace PdfParser
         }
 
         public bool IsWhiteSpace(int offset = 0) =>
-            Bytes[BytePos + offset] == 0 ||
-            Bytes[BytePos + offset] == 9 ||
-            Bytes[BytePos + offset] == 10 ||
-            Bytes[BytePos + offset] == 12 ||
-            Bytes[BytePos + offset] == 13 ||
-            Bytes[BytePos + offset] == 32;
+            BytePos + offset < Bytes.Length && 
+            (Bytes[BytePos + offset] == 0 ||
+             Bytes[BytePos + offset] == 9 ||
+             Bytes[BytePos + offset] == 10 ||
+             Bytes[BytePos + offset] == 12 ||
+             Bytes[BytePos + offset] == 13 ||
+             Bytes[BytePos + offset] == 32);
 
         public void SkipWhiteSpaces()
         {
@@ -178,7 +192,7 @@ namespace PdfParser
             }
 
             // Read number
-            while (Bytes[bp + length] >= '0' && Bytes[bp + length] <= '9')
+            while (bp + length < Bytes.Length && Bytes[bp + length] >= '0' && Bytes[bp + length] <= '9')
             {
                 val = val * 10 + (int)(Bytes[bp + length] - '0');
                 length += 1;
@@ -321,6 +335,57 @@ namespace PdfParser
             return str.ToString();
         }
 
+        #endregion
+
+        #region Backward searches
+
+        // Position in file, going backward
+        public int BackwardBytePos { get; private set; }
+
+        public byte LastByte => Bytes[BackwardBytePos];
+        public byte ReadLastByte() => Bytes[BackwardBytePos--];
+        public void BackwardSkip(int len) => BackwardBytePos -= len;
+
+        public void BackwardSkipCRLF()
+        {
+            if (LastByte == '\n') BackwardBytePos--;
+            if (LastByte == '\r') BackwardBytePos--;
+        }
+
+        public string BackwardGetAsString(int len)
+        {
+            var str = new StringBuilder();
+            for (int i = 0; i < len; i++)
+            {
+                str.Append((char)Bytes[BackwardBytePos - len + i + 1]);
+            }
+
+            return str.ToString();
+        }
+
+        public byte[] BackwardGetBlock(string token)
+        {
+            for(int i = BackwardBytePos - token.Length; i >= BytePos; i--)
+            {
+                if (Strcmp(i, token))
+                {
+                    var result = new byte[BackwardBytePos - i - token.Length + 1];
+                    for(int j = 0; j < result.Length; j++)
+                    {
+                        result[j] = Bytes[i + token.Length + j];
+                    }
+                    BackwardBytePos = i;
+                    return result;
+                }
+            }
+
+            return null;
+        }
+
+        #endregion
+
+        #region Private utilities
+
         private byte CharToNibble(byte b)
         {
             if (b >= '0' && b <= '9')
@@ -340,5 +405,20 @@ namespace PdfParser
 
             throw new FormatException("Malformed hex number");
         }
+
+        private bool Strcmp(int ix, string token)
+        {
+            for(int i = 0; i < token.Length; i++)
+            {
+                if (Bytes[ix + i] != token[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        #endregion
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace PdfParser
@@ -11,11 +11,29 @@ namespace PdfParser
     //
     public class PdfData
     {
-        private readonly List<PdfObject> pdfObjects = new List<PdfObject>();
-        public IEnumerable<PdfObject> PdfObjects => pdfObjects;
+        public PdfData(string file)
+        {
+            // Read file
+            Bytes = File.ReadAllBytes(file);
+        }
+
+        public PdfData(byte[] bytes)
+        {
+            Bytes = bytes;
+        }
+
+        // The file content
+        public readonly byte[] Bytes;
+
+        // Where xref starts
+        public int StartXrefPosition { get; private set; }
 
         // Trailer info
         public PdfTrailer PdfTrailer { get; private set; }
+
+        // Xref
+        private readonly List<PdfXref> pdfXrefs = new List<PdfXref>();
+        public IEnumerable<PdfXref> PdfXrefs => pdfXrefs;
 
         // Derived info
         public PdfDictionary Catalog { get; private set; }
@@ -23,20 +41,170 @@ namespace PdfParser
         public int NumberOfPages { get; private set; }
         public PdfObjectId[] Pages { get; private set; }
 
-        // Add an object
-        public void Add(PdfObject pdfObject)
+        // All the objects
+        private readonly List<PdfObject> pdfObjects = new List<PdfObject>();
+        public IEnumerable<PdfObject> PdfObjects => pdfObjects;
+
+        public void Parse()
         {
-            pdfObjects.Add(pdfObject);
+            //
+            // Create parse context
+            //
+            var parseContext = new ParseContext(Bytes);
+
+            //
+            // Check header
+            //
+            var magic = parseContext.GetAsString(7);
+            if (magic != "%PDF-1.")
+            {
+                throw new FormatException($"Bad magic: {magic}");
+            }
+            parseContext.Skip(7);
+
+            byte ver = parseContext.ReadByte();
+            if (ver < '1' || ver > '7')
+            {
+                throw new FormatException($"Unsupported PDF version: 1.{ver}");
+            }
+            parseContext.SkipCRLF();
+
+            //
+            // Check eof marker
+            //
+            parseContext.BackwardSkipCRLF();
+            string eof = parseContext.BackwardGetAsString(5);
+            if (eof != "%%EOF")
+            {
+                throw new FormatException($"Bad eof marker: {eof}");
+            }
+
+            //
+            // Find startxref position
+            //
+            parseContext.BackwardSkip(eof.Length);
+            ParseStartXref(parseContext);
+
+            //
+            // Parse the trailer
+            //
+            ParseTrailer(parseContext);
+
+            //
+            // Parse the xref
+            //
+            ParseXref(parseContext);
+
+            //
+            // Deal with encryption
+            //
+            CheckPasswordIfNeeded();
+
+            //
+            // Build the pages
+            //
+            BuildPages();
         }
 
-        // Set trailer info
-        public void SetPdfTrailer(int size, PdfObjectId catalog, PdfObjectId info)
+        private void ParseStartXref(ParseContext parseContext)
         {
-            PdfTrailer = new PdfTrailer(size, catalog, info);
+            parseContext.BackwardSkipCRLF();
+            var startxrefBody = parseContext.BackwardGetBlock("startxref");
+            var parseStartXrefBody = new ParseContext(startxrefBody);
+            parseStartXrefBody.SkipCRLF();
+            var startXrefPdfInt = PdfParser.ParsePdfElement(parseStartXrefBody, null, null) as PdfInt;
+            StartXrefPosition = startXrefPdfInt.Value;
+        }
 
-            // Populate derived info
-            Catalog = Find<PdfDictionary>(catalog);
+        private void ParseTrailer(ParseContext parseContext)
+        {
+            // Find the trailer marker going backward
+            parseContext.BackwardSkipCRLF();
+            var trailerBody = parseContext.BackwardGetBlock("trailer");
+            var parseTrailer = new ParseContext(trailerBody);
+            parseTrailer.SkipCRLF();
+
+            // Parse the trailer dictionary
+            var trailerDictionary = PdfParser.ParsePdfElement(parseTrailer, null, null) as PdfDictionary;
+
+            // Look for the size (Number of objects in the xref)
+            int size = trailerDictionary.Find<PdfInt>("Size").Value;
+
+            // Look for the catalog node
+            var catalog = trailerDictionary.Find<PdfReference>("Root").Value;
+
+            // Look for the info node
+            var info = trailerDictionary.Find<PdfReference>("Root").Value;
+
+            // Look for the encrypt node (optional)
+            var encrypt = trailerDictionary.Find<PdfReference>("Encrypt")?.Value;
+
+            PdfTrailer = new PdfTrailer(size, catalog, info, encrypt);
+        }
+
+        private void ParseXref(ParseContext parseContext)
+        {
+            // Extract the block we are interested in
+            parseContext.BackwardSkipCRLF();
+            var xrefBytes = new byte[parseContext.BackwardBytePos - StartXrefPosition];
+            for (int i = 0; i < xrefBytes.Length; i++)
+            {
+                xrefBytes[i] = parseContext.Bytes[StartXrefPosition + i];
+            }
+
+            var parseXrefContext = new ParseContext(xrefBytes);
+            parseXrefContext.Skip(4); // skip xref
+            parseXrefContext.SkipCRLF();
+
+            while (!parseXrefContext.EOF)
+            {
+                // Read subsection definition
+                parseXrefContext.IsInteger(0, true, out int startObj, out int startObjLen);
+                parseXrefContext.Skip(startObjLen);
+                parseXrefContext.IsInteger(0, true, out int numObj, out int numObjLen);
+                parseXrefContext.Skip(numObjLen);
+
+                // Read all entries
+                for (int objId = startObj; objId < startObj + numObj; objId++)
+                {
+                    parseXrefContext.IsInteger(0, true, out int objPos, out int objPosLen);
+                    parseXrefContext.Skip(objPosLen);
+                    parseXrefContext.IsInteger(0, true, out int objGen, out int objGenLen);
+                    parseXrefContext.Skip(objGenLen);
+
+                    if (parseXrefContext.ReadByte() == 'n')
+                    {
+                        pdfXrefs.Add(new PdfXref(objId, objGen, objPos));
+                    }
+                    parseXrefContext.SkipWhiteSpaces();
+                }
+            }
+        }
+
+        private void CheckPasswordIfNeeded()
+        {
+            if (PdfTrailer.Encrypt == null)
+            {
+                // Not encrypted
+                return;
+            }
+
+            // ZZZZ
+        }
+
+        // Find the Ids of pages, put them in the Pages list
+        public void BuildPages()
+        {
+            // Load and memorize the catalog
+            LoadObject(PdfTrailer.Catalog);
+            Catalog = Find<PdfDictionary>(PdfTrailer.Catalog);
+
+            //
+            // Populate catalog-derived info
+            //
+
             var pageTreeRootRef = Catalog.Find<PdfReference>("Pages");
+            LoadObject(pageTreeRootRef.Value);
             PageTreeRoot = Find<PdfDictionary>(pageTreeRootRef.Value);
             NumberOfPages = PageTreeRoot.Find<PdfInt>("Count").Value;
             Pages = new PdfObjectId[NumberOfPages];
@@ -44,6 +212,37 @@ namespace PdfParser
             // Traverse the tree to populate the page ids
             int ix = 0;
             PopulatePages(PageTreeRoot, ref ix);
+        }
+
+        private void LoadObject(PdfObjectId id)
+        {
+            if (pdfObjects.FirstOrDefault(po => id.Equals(po.PdfObjectId)) != null)
+            {
+                // Object already read
+                return;
+            }
+
+            var xref = PdfXrefs.FirstOrDefault(x => x.PdfObjectId.Equals(id));
+            var parseContext = new ParseContext(Bytes, xref.Position);
+
+            if (!parseContext.IsObjectStart(out int objId, out int objGen, out int objLen))
+            {
+                throw new FormatException($"Not an object start for object {id}, pos {xref.Position}");
+            }
+
+            if (objId != id.Id || objGen != id.Gen)
+            {
+                throw new FormatException($"Not the expected object. Expected {id}, read {objId}/{objGen}, pos {xref.Position}");
+            }
+
+            parseContext.Skip(objLen);
+            PdfParser.ParseObject(parseContext, this, id);
+        }
+
+        // Add an object
+        public void Add(PdfObject pdfObject)
+        {
+            pdfObjects.Add(pdfObject);
         }
 
         // Find object by id and type
@@ -67,8 +266,10 @@ namespace PdfParser
 
         public PdfStream GetContentForPage(PdfObjectId page)
         {
+            LoadObject(page);
             var pageDic = Find<PdfDictionary>(page);
             var contentRef = pageDic.Find<PdfReference>("Contents");
+            LoadObject(contentRef.Value);
             var contentStream = Find<PdfStream>(contentRef.Value);
             return contentStream;
         }
@@ -116,6 +317,7 @@ namespace PdfParser
             {
                 if (kid is PdfReference kidref)
                 {
+                    LoadObject(kidref.Value);
                     var kidDictionary = Find<PdfDictionary>(kidref.Value);
                     var kidType = kidDictionary.Find<PdfString>("Type").Value;
                     if (kidType == "Pages")
@@ -142,11 +344,13 @@ namespace PdfParser
     //
     public class PdfTrailer
     {
-        public PdfTrailer(int size, PdfObjectId catalog, PdfObjectId info) => (Size, Catalog, Info) = (size, catalog, info);
+        public PdfTrailer(int size, PdfObjectId catalog, PdfObjectId info, PdfObjectId encrypt) =>
+            (Size, Catalog, Info, Encrypt) = (size, catalog, info, encrypt);
 
         public readonly int Size;
         public readonly PdfObjectId Catalog;
         public readonly PdfObjectId Info;
+        public readonly PdfObjectId Encrypt;
     }
 
     //
@@ -312,6 +516,24 @@ namespace PdfParser
 
         // Object id (may be null)
         public readonly PdfObjectId PdfObjectId;
+    }
+
+    //
+    // Object xref
+    //
+    public class PdfXref
+    {
+        public PdfXref(int id, int gen, int pos)
+        {
+            PdfObjectId = new PdfObjectId(id, gen);
+            Position = pos;
+        }
+
+        // Object id
+        public readonly PdfObjectId PdfObjectId;
+
+        // Position in file
+        public readonly int Position;
     }
 
     //

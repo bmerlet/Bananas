@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using PdfParser;
 
 namespace StatementParser
 {
@@ -27,7 +28,6 @@ namespace StatementParser
                 }
                 else
                 {
-                    var parser = new PdfParser.PdfParser();
                     var analyzer = new StatementAnalyzer();
                     var targetFile = Path.Combine(directory, "StatementParser.QIF");
                     if (File.Exists(targetFile))
@@ -38,7 +38,8 @@ namespace StatementParser
                     foreach (var f in files)
                     {
                         Console.WriteLine($"=== Processing {f}");
-                        var data = parser.Parse(f);
+                        var data = new PdfData(f);
+                        data.Parse();
 
                         // Debug
                         for (int i = 0; i < data.NumberOfPages; i++)
