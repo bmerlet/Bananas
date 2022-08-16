@@ -31,6 +31,9 @@ namespace PdfParser
         // Trailer info
         public PdfTrailer PdfTrailer { get; private set; }
 
+        // Encryption info
+        public byte[] RC4Key { get; private set; }
+
         // Xref
         private readonly List<PdfXref> pdfXrefs = new List<PdfXref>();
         public IEnumerable<PdfXref> PdfXrefs => pdfXrefs;
@@ -139,7 +142,10 @@ namespace PdfParser
             // Look for the encrypt node (optional)
             var encrypt = trailerDictionary.Find<PdfReference>("Encrypt")?.Value;
 
-            PdfTrailer = new PdfTrailer(size, catalog, info, encrypt);
+            // Look for ID (mandatory with encryption, optional otherwise
+            var id = trailerDictionary.Find<PdfArray>("ID")?.Values;
+
+            PdfTrailer = new PdfTrailer(size, catalog, info, encrypt, id);
         }
 
         private void ParseXref(ParseContext parseContext)
@@ -181,14 +187,133 @@ namespace PdfParser
             }
         }
 
-        private void CheckPasswordIfNeeded()
+        private void CheckPasswordIfNeeded(string password = "")
         {
+            byte[] padding = new byte[]
+            {
+                0x28, 0xBF, 0x4E, 0x5E, 0x4E, 0x75, 0x8A, 0x41, 0x64, 0x00, 0x4E, 0x56, 0xFF, 0xFA, 0x01, 0x08,
+                0x2E, 0x2E, 0x00, 0xB6, 0xD0, 0x68, 0x3E, 0x80, 0x2F, 0x0C, 0xA9, 0xFE, 0x64, 0x53, 0x69, 0x7A
+            };
+
+            // Check if file encrypted
             if (PdfTrailer.Encrypt == null)
             {
                 // Not encrypted
                 return;
             }
 
+            // Load encryption info
+            LoadObject(PdfTrailer.Encrypt);
+            var encryptDic = Find<PdfDictionary>(PdfTrailer.Encrypt);
+
+            // We support only "Standard"
+            if (encryptDic.Find<PdfString>("Filter")?.Value != "Standard")
+            {
+                throw new FormatException("Unknown encryption");
+            }
+
+            // We support only version 1
+            if (encryptDic.Find<PdfInt>("V").Value != 1)
+            {
+                throw new FormatException("Only support version 1 of the standard encryption");
+            }
+
+            if (encryptDic.Find<PdfInt>("R").Value != 2)
+            {
+                throw new FormatException("Only support revision 2 of the standard encryption");
+            }
+
+            // Get user and owner passwords
+            var userPasswordStr = encryptDic.Find<PdfString>("U").Value;
+            var userPassword = new byte[userPasswordStr.Length];
+            for(int i = 0; i < userPassword.Length; i++)
+            {
+                userPassword[i] = (byte)userPasswordStr[i];
+            }
+
+            var ownerPassword = encryptDic.Find<PdfString>("O").Value;
+
+            // Get the flags
+            uint flags = (uint)encryptDic.Find<PdfInt>("P").Value;
+
+            // Compute the encryption key (Algorithm 3.2, p125 of PDF spec)
+            var buf = new List<byte>();
+
+            // (1) Add password (up to 32 bytes)...
+            for(int i = 0; i < 32 && i < password.Length; i++)
+            {
+                buf.Add((byte)password[i]);
+            }
+            // ... and pad with specific bytes
+            for (int i = 0; i < 32 && buf.Count < 32; i++)
+            {
+                buf.Add(padding[i]);
+            }
+
+            // (2) Init MD5
+            // (3) Add the owner password
+            for(int i = 0; i < ownerPassword.Length; i++)
+            {
+                buf.Add((byte)ownerPassword[i]);
+            }
+
+            // (4) Add the flags as an uint, low-order bits first
+            buf.Add((byte)(flags & 0xff));
+            buf.Add((byte)((flags >> 8 ) & 0xff));
+            buf.Add((byte)((flags >> 16) & 0xff));
+            buf.Add((byte)((flags >> 24) & 0xff));
+
+            // (5) First element of the ID array in the trailer
+            foreach(PdfHexString str in PdfTrailer.ID)
+            {
+                for(int i = 0; i < str.Value.Length; i++)
+                {
+                    buf.Add(str.Value[i]);
+                }
+                break;
+            }
+
+            // (6) For revison 4 (of what?) and higher, if metadata is not encrypted, pass ffffffff
+            for(int i = 0; i < 4; i++)
+            {
+                buf.Add((byte)0xff);
+            }
+
+            // (7) Compute the MD5 hash
+            var md5 = new System.Security.Cryptography.MD5Cng();
+            var hash = md5.ComputeHash(buf.ToArray());
+
+            // (8) for version 3 and above...
+            // (9) Take first 5 bytes as the key
+            var key = new byte[5];
+            for(int i = 0; i < 5; i++)
+            {
+                key[i] = hash[i];
+            }
+
+            //
+            // Password validation (algorithm 3.6)
+            //
+            // 3.6 (1) Perform all but the last step of algorithm 3.4
+            //   3.4 (1) Create an encryption key using algorithm 3.2 (done above)
+            //   3.4 (2) RC4-Encrypt padding from 3.1 with the key
+            var encryptedPadding = RC4.Encrypt(key, padding);
+
+            // 3.6 (2) Compare result to user password
+            bool match = true;
+            for (int i = 0; i < encryptedPadding.Length; i++)
+            {
+                if (encryptedPadding[i] != userPassword[i])
+                {
+                    match = false;
+                    break;
+                }
+            }
+
+            if (match)
+            {
+                RC4Key = key;
+            }
             // ZZZZ
         }
 
@@ -344,13 +469,14 @@ namespace PdfParser
     //
     public class PdfTrailer
     {
-        public PdfTrailer(int size, PdfObjectId catalog, PdfObjectId info, PdfObjectId encrypt) =>
-            (Size, Catalog, Info, Encrypt) = (size, catalog, info, encrypt);
+        public PdfTrailer(int size, PdfObjectId catalog, PdfObjectId info, PdfObjectId encrypt, IEnumerable<PdfObject> id) =>
+            (Size, Catalog, Info, Encrypt, ID) = (size, catalog, info, encrypt, id);
 
         public readonly int Size;
         public readonly PdfObjectId Catalog;
         public readonly PdfObjectId Info;
         public readonly PdfObjectId Encrypt;
+        public readonly IEnumerable<PdfObject> ID;
     }
 
     //
