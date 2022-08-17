@@ -339,7 +339,7 @@ namespace StatementParser
 
         #endregion
 
-        #region Chase CC
+        #region Chase CC analyzer
 
         private void AnalyzeChaseTransactions(PdfData data, string accountName, string qifFileName)
         {
@@ -434,32 +434,32 @@ namespace StatementParser
             }
 
             // Produce QIF output
-            //var eol = Environment.NewLine;
-            //string qif =
-            //    "!Option:AutoSwitch" + eol +
-            //    "!Account" + eol +
-            //    "N" + accountName + eol +
-            //    "TInvst" + eol +
-            //    "^" + eol +
-            //    "!Type:Invst" + eol;
+            var eol = Environment.NewLine;
+            string qif =
+                "!Option:AutoSwitch" + eol +
+                "!Account" + eol +
+                "N" + accountName + eol +
+                "TCCard" + eol +
+                "^" + eol +
+                "!Type:CCard" + eol;
 
-            //foreach (var cct in trans)
-            //{
-            //    var amount = cct.Amount.ToString();
-            //    qif +=
-            //        "D" + cct.Date + eol +
-            //        "N" + GetVanguardQIFType(cct.Type) + eol +
-            //        "Y" + GetNameForTicker(cct.Ticker) + eol +
-            //        $"I{cct.Price}" + eol +
-            //        $"Q{cct.Quantity}" + eol +
-            //        "C" + eol +
-            //        "U" + amount + eol +
-            //        "T" + amount + eol +
-            //        "$" + amount + eol +
-            //        "^" + eol;
-            //}
+            foreach (var cct in trans)
+            {
+                var amount = (-cct.Amount).ToString("N2");
+                var transqif =
+                    "D" + cct.Date + eol +
+                    "U" + amount + eol +
+                    "T" + amount + eol +
+                    "C" + eol +
+                    "P" + (cct.Vendor == null ? "" : cct.Vendor) + eol +
+                    "M" + (cct.Comment == null ? "" : cct.Comment) + eol +
+                    "L" + (cct.Category == null ? "" : cct.Category) + eol +
+                    "^" + eol;
 
-            //File.AppendAllText(qifFileName, qif);
+                qif += transqif;
+            }
+
+            File.AppendAllText(qifFileName, qif);
 
         }
 

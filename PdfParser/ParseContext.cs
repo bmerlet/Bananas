@@ -309,8 +309,18 @@ namespace PdfParser
                         case '\\':
                             str.Append('\\');
                             break;
+                        case '0':
+                        case '1':
+                        case '2':
+                        case '3':
+                        case '4':
+                        case '5':
+                        case '6':
+                        case '7':
+                            int octalCode = ReadByte() * 64 + ReadByte() * 8 + CurrentByte;
+                            str.Append((char)octalCode);
+                            break;
                         default:
-                            // Note: we could/should support the \ddd format where the character code is given in octal.
                             throw new FormatException($"Unknown escape char {CurrentByte} while parsing paren string");
                     }
                     Skip(1);

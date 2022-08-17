@@ -38,20 +38,22 @@ namespace StatementParser
                     foreach (var f in files)
                     {
                         Console.WriteLine($"=== Processing {f}");
+                        Console.WriteLine();
+
                         var data = new PdfData(f);
                         data.Parse();
 
                         // Debug
-                        for (int i = 0; i < data.NumberOfPages; i++)
-                        {
-                            Console.WriteLine($"================================= Page {i + 1} ==================================");
-                            var strs = data.ExtractTextFromPage(i);
+                        //for (int i = 0; i < data.NumberOfPages; i++)
+                        //{
+                        //    Console.WriteLine($"================================= Page {i + 1} ==================================");
+                        //    var strs = data.ExtractTextFromPage(i);
 
-                            foreach (var str in strs)
-                            {
-                                Console.WriteLine(str);
-                            }
-                        }
+                        //    foreach (var str in strs)
+                        //    {
+                        //        Console.WriteLine(str);
+                        //    }
+                        //}
 
                         analyzer.AnalyzeStatement(data, targetFile);
                     }

@@ -136,7 +136,7 @@ namespace BanaData.Logic.Dialogs.Pickers
 
         private void OnBrowseDifferentialCommand()
         {
-            var logic = new Basics.OpenFileLogic(DifferentialExportPath, "Quicken Interchange Format files (*.QIF)|*.QIF|Any file (*.*)|*.*", "Import QIF file");
+            var logic = new Basics.SaveFileLogic(DifferentialExportPath, "Quicken Interchange Format files (*.QIF)|*.QIF|Any file (*.*)|*.*", "Import QIF file");
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
             {
                 DifferentialExportPath = logic.File;
@@ -146,7 +146,7 @@ namespace BanaData.Logic.Dialogs.Pickers
 
         private void OnBrowseRegularCommand()
         {
-            var logic = new Basics.OpenFileLogic(RegularExportPath, "Quicken Interchange Format files (*.QIF)|*.QIF|Any file (*.*)|*.*", "Import QIF file");
+            var logic = new Basics.SaveFileLogic(RegularExportPath, "Quicken Interchange Format files (*.QIF)|*.QIF|Any file (*.*)|*.*", "Import QIF file");
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
             {
                 RegularExportPath = logic.File;
