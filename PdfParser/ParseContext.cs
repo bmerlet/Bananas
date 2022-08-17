@@ -262,7 +262,7 @@ namespace PdfParser
             var str = new StringBuilder();
             while (true)
             {
-                if (Bytes[BytePos] == '(')
+                if (CurrentByte == '(')
                 {
                     depth += 1;
                     if (depth != 1)
@@ -274,15 +274,50 @@ namespace PdfParser
                         BytePos += 1;
                     }
                 }
-                else if (Bytes[BytePos] == ')')
+                else if (CurrentByte == ')')
                 {
                     depth -= 1;
                     if (depth == 0)
                     {
-                        BytePos += 1;
+                        Skip(1);
                         break;
                     }
                     str.Append((char)ReadByte());
+                }
+                else if (CurrentByte == '\\')
+                {
+                    Skip(1);
+                    switch((char)CurrentByte)
+                    {
+                        case 'n':
+                            str.Append('\n');
+                            break;
+                        case 'r':
+                            str.Append('\r');
+                            break;
+                        case 't':
+                            str.Append('\t');
+                            break;
+                        case 'b':
+                            str.Append('\b');
+                            break;
+                        case 'f':
+                            str.Append('\f');
+                            break;
+                        case '(':
+                            str.Append('(');
+                            break;
+                        case ')':
+                            str.Append(')');
+                            break;
+                        case '\\':
+                            str.Append('\\');
+                            break;
+                        default:
+                            // Note: we could/should support the \ddd format where the character code is given in octal.
+                            throw new FormatException($"Unknown escape char {CurrentByte} while parsing paren string");
+                    }
+                    Skip(1);
                 }
                 else
                 {

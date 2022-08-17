@@ -12,16 +12,20 @@ namespace StatementParser
 
         public enum EInstitution { None, Vanguard, Chase }
 
-        static readonly AccountSpec[] accountSpecsVanguard = new AccountSpec[]
+        static readonly AccountSpec[] accountSpecs = new AccountSpec[]
         {
-            new AccountSpec("SVanguard Brokerage", new AccountHint[] { new AccountHint(2, 2, new string[] { "Vanguard", "Susan", "brokerage" }) }),
-            new AccountSpec("BVanguard Brokerage", new AccountHint[] { new AccountHint(2, 2, new string[] { "Vanguard", "Benoit", "brokerage" }) }),
+            new AccountSpec(EInstitution.Vanguard, "SVanguard Brokerage", new AccountHint[] { new AccountHint(2, 2, new string[] { "Vanguard", "Susan", "brokerage" }) }),
+            new AccountSpec(EInstitution.Vanguard, "BVanguard Brokerage", new AccountHint[] { new AccountHint(2, 2, new string[] { "Vanguard", "Benoit", "brokerage" }) }),
+            new AccountSpec(EInstitution.Chase, "SAmazon XX6555", new AccountHint[] { new AccountHint(1, 1, new string[] { "Amazon Customer Service" }) }),
         };
 
         // Account
         class AccountSpec
         {
-            public AccountSpec(string name, AccountHint[] hints) => (BananaAccountName, AccountHints) = (name, hints);
+            public AccountSpec(EInstitution institution, string name, AccountHint[] hints) => 
+                (Institution, BananaAccountName, AccountHints) = (institution, name, hints);
+            
+            public readonly EInstitution Institution;
             public readonly string BananaAccountName;
             public readonly AccountHint[] AccountHints;
         }
@@ -40,7 +44,7 @@ namespace StatementParser
             EInstitution institution = EInstitution.None;
             string accountName = "?";
 
-            foreach (var spec in accountSpecsVanguard)
+            foreach (var spec in accountSpecs)
             {
                 bool pass = true;
                 foreach (var hint in spec.AccountHints)
@@ -76,7 +80,7 @@ namespace StatementParser
                 if (pass)
                 {
                     accountName = spec.BananaAccountName;
-                    institution = EInstitution.Vanguard;
+                    institution = spec.Institution;
                     break;
                 }
             }
@@ -150,10 +154,21 @@ namespace StatementParser
             }
 
             Console.WriteLine("\n=== Transactions:\n");
-            AnalizeVanguardTransactions(data, bananaAccountName, qifFileName);
+            if (institution == EInstitution.Vanguard)
+            {
+                AnalyzeVanguardTransactions(data, bananaAccountName, qifFileName);
+            }
+            else if (institution == EInstitution.Chase)
+            {
+                AnalyzeChaseTransactions(data, bananaAccountName, qifFileName);
+            }
         }
 
-        private void AnalizeVanguardTransactions(PdfData data, string accountName, string qifFileName)
+        #endregion
+        
+        #region Vanguard analyzer
+
+        private void AnalyzeVanguardTransactions(PdfData data, string accountName, string qifFileName)
         {
             var trans = new List<VanguardTransaction>();
 
@@ -320,6 +335,15 @@ namespace StatementParser
             public readonly decimal Quantity;
             public readonly decimal Price;
             public readonly decimal Amount;
+        }
+
+        #endregion
+
+        #region Chase CC
+
+        private void AnalyzeChaseTransactions(PdfData data, string accountName, string qifFileName)
+        {
+
         }
 
         #endregion

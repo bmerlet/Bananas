@@ -11,6 +11,8 @@ namespace PdfParser
     //
     public class PdfData
     {
+        #region Constructors
+
         public PdfData(string file)
         {
             // Read file
@@ -22,8 +24,15 @@ namespace PdfParser
             Bytes = bytes;
         }
 
+        #endregion
+
+        #region Public properties
+
         // The file content
         public readonly byte[] Bytes;
+
+        // PDF minor version (e.g. 4 for 1.4)
+        public int PdfMinorVersion { get; private set; }
 
         // Where xref starts
         public int StartXrefPosition { get; private set; }
@@ -32,7 +41,8 @@ namespace PdfParser
         public PdfTrailer PdfTrailer { get; private set; }
 
         // Encryption info
-        public byte[] RC4Key { get; private set; }
+        public PdfCrypto PdfCrypto { get; private set; }
+        public byte[] EncryptionKey { get; private set; }
 
         // Xref
         private readonly List<PdfXref> pdfXrefs = new List<PdfXref>();
@@ -48,7 +58,11 @@ namespace PdfParser
         private readonly List<PdfObject> pdfObjects = new List<PdfObject>();
         public IEnumerable<PdfObject> PdfObjects => pdfObjects;
 
-        public void Parse()
+        #endregion
+
+        #region Main parsing
+
+        public void Parse(string password = "")
         {
             //
             // Create parse context
@@ -71,6 +85,9 @@ namespace PdfParser
                 throw new FormatException($"Unsupported PDF version: 1.{ver}");
             }
             parseContext.SkipCRLF();
+
+            // Remember version
+            PdfMinorVersion = ver;
 
             //
             // Check eof marker
@@ -101,7 +118,20 @@ namespace PdfParser
             //
             // Deal with encryption
             //
-            CheckPasswordIfNeeded();
+            if (PdfTrailer.Encrypt != null)
+            {
+                // Load the encryption info into PdfCrypto
+                LoadObject(PdfTrailer.Encrypt);
+                var encryptDic = Find<PdfDictionary>(PdfTrailer.Encrypt);
+                PdfCrypto = new PdfCrypto(encryptDic);
+
+                // ZZZZZ
+                //ComputeUserPasswordHash("");
+                //ComputeOwnerPasswordHash("", "");
+
+                // Check the passed-in password
+                CheckPassword(password);
+            }
 
             //
             // Build the pages
@@ -187,96 +217,156 @@ namespace PdfParser
             }
         }
 
-        private void CheckPasswordIfNeeded(string password = "")
+        #endregion
+
+        #region Crypto
+
+        //
+        // Encrypt/decrypt a set of bytes
+        //
+        public byte[] Encrypt(byte[] data, PdfObjectId id)
         {
-            byte[] padding = new byte[]
+            if (EncryptionKey == null)
             {
+                return data;
+            }
+
+            // Decide if using AES
+            // ZZZ If I understand correctly AES is only used in "crypt filters"
+            //bool usingAES = PdfMinorVersion >= 6;
+
+            // Algorithm 3.1, p119
+            // (1) obtain oject id and gen: they are in the "id" variable
+            
+            // (2) Extend the encryption key...
+            var extKey = new List<byte>();
+            extKey.AddRange(EncryptionKey);
+            
+            // ... by adding 3 bytes of the object number, lsb first...
+            extKey.Add((byte)(id.Id & 0xff));
+            extKey.Add((byte)((id.Id >> 8) & 0xff));
+            extKey.Add((byte)((id.Id >> 16) & 0xff));
+            
+            // ... and 2 bytes of the gen number, lsb first...
+            extKey.Add((byte)(id.Gen & 0xff));
+            extKey.Add((byte)((id.Gen >> 8) & 0xff));
+            
+            // And some salt if we are using AES
+            //if (usingAES)
+            //{
+            //    extKey.Add(0x73);
+            //    extKey.Add(0x41);
+            //    extKey.Add(0x6C);
+            //    extKey.Add(0x54);
+            //}
+
+            // (3) Compute MD5 hash
+            var md5 = new System.Security.Cryptography.MD5Cng();
+            var hash = md5.ComputeHash(extKey.ToArray());
+
+            // (4) Use the first EncryptionKey.Length + 5 bytes (up to 16) as the RC4/AES key
+            var key = new byte[Math.Min(16, EncryptionKey.Length + 5)];
+            for(int i = 0; i < key.Length; i++)
+            {
+                key[i] = hash[i];
+            }
+
+            //if (usingAES)
+            //{
+            //    var aes = new System.Security.Cryptography.AesCng();
+            //    aes.Key = key;
+            //    var decryptor = aes.CreateDecryptor();
+            //    data = decryptor.TransformFinalBlock(data, 0, data.Length);
+            //}
+            //else
+            {
+                data = RC4.Encrypt(key, data);
+            }
+
+            // Debug
+            //var sb = new System.Text.StringBuilder();
+            //foreach (var b in data) sb.Append((char)b);
+            //var str = sb.ToString();
+            //Console.WriteLine(str);
+
+
+            return data;
+        }
+
+        //
+        // Padding, as defined in step 1 of algorithm 3.2 (p125 of PDF spec)
+        //
+        private readonly byte[] padding = new byte[]
+        {
                 0x28, 0xBF, 0x4E, 0x5E, 0x4E, 0x75, 0x8A, 0x41, 0x64, 0x00, 0x4E, 0x56, 0xFF, 0xFA, 0x01, 0x08,
                 0x2E, 0x2E, 0x00, 0xB6, 0xD0, 0x68, 0x3E, 0x80, 0x2F, 0x0C, 0xA9, 0xFE, 0x64, 0x53, 0x69, 0x7A
-            };
+        };
 
-            // Check if file encrypted
-            if (PdfTrailer.Encrypt == null)
+        //
+        // Pad password
+        //
+        private byte[] PadPassword(string password)
+        {
+            var buf = new byte[32];
+            int i;
+
+            // Add password (up to 32 bytes)...
+            for (i = 0; i < 32 && i < password.Length; i++)
             {
-                // Not encrypted
-                return;
+                buf[i] = (byte)password[i];
             }
 
-            // Load encryption info
-            LoadObject(PdfTrailer.Encrypt);
-            var encryptDic = Find<PdfDictionary>(PdfTrailer.Encrypt);
-
-            // We support only "Standard"
-            if (encryptDic.Find<PdfString>("Filter")?.Value != "Standard")
+            // ... and pad with padding bytes
+            for (int j = 0; i < 32; i++)
             {
-                throw new FormatException("Unknown encryption");
+                buf[i] = padding[j++];
             }
 
-            // We support only version 1
-            if (encryptDic.Find<PdfInt>("V").Value != 1)
-            {
-                throw new FormatException("Only support version 1 of the standard encryption");
-            }
+            return buf;
+        }
 
-            if (encryptDic.Find<PdfInt>("R").Value != 2)
-            {
-                throw new FormatException("Only support revision 2 of the standard encryption");
-            }
-
-            // Get user and owner passwords
-            var userPasswordStr = encryptDic.Find<PdfString>("U").Value;
-            var userPassword = new byte[userPasswordStr.Length];
-            for(int i = 0; i < userPassword.Length; i++)
-            {
-                userPassword[i] = (byte)userPasswordStr[i];
-            }
-
-            var ownerPassword = encryptDic.Find<PdfString>("O").Value;
-
-            // Get the flags
-            uint flags = (uint)encryptDic.Find<PdfInt>("P").Value;
-
-            // Compute the encryption key (Algorithm 3.2, p125 of PDF spec)
+        //
+        // Compute encryption key
+        //
+        // Algorithm 3.2, p125 of PDF spec
+        private byte[] ComputeEncryptionKey(string password)
+        {
+            // Buffer
             var buf = new List<byte>();
 
-            // (1) Add password (up to 32 bytes)...
-            for(int i = 0; i < 32 && i < password.Length; i++)
-            {
-                buf.Add((byte)password[i]);
-            }
-            // ... and pad with specific bytes
-            for (int i = 0; i < 32 && buf.Count < 32; i++)
-            {
-                buf.Add(padding[i]);
-            }
+            // (1) Add padded password
+            buf.AddRange(PadPassword(password));
 
             // (2) Init MD5
             // (3) Add the owner password
-            for(int i = 0; i < ownerPassword.Length; i++)
+            for (int i = 0; i < PdfCrypto.OwnerPassword.Length; i++)
             {
-                buf.Add((byte)ownerPassword[i]);
+                buf.Add((byte)PdfCrypto.OwnerPassword[i]);
             }
 
             // (4) Add the flags as an uint, low-order bits first
-            buf.Add((byte)(flags & 0xff));
-            buf.Add((byte)((flags >> 8 ) & 0xff));
-            buf.Add((byte)((flags >> 16) & 0xff));
-            buf.Add((byte)((flags >> 24) & 0xff));
+            buf.Add((byte)(PdfCrypto.Flags & 0xff));
+            buf.Add((byte)((PdfCrypto.Flags >> 8) & 0xff));
+            buf.Add((byte)((PdfCrypto.Flags >> 16) & 0xff));
+            buf.Add((byte)((PdfCrypto.Flags >> 24) & 0xff));
 
             // (5) First element of the ID array in the trailer
-            foreach(PdfHexString str in PdfTrailer.ID)
+            foreach (PdfHexString str in PdfTrailer.ID)
             {
-                for(int i = 0; i < str.Value.Length; i++)
+                for (int i = 0; i < str.Value.Length; i++)
                 {
                     buf.Add(str.Value[i]);
                 }
                 break;
             }
 
-            // (6) For revison 4 (of what?) and higher, if metadata is not encrypted, pass ffffffff
-            for(int i = 0; i < 4; i++)
+            // (6) For revision 4 (of what?) and higher, if metadata is not encrypted, pass ffffffff
+            if (PdfCrypto.Revision >= 4) // ZZZZ Should parse "EncryptMetadata" bool in PdfCrypto, default is TRUE see p123 
             {
-                buf.Add((byte)0xff);
+                for (int i = 0; i < 4; i++)
+                {
+                    buf.Add((byte)0xff);
+                }
             }
 
             // (7) Compute the MD5 hash
@@ -284,18 +374,27 @@ namespace PdfParser
             var hash = md5.ComputeHash(buf.ToArray());
 
             // (8) for version 3 and above...
+            // RFU
+
             // (9) Take first 5 bytes as the key
             var key = new byte[5];
-            for(int i = 0; i < 5; i++)
+            for (int i = 0; i < 5; i++)
             {
                 key[i] = hash[i];
             }
 
+            return key;
+        }
+
+        private void CheckPassword(string password)
+        {
             //
             // Password validation (algorithm 3.6)
             //
             // 3.6 (1) Perform all but the last step of algorithm 3.4
-            //   3.4 (1) Create an encryption key using algorithm 3.2 (done above)
+            //   3.4 (1) Create an encryption key using algorithm 3.2
+            var key = ComputeEncryptionKey(password);
+
             //   3.4 (2) RC4-Encrypt padding from 3.1 with the key
             var encryptedPadding = RC4.Encrypt(key, padding);
 
@@ -303,7 +402,7 @@ namespace PdfParser
             bool match = true;
             for (int i = 0; i < encryptedPadding.Length; i++)
             {
-                if (encryptedPadding[i] != userPassword[i])
+                if (encryptedPadding[i] != PdfCrypto.UserPassword[i])
                 {
                     match = false;
                     break;
@@ -312,10 +411,59 @@ namespace PdfParser
 
             if (match)
             {
-                RC4Key = key;
+                EncryptionKey = key;
             }
-            // ZZZZ
+            else
+            {
+                throw new FormatException("Password does not match");
+            }
         }
+
+        // Algorithm 3.3
+        private byte[] ComputeOwnerPasswordHash(string ownerPassword, string userPassword)
+        {
+            // (1) Get padded owner password
+            var buf = PadPassword(ownerPassword);
+
+            // (2) Get MD5 hash
+            var md5 = new System.Security.Cryptography.MD5Cng();
+            var hash = md5.ComputeHash(buf);
+
+            // (3) Revision 3 or greater...
+
+            // (4) use first 5 bytes of the MD5 as key 
+            var key = new byte[5];
+            for (int i = 0; i < 5; i++)
+            {
+                key[i] = hash[i];
+            }
+
+            // (5) get passed user password
+            buf = PadPassword(userPassword);
+
+            // (6) encrypt user password using key from 4
+            var o = RC4.Encrypt(key, buf);
+
+            // (7) Revision 3 or greater...
+
+            // (8)Store O as owner password
+            return o;
+        }
+
+        // Algorithm 3.4
+        private byte[] ComputeUserPasswordHash(string userPassword)
+        {
+            // (1) Get encryption key
+            var key = ComputeEncryptionKey(userPassword);
+
+            // (2) encrypt padding using key from (1)
+            var u = RC4.Encrypt(key, padding);
+
+            // (3) Store as U
+            return u;
+        }
+
+        #endregion
 
         // Find the Ids of pages, put them in the Pages list
         public void BuildPages()
@@ -462,6 +610,112 @@ namespace PdfParser
                 }
             }
         }
+    }
+
+    //
+    // Pdf encryption info
+    //
+    public class PdfCrypto
+    {
+        public PdfCrypto(PdfDictionary dic)
+        {
+            // Get the filter
+            Filter = dic.Find<PdfString>("Filter")?.Value;
+
+            // We support only "Standard"
+            if (Filter != "Standard")
+            {
+                throw new FormatException($"Unknown encryption filter {Filter}");
+            }
+
+            // Get the version
+            Version = dic.Find<PdfInt>("V").Value;
+
+            // We support only version 1
+            if (Version != 1)
+            {
+                throw new FormatException("Only support version 1 of the standard security handler");
+            }
+
+            // Get key length (optional)
+            var KeyLengthInt = dic.Find<PdfInt>("Length");
+            KeyLength = (KeyLengthInt == null) ? 40 : KeyLengthInt.Value;
+            if (KeyLength != 40)
+            {
+                throw new FormatException("Only support key length of 40 bits for standard security handler");
+            }
+
+            // Get the revision of the standard security handler
+            Revision = dic.Find<PdfInt>("R").Value;
+            if (Revision != 2)
+            {
+                throw new FormatException("Only support revision 2 of the standard security handler");
+            }
+
+            // Get the owner password hash
+            OwnerPassword = FindPasswordHash(dic, "O");
+
+            // Get the user password hash
+            UserPassword = FindPasswordHash(dic, "U");
+
+            // Get the flags
+            Flags = (uint)dic.Find<PdfInt>("P").Value;
+        }
+
+        private byte[] FindPasswordHash(PdfDictionary dic, string key)
+        {
+            byte[] password;
+
+            var passwordHexStr = dic.Find<PdfHexString>(key);
+            if (passwordHexStr != null)
+            {
+                password = passwordHexStr.Value;
+            }
+            else
+            {
+                var passwordStr = dic.Find<PdfString>(key);
+                if (passwordStr != null)
+                {
+                    password = new byte[passwordStr.Value.Length];
+                    for (int i = 0; i < password.Length; i++)
+                    {
+                        password[i] = (byte)passwordStr.Value[i];
+                    }
+                }
+                else
+                {
+                    throw new FormatException("Cannot find owner password hash in encryption dictionary");
+                }
+            }
+
+            if (password.Length != 32)
+            {
+                throw new FormatException($"{key} password hash is {password.Length} bytes instead of 32");
+            }
+
+            return password;
+        }
+
+        // Filter used (always "Standard")
+        public readonly string Filter;
+
+        // Encryption/decryption version (only "1" supported so far)
+        public readonly int Version;
+
+        // Encrytion key length in bits
+        public readonly int KeyLength;
+
+        // Revision of the standard security handler
+        public readonly int Revision;
+
+        // Owner password hash
+        public readonly byte[] OwnerPassword;
+
+        // User password hash
+        public readonly byte[] UserPassword;
+
+        // Flags
+        public readonly uint Flags;
     }
 
     //

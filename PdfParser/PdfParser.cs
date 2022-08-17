@@ -256,8 +256,14 @@ namespace PdfParser
             // Get the bytes
             byte[] data = parseContext.ReadArray(len);
 
+            // Decrypt if needed
+            if (pdfData.EncryptionKey != null)
+            {
+                data  = pdfData.Encrypt(data, pdfObjectId);
+            }
+
             // Decompress if needed
-            if (deflate && !image)
+            if (deflate)
             {
                 // ZZZ Remove ICsharp
                 //var inflater = new ICSharpCode.SharpZipLib.Zip.Compression.Inflater(true);
@@ -279,6 +285,10 @@ namespace PdfParser
                         compressedStream.ReadByte();
                         compressedStream.ReadByte();
                     }
+                }
+                else
+                {
+                    throw new FormatException($"Invalid zlib header {data[0]} {data[1]}");
                 }
 
                 var decompressedStream = new MemoryStream();
