@@ -343,7 +343,135 @@ namespace StatementParser
 
         private void AnalyzeChaseTransactions(PdfData data, string accountName, string qifFileName)
         {
+            var trans = new List<CCTransaction>();
 
+            string year = null; ;
+            {
+                var strs = data.ExtractTextFromPage(0);
+                foreach (var str in strs)
+                {
+                    int ix = str.IndexOf(", monthly transaction statement");
+                    if (ix > 4)
+                    {
+                        year = "/" + str.Substring(ix - 4, 4);
+                        break;
+                    }
+                }
+            }
+
+            // Start at page 3 "Transaction Description", stop at "Annual Percentage Rate"
+            bool foundTransactionDescription = false;
+            bool foundEnd = false;
+
+            for (int page = 2; page < data.NumberOfPages && !foundEnd; page++)
+            {
+                // get the strings on page
+                var strs = data.ExtractTextFromPage(page);
+
+                // Eliminate empty strings
+                var list = new List<string>();
+                foreach(var str in strs)
+                {
+                    if (!String.IsNullOrWhiteSpace(str))
+                    {
+                        list.Add(str);
+                    }
+                }
+                strs = list.ToArray();
+
+                // Fill in the year the first time around
+                if (year == null)
+                {
+                    for (int i = 0; i < strs.Length; i++)
+                    {
+                        if (strs[i].StartsWith("Statement Date:"))
+                        {
+                            string statementDate = strs[i + 1];
+                            var split = statementDate.Split(new char[] { '/' });
+                            year = "/20" + split[split.Length - 1];
+                        }
+                    }
+                }
+
+                for (int i = 0; i < strs.Length; i++)
+                {
+                    if (!foundTransactionDescription)
+                    {
+                        if (strs[i].Contains("Transaction Description"))
+                        {
+                            foundTransactionDescription = true;
+                        }
+                        continue;
+                    }
+
+                    if (strs[i].Contains("Annual Percentage Rate (APR)"))
+                    {
+                        // Done
+                        foundEnd = true;
+                        break;
+                    }
+
+                    // We are after "Transaction Description" and before "Annual Percentage Rate (APR)"
+                    if (strs[i].StartsWith("Payment Thank You"))
+                    {
+                        var cct = new CCTransaction(strs[i - 1].Trim() + year, "Payment", null, null, decimal.Parse(strs[i + 1]));
+                        trans.Add(cct);
+                    }
+                    else if (strs[i].StartsWith("Order Number"))
+                    {
+                        var split = strs[i].Split(new char[] { ' ', '\t' });
+                        var orderNumber = split[split.Length - 1];
+                        var cct = new CCTransaction(strs[i - 3].Trim() + year, "Amazon", orderNumber, null, decimal.Parse(strs[i + -1]));
+                        trans.Add(cct);
+                    }
+                }
+            }
+
+            // ZZZ Debug
+            foreach (var cct in trans)
+            {
+                Console.WriteLine($"{cct.Date}\t{cct.Vendor}\t{cct.Comment}\t{cct.Category}\t{cct.Amount}");
+            }
+
+            // Produce QIF output
+            //var eol = Environment.NewLine;
+            //string qif =
+            //    "!Option:AutoSwitch" + eol +
+            //    "!Account" + eol +
+            //    "N" + accountName + eol +
+            //    "TInvst" + eol +
+            //    "^" + eol +
+            //    "!Type:Invst" + eol;
+
+            //foreach (var cct in trans)
+            //{
+            //    var amount = cct.Amount.ToString();
+            //    qif +=
+            //        "D" + cct.Date + eol +
+            //        "N" + GetVanguardQIFType(cct.Type) + eol +
+            //        "Y" + GetNameForTicker(cct.Ticker) + eol +
+            //        $"I{cct.Price}" + eol +
+            //        $"Q{cct.Quantity}" + eol +
+            //        "C" + eol +
+            //        "U" + amount + eol +
+            //        "T" + amount + eol +
+            //        "$" + amount + eol +
+            //        "^" + eol;
+            //}
+
+            //File.AppendAllText(qifFileName, qif);
+
+        }
+
+        private class CCTransaction
+        {
+            public CCTransaction(string date, string vendor, string comment, string category, decimal amount) =>
+                (Date, Vendor, Comment, Category, Amount) = (date, vendor, comment, category, amount);
+            public readonly string Date;
+            public readonly string Vendor;
+            public readonly string Comment;
+            public readonly string Category;
+            public readonly decimal Amount;
         }
 
         #endregion
