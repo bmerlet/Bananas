@@ -90,10 +90,6 @@ namespace PdfParser
 
         public bool IsBeginText => Bytes[BytePos] == 'B' && Bytes[BytePos + 1] == 'T';
         public bool IsEndText => BytePos >= Bytes.Length - 1 || (Bytes[BytePos] == 'E' && Bytes[BytePos + 1] == 'T');
-        public bool IsTextOperator1 => Bytes[BytePos] == '\'' || Bytes[BytePos] == '"';
-        public bool IsTextOperator2 => 
-            Bytes[BytePos] == 'T' && 
-            (Bytes[BytePos + 1] == 'd' || Bytes[BytePos + 1] == 'D' || Bytes[BytePos + 1] == '*' || Bytes[BytePos + 1] == 'j');
 
         public bool IsObjectStart(out int id, out int gen, out int length)
         {

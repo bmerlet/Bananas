@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Threading.Tasks;
+using System.Text;
 
 namespace PdfParser
 {
@@ -522,15 +523,20 @@ namespace PdfParser
             }
         }
 
+        #endregion
+
+        #region Page content
+
         // Get content for a page
-        public IEnumerable<PdfStream> GetContentForPage(int pageIndex)
+        public IEnumerable<PdfStream> GetContentForPage(int pageIndex, out List<PdfDictionary> fontsWithUnicodeMapping)
         {
-            return GetContentForPage(Pages[pageIndex]);
+            return GetContentForPage(Pages[pageIndex], out fontsWithUnicodeMapping);
         }
 
-        public IEnumerable<PdfStream> GetContentForPage(PdfObjectId page)
+        public IEnumerable<PdfStream> GetContentForPage(PdfObjectId page, out List<PdfDictionary> fontsWithUnicodeMapping)
         {
             var streams = new List<PdfStream>();
+            fontsWithUnicodeMapping = new List<PdfDictionary>();
 
             // Load the page object
             LoadObject(page);
@@ -566,6 +572,24 @@ namespace PdfParser
                         }
                     }
                 }
+
+                // Also look for fonts with a ToUnicode entry
+                if (resourceDic.Find<PdfDictionary>("Font") is PdfDictionary fontRefDic)
+                {
+                    foreach(var entry in fontRefDic.Entries)
+                    {
+                        if (entry.Value is PdfReference fontRef)
+                        {
+                            LoadObject(fontRef.Value);
+                            var fontDic = Find<PdfDictionary>(fontRef.Value);
+                            if (fontDic.Find<PdfReference>("ToUnicode") is PdfReference toUnicodeRef)
+                            {
+                                LoadObject(toUnicodeRef.Value);
+                                fontsWithUnicodeMapping.Add(fontDic);
+                            }
+                        }
+                    }
+                }
             }
             // All done
             return streams;
@@ -585,35 +609,94 @@ namespace PdfParser
             return null;
         }
 
+        #endregion
+
+        #region Text extraction
+
         public string[] ExtractTextFromPage(int pageNumber)
         {
             var result = new List<string>();
-            var contents = GetContentForPage(pageNumber);
+            var contents = GetContentForPage(pageNumber, out List<PdfDictionary> fontsWithUnicodeMapping);
+            var tokens = new List<string>();
             foreach (var content in contents)
             {
                 var parseContext = new ParseContext(content.Data);
 
+                // Look for BT/ET (Begin text/End Text) blocks 
                 while (parseContext.SkipToNextTextBlock())
                 {
+                    byte[] toUnicodeCMap = null;
+
                     while (!parseContext.IsEndText)
                     {
+                        // Parse token
+                        string token;
                         if (parseContext.CurrentByte == '(')
                         {
-                            var str = parseContext.ReadParenString();
-                            if (parseContext.IsTextOperator2)
-                            {
-                                result.Add(str);
-                                parseContext.Skip(2);
-                            }
-                            else if (parseContext.IsTextOperator1)
-                            {
-                                result.Add(str);
-                                parseContext.Skip(1);
-                            }
+                            token = parseContext.ReadParenString();
+                        }
+                        else if (parseContext.CurrentByte == '/')
+                        {
+                            parseContext.Skip(1);
+                            token = parseContext.ReadNameString();
                         }
                         else
                         {
-                            parseContext.Skip(1);
+                            var sb = new StringBuilder();
+                            while(!parseContext.IsWhiteSpace(0))
+                            {
+                                sb.Append((char)parseContext.ReadByte());
+                            }
+                            token = sb.ToString();
+                            parseContext.SkipWhiteSpaces();
+                        }
+
+                        // Is the token an operator?
+                        bool isOperator = true;
+                        if (token == "Tf")
+                        {
+                            // Font operator
+                            if (tokens.Count >= 2)
+                            {
+                                toUnicodeCMap = null;
+                                string fontName = tokens[tokens.Count - 2];
+                                foreach(var mappingFont in fontsWithUnicodeMapping)
+                                {
+                                    if (mappingFont.Find<PdfString>("Name").Value == fontName)
+                                    {
+                                        var toUnicodeRef = mappingFont.Find<PdfReference>("ToUnicode").Value;
+                                        toUnicodeCMap = Find<PdfStream>(toUnicodeRef).Data;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        else if (token == "'" || token == "\"" || token == "Tj" || token == "TJ")
+                        {
+                            // Show text operator
+                            if (tokens.Count >= 1)
+                            {
+                                var text = tokens[tokens.Count - 1];
+                                if (toUnicodeCMap != null)
+                                {
+                                    text = MapToUnicode(text, toUnicodeCMap);
+                                }
+                                result.Add(text);
+                            }
+
+                        }
+                        else
+                        {
+                            isOperator = false;
+                        }
+
+                        if (isOperator)
+                        {
+                            tokens.Clear();
+                        }
+                        else
+                        {
+                            tokens.Add(token);
                         }
                     }
                 }
@@ -622,7 +705,46 @@ namespace PdfParser
             return result.ToArray();
         }
 
+        private string MapToUnicode(string text, byte[] cmap)
+        {
+            var dic = new Dictionary<int, int>();
+
+            // Parse the cmap roughly
+            var parseContext = new ParseContext(cmap);
+            while(parseContext.GetAsString(11) != "beginbfchar")
+            {
+                parseContext.Skip(1);
+            }
+            parseContext.Skip(11);
+            parseContext.SkipWhiteSpaces();
+            while (parseContext.GetAsString(9) != "endbfchar")
+            {
+                var charInString = (PdfParser.ParsePdfElement(parseContext, null, null) as PdfHexString).Value[0];
+                var unicodeChar = (PdfParser.ParsePdfElement(parseContext, null, null) as PdfHexString).Value;
+                dic.Add(charInString, unicodeChar[0] * 256 + unicodeChar[1]);
+                parseContext.SkipCRLF();
+            }
+
+            var sb = new StringBuilder();
+            for (int i = 0; i < text.Length; i++)
+            {
+                int c = text[i];
+                if (dic.ContainsKey(c))
+                {
+                    sb.Append((char)dic[c]);
+                }
+                else
+                {
+                    sb.Append((char)c);
+                }
+            }
+
+            return sb.ToString();
+        }
+
         #endregion
+
+        #region Utilities
 
         // Add an object
         public void Add(PdfObject pdfObject)
@@ -669,6 +791,7 @@ namespace PdfParser
             PdfParser.ParseObject(parseContext, this, id);
         }
 
+        #endregion
 
         #region Supporting classes
 

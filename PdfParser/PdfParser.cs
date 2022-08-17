@@ -295,16 +295,9 @@ namespace PdfParser
                 var deflater = new DeflateStream(compressedStream, CompressionMode.Decompress);
                 //var deflater = new GZipStream(compressedStream, CompressionMode.Decompress);
 
-                try
-                {
-                    deflater.CopyTo(decompressedStream);
-                    data = decompressedStream.GetBuffer();
-                    Console.WriteLine("Success decompress");
-                }
-                catch (InvalidDataException) 
-                {
-                    Console.WriteLine("Failed decompress");
-                }
+                deflater.CopyTo(decompressedStream);
+                data = decompressedStream.GetBuffer();
+                //Console.WriteLine("Success decompress");
             }
 
 
