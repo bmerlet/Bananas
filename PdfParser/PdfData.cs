@@ -630,7 +630,7 @@ namespace PdfParser
                     while (!parseContext.IsEndText)
                     {
                         // Parse token
-                        string token;
+                        string token = null;
                         if (parseContext.CurrentByte == '(')
                         {
                             token = parseContext.ReadParenString();
@@ -639,6 +639,18 @@ namespace PdfParser
                         {
                             parseContext.Skip(1);
                             token = parseContext.ReadNameString();
+                        }
+                        else if (parseContext.CurrentByte == '[')
+                        {
+                            var array = PdfParser.ParsePdfElement(parseContext, null, null) as PdfArray;
+                            foreach(var a in array.Values)
+                            {
+                                if (a is PdfString str)
+                                {
+                                    token = str.Value;
+                                }
+                            }
+                            parseContext.SkipWhiteSpaces();
                         }
                         else
                         {
@@ -649,6 +661,10 @@ namespace PdfParser
                             }
                             token = sb.ToString();
                             parseContext.SkipWhiteSpaces();
+                        }
+                        if (token == null)
+                        {
+                            continue;
                         }
 
                         // Is the token an operator?
