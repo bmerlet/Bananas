@@ -38,10 +38,10 @@ namespace PdfParser
         public int StartXrefPosition { get; private set; }
 
         // Trailer info
-        public PdfTrailer PdfTrailer { get; private set; }
+        public PdfTrailer Trailer { get; private set; }
 
         // Encryption info
-        public PdfCrypto PdfCrypto { get; private set; }
+        public PdfCrypto Crypto { get; private set; }
         public byte[] EncryptionKey { get; private set; }
 
         // Xref
@@ -118,12 +118,12 @@ namespace PdfParser
             //
             // Deal with encryption
             //
-            if (PdfTrailer.Encrypt != null)
+            if (Trailer.Encrypt != null)
             {
-                // Load the encryption info into PdfCrypto
-                LoadObject(PdfTrailer.Encrypt);
-                var encryptDic = Find<PdfDictionary>(PdfTrailer.Encrypt);
-                PdfCrypto = new PdfCrypto(encryptDic);
+                // Load the encryption info into Crypto
+                LoadObject(Trailer.Encrypt);
+                var encryptDic = Find<PdfDictionary>(Trailer.Encrypt);
+                Crypto = new PdfCrypto(encryptDic);
 
                 // ZZZZZ
                 //ComputeUserPasswordHash("");
@@ -175,7 +175,7 @@ namespace PdfParser
             // Look for ID (mandatory with encryption, optional otherwise
             var id = trailerDictionary.Find<PdfArray>("ID")?.Values;
 
-            PdfTrailer = new PdfTrailer(size, catalog, info, encrypt, id);
+            Trailer = new PdfTrailer(size, catalog, info, encrypt, id);
         }
 
         private void ParseXref(ParseContext parseContext)
@@ -339,19 +339,19 @@ namespace PdfParser
 
             // (2) Init MD5
             // (3) Add the owner password
-            for (int i = 0; i < PdfCrypto.OwnerPassword.Length; i++)
+            for (int i = 0; i < Crypto.OwnerPassword.Length; i++)
             {
-                buf.Add((byte)PdfCrypto.OwnerPassword[i]);
+                buf.Add((byte)Crypto.OwnerPassword[i]);
             }
 
             // (4) Add the flags as an uint, low-order bits first
-            buf.Add((byte)(PdfCrypto.Flags & 0xff));
-            buf.Add((byte)((PdfCrypto.Flags >> 8) & 0xff));
-            buf.Add((byte)((PdfCrypto.Flags >> 16) & 0xff));
-            buf.Add((byte)((PdfCrypto.Flags >> 24) & 0xff));
+            buf.Add((byte)(Crypto.Flags & 0xff));
+            buf.Add((byte)((Crypto.Flags >> 8) & 0xff));
+            buf.Add((byte)((Crypto.Flags >> 16) & 0xff));
+            buf.Add((byte)((Crypto.Flags >> 24) & 0xff));
 
             // (5) First element of the ID array in the trailer
-            foreach (PdfHexString str in PdfTrailer.ID)
+            foreach (PdfHexString str in Trailer.ID)
             {
                 for (int i = 0; i < str.Value.Length; i++)
                 {
@@ -361,7 +361,7 @@ namespace PdfParser
             }
 
             // (6) For revision 4 (of what?) and higher, if metadata is not encrypted, pass ffffffff
-            if (PdfCrypto.Revision >= 4) // ZZZZ Should parse "EncryptMetadata" bool in PdfCrypto, default is TRUE see p123 
+            if (Crypto.Revision >= 4) // ZZZZ Should parse "EncryptMetadata" bool in PdfCrypto, default is TRUE see p123 
             {
                 for (int i = 0; i < 4; i++)
                 {
@@ -402,7 +402,7 @@ namespace PdfParser
             bool match = true;
             for (int i = 0; i < encryptedPadding.Length; i++)
             {
-                if (encryptedPadding[i] != PdfCrypto.UserPassword[i])
+                if (encryptedPadding[i] != Crypto.UserPassword[i])
                 {
                     match = false;
                     break;
@@ -420,7 +420,9 @@ namespace PdfParser
         }
 
         // Algorithm 3.3
+#pragma warning disable IDE0051 // Remove unused private members
         private byte[] ComputeOwnerPasswordHash(string ownerPassword, string userPassword)
+#pragma warning restore IDE0051 // Remove unused private members
         {
             // (1) Get padded owner password
             var buf = PadPassword(ownerPassword);
@@ -451,7 +453,9 @@ namespace PdfParser
         }
 
         // Algorithm 3.4
+#pragma warning disable IDE0051 // Remove unused private members
         private byte[] ComputeUserPasswordHash(string userPassword)
+#pragma warning restore IDE0051 // Remove unused private members
         {
             // (1) Get encryption key
             var key = ComputeEncryptionKey(userPassword);
@@ -465,17 +469,18 @@ namespace PdfParser
 
         #endregion
 
+        #region Page tree
+
+        //
         // Find the Ids of pages, put them in the Pages list
-        public void BuildPages()
+        //
+        private void BuildPages()
         {
             // Load and memorize the catalog
-            LoadObject(PdfTrailer.Catalog);
-            Catalog = Find<PdfDictionary>(PdfTrailer.Catalog);
+            LoadObject(Trailer.Catalog);
+            Catalog = Find<PdfDictionary>(Trailer.Catalog);
 
-            //
-            // Populate catalog-derived info
-            //
-
+            // Populate Pages
             var pageTreeRootRef = Catalog.Find<PdfReference>("Pages");
             LoadObject(pageTreeRootRef.Value);
             PageTreeRoot = Find<PdfDictionary>(pageTreeRootRef.Value);
@@ -485,6 +490,158 @@ namespace PdfParser
             // Traverse the tree to populate the page ids
             int ix = 0;
             PopulatePages(PageTreeRoot, ref ix);
+        }
+
+        // Recursively find the pages
+        private void PopulatePages(PdfDictionary pageTreeNode, ref int ix)
+        {
+            // Go through the kids
+            var kids = pageTreeNode.Find<PdfArray>("Kids");
+            foreach (var kid in kids.Values)
+            {
+                if (kid is PdfReference kidref)
+                {
+                    LoadObject(kidref.Value);
+                    var kidDictionary = Find<PdfDictionary>(kidref.Value);
+                    var kidType = kidDictionary.Find<PdfString>("Type").Value;
+                    if (kidType == "Pages")
+                    {
+                        // Tree node - recurse
+                        PopulatePages(kidDictionary, ref ix);
+                    }
+                    else if (kidType == "Page")
+                    {
+                        // Add page
+                        Pages[ix++] = kidDictionary.PdfObjectId;
+                    }
+                    else
+                    {
+                        throw new FormatException($"Unexpected type while parsing pages: {kidType}");
+                    }
+                }
+            }
+        }
+
+        // Get content for a page
+        public IEnumerable<PdfStream> GetContentForPage(int pageIndex)
+        {
+            return GetContentForPage(Pages[pageIndex]);
+        }
+
+        public IEnumerable<PdfStream> GetContentForPage(PdfObjectId page)
+        {
+            var streams = new List<PdfStream>();
+
+            // Load the page object
+            LoadObject(page);
+
+            // Find and load the "Content" object
+            var pageDic = Find<PdfDictionary>(page);
+            var contentRef = pageDic.Find<PdfReference>("Contents");
+            LoadObject(contentRef.Value);
+
+            // Add the content object's stream to the list
+            streams.Add(Find<PdfStream>(contentRef.Value));
+
+            // If we have a resources dictionary...
+            if (pageDic.Find<PdfDictionary>("Resources") is PdfDictionary resourceDic)
+            {
+                // ... that contains an XObject dictionary...
+                if (resourceDic.Find<PdfDictionary>("XObject") is PdfDictionary xobjectDic)
+                {
+                    // ... then go throught the XObjects to find form ones with content streams
+                    foreach(var entry in xobjectDic.Entries)
+                    {
+                        var stream = LookForFormXObjectWithContent(entry.Key, entry.Value);
+                        if (stream != null)
+                        {
+                            streams.Add(stream);
+                            // ZZZZ
+                            //Console.WriteLine($"=== {entry.Key} === {stream.Content}");
+                            //if (entry.Key == "X21")
+                            //{
+                            //    System.Diagnostics.Debugger.Break();
+                            //    LoadObject(new PdfObjectId(273, 0));
+                            //}
+                        }
+                    }
+                }
+            }
+            // All done
+            return streams;
+        }
+
+        private PdfStream LookForFormXObjectWithContent(string xobjectName, PdfObject obj)
+        {
+            if (obj is PdfReference reference)
+            {
+                LoadObject(reference.Value);
+                var xobjectDic = Find<PdfDictionary>(reference.Value);
+                if (xobjectDic.Find<PdfString>("Subtype").Value == "Form")
+                {
+                    return Find<PdfStream>(reference.Value);
+                }
+            }
+            return null;
+        }
+
+        public string[] ExtractTextFromPage(int pageNumber)
+        {
+            var result = new List<string>();
+            var contents = GetContentForPage(pageNumber);
+            foreach (var content in contents)
+            {
+                var parseContext = new ParseContext(content.Data);
+
+                while (parseContext.SkipToNextTextBlock())
+                {
+                    while (!parseContext.IsEndText)
+                    {
+                        if (parseContext.CurrentByte == '(')
+                        {
+                            var str = parseContext.ReadParenString();
+                            if (parseContext.IsTextOperator2)
+                            {
+                                result.Add(str);
+                                parseContext.Skip(2);
+                            }
+                            else if (parseContext.IsTextOperator1)
+                            {
+                                result.Add(str);
+                                parseContext.Skip(1);
+                            }
+                        }
+                        else
+                        {
+                            parseContext.Skip(1);
+                        }
+                    }
+                }
+            }
+
+            return result.ToArray();
+        }
+
+        #endregion
+
+        // Add an object
+        public void Add(PdfObject pdfObject)
+        {
+            pdfObjects.Add(pdfObject);
+        }
+
+        // Find object by id and type
+        public T Find<T>(PdfObjectId id)
+        {
+            foreach(var po in pdfObjects)
+            {
+                if (id.Equals(po.PdfObjectId) && po is T result)
+                {
+                    return result;
+                }
+            }
+ 
+            return default;
         }
 
         private void LoadObject(PdfObjectId id)
@@ -512,431 +669,150 @@ namespace PdfParser
             PdfParser.ParseObject(parseContext, this, id);
         }
 
-        // Add an object
-        public void Add(PdfObject pdfObject)
+
+        #region Supporting classes
+
+        //
+        // Object xref
+        //
+        public class PdfXref
         {
-            pdfObjects.Add(pdfObject);
+            public PdfXref(int id, int gen, int pos)
+            {
+                PdfObjectId = new PdfObjectId(id, gen);
+                Position = pos;
+            }
+
+            // Object id
+            public readonly PdfObjectId PdfObjectId;
+
+            // Position in file
+            public readonly int Position;
         }
 
-        // Find object by id and type
-        public T Find<T>(PdfObjectId id)
+        //
+        // Pdf trailer info
+        //
+        public class PdfTrailer
         {
-            foreach(var po in pdfObjects)
+            public PdfTrailer(int size, PdfObjectId catalog, PdfObjectId info, PdfObjectId encrypt, IEnumerable<PdfObject> id) =>
+                (Size, Catalog, Info, Encrypt, ID) = (size, catalog, info, encrypt, id);
+
+            public readonly int Size;
+            public readonly PdfObjectId Catalog;
+            public readonly PdfObjectId Info;
+            public readonly PdfObjectId Encrypt;
+            public readonly IEnumerable<PdfObject> ID;
+        }
+
+        //
+        // Pdf encryption info
+        //
+        public class PdfCrypto
+        {
+            public PdfCrypto(PdfDictionary dic)
             {
-                if (id.Equals(po.PdfObjectId) && po is T result)
+                // Get the filter
+                Filter = dic.Find<PdfString>("Filter")?.Value;
+
+                // We support only "Standard"
+                if (Filter != "Standard")
                 {
-                    return result;
+                    throw new FormatException($"Unknown encryption filter {Filter}");
                 }
-            }
- 
-            return default;
-        }
 
-        public PdfStream GetContentForPage(int pageIndex)
-        {
-            return GetContentForPage(Pages[pageIndex]);
-        }
+                // Get the version
+                Version = dic.Find<PdfInt>("V").Value;
 
-        public PdfStream GetContentForPage(PdfObjectId page)
-        {
-            LoadObject(page);
-            var pageDic = Find<PdfDictionary>(page);
-            var contentRef = pageDic.Find<PdfReference>("Contents");
-            LoadObject(contentRef.Value);
-            var contentStream = Find<PdfStream>(contentRef.Value);
-            return contentStream;
-        }
-
-        public string[] ExtractTextFromPage(int pageNumber)
-        {
-            var result = new List<string>();
-            var content = GetContentForPage(pageNumber);
-            var parseContext = new ParseContext(content.Data);
-
-            while (parseContext.SkipToNextTextBlock())
-            {
-                while (!parseContext.IsEndText)
+                // We support only version 1
+                if (Version != 1)
                 {
-                    if (parseContext.CurrentByte == '(')
-                    {
-                        var str = parseContext.ReadParenString();
-                        if (parseContext.IsTextOperator2)
-                        {
-                            result.Add(str);
-                            parseContext.Skip(2);
-                        }
-                        else if (parseContext.IsTextOperator1)
-                        {
-                            result.Add(str);
-                            parseContext.Skip(1);
-                        }
-                    }
-                    else
-                    {
-                        parseContext.Skip(1);
-                    }
+                    throw new FormatException("Only support version 1 of the standard security handler");
                 }
-            }
 
-            return result.ToArray();
-        }
-
-
-        private void PopulatePages(PdfDictionary pageTreeNode, ref int ix)
-        {
-            // Go through the kids
-            var kids = pageTreeNode.Find<PdfArray>("Kids");
-            foreach(var kid in kids.Values)
-            {
-                if (kid is PdfReference kidref)
+                // Get key length (optional)
+                var KeyLengthInt = dic.Find<PdfInt>("Length");
+                KeyLength = (KeyLengthInt == null) ? 40 : KeyLengthInt.Value;
+                if (KeyLength != 40)
                 {
-                    LoadObject(kidref.Value);
-                    var kidDictionary = Find<PdfDictionary>(kidref.Value);
-                    var kidType = kidDictionary.Find<PdfString>("Type").Value;
-                    if (kidType == "Pages")
-                    {
-                        // Tree node - recurse
-                        PopulatePages(kidDictionary, ref ix);
-                    }
-                    else if (kidType == "Page")
-                    {
-                        // Add page
-                        Pages[ix++] = kidDictionary.PdfObjectId;
-                    }
-                    else
-                    {
-                        throw new FormatException($"Unexpected type while parsing pages: {kidType}");
-                    }
+                    throw new FormatException("Only support key length of 40 bits for standard security handler");
                 }
-            }
-        }
-    }
 
-    //
-    // Pdf encryption info
-    //
-    public class PdfCrypto
-    {
-        public PdfCrypto(PdfDictionary dic)
-        {
-            // Get the filter
-            Filter = dic.Find<PdfString>("Filter")?.Value;
-
-            // We support only "Standard"
-            if (Filter != "Standard")
-            {
-                throw new FormatException($"Unknown encryption filter {Filter}");
-            }
-
-            // Get the version
-            Version = dic.Find<PdfInt>("V").Value;
-
-            // We support only version 1
-            if (Version != 1)
-            {
-                throw new FormatException("Only support version 1 of the standard security handler");
-            }
-
-            // Get key length (optional)
-            var KeyLengthInt = dic.Find<PdfInt>("Length");
-            KeyLength = (KeyLengthInt == null) ? 40 : KeyLengthInt.Value;
-            if (KeyLength != 40)
-            {
-                throw new FormatException("Only support key length of 40 bits for standard security handler");
-            }
-
-            // Get the revision of the standard security handler
-            Revision = dic.Find<PdfInt>("R").Value;
-            if (Revision != 2)
-            {
-                throw new FormatException("Only support revision 2 of the standard security handler");
-            }
-
-            // Get the owner password hash
-            OwnerPassword = FindPasswordHash(dic, "O");
-
-            // Get the user password hash
-            UserPassword = FindPasswordHash(dic, "U");
-
-            // Get the flags
-            Flags = (uint)dic.Find<PdfInt>("P").Value;
-        }
-
-        private byte[] FindPasswordHash(PdfDictionary dic, string key)
-        {
-            byte[] password;
-
-            var passwordHexStr = dic.Find<PdfHexString>(key);
-            if (passwordHexStr != null)
-            {
-                password = passwordHexStr.Value;
-            }
-            else
-            {
-                var passwordStr = dic.Find<PdfString>(key);
-                if (passwordStr != null)
+                // Get the revision of the standard security handler
+                Revision = dic.Find<PdfInt>("R").Value;
+                if (Revision != 2)
                 {
-                    password = new byte[passwordStr.Value.Length];
-                    for (int i = 0; i < password.Length; i++)
-                    {
-                        password[i] = (byte)passwordStr.Value[i];
-                    }
+                    throw new FormatException("Only support revision 2 of the standard security handler");
+                }
+
+                // Get the owner password hash
+                OwnerPassword = FindPasswordHash(dic, "O");
+
+                // Get the user password hash
+                UserPassword = FindPasswordHash(dic, "U");
+
+                // Get the flags
+                Flags = (uint)dic.Find<PdfInt>("P").Value;
+            }
+
+            private byte[] FindPasswordHash(PdfDictionary dic, string key)
+            {
+                byte[] password;
+
+                var passwordHexStr = dic.Find<PdfHexString>(key);
+                if (passwordHexStr != null)
+                {
+                    password = passwordHexStr.Value;
                 }
                 else
                 {
-                    throw new FormatException("Cannot find owner password hash in encryption dictionary");
+                    var passwordStr = dic.Find<PdfString>(key);
+                    if (passwordStr != null)
+                    {
+                        password = new byte[passwordStr.Value.Length];
+                        for (int i = 0; i < password.Length; i++)
+                        {
+                            password[i] = (byte)passwordStr.Value[i];
+                        }
+                    }
+                    else
+                    {
+                        throw new FormatException("Cannot find owner password hash in encryption dictionary");
+                    }
                 }
-            }
 
-            if (password.Length != 32)
-            {
-                throw new FormatException($"{key} password hash is {password.Length} bytes instead of 32");
-            }
-
-            return password;
-        }
-
-        // Filter used (always "Standard")
-        public readonly string Filter;
-
-        // Encryption/decryption version (only "1" supported so far)
-        public readonly int Version;
-
-        // Encrytion key length in bits
-        public readonly int KeyLength;
-
-        // Revision of the standard security handler
-        public readonly int Revision;
-
-        // Owner password hash
-        public readonly byte[] OwnerPassword;
-
-        // User password hash
-        public readonly byte[] UserPassword;
-
-        // Flags
-        public readonly uint Flags;
-    }
-
-    //
-    // Pdf trailer info
-    //
-    public class PdfTrailer
-    {
-        public PdfTrailer(int size, PdfObjectId catalog, PdfObjectId info, PdfObjectId encrypt, IEnumerable<PdfObject> id) =>
-            (Size, Catalog, Info, Encrypt, ID) = (size, catalog, info, encrypt, id);
-
-        public readonly int Size;
-        public readonly PdfObjectId Catalog;
-        public readonly PdfObjectId Info;
-        public readonly PdfObjectId Encrypt;
-        public readonly IEnumerable<PdfObject> ID;
-    }
-
-    //
-    // Pdf array
-    //
-    public class PdfArray : PdfObject
-    {
-        // Constructor
-        public PdfArray(PdfObjectId pdfObjectId) : base(pdfObjectId) { }
-
-        // Array
-        private readonly List<PdfObject> values = new List<PdfObject>();
-        public IEnumerable<PdfObject> Values => values;
-
-        // Add an entry
-        public void Add(PdfObject value)
-        {
-            values.Add(value);
-        }
-    }
-
-    //
-    // Pdf dictionary
-    //
-    public class PdfDictionary : PdfObject
-    {
-        // Constructor
-        public PdfDictionary(PdfObjectId pdfObjectId) : base(pdfObjectId) { }
-
-        // List of entries
-        private readonly List<PdfDictionaryEntry> entries = new List<PdfDictionaryEntry>();
-        public IEnumerable<PdfDictionaryEntry> Entries => entries;
-
-        // Add an entry
-        public void Add(string key, PdfObject value)
-        {
-            entries.Add(new PdfDictionaryEntry(key, value));
-        }
-
-        // Find object by key and type
-        public T Find<T>(string key)
-        {
-            foreach (var de in entries)
-            {
-                if (de.Key == key && de.Value is T result)
+                if (password.Length != 32)
                 {
-                    return result;
+                    throw new FormatException($"{key} password hash is {password.Length} bytes instead of 32");
                 }
+
+                return password;
             }
 
-            return default;
+            // Filter used (always "Standard")
+            public readonly string Filter;
+
+            // Encryption/decryption version (only "1" supported so far)
+            public readonly int Version;
+
+            // Encrytion key length in bits
+            public readonly int KeyLength;
+
+            // Revision of the standard security handler
+            public readonly int Revision;
+
+            // Owner password hash
+            public readonly byte[] OwnerPassword;
+
+            // User password hash
+            public readonly byte[] UserPassword;
+
+            // Flags
+            public readonly uint Flags;
         }
 
-        // Entry itself
-        public class PdfDictionaryEntry
-        {
-            public PdfDictionaryEntry(string key, PdfObject value) => (Key, Value) = (key, value);
-            public readonly string Key;
-            public readonly PdfObject Value;
-        }
-    }
+        #endregion
 
-    //
-    // Pdf Stream
-    //
-    public class PdfStream : PdfObject
-    {
-        public PdfStream(PdfDictionary dictionary, byte[] data, string content) 
-            : base(dictionary.PdfObjectId) 
-            => (Dictionary, Data, Content) = (dictionary, data, content);
+    } // PdfData
 
-        // Associated dictionary 
-        public readonly PdfDictionary Dictionary;
-
-        // Content in byte array form
-        public readonly byte[] Data;
-
-        // Content in string form (may be null)
-        public readonly string Content;
-    }
-
-    //
-    // Pdf object reference
-    //
-    public class PdfReference : PdfObject
-    {
-        // Constructor
-        public PdfReference(PdfObjectId pdfObjectId, int id, int gen) : base(pdfObjectId)
-        {
-            Value = new PdfObjectId(id, gen);
-        }
-
-        // Reference
-        public readonly PdfObjectId Value;
-    }
-
-    //
-    // Pdf string
-    //
-    public class PdfString : PdfObject
-    {
-        // Constructor
-        public PdfString(PdfObjectId pdfObjectId, string value) : base(pdfObjectId) => Value = value;
-
-        // string value
-        public readonly string Value;
-    }
-
-    //
-    // Pdf hex string
-    //
-    public class PdfHexString : PdfObject
-    {
-        // Constructor
-        public PdfHexString(PdfObjectId pdfObjectId, byte[] value) : base(pdfObjectId) => Value = value;
-
-        // Byte array
-        public readonly byte[] Value;
-    }
-
-    //
-    // Pdf boolean
-    //
-    public class PdfBool : PdfObject
-    {
-        // Constructor
-        public PdfBool(PdfObjectId pdfObjectId, bool value) : base(pdfObjectId) => Value = value;
-
-        // Bool value
-        public readonly bool Value;
-    }
-
-    //
-    // Pdf integer
-    //
-    public class PdfInt : PdfObject
-    {
-        // Constructor
-        public PdfInt(PdfObjectId pdfObjectId, int value) : base(pdfObjectId) => Value = value;
-
-        // Int value
-        public readonly int Value;
-    }
-
-    //
-    // Pdf real
-    //
-    public class PdfReal : PdfObject
-    {
-        // Constructor
-        public PdfReal(PdfObjectId pdfObjectId, decimal value) : base(pdfObjectId) => Value = value;
-
-        // Int value
-        public readonly decimal Value;
-    }
-
-    //
-    // Base class for all Pdf objects
-    //
-    public class PdfObject
-    {
-        public PdfObject(PdfObjectId pdfObjectId) => PdfObjectId = pdfObjectId;
-
-        // Object id (may be null)
-        public readonly PdfObjectId PdfObjectId;
-    }
-
-    //
-    // Object xref
-    //
-    public class PdfXref
-    {
-        public PdfXref(int id, int gen, int pos)
-        {
-            PdfObjectId = new PdfObjectId(id, gen);
-            Position = pos;
-        }
-
-        // Object id
-        public readonly PdfObjectId PdfObjectId;
-
-        // Position in file
-        public readonly int Position;
-    }
-
-    //
-    // Object Id ("<id> <gen> obj" ... "objend")
-    //
-    public class PdfObjectId
-    {
-        public PdfObjectId(int id, int gen) => (Id, Gen) = (id, gen);
-        public readonly int Id;
-        public readonly int Gen;
-
-        public override bool Equals(object obj)
-        {
-            return obj is PdfObjectId o && Id == o.Id && Gen == o.Gen;
-        }
-
-        public override int GetHashCode()
-        {
-            return Id.GetHashCode() + Gen.GetHashCode();
-        }
-        public override string ToString()
-        {
-            return $"{Id}/{Gen}";
-        }
-    }
 }

@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ParseContext.cs" />
+    <Compile Include="PdfObject.cs" />
     <Compile Include="PdfParser.cs" />
     <Compile Include="PdfData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

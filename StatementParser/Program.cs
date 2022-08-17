@@ -47,10 +47,10 @@ namespace StatementParser
                             Console.WriteLine($"================================= Page {i + 1} ==================================");
                             var strs = data.ExtractTextFromPage(i);
 
-                            foreach (var str in strs)
-                            {
-                                Console.WriteLine(str);
-                            }
+                            //foreach (var str in strs)
+                            //{
+                            //    Console.WriteLine(str);
+                            //}
                         }
 
                         analyzer.AnalyzeStatement(data, targetFile);
