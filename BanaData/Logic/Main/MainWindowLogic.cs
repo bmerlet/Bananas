@@ -445,12 +445,12 @@ namespace BanaData.Logic.Main
             Household.AcceptChanges();
         }
 
-        public void ImportQIF(string file)
+        public void ImportQIF(string file, bool db)
         {
             GuiServices.SetCursor(true);
 
             var parser = new QIFParser(Household);
-            parser.ImportFromQIF(file, true);
+            parser.ImportFromQIF(file, db);
 
             GuiServices.SetCursor(false);
 

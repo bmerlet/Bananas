@@ -42,7 +42,8 @@
                     <MenuItem Header="Backup..." Command="{Binding Backup}" InputGestureText="^B"/>
                     <MenuItem Header="Set password..." Command="{Binding SetPassword}"/>
                     <Separator/>
-                    <MenuItem Header="Import..." Command="{Binding Import}"/>
+                    <MenuItem Header="Import DB..." Command="{Binding ImportDB}"/>
+                    <MenuItem Header="Import Transactions..." Command="{Binding ImportTransactions}"/>
                     <MenuItem Header="Export..." Command="{Binding Export}"/>
                     <Separator/>
                     <MenuItem Header="Exit" Command="{Binding Exit}"/>

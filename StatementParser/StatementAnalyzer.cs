@@ -432,6 +432,7 @@ namespace StatementParser
             {
                 Console.WriteLine($"{cct.Date}\t{cct.Vendor}\t{cct.Comment}\t{cct.Category}\t{cct.Amount}");
             }
+            Console.WriteLine();
 
             // Produce QIF output
             var eol = Environment.NewLine;

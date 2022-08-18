@@ -31,6 +31,9 @@ namespace BanaData.Serializations
         private Household.CheckpointRow checkpointRow;
         private readonly List<string> accountNames = new List<string>();
 
+        // When importing only transactions, transaction counter
+        private int numberOfTransactions;
+
         #endregion
 
         #region Constructor
@@ -76,36 +79,55 @@ namespace BanaData.Serializations
 
         #region Entry points
 
-        public void ImportFromQIF(string fileName, bool preserveInfoNotPresentInQIF)
+        //
+        // Parse QIF, importing either the whole DB or just transactions
+        //
+        public void ImportFromQIF(string fileName, bool importWholeDB)
         {
             // Init
             Log = "";
             accountNames.Clear();
+            numberOfTransactions = 0;
 
-            var supplementalInfo = preserveInfoNotPresentInQIF ? GetSupplemtalInfo() : null;
+            // If replacing the whole DB, preserve info not present in QIF
+            // hoping that it could be used against the new DB
+            var supplementalInfo = importWholeDB ? GetSupplemtalInfo() : null;
 
             // Zap the database
-            household.Clear();
-            household.AcceptChanges();
+            if (importWholeDB)
+            {
+                household.Clear();
+                household.AcceptChanges();
+            }
 
             // Create a checkpoint - all transactions are created under this checkpoint
             household.Checkpoint.CreateNewCheckpoint();
             checkpointRow = household.Checkpoint.GetCurrentCheckpoint();
 
             // Parse the file
-            ParseFile(fileName);
+            ParseFile(fileName, !importWholeDB);
 
             // Log what we got
-            Log += $"Imported {household.Account.Rows.Count:N0} accounts" + eol;
-            Log += $"Imported {household.Category.Rows.Count:N0} categories" + eol;
-            Log += $"Imported {household.Security.Rows.Count:N0} securities" + eol;
-            Log += $"Imported {household.SecurityPrice.Rows.Count:N0} security prices" + eol;
-            Log += $"Imported {household.RegularTransactions.Count():N0} transactions" + eol;
-            Log += $"Imported {household.MemorizedPayees.Count():N0} memorized payees" + eol;
+            if (importWholeDB)
+            {
+                Log += $"Imported {household.Account.Rows.Count:N0} accounts" + eol;
+                Log += $"Imported {household.Category.Rows.Count:N0} categories" + eol;
+                Log += $"Imported {household.Security.Rows.Count:N0} securities" + eol;
+                Log += $"Imported {household.SecurityPrice.Rows.Count:N0} security prices" + eol;
+                Log += $"Imported {household.RegularTransactions.Count():N0} transactions" + eol;
+                Log += $"Imported {household.MemorizedPayees.Count():N0} memorized payees" + eol;
+            }
+            else
+            {
+                Log += $"Imported {numberOfTransactions:N0} transactions" + eol;
+            }
             Log += eol;
 
             // Find other sides of transfers
-            PairTransfers();
+            if (importWholeDB)
+            {
+                PairTransfers();
+            }
 
             if (supplementalInfo != null)
             {
@@ -124,7 +146,7 @@ namespace BanaData.Serializations
         #region QIF main parser
 
         // Parse a QIF file file
-        private void ParseFile(string fileName)
+        private void ParseFile(string fileName, bool onlyTransactions)
         {
             // Read the file
             using (var sr = new StreamReader(fileName))
@@ -133,12 +155,12 @@ namespace BanaData.Serializations
                 Household.AccountRow accountRow = null;
                 while (!sr.EndOfStream)
                 {
-                    accountRow = ParseOneSection(sr, accountRow);
+                    accountRow = ParseOneSection(sr, accountRow, onlyTransactions);
                 }
             }
         }
 
-        private Household.AccountRow ParseOneSection(StreamReader sr, Household.AccountRow accountRow)
+        private Household.AccountRow ParseOneSection(StreamReader sr, Household.AccountRow accountRow, bool onlyTransactions)
         {
             var sectionStr = sr.ReadLine();
             if (!sectionStr.StartsWith("!"))
@@ -159,28 +181,36 @@ namespace BanaData.Serializations
                                 SkipToNextType(sr);
                                 break;
                             case "Cat":
+                                ComplainIfOnlyTransactions("Category", onlyTransactions);
                                 ParseCategories(sr);
                                 break;
                             case "Security":
+                                ComplainIfOnlyTransactions("Security", onlyTransactions);
                                 ParseSecurities(sr);
                                 break;
                             case "Bank":
                                 ParseBankTransactions(sr, accountRow);
+                                numberOfTransactions += 1;
                                 break;
                             case "CCard":
                                 ParseBankTransactions(sr, accountRow);
+                                numberOfTransactions += 1;
                                 break;
                             case "Cash":
                                 ParseBankTransactions(sr, accountRow);
+                                numberOfTransactions += 1;
                                 break;
                             case "Oth A":
                             case "Oth L":
                                 ParseBankTransactions(sr, accountRow);
+                                numberOfTransactions += 1;
                                 break;
                             case "Invst":
                                 ParseInvestmentTransactions(sr, accountRow);
+                                numberOfTransactions += 1;
                                 break;
                             case "Memorized":
+                                ComplainIfOnlyTransactions("Memorized payee", onlyTransactions);
                                 ParseMemorizedPayees(sr);
                                 break;
                             case "Prices":
@@ -194,7 +224,7 @@ namespace BanaData.Serializations
                     break;
 
                 case "Account":
-                    accountRow = ParseAccounts(sr);
+                    accountRow = ParseAccounts(sr, onlyTransactions);
                     break;
 
                 case "Option":
@@ -228,6 +258,14 @@ namespace BanaData.Serializations
             }
 
             return accountRow;
+        }
+
+        private void ComplainIfOnlyTransactions(string what, bool onlyTransactions)
+        {
+            if (onlyTransactions)
+            {
+                throw new InvalidDataException($"QIF parser: {what} encountered while parsing only transactions");
+            }
         }
 
         #endregion
@@ -291,19 +329,19 @@ namespace BanaData.Serializations
 
         #region Parse QIF account
 
-        private Household.AccountRow ParseAccounts(StreamReader sr)
+        private Household.AccountRow ParseAccounts(StreamReader sr, bool onlyTransactions)
         {
             Household.AccountRow result = null;
 
             while (sr.Peek() != '!' && !sr.EndOfStream)
             {
-                result = ParseOneAccount(sr);
+                result = ParseOneAccount(sr, onlyTransactions);
             }
 
             return result;
         }
 
-        private Household.AccountRow ParseOneAccount(TextReader sr)
+        private Household.AccountRow ParseOneAccount(TextReader sr, bool onlyTransactions)
         {
             string name = null;
             string description = null;
@@ -382,8 +420,17 @@ namespace BanaData.Serializations
 
             Household.AccountRow accountRow;
 
+            // If only importing transactions this account should already exist
+            if (onlyTransactions)
+            {
+                accountRow = household.Account.GetByName(name);
+                if (accountRow == null)
+                {
+                    throw new InvalidDataException($"QIF parser: Account {name} does not exist");
+                }
+            }
             // Skip if we already saw this name (account name are present at least twice in QIF files)
-            if (accountNames.Contains(name))
+            else if (accountNames.Contains(name))
             {
                 accountRow = household.Account.GetByName(name);
             }

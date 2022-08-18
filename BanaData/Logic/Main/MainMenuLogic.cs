@@ -40,7 +40,8 @@ namespace BanaData.Logic.Main
             SaveAs = new CommandBase(OnSaveAs);
             Backup = new CommandBase(OnBackup);
             SetPassword = new CommandBase(OnSetPassword);
-            Import = new CommandBase(OnImport);
+            ImportDB = new CommandBase(OnImportDB);
+            ImportTransactions = new CommandBase(OnImportTransactions);
             Export = new CommandBase(OnExport);
             Exit = new CommandBase(OnExit);
 
@@ -151,19 +152,33 @@ namespace BanaData.Logic.Main
         }
 
         //
-        // Import
+        // Import DB
         //
-        public CommandBase Import { get; }
+        public CommandBase ImportDB { get; }
 
-        private void OnImport()
+        private void OnImportDB()
         {
             OpenFileLogic logic = new OpenFileLogic(GetSuggestionForQIFFile(), "Quicken Interchange Format files (*.QIF)|*.QIF|Any file (*.*)|*.*", "Import QIF file");
             if (mainWindow.GuiServices.ShowDialog(logic))
             {
                 if (mainWindow.YesNoQuestion($"Are you sure you want to delete the current database data and replace it with the contents of {logic.File}?"))
                 {
-                    mainWindow.ImportQIF(logic.File);
+                    mainWindow.ImportQIF(logic.File, true);
                 }
+            }
+        }
+
+        //
+        // Import transactions
+        //
+        public CommandBase ImportTransactions { get; }
+
+        private void OnImportTransactions()
+        {
+            OpenFileLogic logic = new OpenFileLogic(GetSuggestionForQIFFile(), "Quicken Interchange Format files (*.QIF)|*.QIF|Any file (*.*)|*.*", "Import QIF file");
+            if (mainWindow.GuiServices.ShowDialog(logic))
+            {
+                mainWindow.ImportQIF(logic.File, false);
             }
         }
 
