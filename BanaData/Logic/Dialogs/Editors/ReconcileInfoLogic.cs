@@ -48,6 +48,26 @@ namespace BanaData.Logic.Dialogs.Editors
             // Guess the statement end date
             statementEndDate = PriorStatementEndDate.AddMonths(1);
 
+            // End-of-the-month guesses
+            if (DateTime.DaysInMonth(statementEndDate.Year, statementEndDate.Month) == 31)
+            {
+                if (statementEndDate.Month == 3)
+                {
+                    if (statementEndDate.Day == 28)
+                    {
+                        statementEndDate.AddDays(3);
+                    }
+                    else if (statementEndDate.Day == 29)
+                    {
+                        statementEndDate.AddDays(2);
+                    }
+                }
+                else if (statementEndDate.Day == 30)
+                {
+                    statementEndDate.AddDays(1);
+                }
+            }
+
             // Is interest info visible?
             IsInterestInfoVisible = accountRow.Type == EAccountType.Bank;
 
