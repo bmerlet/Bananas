@@ -14,6 +14,9 @@ namespace StatementParser
 
         static readonly AccountSpec[] accountSpecs = new AccountSpec[]
         {
+            new AccountSpec(EInstitution.Vanguard, "NeoG Vanguard Brokerage", new AccountHint[] { new AccountHint(2, 2, new string[] { "Vanguard", "Susan", "Benoit", "Joint brokerage" }) }),
+            new AccountSpec(EInstitution.Vanguard, "SVanguard IRA XX1248", new AccountHint[] { new AccountHint(2, 2, new string[] { "Vanguard", "Susan", "Traditional IRA brokerage" }) }),
+            new AccountSpec(EInstitution.Vanguard, "BVanguard Roll IRA", new AccountHint[] { new AccountHint(2, 2, new string[] { "Vanguard", "Benoit", "Rollover IRA brokerage" }) }),
             new AccountSpec(EInstitution.Vanguard, "SVanguard Brokerage", new AccountHint[] { new AccountHint(2, 2, new string[] { "Vanguard", "Susan", "brokerage" }) }),
             new AccountSpec(EInstitution.Vanguard, "BVanguard Brokerage", new AccountHint[] { new AccountHint(2, 2, new string[] { "Vanguard", "Benoit", "brokerage" }) }),
             new AccountSpec(EInstitution.Chase, "SAmazon XX6555", new AccountHint[] { new AccountHint(1, 1, new string[] { "Amazon Customer Service" }) }),
@@ -266,6 +269,7 @@ namespace StatementParser
             {
                 Console.WriteLine($"{vg.Date}\t{vg.Ticker}\t{vg.Type}\t{vg.Quantity}\t{vg.Price}\t{vg.Amount}");
             }
+            Console.WriteLine();
 
             // Produce QIF output
             var eol = Environment.NewLine;
