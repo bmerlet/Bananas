@@ -445,7 +445,7 @@ namespace BanaData.Logic.Main
             Household.AcceptChanges();
         }
 
-        public void ImportQIF(string file, bool db)
+        public void ImportQIF(string file, bool db, Household.AccountRow account)
         {
             GuiServices.SetCursor(true);
 

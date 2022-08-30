@@ -145,6 +145,10 @@ namespace XamlUI
             {
                 dialog = new QIFExportPicker(qifExportPickerLogic);
             }
+            else if (logic is QIFImportPickerLogic qifImportPickerLogic)
+            {
+                dialog = new QIFImportPicker(qifImportPickerLogic);
+            }
             else if (logic is ListCategoriesLogic listCategoriesLogic)
             {
                 dialog = new ListCategories(listCategoriesLogic);

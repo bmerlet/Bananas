@@ -137,6 +137,9 @@
     <Compile Include="Dialogs\Pickers\QIFExportPicker.xaml.cs">
       <DependentUpon>QIFExportPicker.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\Pickers\QIFImportPicker.xaml.cs">
+      <DependentUpon>QIFImportPicker.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\Reports\Accounting\BalanceSheet.xaml.cs">
       <DependentUpon>BalanceSheet.xaml</DependentUpon>
     </Compile>
@@ -323,8 +326,12 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\Pickers\QIFExportPicker.xaml">
-      <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialogs\Pickers\QIFImportPicker.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Dialogs\Reports\Accounting\BalanceSheet.xaml">
       <SubType>Designer</SubType>

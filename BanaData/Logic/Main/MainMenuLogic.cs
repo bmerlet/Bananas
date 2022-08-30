@@ -40,8 +40,7 @@ namespace BanaData.Logic.Main
             SaveAs = new CommandBase(OnSaveAs);
             Backup = new CommandBase(OnBackup);
             SetPassword = new CommandBase(OnSetPassword);
-            ImportDB = new CommandBase(OnImportDB);
-            ImportTransactions = new CommandBase(OnImportTransactions);
+            Import = new CommandBase(OnImport);
             Export = new CommandBase(OnExport);
             Exit = new CommandBase(OnExit);
 
@@ -154,31 +153,15 @@ namespace BanaData.Logic.Main
         //
         // Import DB
         //
-        public CommandBase ImportDB { get; }
+        public CommandBase Import { get; }
 
-        private void OnImportDB()
+        private void OnImport()
         {
-            OpenFileLogic logic = new OpenFileLogic(GetSuggestionForQIFFile(), "Quicken Interchange Format files (*.QIF)|*.QIF|Any file (*.*)|*.*", "Import QIF file");
-            if (mainWindow.GuiServices.ShowDialog(logic))
+            var importFileLogic = new QIFImportPickerLogic(mainWindow);
+            if (mainWindow.GuiServices.ShowDialog(importFileLogic))
             {
-                if (mainWindow.YesNoQuestion($"Are you sure you want to delete the current database data and replace it with the contents of {logic.File}?"))
-                {
-                    mainWindow.ImportQIF(logic.File, true);
-                }
-            }
-        }
-
-        //
-        // Import transactions
-        //
-        public CommandBase ImportTransactions { get; }
-
-        private void OnImportTransactions()
-        {
-            OpenFileLogic logic = new OpenFileLogic(GetSuggestionForQIFFile(), "Quicken Interchange Format files (*.QIF)|*.QIF|Any file (*.*)|*.*", "Import QIF file");
-            if (mainWindow.GuiServices.ShowDialog(logic))
-            {
-                mainWindow.ImportQIF(logic.File, false);
+                var importSpec = importFileLogic.ImportSpec;
+                mainWindow.ImportQIF(importSpec.Filename, importSpec.Full, importSpec.TransactionAccount);
             }
         }
 

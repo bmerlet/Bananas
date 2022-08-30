@@ -138,7 +138,23 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        
+
+        <!-- Style for category autocomplete textbox -->
+        <Style TargetType="{x:Type w:AutoCompleteTextBox}" x:Key="AccountBoxStyle">
+            <Setter Property="Watermark" Value="Account"/>
+            <Setter Property="DisplayMember" Value="Name"/>
+            <Setter Property="ListBoxHeight" Value="150"/>
+            <Setter Property="ListBoxWidth" Value="200"/>
+            <Setter Property="IsTextFromItemsSourceOnly" Value="True"/>
+            <Setter Property="ItemTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}"/>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <!-- Style for payee autocomplete textbox-->
         <Style TargetType="{x:Type w:AutoCompleteTextBox}" x:Key="PayeeBoxStyle">
             <Setter Property="Watermark" Value="Payee"/>
