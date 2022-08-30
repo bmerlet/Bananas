@@ -82,7 +82,7 @@ namespace BanaData.Serializations
         //
         // Parse QIF, importing either the whole DB or just transactions
         //
-        public void ImportFromQIF(string fileName, bool importWholeDB)
+        public void ImportFromQIF(string fileName, bool importWholeDB, Household.AccountRow account)
         {
             // Init
             Log = "";
@@ -105,7 +105,7 @@ namespace BanaData.Serializations
             checkpointRow = household.Checkpoint.GetCurrentCheckpoint();
 
             // Parse the file
-            ParseFile(fileName, !importWholeDB);
+            ParseFile(fileName, !importWholeDB, account);
 
             // Log what we got
             if (importWholeDB)
@@ -146,13 +146,12 @@ namespace BanaData.Serializations
         #region QIF main parser
 
         // Parse a QIF file file
-        private void ParseFile(string fileName, bool onlyTransactions)
+        private void ParseFile(string fileName, bool onlyTransactions, Household.AccountRow accountRow)
         {
             // Read the file
             using (var sr = new StreamReader(fileName))
             {
                 // Parse all sections
-                Household.AccountRow accountRow = null;
                 while (!sr.EndOfStream)
                 {
                     accountRow = ParseOneSection(sr, accountRow, onlyTransactions);
@@ -552,8 +551,8 @@ namespace BanaData.Serializations
         private void ParseOneBankTransaction(TextReader sr, Household.AccountRow accountRow)
         {
             DateTime date = DateTime.MinValue;
-            decimal amountToCheck = 0;
-            decimal otherMysteriousAmount = 0;
+            decimal amount = 0;
+            decimal mysteriousAmount = 0;
             string payee = null;
             string memo = null;
             ETransactionStatus status = ETransactionStatus.Pending;
@@ -584,12 +583,12 @@ namespace BanaData.Serializations
                         decimal.TryParse(l.Substring(1), out lineItemHolder.Amount);
                         if (!parsingSplitLineItem)
                         {
-                            amountToCheck = lineItemHolder.Amount;
+                            amount = lineItemHolder.Amount;
                         }
                         break;
 
                     case 'U':
-                        decimal.TryParse(l.Substring(1), out otherMysteriousAmount);
+                        decimal.TryParse(l.Substring(1), out mysteriousAmount);
                         break;
 
                     case 'M':
@@ -641,9 +640,9 @@ namespace BanaData.Serializations
             {
                 throw new InvalidDataException("QIF parser: Transaction has no date - " + payee);
             }
-            if (amountToCheck != otherMysteriousAmount)
+            if (mysteriousAmount != 0 && amount != mysteriousAmount)
             {
-                throw new InvalidDataException("QIF parser: Mysterious amount not the same as regular amount - " + amountToCheck + " - " + otherMysteriousAmount);
+                throw new InvalidDataException($"QIF parser: Mysterious amount ({mysteriousAmount}) not the same as regular amount ({amount})");
             }
 
             // Flush last line item

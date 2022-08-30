@@ -450,7 +450,15 @@ namespace BanaData.Logic.Main
             GuiServices.SetCursor(true);
 
             var parser = new QIFParser(Household);
-            parser.ImportFromQIF(file, db);
+
+            try
+            {
+                parser.ImportFromQIF(file, db, account);
+            }
+            catch (Exception e)
+            {
+                ErrorMessage(e.Message, "Import results");
+            }
 
             GuiServices.SetCursor(false);
 

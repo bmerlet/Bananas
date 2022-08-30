@@ -151,7 +151,7 @@ namespace BanaData.Logic.Main
         }
 
         //
-        // Import DB
+        // Import DB or transactions
         //
         public CommandBase Import { get; }
 
@@ -197,16 +197,6 @@ namespace BanaData.Logic.Main
             mainWindow.GuiServices.Exit();
         }
 
-        private string GetSuggestionForQIFFile()
-        {
-            string lastFile = mainWindow.UserSettings.LastFileOpened;
-            string file =
-                lastFile == null ?
-                System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Bananas.QIF") :
-                lastFile.Substring(0, lastFile.LastIndexOf('.')) + ".QIF";
-
-            return file;
-        }
         #endregion
 
         #region Edit menu

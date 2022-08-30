@@ -41,16 +41,29 @@ namespace BanaData.Logic.Dialogs.Pickers
             // Init
             importType = EImportType.Transactions;
 
+            // Init file names
             string lastFile = mainWindowLogic.UserSettings.LastFileOpened;
-            ImportDBPath =
-                System.IO.Path.Combine(
+            string ImportDBPath = mainWindowLogic.UserSettings.LastImportDBFile;
+
+            if (ImportDBPath == null)
+            {
+                ImportDBPath = System.IO.Path.Combine(
                     lastFile == null ? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) : System.IO.Path.GetDirectoryName(lastFile),
                     "DB.QIF");
+                mainWindowLogic.SaveUserSettings();
+            }
 
-            ImportTransactionsPath =
-                lastFile == null ?
-                System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Transactions.QIF") :
-                lastFile.Substring(0, lastFile.LastIndexOf('.')) + ".QIF";
+            ImportTransactionsPath = mainWindowLogic.UserSettings.LastImportTransactionsFile;
+            if (ImportTransactionsPath == null)
+            {
+                ImportTransactionsPath =
+                    lastFile == null ?
+                    System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Transactions.QIF") :
+                    lastFile.Substring(0, lastFile.LastIndexOf('.')) + ".QIF";
+                mainWindowLogic.SaveUserSettings();
+            }
+
+            SpecificAccount = mainWindowLogic.UserSettings.LastImportAccountName;
 
             UpdateEnabled();
         }
@@ -110,6 +123,8 @@ namespace BanaData.Logic.Dialogs.Pickers
             {
                 ImportDBPath = logic.File;
                 OnPropertyChanged(() => ImportDBPath);
+                mainWindowLogic.UserSettings.LastImportDBFile = ImportDBPath;
+                mainWindowLogic.SaveUserSettings();
             }
         }
 
@@ -120,6 +135,8 @@ namespace BanaData.Logic.Dialogs.Pickers
             {
                 ImportTransactionsPath = logic.File;
                 OnPropertyChanged(() => ImportTransactionsPath);
+                mainWindowLogic.UserSettings.LastImportTransactionsFile = ImportTransactionsPath;
+                mainWindowLogic.SaveUserSettings();
             }
         }
 
@@ -138,13 +155,9 @@ namespace BanaData.Logic.Dialogs.Pickers
 
         protected override bool? Commit()
         {
-            var household = mainWindowLogic.Household;
-            bool? result = false;
-
             if (ImportDB)
             {
                 ImportSpec = new ImportSpecification(true, ImportDBPath, null);
-                result = true;
             }
             else
             {
@@ -158,11 +171,16 @@ namespace BanaData.Logic.Dialogs.Pickers
                         return null;
                     }
                     account = accountItem.AccountRow;
+                    if (SpecificAccount != mainWindowLogic.UserSettings.LastImportAccountName)
+                    {
+                        mainWindowLogic.UserSettings.LastImportAccountName = SpecificAccount;
+                        mainWindowLogic.SaveUserSettings();
+                    }
                 }
-                ImportSpec = new ImportSpecification(true, ImportTransactionsPath, account);
+                ImportSpec = new ImportSpecification(false, ImportTransactionsPath, account);
             }
 
-            return result;
+            return true;
         }
 
         #endregion

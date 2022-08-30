@@ -456,9 +456,9 @@ namespace StatementParser
                     "U" + amount + eol +
                     "T" + amount + eol +
                     "C" + eol +
-                    "P" + (cct.Vendor == null ? "" : cct.Vendor) + eol +
-                    "M" + (cct.Comment == null ? "" : cct.Comment) + eol +
-                    "L" + (cct.Category == null ? "" : cct.Category) + eol +
+                    "P" + (cct.Vendor ?? "") + eol +
+                    "M" + (cct.Comment ?? "") + eol +
+                    "L" + (cct.Category ?? "") + eol +
                     "^" + eol;
 
                 qif += transqif;
