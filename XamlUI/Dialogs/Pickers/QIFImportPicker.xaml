@@ -9,7 +9,7 @@
         xmlns:pickers="clr-namespace:BanaData.Logic.Dialogs.Pickers;assembly=BanaData" 
         d:DataContext="{d:DesignInstance Type=pickers:QIFImportPickerLogic}"
         mc:Ignorable="d"
-        Title="Export to QIF"        
+        Title="Import from QIF"        
         Icon="/XamlUI;component/Images/Bananas.ico"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
