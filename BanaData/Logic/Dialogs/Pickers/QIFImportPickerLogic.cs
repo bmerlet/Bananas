@@ -104,6 +104,11 @@ namespace BanaData.Logic.Dialogs.Pickers
         public IEnumerable<AccountItem> Accounts => accounts;
         public bool ImportToSpecificAccountEnabled => importType == EImportType.Transactions && ImportToSpecificAccount == true;
 
+        //
+        // Options when importing transactions
+        //
+        public bool? ImportComments { get; set; } = false;
+        public bool? LowerCasePayees { get; set; } = true;
 
         #endregion
 
@@ -141,23 +146,13 @@ namespace BanaData.Logic.Dialogs.Pickers
         }
 
         // Result
-        public class ImportSpecification
-        {
-            public readonly bool Full;
-            public string Filename;
-            public Household.AccountRow TransactionAccount;
-
-            public ImportSpecification(bool full, string filename, Household.AccountRow transactionAccount) =>
-                (Full, Filename, TransactionAccount) = (full, filename, transactionAccount);
-        }
-
-        public ImportSpecification ImportSpec { get; private set; }
+        public QIFImportSpecification ImportSpecification { get; private set; }
 
         protected override bool? Commit()
         {
             if (ImportDB)
             {
-                ImportSpec = new ImportSpecification(true, ImportDBPath, null);
+                ImportSpecification = new QIFImportSpecification(true, ImportDBPath, null, true, false);
             }
             else
             {
@@ -177,7 +172,7 @@ namespace BanaData.Logic.Dialogs.Pickers
                         mainWindowLogic.SaveUserSettings();
                     }
                 }
-                ImportSpec = new ImportSpecification(false, ImportTransactionsPath, account);
+                ImportSpecification = new QIFImportSpecification(false, ImportTransactionsPath, account, ImportComments == true, LowerCasePayees == true);
             }
 
             return true;

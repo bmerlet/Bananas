@@ -445,7 +445,7 @@ namespace BanaData.Logic.Main
             Household.AcceptChanges();
         }
 
-        public void ImportQIF(string file, bool db, Household.AccountRow account)
+        public void ImportQIF(QIFImportSpecification spec)
         {
             GuiServices.SetCursor(true);
 
@@ -453,7 +453,7 @@ namespace BanaData.Logic.Main
 
             try
             {
-                parser.ImportFromQIF(file, db, account);
+                parser.ImportFromQIF(spec);
             }
             catch (Exception e)
             {

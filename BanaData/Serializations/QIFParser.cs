@@ -82,7 +82,7 @@ namespace BanaData.Serializations
         //
         // Parse QIF, importing either the whole DB or just transactions
         //
-        public void ImportFromQIF(string fileName, bool importWholeDB, Household.AccountRow account)
+        public void ImportFromQIF(QIFImportSpecification spec)
         {
             // Init
             Log = "";
@@ -91,10 +91,10 @@ namespace BanaData.Serializations
 
             // If replacing the whole DB, preserve info not present in QIF
             // hoping that it could be used against the new DB
-            var supplementalInfo = importWholeDB ? GetSupplemtalInfo() : null;
+            var supplementalInfo = spec.Full ? GetSupplemtalInfo() : null;
 
             // Zap the database
-            if (importWholeDB)
+            if (spec.Full)
             {
                 household.Clear();
                 household.AcceptChanges();
@@ -105,10 +105,10 @@ namespace BanaData.Serializations
             checkpointRow = household.Checkpoint.GetCurrentCheckpoint();
 
             // Parse the file
-            ParseFile(fileName, !importWholeDB, account);
+            ParseFile(spec);
 
             // Log what we got
-            if (importWholeDB)
+            if (spec.Full)
             {
                 Log += $"Imported {household.Account.Rows.Count:N0} accounts" + eol;
                 Log += $"Imported {household.Category.Rows.Count:N0} categories" + eol;
@@ -124,7 +124,7 @@ namespace BanaData.Serializations
             Log += eol;
 
             // Find other sides of transfers
-            if (importWholeDB)
+            if (spec.Full)
             {
                 PairTransfers();
             }
@@ -146,21 +146,25 @@ namespace BanaData.Serializations
         #region QIF main parser
 
         // Parse a QIF file file
-        private void ParseFile(string fileName, bool onlyTransactions, Household.AccountRow accountRow)
+        private void ParseFile(QIFImportSpecification spec)
         {
+            var accountRow = spec.TransactionAccount;
+
             // Read the file
-            using (var sr = new StreamReader(fileName))
+            using (var sr = new StreamReader(spec.Filename))
             {
                 // Parse all sections
                 while (!sr.EndOfStream)
                 {
-                    accountRow = ParseOneSection(sr, accountRow, onlyTransactions);
+                    accountRow = ParseOneSection(sr, accountRow, spec);
                 }
             }
         }
 
-        private Household.AccountRow ParseOneSection(StreamReader sr, Household.AccountRow accountRow, bool onlyTransactions)
+        private Household.AccountRow ParseOneSection(StreamReader sr, Household.AccountRow accountRow, QIFImportSpecification spec)
         {
+            bool onlyTransactions = !spec.Full;
+
             var sectionStr = sr.ReadLine();
             if (!sectionStr.StartsWith("!"))
             {
@@ -188,24 +192,24 @@ namespace BanaData.Serializations
                                 ParseSecurities(sr);
                                 break;
                             case "Bank":
-                                ParseBankTransactions(sr, accountRow);
+                                ParseBankTransactions(sr, accountRow, spec);
                                 numberOfTransactions += 1;
                                 break;
                             case "CCard":
-                                ParseBankTransactions(sr, accountRow);
+                                ParseBankTransactions(sr, accountRow, spec);
                                 numberOfTransactions += 1;
                                 break;
                             case "Cash":
-                                ParseBankTransactions(sr, accountRow);
+                                ParseBankTransactions(sr, accountRow, spec);
                                 numberOfTransactions += 1;
                                 break;
                             case "Oth A":
                             case "Oth L":
-                                ParseBankTransactions(sr, accountRow);
+                                ParseBankTransactions(sr, accountRow, spec);
                                 numberOfTransactions += 1;
                                 break;
                             case "Invst":
-                                ParseInvestmentTransactions(sr, accountRow);
+                                ParseInvestmentTransactions(sr, accountRow, spec);
                                 numberOfTransactions += 1;
                                 break;
                             case "Memorized":
@@ -231,7 +235,7 @@ namespace BanaData.Serializations
                         switch (comps[1])
                         {
                             case "AutoSwitch":
-                            // No idea what that means
+                                // No idea what that means
                                 break;
                             default:
                                 throw new InvalidDataException("QIF parser: Unknown option: " + sectionStr);
@@ -294,7 +298,7 @@ namespace BanaData.Serializations
                     break;
                 }
 
-                switch(l[0])
+                switch (l[0])
                 {
                     case 'N': path = l.Substring(1); break;
                     case 'D': description = l.Substring(1); break;
@@ -527,7 +531,7 @@ namespace BanaData.Serializations
 
         # region Parse QIF banking transactions
 
-        private void ParseBankTransactions(StreamReader sr, Household.AccountRow account)
+        private void ParseBankTransactions(StreamReader sr, Household.AccountRow account, QIFImportSpecification spec)
         {
             if (account == null)
             {
@@ -536,7 +540,7 @@ namespace BanaData.Serializations
 
             while (sr.Peek() != '!' && !sr.EndOfStream)
             {
-                ParseOneBankTransaction(sr, account);
+                ParseOneBankTransaction(sr, account, spec);
             }
         }
 
@@ -548,7 +552,7 @@ namespace BanaData.Serializations
             public decimal Amount = 0;
         }
 
-        private void ParseOneBankTransaction(TextReader sr, Household.AccountRow accountRow)
+        private void ParseOneBankTransaction(TextReader sr, Household.AccountRow accountRow, QIFImportSpecification spec)
         {
             DateTime date = DateTime.MinValue;
             decimal amount = 0;
@@ -593,32 +597,42 @@ namespace BanaData.Serializations
 
                     case 'M':
                         // Main memo
-                        memo = l.Substring(1);
+                        if (spec.ImportComments)
+                        {
+                            memo = l.Substring(1);
+                        }
                         break;
 
                     case 'E':
                         // Line item memo
-                        lineItemHolder.Memo = l.Substring(1);
+                        if (spec.ImportComments)
+                        {
+                            lineItemHolder.Memo = l.Substring(1);
+                        }
                         break;
 
                     case 'P':
                         // Payee
                         payee = l.Substring(1);
+                        if (spec.LowerCasePayees)
+                        {
+                            payee = MakePayeeLowercase(payee);
+                        }
                         break;
-                    
+
                     case 'C':
                         // Transaction status
                         status = ParseTransactionStatus(l.Substring(1));
                         break;
-                    
+
                     case 'L':
                         (lineItemHolder.AccountID, lineItemHolder.CategoryID, _) = ParseTransactionTarget(household, accountRow, l.Substring(1));
                         break;
-                    
+
                     case 'N':
                         medium = ParseBankTransactionMedium(l.Substring(1), out checkNumber);
                         break;
-                    
+
                     case 'S':
                         // Indicates beginning of a new split line item - commit previous one if any
                         if (parsingSplitLineItem)
@@ -653,9 +667,9 @@ namespace BanaData.Serializations
         }
 
         private Household.TransactionRow CreateBankingTransaction(
-            Household.AccountRow accountRow, 
+            Household.AccountRow accountRow,
             DateTime date,
-            string payee, 
+            string payee,
             string memo,
             ETransactionStatus status,
             ETransactionMedium medium,
@@ -700,7 +714,7 @@ namespace BanaData.Serializations
 
         #region Parse QIF investment transactions
 
-        private void ParseInvestmentTransactions(StreamReader sr, Household.AccountRow account)
+        private void ParseInvestmentTransactions(StreamReader sr, Household.AccountRow account, QIFImportSpecification spec)
         {
             if (account == null)
             {
@@ -709,11 +723,11 @@ namespace BanaData.Serializations
 
             while (sr.Peek() != '!' && !sr.EndOfStream)
             {
-                ParseOneInvestmentTransaction(sr, account);
+                ParseOneInvestmentTransaction(sr, account, spec);
             }
         }
 
-        private void ParseOneInvestmentTransaction(TextReader sr, Household.AccountRow accountRow)
+        private void ParseOneInvestmentTransaction(TextReader sr, Household.AccountRow accountRow, QIFImportSpecification spec)
         {
             DateTime date = DateTime.MinValue;
             decimal amount = 0;
@@ -784,14 +798,21 @@ namespace BanaData.Serializations
                     case 'U':
                         decimal.TryParse(arg, out otherMysteriousAmount);
                         break;
-                        
+
                     //case 'E':
                     case 'M':
-                        memo = arg;
+                        if (spec.ImportComments)
+                        {
+                            memo = arg;
+                        }
                         break;
 
                     case 'P':
                         payee = arg;
+                        if (spec.LowerCasePayees)
+                        {
+                            payee = MakePayeeLowercase(payee);
+                        }
                         break;
 
                     case 'C':
@@ -837,13 +858,13 @@ namespace BanaData.Serializations
             }
 
             // Get rid of old transfer types and move them to CashIn/CashOut and XIn/XOut
-            if (extendedType == EExtendedInvestmentTransactionType.Cash || 
+            if (extendedType == EExtendedInvestmentTransactionType.Cash ||
                 extendedType == EExtendedInvestmentTransactionType.TransferCash ||
                 extendedType == EExtendedInvestmentTransactionType.TransferMiscellaneousIncomeIn)
             {
                 if (amount >= 0)
                 {
-                    type = categoryAccountID >=0 ? EInvestmentTransactionType.TransferCashIn : EInvestmentTransactionType.CashIn;
+                    type = categoryAccountID >= 0 ? EInvestmentTransactionType.TransferCashIn : EInvestmentTransactionType.CashIn;
                 }
                 else
                 {
@@ -899,6 +920,20 @@ namespace BanaData.Serializations
             }
 
             return transRow;
+        }
+
+        static private string MakePayeeLowercase(string payee)
+        {
+            var words = payee.Trim().Split(new char[] { ' ' });
+            string result = "";
+            foreach(var word in words)
+            {
+                var lowercaseWord = word[0] + word.Substring(1).ToLower();
+                result += (result == "") ? "" : " ";
+                result += lowercaseWord;
+            }
+
+            return result;
         }
 
         #endregion
@@ -1087,10 +1122,10 @@ namespace BanaData.Serializations
                 string mainStr = "0";
                 string numStr = "0";
                 string denomStr = "1";
-                
+
                 subComps = comps[1].Split(new char[] { ' ', '/' });
 
-                switch(subComps.Length)
+                switch (subComps.Length)
                 {
                     case 1:
                         mainStr = subComps[0];
@@ -1458,7 +1493,7 @@ namespace BanaData.Serializations
             //
             // Go over all transfer line items
             //
-            foreach(Household.LineItemTransferRow sourceLineItemTransferRow in household.LineItemTransfer.Rows)
+            foreach (Household.LineItemTransferRow sourceLineItemTransferRow in household.LineItemTransfer.Rows)
             {
                 // Verify we don't know about it already
                 if (sourceLineItemTransferRow.PeerTransID != -1)
@@ -1503,7 +1538,7 @@ namespace BanaData.Serializations
                 if (sourceLineItemTransferRow.PeerTransID == -1)
                 {
                     var targetAccountRow = household.Account.FindByID(targetAccountID);
-                    Log += $"Warning: Could not pair transaction on account {sourceTransactionRow.AccountRow.Name}" + eol+
+                    Log += $"Warning: Could not pair transaction on account {sourceTransactionRow.AccountRow.Name}" + eol +
                         $"to/from account {targetAccountRow.Name} on {sourceTransactionRow.Date} for ${sourceLineItemTransferRow.LineItemRow.Amount};" + eol;
                     Log += "Changing category to <none>." + eol;
 
@@ -1526,13 +1561,13 @@ namespace BanaData.Serializations
             var supplementalInfo = new SupplementalInfo();
 
             // Persons
-            foreach(Household.PersonRow personRow in household.Person.Rows)
+            foreach (Household.PersonRow personRow in household.Person.Rows)
             {
                 supplementalInfo.Persons.Add(personRow.Name);
             }
 
             // Accounts: Hidden flag in accounts, IRA kind in accounts, last statement date
-            foreach(Household.AccountRow accountRow in household.Account.Rows)
+            foreach (Household.AccountRow accountRow in household.Account.Rows)
             {
                 supplementalInfo.Accounts.Add(
                     new SupplementalInfo.Account(
@@ -1588,7 +1623,7 @@ namespace BanaData.Serializations
             }
 
             // Scheduled transactions
-            foreach(Household.ScheduleRow scheduleRow in household.Schedule)
+            foreach (Household.ScheduleRow scheduleRow in household.Schedule)
             {
                 var transactionRow = scheduleRow.TransactionRow;
                 var medium = transactionRow.AccountRow.Type == EAccountType.Bank ? transactionRow.GetBankingTransaction().Medium : ETransactionMedium.None;
@@ -1599,7 +1634,7 @@ namespace BanaData.Serializations
                     transactionRow.IsPayeeNull() ? null : transactionRow.Payee,
                     transactionRow.IsMemoNull() ? null : transactionRow.Memo);
 
-                foreach(var lineItemRow in transactionRow.GetLineItemRows())
+                foreach (var lineItemRow in transactionRow.GetLineItemRows())
                 {
                     string memo = lineItemRow.IsMemoNull() ? null : lineItemRow.Memo;
                     if (lineItemRow.GetLineItemCategoryRow() is Household.LineItemCategoryRow licr)
@@ -1621,7 +1656,7 @@ namespace BanaData.Serializations
         private void ApplySupplementalInfo(SupplementalInfo supplementalInfo)
         {
             // Persons
-            foreach(var person in supplementalInfo.Persons)
+            foreach (var person in supplementalInfo.Persons)
             {
                 var personRow = household.Person.NewPersonRow();
                 personRow.Name = person;
@@ -1657,7 +1692,7 @@ namespace BanaData.Serializations
                 if (accountRow != null)
                 {
                     var reconcileInfoRow = household.ReconcileInfo.NewReconcileInfoRow();
-                    
+
                     reconcileInfoRow.AccountID = accountRow.ID;
                     reconcileInfoRow.StatementDate = reconcileInfo.StatementDate;
                     reconcileInfoRow.StatementBalance = reconcileInfo.StatementBalance;
@@ -1675,7 +1710,7 @@ namespace BanaData.Serializations
 
                     household.ReconcileInfo.AddReconcileInfoRow(reconcileInfoRow);
 
-                    foreach(var securityReconcileInfo in reconcileInfo.SecurityReconcileInfos)
+                    foreach (var securityReconcileInfo in reconcileInfo.SecurityReconcileInfos)
                     {
                         var securityRow = household.Security.GetByName(securityReconcileInfo.Name);
                         if (securityRow != null)
@@ -1709,7 +1744,7 @@ namespace BanaData.Serializations
             }
 
             // Transaction reports
-            foreach(var transactionReport in supplementalInfo.TransactionReports)
+            foreach (var transactionReport in supplementalInfo.TransactionReports)
             {
                 var transactionReportRow = household.TransactionReport.NewTransactionReportRow();
                 transactionReportRow.Name = transactionReport.Name;
@@ -1722,7 +1757,7 @@ namespace BanaData.Serializations
                 transactionReportRow.Flags = transactionReport.Flags;
                 household.TransactionReport.AddTransactionReportRow(transactionReportRow);
 
-                foreach(var accountName in transactionReport.Accounts)
+                foreach (var accountName in transactionReport.Accounts)
                 {
                     var accountRow = household.Account.GetByName(accountName);
                     if (accountRow != null)
@@ -1756,7 +1791,7 @@ namespace BanaData.Serializations
             }
 
             // Scheduled transactions
-            foreach(var schedule in supplementalInfo.Schedules)
+            foreach (var schedule in supplementalInfo.Schedules)
             {
                 // Check the categories and accounts referenced are still present
                 var accountRow = household.Account.GetByName(schedule.Account);
@@ -1858,7 +1893,7 @@ namespace BanaData.Serializations
             public readonly List<RebalanceTarget> RebalanceTargets = new List<RebalanceTarget>();
             public class RebalanceTarget
             {
-                public RebalanceTarget(string accountName, string securityName, decimal target) => 
+                public RebalanceTarget(string accountName, string securityName, decimal target) =>
                     (AccountName, SecurityName, Target) = (accountName, securityName, target);
 
                 public readonly string AccountName;
@@ -1922,4 +1957,29 @@ namespace BanaData.Serializations
 
         #endregion
     }
+
+    /// <summary>
+    /// Parsing specification
+    /// </summary>
+    public class QIFImportSpecification
+    {
+        #region Properties
+
+        public readonly bool Full;
+        public readonly string Filename;
+        public readonly Household.AccountRow TransactionAccount;
+        public readonly bool ImportComments;
+        public readonly bool LowerCasePayees;
+
+        #endregion
+
+        #region Constructor
+
+        public QIFImportSpecification(bool full, string filename, Household.AccountRow transactionAccount, bool importComments, bool lowerCasePayees) =>
+            (Full, Filename, TransactionAccount, ImportComments, LowerCasePayees) = (full, filename, transactionAccount, importComments, lowerCasePayees);
+
+        #endregion
+    }
+
+
 }

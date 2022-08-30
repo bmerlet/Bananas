@@ -160,8 +160,8 @@ namespace BanaData.Logic.Main
             var importFileLogic = new QIFImportPickerLogic(mainWindow);
             if (mainWindow.GuiServices.ShowDialog(importFileLogic))
             {
-                var importSpec = importFileLogic.ImportSpec;
-                mainWindow.ImportQIF(importSpec.Filename, importSpec.Full, importSpec.TransactionAccount);
+                var importSpec = importFileLogic.ImportSpecification;
+                mainWindow.ImportQIF(importSpec);
             }
         }
 

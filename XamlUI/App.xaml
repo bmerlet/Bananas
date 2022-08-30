@@ -81,6 +81,7 @@
         <!-- Form radio button -->
         <Style TargetType="RadioButton" x:Key="FormRadioButton">
             <Setter Property="Margin" Value="5"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
 
         <!-- Form autocomplete-->
