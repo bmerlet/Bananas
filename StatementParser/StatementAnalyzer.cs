@@ -101,6 +101,7 @@ namespace StatementParser
             new HoldingHint(4, 5, "VNQ", 2, "VNQ"),
             new HoldingHint(4, 5, "VGIT", 2, "VGIT"),
             new HoldingHint(4, 5, "BND", 2, "BND"),
+            new HoldingHint(4, 5, "BNDX", 2, "BNDX"),
             new HoldingHint(4, 5, "VXUS", 2, "VXUS"),
             new HoldingHint(4, 5, "VTI", 2, "VTI"),
         };

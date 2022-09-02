@@ -193,24 +193,19 @@ namespace BanaData.Serializations
                                 break;
                             case "Bank":
                                 ParseBankTransactions(sr, accountRow, spec);
-                                numberOfTransactions += 1;
                                 break;
                             case "CCard":
                                 ParseBankTransactions(sr, accountRow, spec);
-                                numberOfTransactions += 1;
                                 break;
                             case "Cash":
                                 ParseBankTransactions(sr, accountRow, spec);
-                                numberOfTransactions += 1;
                                 break;
                             case "Oth A":
                             case "Oth L":
                                 ParseBankTransactions(sr, accountRow, spec);
-                                numberOfTransactions += 1;
                                 break;
                             case "Invst":
                                 ParseInvestmentTransactions(sr, accountRow, spec);
-                                numberOfTransactions += 1;
                                 break;
                             case "Memorized":
                                 ComplainIfOnlyTransactions("Memorized payee", onlyTransactions);
@@ -664,6 +659,7 @@ namespace BanaData.Serializations
 
             // Create transaction
             CreateBankingTransaction(accountRow, date, payee, memo, status, medium, checkNumber, lineItemHolders);
+            numberOfTransactions += 1;
         }
 
         private Household.TransactionRow CreateBankingTransaction(
@@ -883,6 +879,7 @@ namespace BanaData.Serializations
             }
 
             CreateInvestmentTransaction(accountRow, date, payee, memo, status, categoryID, categoryAccountID, amount, type, securityRow, securityPrice, securityQuantity, commission);
+            numberOfTransactions += 1;
         }
 
         private Household.TransactionRow CreateInvestmentTransaction(
