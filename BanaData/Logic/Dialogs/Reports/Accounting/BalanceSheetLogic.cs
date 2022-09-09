@@ -16,18 +16,18 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
     {
         #region Private members
 
-        private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
 
         #endregion
 
         #region Constructor
 
-        public BalanceSheetLogic(MainWindowLogic _mainWindowLogic)
+        public BalanceSheetLogic(Household _household)
         {
-            mainWindowLogic = _mainWindowLogic;
+            household = _household;
 
             // Setup members
-            foreach(var person in mainWindowLogic.Household.Person)
+            foreach(var person in household.Person)
             {
                 MembersSource.Add(new MemberItem(person));
             }
@@ -75,8 +75,6 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
 
         private void ComputeBalanceSheet()
         {
-            var household = mainWindowLogic.Household;
-
             //
             // Compute assets
             //

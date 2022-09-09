@@ -17,23 +17,23 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
     {
         #region Private members
 
-        private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
 
         #endregion
 
         #region Constructor
 
-        public JournalLogic(MainWindowLogic _mainWindowLogic)
+        public JournalLogic(Household _household)
         {
-            mainWindowLogic = _mainWindowLogic;
+            household = _household;
 
             // Setup date range
             DateRangeLogic = new DateRangeLogic(DateRangeLogic.ERange.YearToDate,
-                () => mainWindowLogic.Household.RegularTransactions.Select(tr => tr.Date).Min());
+                () => household.RegularTransactions.Select(tr => tr.Date).Min());
             DateRangeLogic.DateRangeChanged += (s, e) => ComputeJournal();
 
             // Setup members
-            foreach (var person in mainWindowLogic.Household.Person)
+            foreach (var person in household.Person)
             {
                 MembersSource.Add(new MemberItem(person));
             }
@@ -72,7 +72,6 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
 
         private void ComputeJournal()
         {
-            var household = mainWindowLogic.Household;
             var startDate = DateRangeLogic.StartDate;
             var endDate = DateRangeLogic.EndDate;
             var member = selectedMember.Member;

@@ -20,18 +20,19 @@ namespace BanaData.Logic.Dialogs.Listers
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
 
         #endregion
 
         #region Constructor
 
-        public ListAccountsLogic(MainWindowLogic _mainWindowLogic)
+        public ListAccountsLogic(MainWindowLogic _mainWindowLogic, Household _household)
         {
-            mainWindowLogic = _mainWindowLogic;
+            (mainWindowLogic, household) = (_mainWindowLogic, _household);
 
             accountsSource = new ObservableCollection<AccountItem>();
 
-            foreach (Household.AccountRow acct in mainWindowLogic.Household.Account.Rows)
+            foreach (Household.AccountRow acct in household.Account.Rows)
             {
                 // Skip hidden accounts if required
                 if (acct.Hidden && mainWindowLogic.UserSettings.HideClosedAccounts)
@@ -73,7 +74,7 @@ namespace BanaData.Logic.Dialogs.Listers
             // Create new account
             var account = new AccountItem(null, "", "", EAccountType.Bank, 0, EInvestmentKind.Invalid, false, null);
 
-            var logic = new EditAccountLogic(mainWindowLogic, account, true);
+            var logic = new EditAccountLogic(mainWindowLogic, household, account, true);
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
             {
                 // Get new account
@@ -95,7 +96,7 @@ namespace BanaData.Logic.Dialogs.Listers
         {
             if (SelectedAccount != null)
             {
-                var logic = new EditAccountLogic(mainWindowLogic, SelectedAccount, false);
+                var logic = new EditAccountLogic(mainWindowLogic, household, SelectedAccount, false);
                 if (mainWindowLogic.GuiServices.ShowDialog(logic))
                 {
                     // Get modified account
@@ -135,13 +136,11 @@ namespace BanaData.Logic.Dialogs.Listers
 
         private AccountItem AddAccountToDataSet(AccountItem newAccount)
         {
-            var household = mainWindowLogic.Household;
-
             // Create and commit new account
             var newAccountRow = household.Account.Add(
                 newAccount.Name, newAccount.Description, newAccount.Type, newAccount.CreditLimit, newAccount.InvestmentKind, newAccount.Hidden, FindPersonRow(newAccount.Owner));
 
-            mainWindowLogic.CommitChanges();
+            mainWindowLogic.CommitChanges(household);
             mainWindowLogic.UpdateAccountNamesAndBalances(null);
             mainWindowLogic.BuildCategoriesList();
 
@@ -151,14 +150,12 @@ namespace BanaData.Logic.Dialogs.Listers
 
         private void UpdateAccountInDataSet(AccountItem newAccount)
         {
-            var household = mainWindowLogic.Household;
-
             // Update the row
             household.Account.Update(
                 newAccount.AccountRow, newAccount.Name, newAccount.Description, newAccount.Type, newAccount.CreditLimit, newAccount.InvestmentKind, newAccount.Hidden, FindPersonRow(newAccount.Owner));
 
             // Commit
-            mainWindowLogic.CommitChanges();
+            mainWindowLogic.CommitChanges(household);
             mainWindowLogic.UpdateAccountNamesAndBalances(new int[] { newAccount.AccountRow.ID });
             mainWindowLogic.CloseRegisterIfOpen(newAccount.AccountRow.ID);
             mainWindowLogic.BuildCategoriesList();
@@ -170,7 +167,7 @@ namespace BanaData.Logic.Dialogs.Listers
             int id = account.AccountRow.ID;
             account.AccountRow.Delete();
 
-            mainWindowLogic.CommitChanges();
+            mainWindowLogic.CommitChanges(household);
             mainWindowLogic.UpdateAccountNamesAndBalances(null);
             mainWindowLogic.CloseRegisterIfOpen(id);
             mainWindowLogic.BuildCategoriesList();
@@ -182,7 +179,7 @@ namespace BanaData.Logic.Dialogs.Listers
 
             if (owner != null)
             {
-                personRow = mainWindowLogic.Household.Person.Rows.Cast<Household.PersonRow>().Where(pr => pr.Name == owner).SingleOrDefault();
+                personRow = household.Person.Rows.Cast<Household.PersonRow>().Where(pr => pr.Name == owner).SingleOrDefault();
             }
 
             return personRow;

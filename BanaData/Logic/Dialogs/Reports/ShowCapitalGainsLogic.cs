@@ -12,19 +12,17 @@ namespace BanaData.Logic.Dialogs.Reports
 {
     public class ShowCapitalGainsLogic : LogicBase
     {
-        private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
 
-        public ShowCapitalGainsLogic(MainWindowLogic _mainWindowLogic, int transactionID)
+        public ShowCapitalGainsLogic(Household _household, int transactionID)
         {
-            mainWindowLogic = _mainWindowLogic;
+            household = _household;
 
             BuildCapitalGainsInfo(transactionID);
         }
 
         private void BuildCapitalGainsInfo(int transactionID)
         {
-            var household = mainWindowLogic.Household;
-
             var sale = Portfolio.ComputeSaleCapitalGains(household, transactionID, true);
 
             Description = sale.Description;

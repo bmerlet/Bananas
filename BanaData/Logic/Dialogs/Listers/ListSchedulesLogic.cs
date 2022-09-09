@@ -23,17 +23,18 @@ namespace BanaData.Logic.Dialogs.Listers
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
 
         #endregion
 
         #region Constructor
 
-        public ListSchedulesLogic(MainWindowLogic _mainWindowLogic)
+        public ListSchedulesLogic(MainWindowLogic _mainWindowLogic, Household _household)
         {
-            mainWindowLogic = _mainWindowLogic;
+            (mainWindowLogic, household) = (_mainWindowLogic, _household);
 
             schedulesSource = new ObservableCollection<ScheduleItem>();
-            foreach(var scheduleRow in mainWindowLogic.Household.Schedule)
+            foreach(var scheduleRow in household.Schedule)
             {
                 schedulesSource.Add(new ScheduleItem(mainWindowLogic, scheduleRow));
             }
@@ -71,7 +72,7 @@ namespace BanaData.Logic.Dialogs.Listers
                 -1, DateTime.Today, DateTime.Today, EScheduleFrequency.Monthly, EScheduleFlag.None,
                 -1, "", "", "", "", new LineItem[] { new LineItem(mainWindowLogic, -1, "", -1, -1, "", 0, true)});
 
-            var logic = new EditScheduleLogic(mainWindowLogic, schedule, true);
+            var logic = new EditScheduleLogic(mainWindowLogic, household, schedule, true);
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
             {
                 // Get new schedule
@@ -93,7 +94,7 @@ namespace BanaData.Logic.Dialogs.Listers
         {
             if (SelectedSchedule != null)
             {
-                var logic = new EditScheduleLogic(mainWindowLogic, SelectedSchedule, false);
+                var logic = new EditScheduleLogic(mainWindowLogic, household, SelectedSchedule, false);
                 if (mainWindowLogic.GuiServices.ShowDialog(logic))
                 {
                     // Get modified payee
@@ -127,7 +128,6 @@ namespace BanaData.Logic.Dialogs.Listers
 
         private ScheduleItem AddScheduleToDataSet(ScheduleItem scheduleItem)
         {
-            var household = mainWindowLogic.Household;
             var accountRow = household.Account.GetByName(scheduleItem.Account);
 
             // Commit new transaction
@@ -169,7 +169,7 @@ namespace BanaData.Logic.Dialogs.Listers
                 (int)scheduleItem.Flags,
                 newTransactionRow);
 
-            mainWindowLogic.CommitChanges();
+            mainWindowLogic.CommitChanges(household);
 
             // Recreate schedule with correct IDs
             return new ScheduleItem(mainWindowLogic, newScheduleRow);
@@ -177,8 +177,6 @@ namespace BanaData.Logic.Dialogs.Listers
 
         private ScheduleItem UpdateScheduleInDataSet(ScheduleItem updatedScheduleItem)
         {
-            var household = mainWindowLogic.Household;
-
             // Update schedule
             var scheduleRow = household.Schedule.FindByID(updatedScheduleItem.ID);
             scheduleRow.NextDate = updatedScheduleItem.NextDate;
@@ -297,7 +295,7 @@ namespace BanaData.Logic.Dialogs.Listers
                 }
             }
 
-            mainWindowLogic.CommitChanges();
+            mainWindowLogic.CommitChanges(household);
 
             // Recreate memorized payee with correct IDs
             return new ScheduleItem(mainWindowLogic, scheduleRow);
@@ -305,8 +303,6 @@ namespace BanaData.Logic.Dialogs.Listers
 
         private void RemoveMemorizedPayeeFromDataSet(ScheduleItem scheduleItem)
         {
-            var household = mainWindowLogic.Household;
-
             // Remove the line items
             foreach (var lineItem in scheduleItem.LineItems)
             {
@@ -319,7 +315,7 @@ namespace BanaData.Logic.Dialogs.Listers
             // Remove the transaction
             household.Transaction.FindByID(scheduleItem.TransactionID).Delete();
 
-            mainWindowLogic.CommitChanges();
+            mainWindowLogic.CommitChanges(household);
         }
 
         #endregion

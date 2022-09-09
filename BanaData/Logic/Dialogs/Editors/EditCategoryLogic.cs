@@ -16,15 +16,16 @@ namespace BanaData.Logic.Dialogs.Editors
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
         private readonly CategoryItem oldCategoryItem;
 
         #endregion
 
         #region Constructor
 
-        public EditCategoryLogic(MainWindowLogic _mainWindowLogic, CategoryItem categoryItem)
+        public EditCategoryLogic(MainWindowLogic _mainWindowLogic, Household _household, CategoryItem categoryItem)
         {
-            (mainWindowLogic, oldCategoryItem) = (_mainWindowLogic, categoryItem);
+            (mainWindowLogic, household, oldCategoryItem) = (_mainWindowLogic, _household, categoryItem);
 
             Name = categoryItem.Name;
             Description = categoryItem.Description;
@@ -93,7 +94,7 @@ namespace BanaData.Logic.Dialogs.Editors
 
             var parent = GetParent();
 
-            foreach (Household.CategoryRow cat in mainWindowLogic.Household.Category.Rows)
+            foreach (Household.CategoryRow cat in household.Category.Rows)
             {
                 if (cat.ID != oldCategoryItem.ID && cat.Name == Name &&
                     ((parent == null && cat.IsParentIDNull()) || (parent != null && !cat.IsParentIDNull() && parent.ID == cat.ParentID)))

@@ -21,14 +21,15 @@ namespace BanaData.Logic.Dialogs.Listers
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
 
         #endregion
 
         #region Constructor
 
-        public ListSecuritiesLogic(MainWindowLogic _mainWindowLogic)
+        public ListSecuritiesLogic(MainWindowLogic _mainWindowLogic, Household _household)
         {
-            mainWindowLogic = _mainWindowLogic;
+            (mainWindowLogic, household) = (_mainWindowLogic, _household);
 
             securitySource = new WpfObservableRangeCollection<SecurityItem>();
             securitySource.ReplaceRange(mainWindowLogic.Securities);
@@ -66,7 +67,7 @@ namespace BanaData.Logic.Dialogs.Listers
             // Create new security
             var security = new SecurityItem(-1, "", "", ESecurityType.Invalid);
 
-            var logic = new EditSecurityLogic(mainWindowLogic, security);
+            var logic = new EditSecurityLogic(mainWindowLogic, household, security);
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
             {
                 // Get new security
@@ -92,7 +93,7 @@ namespace BanaData.Logic.Dialogs.Listers
         {
             if (SelectedSecurity != null)
             {
-                var logic = new EditSecurityLogic(mainWindowLogic, SelectedSecurity);
+                var logic = new EditSecurityLogic(mainWindowLogic, household, SelectedSecurity);
                 if (mainWindowLogic.GuiServices.ShowDialog(logic))
                 {
                     // Get modified security
@@ -122,7 +123,7 @@ namespace BanaData.Logic.Dialogs.Listers
             if (SelectedSecurity != null)
             {
                 // Delete only if no transactions
-                var securityRow = mainWindowLogic.Household.Security.FindByID(SelectedSecurity.ID);
+                var securityRow = household.Security.FindByID(SelectedSecurity.ID);
                 if (securityRow.HasTransactions)
                 {
                     mainWindowLogic.ErrorMessage("This security cannot be deleted because it has transactions associated with it.");
@@ -145,7 +146,7 @@ namespace BanaData.Logic.Dialogs.Listers
         {
             if (SelectedSecurity != null)
             {
-                var logic = new ListSecurityPricesLogic(mainWindowLogic, SelectedSecurity);
+                var logic = new ListSecurityPricesLogic(mainWindowLogic, household, SelectedSecurity);
                 mainWindowLogic.GuiServices.ShowDialog(logic);
                 mainWindowLogic.UpdateAccountNamesAndBalances(null);
             }
@@ -153,12 +154,10 @@ namespace BanaData.Logic.Dialogs.Listers
 
         private SecurityItem AddSecurityToDataSet(SecurityItem newSecurity)
         {
-            var household = mainWindowLogic.Household;
-
             // Create and commit new security
             var newSecurityRow = household.Security.Add(newSecurity.Name, newSecurity.Symbol, newSecurity.Type);
 
-            mainWindowLogic.CommitChanges();
+            mainWindowLogic.CommitChanges(household);
 
             // Note that a new ID is created automatically, so we need to update the security item with it
             return new SecurityItem(newSecurity, newSecurityRow.ID);
@@ -166,23 +165,19 @@ namespace BanaData.Logic.Dialogs.Listers
 
         private void UpdateSecurityInDataSet(SecurityItem newSecurity)
         {
-            var household = mainWindowLogic.Household;
-
             // Update the row
             household.Security.Update(newSecurity.ID, newSecurity.Name, newSecurity.Symbol, newSecurity.Type);
 
             // Commit
-            mainWindowLogic.CommitChanges();
+            mainWindowLogic.CommitChanges(household);
         }
 
         private void RemoveSecurityFromDataSet(SecurityItem security)
         {
-            var household = mainWindowLogic.Household;
-
             // Remove the security
             household.Security.FindByID(security.ID).Delete();
 
-            mainWindowLogic.CommitChanges();
+            mainWindowLogic.CommitChanges(household);
         }
 
         #endregion

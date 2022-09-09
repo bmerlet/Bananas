@@ -17,14 +17,15 @@ namespace BanaData.Logic.Dialogs.Reports
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
 
         #endregion
 
         #region Constructor
 
-        public SearchResultLogic(MainWindowLogic _mainWindowLogic, string searchText)
+        public SearchResultLogic(MainWindowLogic _mainWindowLogic, Household _household, string searchText)
         {
-            (mainWindowLogic, SearchText) = (_mainWindowLogic, searchText);
+            (mainWindowLogic, household, SearchText) = (_mainWindowLogic, _household, searchText);
 
             FoundItemsSource = (CollectionView)CollectionViewSource.GetDefaultView(foundItems);
             FoundItemsSource.SortDescriptions.Add(new SortDescription("Date", ListSortDirection.Descending));
@@ -62,7 +63,6 @@ namespace BanaData.Logic.Dialogs.Reports
                 return;
             }
 
-            var household = mainWindowLogic.Household;
             var tmpList = new List<FoundItem>();
 
             if (!decimal.TryParse(searchText, out decimal searchDecimal))

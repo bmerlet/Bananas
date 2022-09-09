@@ -28,8 +28,8 @@ namespace BanaData.Logic.Main
 
         #region Constructor
 
-        public BankingTransactionLogic(MainWindowLogic mainWindowLogic, BankRegisterLogic _bankRegisterLogic, Household.AccountRow accountRow, int transID, BankTransactionData _data)
-            : base(mainWindowLogic, accountRow, transID, _data)
+        public BankingTransactionLogic(MainWindowLogic mainWindowLogic, BankRegisterLogic _bankRegisterLogic, Household household, Household.AccountRow accountRow, int transID, BankTransactionData _data)
+            : base(mainWindowLogic, household, accountRow, transID, _data)
         {
             (bankRegisterLogic, data) = (_bankRegisterLogic, _data);
 
@@ -40,8 +40,8 @@ namespace BanaData.Logic.Main
         }
 
         // To create new transactions (not in DB yet)
-        public BankingTransactionLogic(MainWindowLogic _mainWindowLogic, BankRegisterLogic _bankRegisterLogic, Household.AccountRow _accountRow)
-            : this(_mainWindowLogic, _bankRegisterLogic, _accountRow, AbstractTransactionLogic.TRANSID_NOT_COMMITTED,
+        public BankingTransactionLogic(MainWindowLogic _mainWindowLogic, BankRegisterLogic _bankRegisterLogic, Household household, Household.AccountRow _accountRow)
+            : this(_mainWindowLogic, _bankRegisterLogic, household, _accountRow, AbstractTransactionLogic.TRANSID_NOT_COMMITTED,
                   new BankTransactionData(DateTime.Today, ETransactionMedium.None, 0, "", "", ETransactionStatus.Pending,
                       new LineItem[] { new LineItem(_mainWindowLogic, -1, "", -1, -1, "", 0, false) }))
         {
@@ -150,12 +150,12 @@ namespace BanaData.Logic.Main
         // Is the deposit box a tab stop
         public bool IsDepositTabStop => 
             data.Medium == ETransactionMedium.Deposit ||
-            data.LineItems.Any(li => li.CategoryID != -1 && mainWindowLogic.Household.Category.FindByID(li.CategoryID).IsIncome);
+            data.LineItems.Any(li => li.CategoryID != -1 && household.Category.FindByID(li.CategoryID).IsIncome);
 
         // Is the payment box a tab stop
         public bool IsPaymentTabStop =>
             data.Medium != ETransactionMedium.Deposit ||
-            data.LineItems.Any(li => li.CategoryID != -1 && !mainWindowLogic.Household.Category.FindByID(li.CategoryID).IsIncome);
+            data.LineItems.Any(li => li.CategoryID != -1 && !household.Category.FindByID(li.CategoryID).IsIncome);
 
         // Activated when a payee is selected from the drop down list
         public CommandBase PayeeSelected { get; }
@@ -301,8 +301,6 @@ namespace BanaData.Logic.Main
 
         private void CommitTransactionToDataSet()
         {
-            var household = mainWindowLogic.Household;
-
             // Remember impacted accounts
             var impactedAccounts = new List<int>
             {
@@ -395,7 +393,7 @@ namespace BanaData.Logic.Main
                 }
             }
 
-            mainWindowLogic.CommitChanges();
+            mainWindowLogic.CommitChanges(household);
 
             // Update balances for accounts impacted by this transaction
             mainWindowLogic.UpdateAccountNamesAndBalances(impactedAccounts);
@@ -442,7 +440,7 @@ namespace BanaData.Logic.Main
             }
 
             // Show the split transaction dialog
-            var splitDialog = new EditSplitLogic(mainWindowLogic, lis);
+            var splitDialog = new EditSplitLogic(mainWindowLogic, household, lis);
             if (mainWindowLogic.GuiServices.ShowDialog(splitDialog))
             {
                 // Copy the result back
@@ -489,7 +487,7 @@ namespace BanaData.Logic.Main
         {
             if (backup == null && TransID != TRANSID_NOT_COMMITTED)
             {
-                var transactionRow = mainWindowLogic.Household.Transaction.FindByID(TransID);
+                var transactionRow = household.Transaction.FindByID(TransID);
                 if (!transactionRow.IsPayeeNull())
                 {
                     if (data.Payee != transactionRow.Payee)

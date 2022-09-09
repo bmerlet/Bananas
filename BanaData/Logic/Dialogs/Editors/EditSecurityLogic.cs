@@ -17,15 +17,16 @@ namespace BanaData.Logic.Dialogs.Editors
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
         private readonly SecurityItem oldSecurityItem;
 
         #endregion
 
         #region Constructor
 
-        public EditSecurityLogic(MainWindowLogic _mainWindowLogic, SecurityItem securityItem)
+        public EditSecurityLogic(MainWindowLogic _mainWindowLogic, Household _household, SecurityItem securityItem)
         {
-            (mainWindowLogic, oldSecurityItem) = (_mainWindowLogic, securityItem);
+            (mainWindowLogic, household, oldSecurityItem) = (_mainWindowLogic, _household, securityItem);
 
             Name = securityItem.Name;
             Symbol = securityItem.Symbol;
@@ -75,7 +76,7 @@ namespace BanaData.Logic.Dialogs.Editors
                 return null;
             }
 
-            foreach (Household.SecurityRow security in mainWindowLogic.Household.Security.Rows)
+            foreach (Household.SecurityRow security in household.Security.Rows)
             {
                 if (security.ID != oldSecurityItem.ID)
                 {

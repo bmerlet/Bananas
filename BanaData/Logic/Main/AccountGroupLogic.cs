@@ -1,4 +1,5 @@
 ﻿using BanaData.Database;
+using BanaData.Serializations;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -16,17 +17,19 @@ namespace BanaData.Logic.Main
 
         #region Private members
 
-        private readonly MainWindowLogic mainWindow;
+        private readonly Household household;
+        private readonly UserSettings userSettings;
         private readonly EType type;
 
         #endregion
 
         #region Constructor
 
-        public AccountGroupLogic(MainWindowLogic mainWindow, EType type)
+        public AccountGroupLogic(Household _household, UserSettings _userSettings, EType _type)
         {
-            this.mainWindow = mainWindow;
-            this.type = type;
+            household = _household;
+            userSettings = _userSettings;
+            type = _type;
 
             switch(type)
             {
@@ -101,7 +104,6 @@ namespace BanaData.Logic.Main
 
         public decimal UpdateAccountsAndBalances(IEnumerable<int> accountIDs)
         {
-            var household = mainWindow.Household;
             decimal totalBalance = 0;
 
             if (accountIDs == null)
@@ -126,7 +128,7 @@ namespace BanaData.Logic.Main
                 foreach (var account in accounts)
                 {
                     // Skip closed accounts if required
-                    if (account.Hidden && mainWindow.UserSettings.HideClosedAccounts)
+                    if (account.Hidden && userSettings.HideClosedAccounts)
                     {
                         continue;
                     }

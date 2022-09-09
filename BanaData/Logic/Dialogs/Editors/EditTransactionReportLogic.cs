@@ -21,6 +21,7 @@ namespace BanaData.Logic.Dialogs.Editors
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
         private readonly TransactionReportItem oldReportItem;
         private ETransactionReportFlag localFlags;
 
@@ -28,9 +29,9 @@ namespace BanaData.Logic.Dialogs.Editors
 
         #region Constructor
 
-        public EditTransactionReportLogic(MainWindowLogic _mainWindowLogic, TransactionReportItem reportItem)
+        public EditTransactionReportLogic(MainWindowLogic _mainWindowLogic, Household _household, TransactionReportItem reportItem)
         {
-            (mainWindowLogic, oldReportItem) = (_mainWindowLogic, reportItem);
+            (mainWindowLogic, household, oldReportItem) = (_mainWindowLogic, _household, reportItem);
 
             PickAccounts = new CommandBase(OnPickAccounts);
             PickPayees = new CommandBase(OnPickPayees);
@@ -332,7 +333,7 @@ namespace BanaData.Logic.Dialogs.Editors
 
         private void OnPickAccounts()
         {
-            var logic = new AccountListPickerLogic(mainWindowLogic, accounts);
+            var logic = new AccountListPickerLogic(household, accounts);
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
             {
                 accounts.Clear();
@@ -343,7 +344,7 @@ namespace BanaData.Logic.Dialogs.Editors
 
         private void OnPickPayees()
         {
-            var logic = new PayeeListPickerLogic(mainWindowLogic, payees);
+            var logic = new PayeeListPickerLogic(household, payees);
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
             {
                 payees.Clear();
@@ -354,7 +355,7 @@ namespace BanaData.Logic.Dialogs.Editors
 
         private void OnPickCategories()
         {
-            var logic = new CategoryListPickerLogic(mainWindowLogic, categories);
+            var logic = new CategoryListPickerLogic(household, categories);
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
             {
                 categories.Clear();
@@ -365,7 +366,7 @@ namespace BanaData.Logic.Dialogs.Editors
 
         private void OnGenerateReport()
         {
-            var logic = new TransactionReportLogic(mainWindowLogic, BuildTransactionReportItemFromControls(), false);
+            var logic = new TransactionReportLogic(mainWindowLogic, household, BuildTransactionReportItemFromControls(), false);
             mainWindowLogic.GuiServices.ShowDialog(logic);
         }
 
@@ -432,7 +433,7 @@ namespace BanaData.Logic.Dialogs.Editors
                 return null;
             }
 
-            foreach (Household.TransactionReportRow report in mainWindowLogic.Household.TransactionReport.Rows)
+            foreach (Household.TransactionReportRow report in household.TransactionReport.Rows)
             {
                 if (report != oldReportItem.TransactionReportRow && report.Name == Name)
                 {

@@ -20,16 +20,18 @@ namespace BanaData.Logic.Dialogs.Listers
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
 
         #endregion
 
         #region Constructor
 
-        public ListTransactionReportsLogic(MainWindowLogic _mainWindowLogic, TransactionReportItem initialItem)
+        public ListTransactionReportsLogic(MainWindowLogic _mainWindowLogic, Household _household, TransactionReportItem initialItem)
         {
             mainWindowLogic = _mainWindowLogic;
+            household = _household;
 
-            foreach (Household.TransactionReportRow reportRow in mainWindowLogic.Household.TransactionReport.Rows)
+            foreach (Household.TransactionReportRow reportRow in household.TransactionReport.Rows)
             {
                 reportsSource.Add(TransactionReportItem.CreateFromDB(reportRow));
             }
@@ -73,7 +75,7 @@ namespace BanaData.Logic.Dialogs.Listers
             // Create new report
             var report = TransactionReportItem.CreateEmpty();
 
-            var logic = new EditTransactionReportLogic(mainWindowLogic, report);
+            var logic = new EditTransactionReportLogic(mainWindowLogic, household, report);
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
             {
                 // Get new report
@@ -97,7 +99,7 @@ namespace BanaData.Logic.Dialogs.Listers
         {
             if (SelectedReport != null)
             {
-                var logic = new EditTransactionReportLogic(mainWindowLogic, SelectedReport);
+                var logic = new EditTransactionReportLogic(mainWindowLogic, household, SelectedReport);
                 if (mainWindowLogic.GuiServices.ShowDialog(logic))
                 {
                     // Get modified report
@@ -134,7 +136,7 @@ namespace BanaData.Logic.Dialogs.Listers
                     SelectedReport.Payees,
                     SelectedReport.Categories);
 
-                var logic = new EditTransactionReportLogic(mainWindowLogic, clonedItem);
+                var logic = new EditTransactionReportLogic(mainWindowLogic, household, clonedItem);
                 if (mainWindowLogic.GuiServices.ShowDialog(logic))
                 {
                     // Get modified report
@@ -169,8 +171,6 @@ namespace BanaData.Logic.Dialogs.Listers
 
         private TransactionReportItem AddReportToDataSet(TransactionReportItem newReport)
         {
-            var household = mainWindowLogic.Household;
-
             // Create and commit new report
             var reportRow = household.TransactionReport.NewTransactionReportRow();
 
@@ -209,7 +209,7 @@ namespace BanaData.Logic.Dialogs.Listers
                 household.TransactionReportCategory.AddTransactionReportCategoryRow(catRow);
             }
 
-            mainWindowLogic.CommitChanges();
+            mainWindowLogic.CommitChanges(household);
 
             // Note that a new ID is created automatically, so we need to update the account item with it
             return TransactionReportItem.CreateFromDB(reportRow);
@@ -246,7 +246,6 @@ namespace BanaData.Logic.Dialogs.Listers
                 // Add accounts that are not present
                 if (reportRow.GetTransactionReportAccountRows().FirstOrDefault(trar => trar.AccountRow == account) == null)
                 {
-                    var household = mainWindowLogic.Household;
                     var acctRow = household.TransactionReportAccount.NewTransactionReportAccountRow();
                     acctRow.TransactionReportID = reportRow.ID;
                     acctRow.AccountID = account.ID;
@@ -268,7 +267,6 @@ namespace BanaData.Logic.Dialogs.Listers
                 // Add payees that are not present
                 if (reportRow.GetTransactionReportPayeeRows().FirstOrDefault(trpr => trpr.Payee == payee) == null)
                 {
-                    var household = mainWindowLogic.Household;
                     var payeeRow = household.TransactionReportPayee.NewTransactionReportPayeeRow();
                     payeeRow.TransactionReportID = reportRow.ID;
                     payeeRow.Payee = payee;
@@ -290,7 +288,6 @@ namespace BanaData.Logic.Dialogs.Listers
                 // Add categories that are not present
                 if (reportRow.GetTransactionReportCategoryRows().FirstOrDefault(trcr => trcr.CategoryRow == category) == null)
                 {
-                    var household = mainWindowLogic.Household;
                     var catRow = household.TransactionReportCategory.NewTransactionReportCategoryRow();
                     catRow.TransactionReportID = reportRow.ID;
                     catRow.CategoryID = category.ID;
@@ -299,7 +296,7 @@ namespace BanaData.Logic.Dialogs.Listers
             }
 
             // Commit
-            mainWindowLogic.CommitChanges();
+            mainWindowLogic.CommitChanges(household);
         }
 
         private void RemoveReportFromDataSet(TransactionReportItem report)
@@ -307,7 +304,7 @@ namespace BanaData.Logic.Dialogs.Listers
             // Remove the report
             report.TransactionReportRow.Delete();
 
-            mainWindowLogic.CommitChanges();
+            mainWindowLogic.CommitChanges(household);
         }
 
         #endregion

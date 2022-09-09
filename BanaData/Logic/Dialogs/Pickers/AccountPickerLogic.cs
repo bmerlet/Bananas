@@ -26,13 +26,13 @@ namespace BanaData.Logic.Dialogs.Pickers
 
         #region Constructor
 
-        public AccountPickerLogic(MainWindowLogic _mainWindowLogic, Household.AccountRow _accountFrom)
+        public AccountPickerLogic(MainWindowLogic _mainWindowLogic, Household household, Household.AccountRow _accountFrom)
         {
             (mainWindowLogic, accountFrom) = (_mainWindowLogic, _accountFrom);
 
             accountsSource = new ObservableCollection<AccountItem>();
 
-            foreach (Household.AccountRow acct in mainWindowLogic.Household.Account.Rows)
+            foreach (Household.AccountRow acct in household.Account.Rows)
             {
                 // Skip hidden accounts if required
                 if (acct.Hidden && mainWindowLogic.UserSettings.HideClosedAccounts)

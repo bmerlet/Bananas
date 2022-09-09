@@ -18,6 +18,9 @@ namespace BanaData.Logic.Main
         // Parent logic
         protected readonly MainWindowLogic mainWindowLogic;
 
+        // Database we are working on
+        protected readonly Household household;
+
         // Account this transaction is for
         protected readonly Household.AccountRow accountRow;
 
@@ -34,9 +37,9 @@ namespace BanaData.Logic.Main
         #region Constructor
 
         protected AbstractTransactionLogic(
-            MainWindowLogic _mainWindowLogic, Household.AccountRow _accountRow, int _transID, BaseTransactionData _data)
+            MainWindowLogic _mainWindowLogic, Household _household, Household.AccountRow _accountRow, int _transID, BaseTransactionData _data)
         {
-            (mainWindowLogic, accountRow, TransID, data) = (_mainWindowLogic, _accountRow, _transID, _data);
+            (mainWindowLogic, household, accountRow, TransID, data) = (_mainWindowLogic, _household, _accountRow, _transID, _data);
 
             GotoOtherSideOfTransfer = new CommandBase(OnGotoOtherSideOfTransfer);
         }
@@ -206,8 +209,6 @@ namespace BanaData.Logic.Main
 
         protected void CreateLineItemInDB(LineItem li, Household.TransactionRow transactionRow, List<int> impactedAccounts)
         {
-            var household = mainWindowLogic.Household;
-
             var liRow = household.LineItem.Add(transactionRow, li.Memo, li.Amount);
             li.ID = liRow.ID;
 
@@ -224,8 +225,6 @@ namespace BanaData.Logic.Main
 
         protected void UpdateLineItemInDB(LineItem li, Household.TransactionRow transactionRow, List<int> impactedAccounts)
         {
-            var household = mainWindowLogic.Household;
-
             var liRow = household.LineItem.FindByID(li.ID);
             var liCategoryRow = liRow.GetLineItemCategoryRow();
             var liTransferRow = liRow.GetLineItemTransferRow();
@@ -375,8 +374,6 @@ namespace BanaData.Logic.Main
         // Called by on behalf of reconcile to update status on transaction if needed
         public void UpdateStatus()
         {
-            var household = mainWindowLogic.Household;
-
             if (TransID != TRANSID_NOT_COMMITTED)
             {
                 var trRow = household.Transaction.FindByID(TransID);
@@ -398,7 +395,6 @@ namespace BanaData.Logic.Main
             };
 
             // Delete from dataset
-            var household = mainWindowLogic.Household;
             var transactionRow = household.Transaction.FindByID(transID);
 
             // Delete all line items
@@ -436,7 +432,7 @@ namespace BanaData.Logic.Main
             // Finally delete the transaction
             transactionRow.Delete();
 
-            mainWindowLogic.CommitChanges();
+            mainWindowLogic.CommitChanges(household);
 
             mainWindowLogic.UpdateAccountNamesAndBalances(impactedAccounts);
         }
@@ -482,7 +478,6 @@ namespace BanaData.Logic.Main
 
         private void OnGotoOtherSideOfTransfer()
         {
-            var household = mainWindowLogic.Household;
             var transRow = household.Transaction.FindByID(TransID);
 
             foreach (var liRow in transRow.GetLineItemRows())

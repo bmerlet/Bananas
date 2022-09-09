@@ -22,6 +22,7 @@ namespace BanaData.Logic.Dialogs.Editors
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
         private readonly Household.AccountRow accountRow;
         private Household.ReconcileInfoRow reconcileInfoRow;
 
@@ -29,12 +30,9 @@ namespace BanaData.Logic.Dialogs.Editors
 
         #region Constructor
 
-        public ReconcileInfoLogic(MainWindowLogic _mainWindowLogic, int _accountID)
+        public ReconcileInfoLogic(MainWindowLogic _mainWindowLogic, Household _household, int _accountID)
         {
-            (mainWindowLogic, accountRow) = (_mainWindowLogic, _mainWindowLogic.Household.Account.FindByID(_accountID));
-
-            // Get DB
-            var household = mainWindowLogic.Household;
+            (mainWindowLogic, household, accountRow) = (_mainWindowLogic, _household, _household.Account.FindByID(_accountID));
 
             // Fill out properties with account info
             BasicInfo = $"Information to reconcile account {accountRow.Name}";
@@ -226,7 +224,6 @@ namespace BanaData.Logic.Dialogs.Editors
 
         protected override bool? Commit()
         {
-            var household = mainWindowLogic.Household;
             bool adding = reconcileInfoRow == null;
 
             accountRow.LastStatementDate = PriorStatementEndDate;
@@ -287,7 +284,7 @@ namespace BanaData.Logic.Dialogs.Editors
                 }
             }
 
-            mainWindowLogic.CommitChanges();
+            mainWindowLogic.CommitChanges(household);
 
             return true;
         }

@@ -23,22 +23,22 @@ namespace BanaData.Logic.Dialogs.Listers
     {
         #region Private members
 
-        private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
         private readonly SecurityItem securityItem;
 
         #endregion
 
         #region Constructor
 
-        public ListSecurityPricesLogic(MainWindowLogic mainWindowLogic, SecurityItem securityItem)
+        public ListSecurityPricesLogic(MainWindowLogic mainWindowLogic, Household household, SecurityItem securityItem)
         {
-            (this.mainWindowLogic, this.securityItem) = (mainWindowLogic, securityItem);
+            (this.household, this.securityItem) = (household, securityItem);
 
-            Register = new SecurityPricesRegisterLogic(mainWindowLogic, this, securityItem.ID);
+            Register = new SecurityPricesRegisterLogic(mainWindowLogic, household, this, securityItem.ID);
 
             DateRangeLogic = new DateRangeLogic(
                 DateRangeLogic.ERange.LastYear, 
-                () => mainWindowLogic.Household.SecurityPrice.Where(sp => sp.SecurityID == securityItem.ID).Min(sp => sp.Date));
+                () => household.SecurityPrice.Where(sp => sp.SecurityID == securityItem.ID).Min(sp => sp.Date));
             DateRangeLogic.DateRangeChanged += (s, e) => UpdateGraph();
 
             UpdateGraph();
@@ -83,7 +83,7 @@ namespace BanaData.Logic.Dialogs.Listers
         public void UpdateGraph()
         {
             var sortableList =
-                mainWindowLogic.Household.SecurityPrice
+                household.SecurityPrice
                 .Where(sp => sp.SecurityID == securityItem.ID)
                 .Where(sp => sp.Date.CompareTo(DateRangeLogic.StartDate) >= 0)
                 .Where(sp => sp.Date.CompareTo(DateRangeLogic.EndDate) <= 0)
@@ -93,7 +93,7 @@ namespace BanaData.Logic.Dialogs.Listers
             Quotes.ReplaceRange(sortableList);
 
             ReinvestedDividends.ReplaceRange(
-                mainWindowLogic.Household.InvestmentTransaction
+                household.InvestmentTransaction
                 .Where(it => it.Type == EInvestmentTransactionType.ReinvestDividends ||
                     it.Type == EInvestmentTransactionType.ReinvestShortTermCapitalGains ||
                     it.Type == EInvestmentTransactionType.ReinvestMediumTermCapitalGains ||
@@ -104,7 +104,7 @@ namespace BanaData.Logic.Dialogs.Listers
                 .Select(it => new DatePriceGraphItem(it)));
 
             Trades.ReplaceRange(
-                mainWindowLogic.Household.InvestmentTransaction
+                household.InvestmentTransaction
                 .Where(it => it.Type == EInvestmentTransactionType.Buy ||
                     it.Type == EInvestmentTransactionType.BuyFromTransferredCash ||
                     it.Type == EInvestmentTransactionType.Sell ||
@@ -129,6 +129,7 @@ namespace BanaData.Logic.Dialogs.Listers
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
         private readonly ListSecurityPricesLogic listSecurityPricesLogic;
         private readonly int securityID;
 
@@ -136,18 +137,18 @@ namespace BanaData.Logic.Dialogs.Listers
 
         #region Constructor
 
-        public SecurityPricesRegisterLogic(MainWindowLogic _mainWindowLogic, ListSecurityPricesLogic _listSecurityPricesLogic, int _securityID)
+        public SecurityPricesRegisterLogic(MainWindowLogic _mainWindowLogic, Household _household, ListSecurityPricesLogic _listSecurityPricesLogic, int _securityID)
         {
             mainWindowLogic = _mainWindowLogic;
+            household = _household;
             listSecurityPricesLogic = _listSecurityPricesLogic;
             securityID = _securityID;
 
             // Build security price collection
-            var household = mainWindowLogic.Household;
             datePriceItems = new ObservableCollection<DatePriceItem>();
             foreach (var securityPrice in household.SecurityPrice.Where(sp => sp.SecurityID == securityID))
             {
-                datePriceItems.Add(new DatePriceItem(mainWindowLogic, securityPrice));
+                datePriceItems.Add(new DatePriceItem(mainWindowLogic, household, securityPrice));
             }
 
             // Update graph when a line is deleted
@@ -303,7 +304,7 @@ namespace BanaData.Logic.Dialogs.Listers
                 }
 
                 // Check no 2 prices for the same day
-                if (mainWindowLogic.Household.SecurityPrice
+                if (household.SecurityPrice
                     .Where(sp => sp != selectedDatePrice.SecurityPriceRow &&
                            sp.Date == selectedDatePrice.Date &&
                            sp.SecurityID == securityID)
@@ -385,6 +386,7 @@ namespace BanaData.Logic.Dialogs.Listers
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
         private readonly int securityID;
 
         private struct Data
@@ -402,9 +404,10 @@ namespace BanaData.Logic.Dialogs.Listers
         #region Constructors
 
         // Create a date price from a security price row
-        public DatePriceItem(MainWindowLogic _mainWindowLogic, Household.SecurityPriceRow securityPriceRow)
+        public DatePriceItem(MainWindowLogic _mainWindowLogic, Household _household, Household.SecurityPriceRow securityPriceRow)
         {
             mainWindowLogic = _mainWindowLogic;
+            household = _household;
             SecurityPriceRow = securityPriceRow;
 
             data.Date = securityPriceRow.Date;
@@ -469,10 +472,10 @@ namespace BanaData.Logic.Dialogs.Listers
                     }
                     else
                     {
-                        var securityRow = mainWindowLogic.Household.Security.FindByID(securityID);
-                        SecurityPriceRow = mainWindowLogic.Household.SecurityPrice.AddSecurityPriceRow(securityRow, data.Date, data.Price);
+                        var securityRow = household.Security.FindByID(securityID);
+                        SecurityPriceRow = household.SecurityPrice.AddSecurityPriceRow(securityRow, data.Date, data.Price);
                     }
-                    mainWindowLogic.CommitChanges();
+                    mainWindowLogic.CommitChanges(household);
                 }
             }
         }
@@ -495,7 +498,7 @@ namespace BanaData.Logic.Dialogs.Listers
             {
                 SecurityPriceRow.Delete();
                 SecurityPriceRow = null;
-                mainWindowLogic.CommitChanges();
+                mainWindowLogic.CommitChanges(household);
             }
         }
 

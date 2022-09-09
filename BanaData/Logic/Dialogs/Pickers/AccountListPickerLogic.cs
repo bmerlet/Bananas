@@ -20,19 +20,19 @@ namespace BanaData.Logic.Dialogs.Pickers
     {
         #region Private members
 
-        private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
         private readonly IEnumerable<Household.AccountRow> oldPickedAccounts;
 
         #endregion
 
         #region Constructor
 
-        public AccountListPickerLogic(MainWindowLogic _mainWindowLogic, IEnumerable<Household.AccountRow> pickedAccounts)
+        public AccountListPickerLogic(Household _household, IEnumerable<Household.AccountRow> pickedAccounts)
         {
-            (mainWindowLogic, oldPickedAccounts) = (_mainWindowLogic, pickedAccounts);
+            (household, oldPickedAccounts) = (_household, pickedAccounts);
 
             // Create account list
-            AccountListLogic = new AccountListLogic(mainWindowLogic);
+            AccountListLogic = new AccountListLogic(household);
 
             // Select passed in accounts
             foreach (AccountListLogic.AccountPickerItem accountItem in AccountListLogic.Accounts)

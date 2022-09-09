@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BanaData.Logic.Main;
+using BanaData.Database;
+using BanaData.Serializations;
 using Toolbox.UILogic;
 
 namespace BanaData.Logic.Dialogs.Basics
@@ -13,20 +14,20 @@ namespace BanaData.Logic.Dialogs.Basics
     /// </summary>
     public class YearPickerLogic : LogicBase
     {
-        public YearPickerLogic(MainWindowLogic mainWindowLogic)
+        public YearPickerLogic(Household household, UserSettings userSettings)
         {
             // Setup years
             var thisYear = DateTime.Today.Year;
             int firstYear;
             try
             {
-                if (mainWindowLogic.UserSettings.HideClosedAccounts)
+                if (userSettings.HideClosedAccounts)
                 {
-                    firstYear = mainWindowLogic.Household.RegularTransactions.Where(tr => !tr.AccountRow.Hidden).Min(tr => tr.Date).Year;
+                    firstYear = household.RegularTransactions.Where(tr => !tr.AccountRow.Hidden).Min(tr => tr.Date).Year;
                 }
                 else
                 {
-                    firstYear = mainWindowLogic.Household.RegularTransactions.Min(tr => tr.Date).Year;
+                    firstYear = household.RegularTransactions.Min(tr => tr.Date).Year;
                 }
             }
             catch (Exception) 

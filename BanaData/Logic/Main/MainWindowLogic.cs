@@ -32,6 +32,9 @@ namespace BanaData.Logic.Main
         // User settings manager
         private readonly SettingsManager<UserSettings> settingsManager = new SettingsManager<UserSettings>("Sarabande Inc.", APPNAME);
 
+        // The database
+        private readonly Household household;
+
         // Save timer and lock
         private readonly Timer saveTimer = new Timer(300 * 1000);
         private readonly object householdLock = new object();
@@ -54,25 +57,25 @@ namespace BanaData.Logic.Main
             GuiServices = guiServices;
 
             // Create empty database
-            Household = new Household();
+            household = new Household();
 
             // Get settings
             UserSettings = settingsManager.Load() ?? new UserSettings();
 
             // Main menu
-            MainMenuLogic = new MainMenuLogic(this);
+            MainMenuLogic = new MainMenuLogic(this, household);
 
             // Search command
             Search = new CommandBase(OnSearch);
 
             // Account groups
-            BankAccountGroup = new AccountGroupLogic(this, AccountGroupLogic.EType.Banking);
-            InvestmentAccountGroup = new AccountGroupLogic(this, AccountGroupLogic.EType.Investment);
-            AssetAccountGroup = new AccountGroupLogic(this, AccountGroupLogic.EType.Asset);
+            BankAccountGroup = new AccountGroupLogic(household, UserSettings, AccountGroupLogic.EType.Banking);
+            InvestmentAccountGroup = new AccountGroupLogic(household, UserSettings, AccountGroupLogic.EType.Investment);
+            AssetAccountGroup = new AccountGroupLogic(household, UserSettings, AccountGroupLogic.EType.Asset);
 
             // Registers
-            BankRegister = new BankRegisterLogic(this);
-            InvestmentRegister = new InvestmentRegisterLogic(this);
+            BankRegister = new BankRegisterLogic(this, household);
+            InvestmentRegister = new InvestmentRegisterLogic(this, household);
 
             BankAccountGroup.AccountClicked += (o, e) => OnBankAccountClicked(o as AccountGroupLogic, e.AccountID);
             InvestmentAccountGroup.AccountClicked += (o, e) => OnInvestmentAccountClicked(e.AccountID);
@@ -129,9 +132,6 @@ namespace BanaData.Logic.Main
 
         // Gui services
         public readonly IGuiServices GuiServices;
-
-        // The database
-        public readonly Household Household;
 
         // If household needs to be saved to disk
         public bool Dirty { get; private set; }
@@ -296,15 +296,15 @@ namespace BanaData.Logic.Main
                     if (file.EndsWith(".BAN", StringComparison.InvariantCultureIgnoreCase))
                     {
                         fileFormat = EFileFormat.Ban;
-                        var serializer = new BANSerializer(Household);
+                        var serializer = new BANSerializer(household);
                         serializer.Read(fileStream, password);
                     }
                     else if (file.EndsWith(".XBAN", StringComparison.InvariantCultureIgnoreCase))
                     {
                         fileFormat = EFileFormat.XBan;
-                        Household.Clear();
-                        Household.AcceptChanges();
-                        Household.ReadXml(fileStream);
+                        household.Clear();
+                        household.AcceptChanges();
+                        household.ReadXml(fileStream);
                     }
                     else
                     {
@@ -313,7 +313,7 @@ namespace BanaData.Logic.Main
                     }
 
                     // Fixup checkpoints for older databases
-                    Household.Checkpoint.InitializeCheckpoints();
+                    household.Checkpoint.InitializeCheckpoints();
                 }
                 catch (Exception e)
                 {
@@ -392,13 +392,13 @@ namespace BanaData.Logic.Main
 
                         if (file.EndsWith(".BAN", StringComparison.InvariantCultureIgnoreCase))
                         {
-                            var serializer = new BANSerializer(Household);
+                            var serializer = new BANSerializer(household);
                             serializer.Write(backupStream, password);
                         }
                         else
                         {
                             backupStream.SetLength(0);
-                            Household.WriteXml(backupStream);
+                            household.WriteXml(backupStream);
                         }
 
                         GuiServices.SetCursor(false);
@@ -441,15 +441,15 @@ namespace BanaData.Logic.Main
             InvestmentRegister.SetAccount(-1, -1);
 
             // Zap the DB
-            Household.Clear();
-            Household.AcceptChanges();
+            household.Clear();
+            household.AcceptChanges();
         }
 
         public void ImportQIF(QIFImportSpecification spec)
         {
             GuiServices.SetCursor(true);
 
-            var parser = new QIFParser(Household);
+            var parser = new QIFParser(household);
 
             try
             {
@@ -476,7 +476,7 @@ namespace BanaData.Logic.Main
         {
             GuiServices.SetCursor(true);
 
-            var exporter = new QIFWriter(this);
+            var exporter = new QIFWriter(this, household);
             var result = exporter.Export(file, contents, transactionAccounts);
             ErrorMessage(result, "Export results");
 
@@ -485,7 +485,7 @@ namespace BanaData.Logic.Main
 
         public void DifferentialExportQIF(string file)
         {
-            var exporter = new QIFWriter(this);
+            var exporter = new QIFWriter(this, household);
             (int numAccounts, int numTransactions)  = exporter.DifferentialExportToQIF(file);
             ErrorMessage($"Differential export: Exported {numTransactions} transactions in {numAccounts} accounts; new checkpoint created", "Export results");
         }
@@ -525,25 +525,29 @@ namespace BanaData.Logic.Main
         #region DB services
 
         // Commit changes to household data set
-        public void CommitChanges()
+        public void CommitChanges(Household _household)
         {
             lock (householdLock)
             {
-                if (Household.SanityCheck() is string error)
+                if (_household.SanityCheck() is string error)
                 {
                     ErrorMessage("DB sanity check error: " + error);
-                    Household.RejectChanges();
+                    _household.RejectChanges();
                     return;
                 }
 
-                Household.AcceptChanges();
-                if (Household.HasErrors)
+                _household.AcceptChanges();
+                if (_household.HasErrors)
                 {
                     ErrorMessage("Error in dataset");
                 }
 
-                Dirty = true;
-                UpdateTitle();
+                // Update dirty if changing the main DB
+                if (_household == household)
+                {
+                    Dirty = true;
+                    UpdateTitle();
+                }
             }
         }
 
@@ -553,7 +557,7 @@ namespace BanaData.Logic.Main
             var now = DateTime.Today;
             bool changesToCommit = false;
 
-            foreach(var scheduleRow in Household.Schedule)
+            foreach(var scheduleRow in household.Schedule)
             {
                 if (now.CompareTo(scheduleRow.NextDate) >= 0)
                 {
@@ -578,13 +582,13 @@ namespace BanaData.Logic.Main
                         var str = scheduleRow.TransactionRow;
 
                         // Create transaction
-                        var transactionRow = Household.Transaction.Add(
+                        var transactionRow = household.Transaction.Add(
                             str.AccountRow,
                             scheduleRow.NextDate,
                             str.IsPayeeNull() ? null : str.Payee,
                             str.IsMemoNull() ? null : str.Memo,
                             ETransactionStatus.Pending,
-                            Household.Checkpoint.GetCurrentCheckpoint(),
+                            household.Checkpoint.GetCurrentCheckpoint(),
                             ETransactionType.Regular);
 
                         // Banking transaction if needed
@@ -597,18 +601,18 @@ namespace BanaData.Logic.Main
                                 medium = ETransactionMedium.Check;
                                 checkNumber = Household.BankingTransactionDataTable.GetNextCheckNumber(str.AccountRow);
                             }
-                            Household.BankingTransaction.Add(transactionRow, medium, (uint)checkNumber);
+                            household.BankingTransaction.Add(transactionRow, medium, (uint)checkNumber);
                         }
 
                         // Line items
                         foreach(var sli in str.GetLineItemRows())
                         {
                             var memo = sli.IsMemoNull() ? null : sli.Memo;
-                            var lineItemRow = Household.LineItem.Add(transactionRow, memo, sli.Amount);
+                            var lineItemRow = household.LineItem.Add(transactionRow, memo, sli.Amount);
 
                             if (sli.GetLineItemCategoryRow() is Household.LineItemCategoryRow licr)
                             {
-                                Household.LineItemCategory.AddLineItemCategoryRow(lineItemRow, licr.CategoryRow);
+                                household.LineItemCategory.AddLineItemCategoryRow(lineItemRow, licr.CategoryRow);
                             }
                             else if (sli.GetLineItemTransferRow() is Household.LineItemTransferRow litr)
                             {
@@ -662,7 +666,7 @@ namespace BanaData.Logic.Main
                                 scheduleRow.NextDate = scheduleRow.NextDate.AddYears(1);
                                 break;
                         }
-                        CommitChanges();
+                        CommitChanges(household);
                     }
 
                     // Notify 
@@ -700,7 +704,7 @@ namespace BanaData.Logic.Main
 
             if (changesToCommit)
             {
-                CommitChanges();
+                CommitChanges(household);
             }
         }
 
@@ -826,7 +830,7 @@ namespace BanaData.Logic.Main
             AssetAccountGroup.SelectedAccount = null;
             InvestmentAccountGroup.SelectedAccount = null;
 
-            var accountRow = Household.Account.FindByID(accountID);
+            var accountRow = household.Account.FindByID(accountID);
             if (accountRow.Type == EAccountType.Investment)
             {
                 OnInvestmentAccountClicked(accountID, transactionID);
@@ -881,13 +885,13 @@ namespace BanaData.Logic.Main
 
                     if (fileFormat == EFileFormat.Ban)
                     {
-                        var serializer = new BANSerializer(Household);
+                        var serializer = new BANSerializer(household);
                         serializer.Write(fileStream, password);
                     }
                     else
                     {
                         fileStream.SetLength(0);
-                        Household.WriteXml(fileStream);
+                        household.WriteXml(fileStream);
                         fileStream.Flush();
                     }
 
@@ -912,11 +916,11 @@ namespace BanaData.Logic.Main
         // Builds or rebuilds the list of memorized payees
         private void BuildMemorizedPayeeList()
         {
-            var household = Household;
+            var household = this.household;
 
             MemorizedPayees.Clear();
 
-            foreach (var mpr in Household.MemorizedPayees)
+            foreach (var mpr in this.household.MemorizedPayees)
             {
                 // Get memorized line item(s)
                 var dbLineItems = mpr.GetLineItemRows();
@@ -945,7 +949,7 @@ namespace BanaData.Logic.Main
             HiddenCategories.Clear();
 
             // Add all top-level categories
-            foreach (var category in Household.Category)
+            foreach (var category in household.Category)
             {
                 // Exclude internal categories (not used)
                 if (category.IsParentIDNull())
@@ -969,7 +973,7 @@ namespace BanaData.Logic.Main
             {
                 categoryNotFound = false;
 
-                foreach (var category in Household.Category)
+                foreach (var category in household.Category)
                 {
                     // If category has a parent
                     if (!category.IsParentIDNull())
@@ -990,7 +994,7 @@ namespace BanaData.Logic.Main
             } while (categoryNotFound);
 
             // Add all possible transfers
-            foreach (var account in Household.Account)
+            foreach (var account in household.Account)
             {
                 var transferItem = new CategoryItem(account.ID, account.Name);
                 if (account.Hidden)
@@ -1016,7 +1020,7 @@ namespace BanaData.Logic.Main
         {
             Securities.Clear();
 
-            foreach (Household.SecurityRow security in Household.Security.Rows)
+            foreach (Household.SecurityRow security in household.Security.Rows)
             {
                 Securities.Add(new SecurityItem(security.ID, security.Name, security.Symbol, security.Type));
             }
@@ -1028,7 +1032,7 @@ namespace BanaData.Logic.Main
         {
             if (arg is string text && !string.IsNullOrWhiteSpace(text))
             {
-                GuiServices.ShowDialog(new SearchResultLogic(this, text));
+                GuiServices.ShowDialog(new SearchResultLogic(this, household, text));
             }
         }
 

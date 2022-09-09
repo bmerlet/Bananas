@@ -15,6 +15,7 @@ using BanaData.Database;
 using BanaData.Logic.Items;
 using BanaData.Logic.Dialogs.Pickers;
 using BanaData.Logic.Dialogs.Basics;
+using BanaData.Serializations;
 
 namespace BanaData.Logic.Dialogs.Reports
 {
@@ -22,7 +23,8 @@ namespace BanaData.Logic.Dialogs.Reports
     {
         #region Private members
 
-        private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
+        private readonly IGuiServices guiServices;
         private readonly List<Household.AccountRow> shownAccounts = new List<Household.AccountRow>();
         private readonly List<int> interestCategories = new List<int>();
 
@@ -30,16 +32,17 @@ namespace BanaData.Logic.Dialogs.Reports
 
         #region Constructor
 
-        public ShowYearlyCGDivIntLogic(MainWindowLogic _mainWindowLogic)
+        public ShowYearlyCGDivIntLogic(Household _household, UserSettings userSettings, IGuiServices _guiServices)
         {
-            mainWindowLogic = _mainWindowLogic;
+            household = _household;
+            guiServices = _guiServices;
 
             // Setup years
-            YearPickerLogic = new YearPickerLogic(mainWindowLogic);
+            YearPickerLogic = new YearPickerLogic(household, userSettings);
             YearPickerLogic.YearChanged += (s, e) => UpdateTransactions();
 
             // Setup accounts - skip IRAs as they are not taxable
-            foreach (Household.AccountRow accountRow in mainWindowLogic.Household.Account.Rows)
+            foreach (Household.AccountRow accountRow in household.Account.Rows)
             {
                 if (!(accountRow.Type == EAccountType.Investment) || !(accountRow.Kind == EInvestmentKind.TraditionalIRA))
                 {
@@ -48,7 +51,7 @@ namespace BanaData.Logic.Dialogs.Reports
             }
 
             // Find the categories that hold interest income
-            foreach (Household.CategoryRow categoryRow in mainWindowLogic.Household.Category.Rows)
+            foreach (Household.CategoryRow categoryRow in household.Category.Rows)
             {
                 if (!categoryRow.IsTaxInfoNull() && CategoryItem.TaxInfoDictionary[categoryRow.TaxInfo].Contains("Interest income"))
                 {
@@ -267,8 +270,6 @@ namespace BanaData.Logic.Dialogs.Reports
 
         private void UpdateTransactions()
         {
-            var household = mainWindowLogic.Household;
-
             // Accumulate the transactions in a temp list
             var tempTransList = new List<TransactionItem>();
             TotalDividend = 0;
@@ -394,8 +395,8 @@ namespace BanaData.Logic.Dialogs.Reports
 
         private void OnPickAccountsCommand()
         {
-            var logic = new AccountListPickerLogic(mainWindowLogic, shownAccounts);
-            if (mainWindowLogic.GuiServices.ShowDialog(logic))
+            var logic = new AccountListPickerLogic(household, shownAccounts);
+            if (guiServices.ShowDialog(logic))
             {
                 shownAccounts.Clear();
                 shownAccounts.AddRange(logic.PickedAccounts);

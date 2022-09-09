@@ -8,6 +8,7 @@ using Toolbox.UILogic;
 using Toolbox.UILogic.Dialogs;
 using BanaData.Logic.Main;
 using BanaData.Logic.Items;
+using BanaData.Database;
 
 namespace BanaData.Logic.Dialogs.Editors
 {
@@ -19,6 +20,7 @@ namespace BanaData.Logic.Dialogs.Editors
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
         private readonly MemorizedPayeeItem item;
         private LineItem[] lineItems;
         private readonly bool add;
@@ -30,9 +32,9 @@ namespace BanaData.Logic.Dialogs.Editors
 
         #region Constructor
 
-        public EditMemorizedPayeeLogic(MainWindowLogic _mainWindowLogic, MemorizedPayeeItem _item, bool _add)
+        public EditMemorizedPayeeLogic(MainWindowLogic _mainWindowLogic, Household _household, MemorizedPayeeItem _item, bool _add)
         {
-            (mainWindowLogic, item, add, lineItems) = (_mainWindowLogic, _item, _add, _item.LineItems);
+            (mainWindowLogic, household, item, add, lineItems) = (_mainWindowLogic, _household, _item, _add, _item.LineItems);
 
             // Setup UI properties
             EditSplit = new CommandBase(OnEditSplit);
@@ -80,7 +82,7 @@ namespace BanaData.Logic.Dialogs.Editors
 
         private void OnEditSplit()
         {
-            var logic = new EditSplitLogic(mainWindowLogic, lineItems);
+            var logic = new EditSplitLogic(mainWindowLogic, household, lineItems);
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
             {
                 // Get new line items from logic

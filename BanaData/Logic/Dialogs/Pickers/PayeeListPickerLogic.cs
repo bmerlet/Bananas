@@ -18,18 +18,17 @@ namespace BanaData.Logic.Dialogs.Pickers
     {
         #region Private memebers
 
-        private readonly MainWindowLogic mainWindowLogic;
         private readonly IEnumerable<string> oldPickedPayees;
 
         #endregion
 
         #region Constructor
 
-        public PayeeListPickerLogic(MainWindowLogic _mainWindowLogic, IEnumerable<string> pickedPayees)
+        public PayeeListPickerLogic(Household household, IEnumerable<string> pickedPayees)
         {
-            (mainWindowLogic, oldPickedPayees) = (_mainWindowLogic, pickedPayees);
+            oldPickedPayees = pickedPayees;
 
-            foreach (Household.TransactionRow transRow in mainWindowLogic.Household.RegularTransactions)
+            foreach (Household.TransactionRow transRow in household.RegularTransactions)
             {
                 if (!transRow.IsPayeeNull() && payees.FirstOrDefault(p => p.Payee == transRow.Payee) == null)
                 {

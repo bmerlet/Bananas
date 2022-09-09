@@ -1,4 +1,5 @@
-﻿using BanaData.Logic.Dialogs.Basics;
+﻿using BanaData.Database;
+using BanaData.Logic.Dialogs.Basics;
 using BanaData.Logic.Items;
 using BanaData.Logic.Main;
 using System;
@@ -15,17 +16,18 @@ namespace BanaData.Logic.Dialogs.Editors
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
 
         #endregion
 
         #region Constructor
 
-        public RenamePayeeLogic(MainWindowLogic _mainWindowLogic)
+        public RenamePayeeLogic(MainWindowLogic _mainWindowLogic, Household _household)
         {
-            mainWindowLogic = _mainWindowLogic;
+            (mainWindowLogic, household) = (_mainWindowLogic, _household);
 
             DateRange = new DateRangeLogic(DateRangeLogic.ERange.AllAvailable,
-                () => mainWindowLogic.Household.RegularTransactions.Select(tr => tr.Date).Min());
+                () => household.RegularTransactions.Select(tr => tr.Date).Min());
 
             // Copy to avoid filter interaction issues with the open register
             MemorizedPayees = new List<MemorizedPayeeItem>(mainWindowLogic.MemorizedPayees);
@@ -68,7 +70,6 @@ namespace BanaData.Logic.Dialogs.Editors
                 return null;
             }
 
-            var household = mainWindowLogic.Household;
             bool change = false;
 
             foreach (var transactionRow in household.RegularTransactions.Where(tr =>
@@ -91,7 +92,7 @@ namespace BanaData.Logic.Dialogs.Editors
 
             if (change)
             {
-                mainWindowLogic.CommitChanges();
+                mainWindowLogic.CommitChanges(household);
 
                 // ZZZZZ Update registers
 

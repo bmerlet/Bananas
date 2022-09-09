@@ -19,7 +19,9 @@ namespace BanaData.Logic.Dialogs.Reports
     {
         #region Private members
 
-        private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
+        private readonly IGuiServices guiServices;
+
         private readonly Dictionary<int, List<SecurityPrice>> securityPrices = new Dictionary<int, List<SecurityPrice>>();
         private List<Household.TransactionRow> transactions;
 
@@ -27,12 +29,13 @@ namespace BanaData.Logic.Dialogs.Reports
 
         #region Constructor
 
-        public ShowWealthOverTimeLogic(MainWindowLogic _mainWindowLogic)
+        public ShowWealthOverTimeLogic(Household _household, IGuiServices _guiServices)
         {
-            mainWindowLogic = _mainWindowLogic;
+            household = _household;
+            guiServices = _guiServices;
 
             // Init account list
-            AccountListLogic = new AccountListLogic(mainWindowLogic);
+            AccountListLogic = new AccountListLogic(household);
             foreach(AccountListLogic.AccountPickerItem accountItem in AccountListLogic.Accounts)
             {
                 accountItem.IsSelected = true;
@@ -45,7 +48,7 @@ namespace BanaData.Logic.Dialogs.Reports
             };
 
             // Setup dictionary of sorted security prices. The key is the security ID
-            foreach(var securityRow in mainWindowLogic.Household.Security)
+            foreach(var securityRow in household.Security)
             {
                 var prices = new List<SecurityPrice>();
                 foreach(var price in securityRow.GetSecurityPriceRows())
@@ -62,7 +65,7 @@ namespace BanaData.Logic.Dialogs.Reports
             // Setup date range
             DateRangeLogic = new DateRangeLogic(DateRangeLogic.ERange.LastTenYears, () =>
                 // Return start date of all available transactions
-                mainWindowLogic.Household.RegularTransactions
+                household.RegularTransactions
                     .Where(tr => AccountListLogic.IsAccountSelected(tr.AccountRow))
                     .Min(tr => tr.Date)
             );
@@ -132,7 +135,7 @@ namespace BanaData.Logic.Dialogs.Reports
         private void UpdateTransactions()
         {
             // Get time-sorted transactions for relevant accounts
-            transactions = mainWindowLogic.Household.RegularTransactions
+            transactions = household.RegularTransactions
                 .Where(tr => AccountListLogic.IsAccountSelected(tr.AccountRow))
                 .ToList();
             transactions.Sort((t1, t2) =>
@@ -174,7 +177,7 @@ namespace BanaData.Logic.Dialogs.Reports
 
         private void UpdateGraph()
         {
-            mainWindowLogic.GuiServices.SetCursor(true);
+            guiServices.SetCursor(true);
             DateValues.Clear();
             PayoutDateValues.Clear();
 
@@ -249,7 +252,7 @@ namespace BanaData.Logic.Dialogs.Reports
 
             RedrawGraph();
 
-            mainWindowLogic.GuiServices.SetCursor(false);
+            guiServices.SetCursor(false);
         }
 
         // Get security price at a specified date knowing that the list is sorted by date

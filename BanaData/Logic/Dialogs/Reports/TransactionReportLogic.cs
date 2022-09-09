@@ -19,6 +19,7 @@ namespace BanaData.Logic.Dialogs.Reports
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
         private readonly TransactionReportItem transactionReportItem;
         private ETransactionReportFlag localFlags;
 
@@ -26,14 +27,13 @@ namespace BanaData.Logic.Dialogs.Reports
 
         #region Constructor
 
-        public TransactionReportLogic(MainWindowLogic _mainWindowLogic, TransactionReportItem _transactionReportItem, bool fromMainMenu)
+        public TransactionReportLogic(MainWindowLogic _mainWindowLogic, Household _household, TransactionReportItem _transactionReportItem, bool fromMainMenu)
         {
-            (mainWindowLogic, transactionReportItem, IsEditVisible) = (_mainWindowLogic, _transactionReportItem, fromMainMenu);
+            (mainWindowLogic, household, transactionReportItem, IsEditVisible) = (_mainWindowLogic, _household, _transactionReportItem, fromMainMenu);
 
             Edit = new CommandBase(OnEdit);
 
             // Look for the transactions selected by this report
-            var household = mainWindowLogic.Household;
             foreach (Household.TransactionRow transactionRow in household.RegularTransactions)
             {
                 // Date check

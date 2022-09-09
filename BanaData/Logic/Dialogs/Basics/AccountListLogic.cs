@@ -17,18 +17,18 @@ namespace BanaData.Logic.Dialogs.Basics
     {
         #region Private members
 
-        private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
         private bool internalUpdate = false;
 
         #endregion
 
         #region Constructor
 
-        public AccountListLogic(MainWindowLogic _mainWindowLogic)
+        public AccountListLogic(Household _household)
         {
-            mainWindowLogic = _mainWindowLogic;
+            household = _household;
 
-            foreach (Household.AccountRow accountRow in mainWindowLogic.Household.Account)
+            foreach (Household.AccountRow accountRow in household.Account)
             {
                 var accountItem = new AccountPickerItem(accountRow);
                 accountItem.PropertyChanged += OnAccountItemPropertyChanged;

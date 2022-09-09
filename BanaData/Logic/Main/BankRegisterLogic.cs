@@ -18,8 +18,8 @@ namespace BanaData.Logic.Main
     {
         #region Constructor
 
-        public BankRegisterLogic(MainWindowLogic mainWindowLogic)
-            :  base(mainWindowLogic)
+        public BankRegisterLogic(MainWindowLogic mainWindowLogic, Household household)
+            :  base(mainWindowLogic, household)
         {
             // Create column width manager
             Widths = new ColumnWidths(mainWindowLogic, this);
@@ -88,14 +88,14 @@ namespace BanaData.Logic.Main
                 transRow.Status,
                 lineItems);
 
-            var bankingTransaction = new BankingTransactionLogic(mainWindowLogic, this, accountRow, transRow.ID, transactionData);
+            var bankingTransaction = new BankingTransactionLogic(mainWindowLogic, this, household, accountRow, transRow.ID, transactionData);
 
             return bankingTransaction;
         }
 
         protected override AbstractTransactionLogic CreateEmptyTransaction()
         {
-            return new BankingTransactionLogic(mainWindowLogic, this, accountRow);
+            return new BankingTransactionLogic(mainWindowLogic, this, household, accountRow);
         }
 
         private void UpdateMemorizedPayees()

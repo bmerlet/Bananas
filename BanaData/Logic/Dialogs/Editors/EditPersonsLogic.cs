@@ -18,17 +18,18 @@ namespace BanaData.Logic.Dialogs.Editors
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
 
         #endregion
 
         #region Constructor
 
-        public EditPersonsLogic(MainWindowLogic _mainWindowLogic)
+        public EditPersonsLogic(MainWindowLogic _mainWindowLogic, Household _household)
         {
-            mainWindowLogic = _mainWindowLogic;
+            (mainWindowLogic, household) = (_mainWindowLogic, _household);
 
             // Add all the persons
-            foreach (Household.PersonRow personRow in mainWindowLogic.Household.Person.Rows)
+            foreach (Household.PersonRow personRow in household.Person.Rows)
             {
                 var item = new PersonItem(personRow.ID, personRow.Name);
                 item.NameChanged += OnNameChanged;
@@ -86,7 +87,6 @@ namespace BanaData.Logic.Dialogs.Editors
         protected override bool? Commit()
         {
             bool change = false;
-            var household = mainWindowLogic.Household;
 
             foreach (var item1 in persons.Where(p => !string.IsNullOrWhiteSpace(p.Name)))
             {
@@ -137,7 +137,7 @@ namespace BanaData.Logic.Dialogs.Editors
 
             if (change)
             {
-                mainWindowLogic.CommitChanges();
+                mainWindowLogic.CommitChanges(household);
             }
 
             return change;

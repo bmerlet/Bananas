@@ -35,10 +35,11 @@ namespace BanaData.Logic.Main
         public InvestmentTransactionLogic(
             MainWindowLogic _mainWindowLogic,
             InvestmentRegisterLogic _investmentRegisterLogic,
+            Household household,
             Household.AccountRow accountRow,
             int transID,
             InvestmentTransactionData _data)
-            : base(_mainWindowLogic,  accountRow, transID, _data)
+            : base(_mainWindowLogic, household, accountRow, transID, _data)
         {
             (investmentRegisterLogic, data) = (_investmentRegisterLogic, _data);
 
@@ -66,8 +67,9 @@ namespace BanaData.Logic.Main
         public InvestmentTransactionLogic(
             MainWindowLogic mainWindowLogic,
             InvestmentRegisterLogic investmentRegisterLogic,
+            Household household,
              Household.AccountRow accountRow)
-            : this(mainWindowLogic, investmentRegisterLogic, accountRow, TRANSID_NOT_COMMITTED,
+            : this(mainWindowLogic, investmentRegisterLogic, household, accountRow, TRANSID_NOT_COMMITTED,
                   new InvestmentTransactionData(DateTime.Today, "", "", ETransactionStatus.Pending, new LineItem(mainWindowLogic, -1, "", -1, -1, "", 0, false),
                     EInvestmentTransactionType.Dividends, -1, 0, 0, 0)) { }
 
@@ -510,7 +512,6 @@ namespace BanaData.Logic.Main
 
             if (id >= 0)
             {
-                var household = mainWindowLogic.Household;
                 var security = household.Security.FindByID(id);
                 result = security.Symbol;
             }
@@ -524,7 +525,6 @@ namespace BanaData.Logic.Main
 
             if (!string.IsNullOrWhiteSpace(value))
             {
-                var household = mainWindowLogic.Household;
                 var securityRow = household.Security.GetBySymbol(value);
                 if (securityRow != null)
                 {
@@ -572,7 +572,6 @@ namespace BanaData.Logic.Main
         {
             if (investmentTransactionType != null && investmentTransactionType.IsFilteringSecurity)
             {
-                var household = mainWindowLogic.Household;
                 var portfolio = accountRow.GetPortfolio(data.Date);
                 securities.ReplaceRange(portfolio.GetSecurities().Select<int, SecurityItem>(sid => mainWindowLogic.Securities.First(s => s.ID == sid)));
             }
@@ -592,8 +591,6 @@ namespace BanaData.Logic.Main
 
         private void CommitTransactionToDataSet()
         {
-            var household = mainWindowLogic.Household;
-
             // Remember impacted accounts
             var impactedAccounts = new List<int>
             {
@@ -649,14 +646,14 @@ namespace BanaData.Logic.Main
                 household.InvestmentTransaction.Update(transactionRow, data.Type, securityRow, data.SecurityPrice, data.SecurityQuantity, data.Commission);
             }
 
-            mainWindowLogic.CommitChanges();
+            mainWindowLogic.CommitChanges(household);
 
             mainWindowLogic.UpdateAccountNamesAndBalances(impactedAccounts);
         }
 
         private void OnShowCapitalGains()
         {
-            mainWindowLogic.GuiServices.ShowDialog(new ShowCapitalGainsLogic(mainWindowLogic, TransID));
+            mainWindowLogic.GuiServices.ShowDialog(new ShowCapitalGainsLogic(household, TransID));
         }
 
         #endregion

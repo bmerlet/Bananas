@@ -18,8 +18,8 @@ namespace BanaData.Logic.Main
     {
         #region Constructor
 
-        public InvestmentRegisterLogic(MainWindowLogic mainWindowLogic)
-            : base(mainWindowLogic)
+        public InvestmentRegisterLogic(MainWindowLogic mainWindowLogic, Household household)
+            : base(mainWindowLogic, household)
         {
             // Create column width manager
             Widths = new ColumnWidths(mainWindowLogic);
@@ -62,14 +62,14 @@ namespace BanaData.Logic.Main
                 investmentTransRow.IsSecurityQuantityNull() ? 0 : investmentTransRow.SecurityQuantity,
                 investmentTransRow.Commission);
 
-            var investmentTransaction = new InvestmentTransactionLogic(mainWindowLogic, this, accountRow, transRow.ID, transactionData);
+            var investmentTransaction = new InvestmentTransactionLogic(mainWindowLogic, this, household, accountRow, transRow.ID, transactionData);
 
             return investmentTransaction;
         }
 
         protected override AbstractTransactionLogic CreateEmptyTransaction()
         {
-            return new InvestmentTransactionLogic(mainWindowLogic, this, accountRow);
+            return new InvestmentTransactionLogic(mainWindowLogic, this, household, accountRow);
         }
 
         // Override to compute share balances in addition to cash balance

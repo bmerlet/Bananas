@@ -24,8 +24,8 @@ namespace BanaData.Serializations
 
         #region Constructor
 
-        public QIFWriter(MainWindowLogic _mainWindowLogic) =>
-            (mainWindowLogic, household) = (_mainWindowLogic, _mainWindowLogic.Household);
+        public QIFWriter(MainWindowLogic _mainWindowLogic, Household _household) =>
+            (mainWindowLogic, household) = (_mainWindowLogic, _household);
 
         #endregion
 
@@ -104,7 +104,7 @@ namespace BanaData.Serializations
 
             // Create a new checkpoint
             household.Checkpoint.CreateNewCheckpoint();
-            mainWindowLogic.CommitChanges();
+            mainWindowLogic.CommitChanges(household);
 
             return (numAccounts, numTransactions);
         }

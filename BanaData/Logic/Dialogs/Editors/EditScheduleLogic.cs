@@ -17,6 +17,7 @@ namespace BanaData.Logic.Dialogs.Editors
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
         private readonly ScheduleItem scheduleItem;
         private LineItem[] lineItems;
         private readonly bool add;
@@ -28,9 +29,9 @@ namespace BanaData.Logic.Dialogs.Editors
 
         #region Constructor
 
-        public EditScheduleLogic(MainWindowLogic _mainWindowLogic, ScheduleItem _scheduleItem, bool _add)
+        public EditScheduleLogic(MainWindowLogic _mainWindowLogic, Household _household, ScheduleItem _scheduleItem, bool _add)
         {
-            (mainWindowLogic, scheduleItem, add, lineItems) = (_mainWindowLogic, _scheduleItem, _add, _scheduleItem.LineItems);
+            (mainWindowLogic, household, scheduleItem, add, lineItems) = (_mainWindowLogic, _household, _scheduleItem, _add, _scheduleItem.LineItems);
 
             // Setup UI properties
             NextDate = scheduleItem.NextDate;
@@ -91,12 +92,12 @@ namespace BanaData.Logic.Dialogs.Editors
             set
             {
                 account = value;
-                MediumEnabled = (mainWindowLogic.Household.Account.GetByName(account) is Household.AccountRow accountRow) && accountRow.Type == EAccountType.Bank;
+                MediumEnabled = (household.Account.GetByName(account) is Household.AccountRow accountRow) && accountRow.Type == EAccountType.Bank;
                 OnPropertyChanged(() => MediumEnabled);
             }
         }
         public IEnumerable<string> Accounts =>
-            mainWindowLogic.Household.Account
+            household.Account
             .Where(acc => !acc.Hidden)
             .Where(acc => acc.Type == Database.EAccountType.Bank || acc.Type == Database.EAccountType.Cash || acc.Type == Database.EAccountType.CreditCard)
             .Select(acc => acc.Name);
@@ -141,7 +142,7 @@ namespace BanaData.Logic.Dialogs.Editors
 
         private void OnEditSplit()
         {
-            var logic = new EditSplitLogic(mainWindowLogic, lineItems);
+            var logic = new EditSplitLogic(mainWindowLogic, household, lineItems);
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
             {
                 // Get new line items from logic

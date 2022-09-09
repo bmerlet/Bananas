@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using BanaData.Database;
 using BanaData.Logic.Main;
+using BanaData.Serializations;
 using Toolbox.UILogic;
 
 namespace BanaData.Logic.Dialogs.Reports
@@ -17,14 +18,15 @@ namespace BanaData.Logic.Dialogs.Reports
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
 
         #endregion
 
         #region Constructor
 
-        public ShowHoldingsPerPersonLogic(MainWindowLogic _mainWindowLogic)
+        public ShowHoldingsPerPersonLogic(MainWindowLogic _mainWindowLogic, Household _household)
         {
-            mainWindowLogic = _mainWindowLogic;
+            (mainWindowLogic, household) = (_mainWindowLogic, _household);
             Date = DateTime.Today;
 
             PersonsSource = (CollectionView)CollectionViewSource.GetDefaultView(personItems);
@@ -54,13 +56,13 @@ namespace BanaData.Logic.Dialogs.Reports
         {
             personItems.Clear();
 
-            foreach (Household.PersonRow personRow in mainWindowLogic.Household.Person.Rows)
+            foreach (Household.PersonRow personRow in household.Person.Rows)
             {
-                personItems.Add(new PersonItem(mainWindowLogic, personRow, date));
+                personItems.Add(new PersonItem(household, mainWindowLogic.UserSettings, personRow, date));
             }
 
             // For unowned accounts
-            var unowned = new PersonItem(mainWindowLogic, null, date);
+            var unowned = new PersonItem(household, mainWindowLogic.UserSettings, null, date);
             if (unowned.Value != 0)
             {
                 personItems.Add(unowned);
@@ -77,10 +79,8 @@ namespace BanaData.Logic.Dialogs.Reports
         public class PersonItem
         {
             // Constructor
-            public PersonItem(MainWindowLogic mainWindowLogic, Household.PersonRow personRow, DateTime date)
+            public PersonItem(Household household, UserSettings userSettings, Household.PersonRow personRow, DateTime date)
             {
-                var household = mainWindowLogic.Household;
-
                 IEnumerable<Household.AccountRow> accounts =
                     personRow == null ?
                     household.Account.Rows.Cast<Household.AccountRow>().Where(a => a.IsPersonIDNull()) :
@@ -101,7 +101,7 @@ namespace BanaData.Logic.Dialogs.Reports
                         value = accountRow.GetBalance(date);
                     }
 
-                    if (value != 0 || !mainWindowLogic.UserSettings.HideClosedAccounts || !accountRow.Hidden)
+                    if (value != 0 || !userSettings.HideClosedAccounts || !accountRow.Hidden)
                     {
                         accountItems.Add(new AccountItem(accountRow.Name, value, portfolio, date));
                     }

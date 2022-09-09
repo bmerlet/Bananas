@@ -9,6 +9,7 @@ using System.Windows.Data;
 using BanaData.Database;
 using BanaData.Logic.Dialogs.Basics;
 using BanaData.Logic.Main;
+using BanaData.Serializations;
 using Toolbox.UILogic;
 
 namespace BanaData.Logic.Dialogs.Reports
@@ -18,28 +19,32 @@ namespace BanaData.Logic.Dialogs.Reports
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
+        private readonly UserSettings userSettings;
 
         #endregion
 
         #region Constructor
 
-        public ShowCashFlowBetweenPersonsLogic(MainWindowLogic _mainWindowLogic)
+        public ShowCashFlowBetweenPersonsLogic(MainWindowLogic _mainWindowLogic, Household _household, UserSettings _userSettings)
         {
             mainWindowLogic = _mainWindowLogic;
+            household = _household;
+            userSettings = _userSettings;
 
             // Setup years
-            YearPickerLogic = new YearPickerLogic(mainWindowLogic);
+            YearPickerLogic = new YearPickerLogic(household, userSettings);
             YearPickerLogic.YearChanged += (s, e) => ComputeCashFlow();
 
             // Setup members
-            members = mainWindowLogic.Household.Person.ToArray();
+            members = household.Person.ToArray();
             var tmpList = new List<string>();
             GenerateMemberOrder(tmpList, "", members.Select(m => m.Name).ToArray());
             MemberOrderSource = tmpList.ToArray();
 
-            if (mainWindowLogic.UserSettings.MemberOrderForCashFlowDialog != null)
+            if (userSettings.MemberOrderForCashFlowDialog != null)
             {
-                ParseMemberOrder(mainWindowLogic.UserSettings.MemberOrderForCashFlowDialog, false);
+                ParseMemberOrder(userSettings.MemberOrderForCashFlowDialog, false);
             }
 
             // Give the cash flow item list to the UI
@@ -111,8 +116,6 @@ namespace BanaData.Logic.Dialogs.Reports
 
         private void ComputeTransfersBetweenMembers(DateTime startDate, DateTime endDate)
         {
-            var household = mainWindowLogic.Household;
-
             // Find transfers from an account owned by this member to an account owned by another member
             foreach (var transactionRow in household.RegularTransactions
                 .Where(tr => tr.Date >= startDate && tr.Date <= endDate && !tr.AccountRow.IsPersonIDNull()))
@@ -270,7 +273,7 @@ namespace BanaData.Logic.Dialogs.Reports
 
             // Get time-sorted transactions for relevant accounts and relevant time period
             List<Household.TransactionRow> transactions;
-            transactions = mainWindowLogic.Household.RegularTransactions
+            transactions = household.RegularTransactions
                 .Where(tr => tr.Date >= startDate && tr.Date <= finalEndDate)
                 .Where(tr => !tr.AccountRow.IsPersonIDNull() && members.Contains(tr.AccountRow.PersonRow))
                 .ToList();
@@ -468,9 +471,9 @@ namespace BanaData.Logic.Dialogs.Reports
 
             if (publish)
             {
-                if (mainWindowLogic.UserSettings.MemberOrderForCashFlowDialog != value)
+                if (userSettings.MemberOrderForCashFlowDialog != value)
                 {
-                    mainWindowLogic.UserSettings.MemberOrderForCashFlowDialog = value;
+                    userSettings.MemberOrderForCashFlowDialog = value;
                     mainWindowLogic.SaveUserSettings();
                 }
                 OnPropertyChanged(() => ColumnDescriptions);

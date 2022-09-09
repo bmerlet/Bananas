@@ -21,6 +21,7 @@ namespace BanaData.Logic.Dialogs.Editors
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
         private readonly Household.AccountRow accountRow;
         private readonly decimal interestAmount;
 
@@ -28,9 +29,9 @@ namespace BanaData.Logic.Dialogs.Editors
 
         #region Constructor
 
-        public ReconcileLogic(MainWindowLogic _mainWindowLogic, int accountID)
+        public ReconcileLogic(MainWindowLogic _mainWindowLogic, Household _household, int accountID)
         {
-            (mainWindowLogic, accountRow) = (_mainWindowLogic, _mainWindowLogic.Household.Account.FindByID(accountID));
+            (mainWindowLogic, household, accountRow) = (_mainWindowLogic, _household, _household.Account.FindByID(accountID));
 
             // Get account info
             PriorStatementBalance = accountRow.GetReconciledBalance();
@@ -60,7 +61,6 @@ namespace BanaData.Logic.Dialogs.Editors
         {
             // Find all candidates
             var transactions = new List<TransactionToReconcile>();
-            var household = mainWindowLogic.Household;
 
             // Process regular transactions
             foreach (Household.TransactionRow tr in accountRow.GetUnreconciledTransactions())
@@ -193,13 +193,11 @@ namespace BanaData.Logic.Dialogs.Editors
         // Propagate the cleared transaction to the DB and the register view
         private void OnFinishLaterCommand()
         {
-            var household = mainWindowLogic.Household;
-
             // Update the status of relevant transactions in the DB
             UpdateAllMarkedTransactionsTo(ETransactionStatus.Cleared);
 
             // Update DB
-            mainWindowLogic.CommitChanges();
+            mainWindowLogic.CommitChanges(household);
 
             // Close the dialog indicating change
             CloseView(true);
@@ -232,7 +230,7 @@ namespace BanaData.Logic.Dialogs.Editors
             reconcileInfoRow.Delete();
 
             // Update DB
-            mainWindowLogic.CommitChanges();
+            mainWindowLogic.CommitChanges(household);
 
             // Close the dialog indicating change
             return true;
@@ -240,7 +238,6 @@ namespace BanaData.Logic.Dialogs.Editors
 
         private void UpdateAllMarkedTransactionsTo(ETransactionStatus newStatus)
         {
-            var household = mainWindowLogic.Household;
             var latestCheckpoint = household.Checkpoint.GetCurrentCheckpoint();
 
             foreach (var trList in new ReconcileGridLogic[] { Payments, Deposits })
@@ -256,8 +253,6 @@ namespace BanaData.Logic.Dialogs.Editors
 
         private void AddInterestTransactionToDB(Household.AccountRow accountRow, Household.ReconcileInfoRow reconcileInfoRow)
         {
-            var household = mainWindowLogic.Household;
-
             // Create new transaction row
             var transactionRow = household.Transaction.Add(
                 accountRow, 

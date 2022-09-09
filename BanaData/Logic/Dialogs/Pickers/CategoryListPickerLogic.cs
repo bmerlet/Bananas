@@ -20,20 +20,12 @@ namespace BanaData.Logic.Dialogs.Pickers
     /// </summary>
     public class CategoryListPickerLogic : LogicDialogBase
     {
-        #region Private members
-
-        private readonly MainWindowLogic mainWindowLogic;
-
-        #endregion
-
         #region Constructor
 
-        public CategoryListPickerLogic(MainWindowLogic _mainWindowLogic, IEnumerable<Household.CategoryRow> pickedCategories)
+        public CategoryListPickerLogic(Household household, IEnumerable<Household.CategoryRow> pickedCategories)
         {
-            mainWindowLogic = _mainWindowLogic;
-
             // Create category tree
-            var categoryTable = mainWindowLogic.Household.Category;
+            var categoryTable = household.Category;
             foreach (Household.CategoryRow categoryRow in categoryTable)
             {
                 if (categoryRow.IsParentIDNull())

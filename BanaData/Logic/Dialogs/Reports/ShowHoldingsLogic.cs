@@ -17,17 +17,16 @@ namespace BanaData.Logic.Dialogs.Reports
     {
         #region Private members
 
-        private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
         private readonly Household.AccountRow accountRow;
 
         #endregion
 
         #region Constructor
 
-        public ShowHoldingsLogic(MainWindowLogic _mainWindowLogic, int accountID)
+        public ShowHoldingsLogic(Household _household, int accountID)
         {
-            mainWindowLogic = _mainWindowLogic;
-            var household = mainWindowLogic.Household;
+            household = _household;
             accountRow = household.Account.FindByID(accountID);
 
             // Init data
@@ -71,7 +70,7 @@ namespace BanaData.Logic.Dialogs.Reports
                 // Get a security list
                 foreach (var securityID in portfolio.GetSecurities())
                 {
-                    var securityRow = mainWindowLogic.Household.Security.FindByID(securityID);
+                    var securityRow = household.Security.FindByID(securityID);
 
                     // Get lots for this securoty
                     var lots = portfolio.Lots.ToList().FindAll(l => l.Security.ID == securityID);

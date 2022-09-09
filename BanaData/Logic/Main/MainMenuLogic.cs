@@ -25,14 +25,16 @@ namespace BanaData.Logic.Main
         #region Private members
 
         private readonly MainWindowLogic mainWindow;
+        private readonly Household household;
 
         #endregion
 
         #region Constructor
 
-        public MainMenuLogic(MainWindowLogic _mainWindow)
+        public MainMenuLogic(MainWindowLogic _mainWindow, Household _household)
         {
             mainWindow = _mainWindow;
+            household = _household;
 
             New = new CommandBase(OnNew);
             Open = new CommandBase(OnOpen);
@@ -157,7 +159,7 @@ namespace BanaData.Logic.Main
 
         private void OnImport()
         {
-            var importFileLogic = new QIFImportPickerLogic(mainWindow);
+            var importFileLogic = new QIFImportPickerLogic(mainWindow, household);
             if (mainWindow.GuiServices.ShowDialog(importFileLogic))
             {
                 var importSpec = importFileLogic.ImportSpecification;
@@ -172,7 +174,7 @@ namespace BanaData.Logic.Main
 
         private void OnExport()
         {
-            var logic = new QIFExportPickerLogic(mainWindow);
+            var logic = new QIFExportPickerLogic(mainWindow, household);
             if (mainWindow.GuiServices.ShowDialog(logic))
             {
                 var exportSpec = logic.Export;
@@ -208,7 +210,7 @@ namespace BanaData.Logic.Main
 
         private void OnEditAccounts()
         {
-            var logic = new ListAccountsLogic(mainWindow);
+            var logic = new ListAccountsLogic(mainWindow, household);
             mainWindow.GuiServices.ShowDialog(logic);
         }
 
@@ -219,7 +221,7 @@ namespace BanaData.Logic.Main
 
         private void OnEditCategories()
         {
-            var logic = new ListCategoriesLogic(mainWindow);
+            var logic = new ListCategoriesLogic(mainWindow, household);
             mainWindow.GuiServices.ShowDialog(logic);
         }
 
@@ -230,7 +232,7 @@ namespace BanaData.Logic.Main
 
         private void OnEditPersons()
         {
-            var logic = new EditPersonsLogic(mainWindow);
+            var logic = new EditPersonsLogic(mainWindow, household);
             mainWindow.GuiServices.ShowDialog(logic);
         }
 
@@ -241,7 +243,7 @@ namespace BanaData.Logic.Main
 
         private void OnEditMemorizedPayees()
         {
-            var logic = new ListMemorizedPayeesLogic(mainWindow);
+            var logic = new ListMemorizedPayeesLogic(mainWindow, household);
             mainWindow.GuiServices.ShowDialog(logic);
         }
 
@@ -252,7 +254,7 @@ namespace BanaData.Logic.Main
 
         private void OnRenamePayee()
         {
-            var logic = new RenamePayeeLogic(mainWindow);
+            var logic = new RenamePayeeLogic(mainWindow, household);
             mainWindow.GuiServices.ShowDialog(logic);
         }
 
@@ -263,7 +265,7 @@ namespace BanaData.Logic.Main
 
         private void OnEditSecurities()
         {
-            var logic = new ListSecuritiesLogic(mainWindow);
+            var logic = new ListSecuritiesLogic(mainWindow, household);
             mainWindow.GuiServices.ShowDialog(logic);
         }
 
@@ -274,7 +276,7 @@ namespace BanaData.Logic.Main
 
         private void OnEditTransactionReports(object arg)
         {
-            var logic = new ListTransactionReportsLogic(mainWindow, arg as TransactionReportItem);
+            var logic = new ListTransactionReportsLogic(mainWindow, household, arg as TransactionReportItem);
             mainWindow.GuiServices.ShowDialog(logic);
             UpdateTransactionReports();
         }
@@ -286,7 +288,7 @@ namespace BanaData.Logic.Main
 
         private void OnEditScheduledTransactions()
         {
-            var logic = new ListSchedulesLogic(mainWindow);
+            var logic = new ListSchedulesLogic(mainWindow, household);
             mainWindow.GuiServices.ShowDialog(logic);
             mainWindow.CheckForScheduledTransactions();
         }
@@ -304,16 +306,16 @@ namespace BanaData.Logic.Main
         {
             // Retreive account info
             int accountID = mainWindow.DisplayedAccountID;
-            bool isInvestment = mainWindow.Household.Account.FindByID(accountID).Type == EAccountType.Investment;
+            bool isInvestment = household.Account.FindByID(accountID).Type == EAccountType.Investment;
 
             // Create logic and show reconcile info dialog
-            var infoLogic = new ReconcileInfoLogic(mainWindow, accountID);
+            var infoLogic = new ReconcileInfoLogic(mainWindow, household, accountID);
             if (mainWindow.GuiServices.ShowDialog(infoLogic))
             {
                 // Show reconcile dialog
                 if (isInvestment)
                 {
-                    var logic = new ReconcileInvestmentsLogic(mainWindow, accountID);
+                    var logic = new ReconcileInvestmentsLogic(mainWindow, household, accountID);
                     if (mainWindow.GuiServices.ShowDialog(logic))
                     {
                         mainWindow.InvestmentRegister.UpdateAllTransactionStatus();
@@ -321,7 +323,7 @@ namespace BanaData.Logic.Main
                 }
                 else
                 {
-                    var logic = new ReconcileLogic(mainWindow, accountID);
+                    var logic = new ReconcileLogic(mainWindow, household, accountID);
 
                     if (mainWindow.GuiServices.ShowDialog(logic))
                     {
@@ -347,7 +349,6 @@ namespace BanaData.Logic.Main
         private void OnUpdateStockPrices()
         {
             decimal oldNetWorth = mainWindow.NetWorth;
-            var household = mainWindow.Household;
             var securities = new List<int>();
             var quoter = new Quote();
             var investmentIDs = new List<int>();
@@ -397,7 +398,7 @@ namespace BanaData.Logic.Main
                 }
             }
 
-            mainWindow.CommitChanges();
+            mainWindow.CommitChanges(household);
             mainWindow.UpdateAccountNamesAndBalances(investmentIDs);
 
             mainWindow.GuiServices.ShowDialog(new ShowQuoteUpdateLogic(securities.Count, oldNetWorth, mainWindow.NetWorth));
@@ -435,20 +436,20 @@ namespace BanaData.Logic.Main
         public void UpdateTransactionReports()
         {
             transactionReports.ReplaceRange(
-                mainWindow.Household.TransactionReport.Rows
+                household.TransactionReport.Rows
                 .Cast<Household.TransactionReportRow>()
                 .Select(tr => TransactionReportItem.CreateFromDB(tr))
-                .Select(tr => new TransactionReportMenuItem(mainWindow, tr)));
+                .Select(tr => new TransactionReportMenuItem(mainWindow, household, tr)));
         }
 
         public class TransactionReportMenuItem : LogicBase
         {
-            public TransactionReportMenuItem(MainWindowLogic mainWindowLogic, TransactionReportItem transactionReportItem)
+            public TransactionReportMenuItem(MainWindowLogic mainWindowLogic, Household household, TransactionReportItem transactionReportItem)
             {
                 TransactionReportItem = transactionReportItem;
                 GenerateReport = new CommandBase(arg =>
                 {
-                    mainWindowLogic.GuiServices.ShowDialog(new TransactionReportLogic(mainWindowLogic, arg as TransactionReportItem, true));
+                    mainWindowLogic.GuiServices.ShowDialog(new TransactionReportLogic(mainWindowLogic, household, arg as TransactionReportItem, true));
                 });
             }
 
@@ -478,7 +479,7 @@ namespace BanaData.Logic.Main
 
         private void OnShowYearlyCapGainsAndDividends()
         {
-            mainWindow.GuiServices.ShowDialog(new ShowYearlyCGDivIntLogic(mainWindow));
+            mainWindow.GuiServices.ShowDialog(new ShowYearlyCGDivIntLogic(household, mainWindow.UserSettings, mainWindow.GuiServices));
         }
 
         //
@@ -488,7 +489,7 @@ namespace BanaData.Logic.Main
 
         private void OnShowHoldings()
         {
-            var logic = new ShowHoldingsLogic(mainWindow, mainWindow.DisplayedAccountID);
+            var logic = new ShowHoldingsLogic(household, mainWindow.DisplayedAccountID);
             mainWindow.GuiServices.ShowDialog(logic);
         }
 
@@ -499,7 +500,7 @@ namespace BanaData.Logic.Main
 
         private void OnShowHoldingsPerPerson()
         {
-            var logic = new ShowHoldingsPerPersonLogic(mainWindow);
+            var logic = new ShowHoldingsPerPersonLogic(mainWindow, household);
             mainWindow.GuiServices.ShowDialog(logic);
         }
 
@@ -510,7 +511,7 @@ namespace BanaData.Logic.Main
 
         private void OnShowRebalance()
         {
-            mainWindow.GuiServices.ShowDialog(new ShowRebalanceLogic(mainWindow, mainWindow.DisplayedAccountID));
+            mainWindow.GuiServices.ShowDialog(new ShowRebalanceLogic(mainWindow, household, mainWindow.DisplayedAccountID));
         }
 
         //
@@ -520,7 +521,7 @@ namespace BanaData.Logic.Main
 
         private void OnShowWealthOverTime()
         {
-            mainWindow.GuiServices.ShowDialog(new ShowWealthOverTimeLogic(mainWindow));
+            mainWindow.GuiServices.ShowDialog(new ShowWealthOverTimeLogic(household, mainWindow.GuiServices));
         }
 
         //
@@ -530,7 +531,7 @@ namespace BanaData.Logic.Main
 
         private void OnShowCashFlowBetweenPersons()
         {
-            mainWindow.GuiServices.ShowDialog(new ShowCashFlowBetweenPersonsLogic(mainWindow));
+            mainWindow.GuiServices.ShowDialog(new ShowCashFlowBetweenPersonsLogic(mainWindow, household, mainWindow.UserSettings));
         }
 
         //
@@ -540,7 +541,7 @@ namespace BanaData.Logic.Main
 
         private void OnShowBalanceSheet()
         {
-            mainWindow.GuiServices.ShowDialog(new BalanceSheetLogic(mainWindow));
+            mainWindow.GuiServices.ShowDialog(new BalanceSheetLogic(household));
         }
 
         //
@@ -550,7 +551,7 @@ namespace BanaData.Logic.Main
 
         private void OnShowIncomeStatement()
         {
-            mainWindow.GuiServices.ShowDialog(new IncomeStatementLogic(mainWindow));
+            mainWindow.GuiServices.ShowDialog(new IncomeStatementLogic(household));
         }
 
         //
@@ -560,7 +561,7 @@ namespace BanaData.Logic.Main
 
         private void OnShowJournal()
         {
-            mainWindow.GuiServices.ShowDialog(new JournalLogic(mainWindow));
+            mainWindow.GuiServices.ShowDialog(new JournalLogic(household));
         }
 
         #endregion

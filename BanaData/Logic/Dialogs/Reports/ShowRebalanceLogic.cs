@@ -22,16 +22,19 @@ namespace BanaData.Logic.Dialogs.Reports
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
         private readonly Household.AccountRow accountRow;
 
         #endregion
 
         #region Constructor
 
-        public ShowRebalanceLogic(MainWindowLogic _mainWindowLogic, int accountID)
+        public ShowRebalanceLogic(MainWindowLogic _mainWindowLogic, Household _household, int accountID)
         {
             mainWindowLogic = _mainWindowLogic;
-            accountRow = mainWindowLogic.Household.Account.FindByID(accountID);
+            household = _household;
+
+            accountRow = household.Account.FindByID(accountID);
 
             var portfolio = accountRow.GetPortfolio();
             foreach (var securityRow in portfolio.GetSecuritiesRows())
@@ -268,11 +271,11 @@ namespace BanaData.Logic.Dialogs.Reports
                 if (!found)
                 {
                     // Create new entry in DB
-                    var newTarget = mainWindowLogic.Household.RebalanceTarget.NewRebalanceTargetRow();
+                    var newTarget = household.RebalanceTarget.NewRebalanceTargetRow();
                     newTarget.AccountID = accountRow.ID;
                     newTarget.SecurityID = si.SecurityRow.ID;
                     newTarget.Target = si.Target;
-                    mainWindowLogic.Household.RebalanceTarget.AddRebalanceTargetRow(newTarget);
+                    household.RebalanceTarget.AddRebalanceTargetRow(newTarget);
 
                     change = true;
                 }
@@ -280,7 +283,7 @@ namespace BanaData.Logic.Dialogs.Reports
 
             if (change)
             {
-                mainWindowLogic.CommitChanges();
+                mainWindowLogic.CommitChanges(household);
             }
 
             return change;

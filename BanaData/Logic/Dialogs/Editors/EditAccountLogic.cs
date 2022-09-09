@@ -17,15 +17,16 @@ namespace BanaData.Logic.Dialogs.Editors
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
         private readonly AccountItem oldAccountItem;
 
         #endregion
 
         #region Constructor
 
-        public EditAccountLogic(MainWindowLogic _mainWindowLogic, AccountItem accountItem, bool add)
+        public EditAccountLogic(MainWindowLogic _mainWindowLogic, Household _household, AccountItem accountItem, bool add)
         {
-            (mainWindowLogic, oldAccountItem) = (_mainWindowLogic, accountItem);
+            (mainWindowLogic, household, oldAccountItem) = (_mainWindowLogic, _household, accountItem);
 
             Name = accountItem.Name;
             Description = accountItem.Description;
@@ -40,7 +41,7 @@ namespace BanaData.Logic.Dialogs.Editors
             IsHidden = accountItem.Hidden;
 
             var owners = new List<string>();
-            owners.AddRange(mainWindowLogic.Household.Person.Rows.Cast<Household.PersonRow>().Select<Household.PersonRow, string>(p => p.Name));
+            owners.AddRange(household.Person.Rows.Cast<Household.PersonRow>().Select<Household.PersonRow, string>(p => p.Name));
             owners.Sort();
             owners.Insert(0, "<None>");
             Owners = owners.ToArray();
@@ -112,7 +113,7 @@ namespace BanaData.Logic.Dialogs.Editors
                 return null;
             }
 
-            foreach (Household.AccountRow acct in mainWindowLogic.Household.Account.Rows)
+            foreach (Household.AccountRow acct in household.Account.Rows)
             {
                 if (acct != oldAccountItem.AccountRow && acct.Name == Name)
                 {

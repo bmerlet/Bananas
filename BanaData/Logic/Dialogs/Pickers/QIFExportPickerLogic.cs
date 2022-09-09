@@ -17,21 +17,23 @@ namespace BanaData.Logic.Dialogs.Pickers
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
 
         #endregion
 
         #region Constructor
 
-        public QIFExportPickerLogic(MainWindowLogic _mainWindowLogic)
+        public QIFExportPickerLogic(MainWindowLogic _mainWindowLogic, Household _household)
         {
             mainWindowLogic = _mainWindowLogic;
+            household = _household;
 
             // Create commands
             BrowseDifferentialCommand = new CommandBase(OnBrowseDifferentialCommand);
             BrowseRegularCommand = new CommandBase(OnBrowseRegularCommand);
 
             // Create account list
-            AccountListLogic = new AccountListLogic(mainWindowLogic);
+            AccountListLogic = new AccountListLogic(household);
 
             // Init
             exportType = EExportType.Differential;
@@ -170,7 +172,6 @@ namespace BanaData.Logic.Dialogs.Pickers
 
         protected override bool? Commit()
         {
-            var household = mainWindowLogic.Household;
             bool? result = false;
 
             if (DifferentialExport)

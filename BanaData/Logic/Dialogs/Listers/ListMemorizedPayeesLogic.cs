@@ -21,14 +21,15 @@ namespace BanaData.Logic.Dialogs.Listers
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
 
         #endregion
 
         #region Constructor
 
-        public ListMemorizedPayeesLogic(MainWindowLogic _mainWindowLogic)
+        public ListMemorizedPayeesLogic(MainWindowLogic _mainWindowLogic, Household _household)
         {
-            mainWindowLogic = _mainWindowLogic;
+            (mainWindowLogic, household) = (_mainWindowLogic, _household);
 
             memorizedPayeesSource = new ObservableCollection<MemorizedPayeeItem>();
             mainWindowLogic.MemorizedPayees.ForEach(mpi => memorizedPayeesSource.Add(mpi));
@@ -64,7 +65,7 @@ namespace BanaData.Logic.Dialogs.Listers
             // Create new memorized payee
             var newMemorizedPayee = new MemorizedPayeeItem(-1, "", "", new LineItem[1] { new LineItem(mainWindowLogic, -1, "", -1, -1, "", 0, true) });
 
-            var logic = new EditMemorizedPayeeLogic(mainWindowLogic, newMemorizedPayee, true);
+            var logic = new EditMemorizedPayeeLogic(mainWindowLogic, household, newMemorizedPayee, true);
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
             {
                 // Get new memorized payee
@@ -86,7 +87,7 @@ namespace BanaData.Logic.Dialogs.Listers
         {
             if (SelectedMemorizedPayee != null)
             {
-                var logic = new EditMemorizedPayeeLogic(mainWindowLogic, SelectedMemorizedPayee, false);
+                var logic = new EditMemorizedPayeeLogic(mainWindowLogic, household, SelectedMemorizedPayee, false);
                 if (mainWindowLogic.GuiServices.ShowDialog(logic))
                 {
                     // Get modified payee
@@ -120,8 +121,6 @@ namespace BanaData.Logic.Dialogs.Listers
 
         private MemorizedPayeeItem AddMemorizedPayeeToDataSet(MemorizedPayeeItem newPayee)
         {
-            var household = mainWindowLogic.Household;
-
             // Commit new payee
             var newPayeeRow = household.Transaction.Add(
                 null,
@@ -150,7 +149,7 @@ namespace BanaData.Logic.Dialogs.Listers
                 newLineItems.Add(new LineItem(lineItem, newRow.ID));
             }
 
-            mainWindowLogic.CommitChanges();
+            mainWindowLogic.CommitChanges(household);
             mainWindowLogic.UpdateMemorizedPayees();
 
             // Recreate memorized payee with correct ID
@@ -159,8 +158,6 @@ namespace BanaData.Logic.Dialogs.Listers
 
         private MemorizedPayeeItem UpdateMemorizedPayeeInDataSet(MemorizedPayeeItem newPayee)
         {
-            var household = mainWindowLogic.Household;
-
             // Update the memorized payee
             var payeeRow = household.Transaction.FindByID(newPayee.ID);
             household.Transaction.Update(
@@ -257,7 +254,7 @@ namespace BanaData.Logic.Dialogs.Listers
                 }
             }
 
-            mainWindowLogic.CommitChanges();
+            mainWindowLogic.CommitChanges(household);
             mainWindowLogic.UpdateMemorizedPayees();
 
             // Recreate memorized payee with correct line item IDs
@@ -266,8 +263,6 @@ namespace BanaData.Logic.Dialogs.Listers
 
         private void RemoveMemorizedPayeeFromDataSet(MemorizedPayeeItem payee)
         {
-            var household = mainWindowLogic.Household;
-
             // Remove the line items
             foreach (var lineItem in payee.LineItems)
             {
@@ -277,7 +272,7 @@ namespace BanaData.Logic.Dialogs.Listers
             // Remove the memorized payee
             household.Transaction.FindByID(payee.ID).Delete();
 
-            mainWindowLogic.CommitChanges();
+            mainWindowLogic.CommitChanges(household);
             mainWindowLogic.UpdateMemorizedPayees();
         }
 

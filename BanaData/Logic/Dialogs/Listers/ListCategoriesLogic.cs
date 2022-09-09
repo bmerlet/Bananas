@@ -11,6 +11,7 @@ using Toolbox.UILogic;
 using BanaData.Logic.Main;
 using BanaData.Logic.Items;
 using BanaData.Logic.Dialogs.Editors;
+using BanaData.Database;
 
 namespace BanaData.Logic.Dialogs.Listers
 {
@@ -19,15 +20,15 @@ namespace BanaData.Logic.Dialogs.Listers
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
 
         #endregion
 
         #region Constructor
 
-        public ListCategoriesLogic(MainWindowLogic _mainWindowLogic)
+        public ListCategoriesLogic(MainWindowLogic _mainWindowLogic, Household _household)
         {
-            mainWindowLogic = _mainWindowLogic;
-            var household = mainWindowLogic.Household;
+            (mainWindowLogic, household) = (_mainWindowLogic, _household);
 
             categoriesSource = new ObservableCollection<EditCategoryItem>();
 
@@ -136,7 +137,7 @@ namespace BanaData.Logic.Dialogs.Listers
 
         private void OnAddCategory()
         {
-            var logic = new EditCategoryLogic(mainWindowLogic, new CategoryItem(-1, "", "", false, "", null));
+            var logic = new EditCategoryLogic(mainWindowLogic, household, new CategoryItem(-1, "", "", false, "", null));
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
             {
                 // Update DB
@@ -170,7 +171,7 @@ namespace BanaData.Logic.Dialogs.Listers
                     return;
                 }
 
-                var logic = new EditCategoryLogic(mainWindowLogic, SelectedCategory.CategoryItem);
+                var logic = new EditCategoryLogic(mainWindowLogic, household, SelectedCategory.CategoryItem);
                 if (mainWindowLogic.GuiServices.ShowDialog(logic))
                 {
                     // Update DB
@@ -232,35 +233,29 @@ namespace BanaData.Logic.Dialogs.Listers
 
         private CategoryItem AddCategoryToDataSet(CategoryItem category)
         {
-            var household = mainWindowLogic.Household;
-
             var parentRow = category.Parent == null ? null : household.Category.FindByID(category.Parent.ID);
             var catRow = household.Category.Add(category.Name, category.Description, parentRow, category.IsIncome, category.TaxInfo);
 
-            mainWindowLogic.CommitChanges();
+            mainWindowLogic.CommitChanges(household);
 
             return new CategoryItem(category, catRow.ID);
         }
 
         private void UpdateCategoryInDataSet(CategoryItem category)
         {
-            var household = mainWindowLogic.Household;
-
             var catRow = household.Category.FindByID(category.ID);
             var parentRow = category.Parent == null ? null : household.Category.FindByID(category.Parent.ID);
             household.Category.Update(catRow, category.Name, category.Description, parentRow, category.IsIncome, category.TaxInfoKey);
 
-            mainWindowLogic.CommitChanges();
+            mainWindowLogic.CommitChanges(household);
         }
 
         private void DeleteCategoryFromDataSet(CategoryItem category)
         {
-            var household = mainWindowLogic.Household;
-
             var row = household.Category.FindByID(category.ID);
             row.Delete();
 
-            mainWindowLogic.CommitChanges();
+            mainWindowLogic.CommitChanges(household);
         }
 
         #endregion

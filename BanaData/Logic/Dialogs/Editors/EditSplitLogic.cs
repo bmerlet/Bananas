@@ -11,6 +11,7 @@ using BanaData.Logic.Items;
 using System.Collections.ObjectModel;
 using System.Windows.Data;
 using System.ComponentModel;
+using BanaData.Database;
 
 namespace BanaData.Logic.Dialogs.Editors
 {
@@ -25,6 +26,7 @@ namespace BanaData.Logic.Dialogs.Editors
         #region Private members
 
         private readonly MainWindowLogic mainWindowLogic;
+        private readonly Household household;
         private readonly LineItem[] oldLineItems;
 
         private const string PAYMENT = "Payment";
@@ -34,9 +36,9 @@ namespace BanaData.Logic.Dialogs.Editors
 
         #region Constructor
 
-        public EditSplitLogic(MainWindowLogic _mainWindowLogic, LineItem[] _lineItems)
+        public EditSplitLogic(MainWindowLogic _mainWindowLogic, Household _household, LineItem[] _lineItems)
         {
-            (mainWindowLogic, oldLineItems) = (_mainWindowLogic, _lineItems);
+            (mainWindowLogic, household, oldLineItems) = (_mainWindowLogic, _household, _lineItems);
 
             // Deposit or payment?
             decimal total = oldLineItems.Sum(li => li.Amount);
@@ -112,7 +114,7 @@ namespace BanaData.Logic.Dialogs.Editors
                 if (li.CategoryAccountID != -1 &&
                     newLineItems.Count(l => l.CategoryAccountID == li.CategoryAccountID) > 1)
                 {
-                    mainWindowLogic.ErrorMessage($"Entering multiple transfers to the same account ({mainWindowLogic.Household.Account.FindByID(li.CategoryAccountID).Name}) is not supported.");
+                    mainWindowLogic.ErrorMessage($"Entering multiple transfers to the same account ({household.Account.FindByID(li.CategoryAccountID).Name}) is not supported.");
                     return null;
                 }
             }

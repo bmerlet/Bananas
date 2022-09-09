@@ -21,6 +21,9 @@ namespace BanaData.Logic.Main
         // Parent logic
         protected readonly MainWindowLogic mainWindowLogic;
 
+        // Database we are working on
+        protected readonly Household household;
+
         // Account we are displaying
         protected Household.AccountRow accountRow = null;
 
@@ -32,9 +35,10 @@ namespace BanaData.Logic.Main
 
         #region Constructor
 
-        protected AbstractRegisterLogic(MainWindowLogic _mainWindowLogic)
+        protected AbstractRegisterLogic(MainWindowLogic _mainWindowLogic, Household _household)
         {
             mainWindowLogic = _mainWindowLogic;
+            household = _household;
 
             // Create transaction collection view, and sort by date
             RegisterItems = (CollectionView)CollectionViewSource.GetDefaultView(transactions);
@@ -92,7 +96,6 @@ namespace BanaData.Logic.Main
             }
 
             // Get the account details
-            var household = mainWindowLogic.Household;
             accountRow = household.Account.FindByID(accountID);
 
             // Derived class specific action 
@@ -153,7 +156,6 @@ namespace BanaData.Logic.Main
         // (e.g. interest transaction by the reconcile dialog)
         public void AddTransaction(int transactionID)
         {
-            var household = mainWindowLogic.Household;
             var transRow = household.Transaction.FindByID(transactionID);
             var lineItems = GetLineItems(transRow);
 
@@ -433,11 +435,10 @@ namespace BanaData.Logic.Main
             }
 
             // Ask what account to move this transaction to
-            var logic = new AccountPickerLogic(mainWindowLogic, accountRow);
+            var logic = new AccountPickerLogic(mainWindowLogic, household, accountRow);
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
             {
                 // Get transaction and basic info
-                var household = mainWindowLogic.Household;
                 var transRow = household.Transaction.FindByID(atl.TransID);
                 var oldAccountRow = transRow.AccountRow;
                 var newAccountRow = logic.PickedAccount;
@@ -480,7 +481,7 @@ namespace BanaData.Logic.Main
                 }
 
                 // Commit to DB
-                mainWindowLogic.CommitChanges();
+                mainWindowLogic.CommitChanges(household);
 
                 // Delete from list
                 transactions.Remove(atl);

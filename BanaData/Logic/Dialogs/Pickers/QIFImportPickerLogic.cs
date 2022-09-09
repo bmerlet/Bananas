@@ -23,7 +23,7 @@ namespace BanaData.Logic.Dialogs.Pickers
 
         #region Constructor
 
-        public QIFImportPickerLogic(MainWindowLogic _mainWindowLogic)
+        public QIFImportPickerLogic(MainWindowLogic _mainWindowLogic, Household household)
         {
             mainWindowLogic = _mainWindowLogic;
 
@@ -32,7 +32,7 @@ namespace BanaData.Logic.Dialogs.Pickers
             BrowseImportTransactionsCommand = new CommandBase(OnBrowseImportTransactionsCommand);
 
             // Create account list for autocomplete text box
-            foreach (Household.AccountRow accountRow in mainWindowLogic.Household.Account)
+            foreach (Household.AccountRow accountRow in household.Account)
             {
                 var accountItem = AccountItem.CreateFromDB(accountRow);
                 accounts.Add(accountItem);
