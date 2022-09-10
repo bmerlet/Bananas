@@ -71,6 +71,9 @@
     <Compile Include="Dialogs\Editors\EditCategory.xaml.cs">
       <DependentUpon>EditCategory.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\Editors\EditImportedTransactions.xaml.cs">
+      <DependentUpon>EditImportedTransactions.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\Editors\EditMemorizedPayee.xaml.cs">
       <DependentUpon>EditMemorizedPayee.xaml</DependentUpon>
     </Compile>
@@ -238,6 +241,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\Editors\EditCategory.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Editors\EditImportedTransactions.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

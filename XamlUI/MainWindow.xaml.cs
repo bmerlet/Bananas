@@ -273,6 +273,10 @@ namespace XamlUI
             {
                 dialog = new Journal(journalLogic);
             }
+            else if (logic is EditImportedTransactionsLogic editImportedTransactionsLogic)
+            {
+                dialog = new EditImportedTransactions(editImportedTransactionsLogic);
+            }
             else
             {
                 throw new NotImplementedException();

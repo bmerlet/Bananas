@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using BanaData.Database;
-using BanaData.Logic.Dialogs.Basics;
 using BanaData.Logic.Items;
 using BanaData.Logic.Main;
 using BanaData.Serializations;
@@ -23,33 +23,29 @@ namespace BanaData.Logic.Dialogs.Pickers
 
         #region Constructor
 
-        public QIFImportPickerLogic(MainWindowLogic _mainWindowLogic, Household household)
+        public QIFImportPickerLogic(MainWindowLogic _mainWindowLogic)
         {
             mainWindowLogic = _mainWindowLogic;
 
             // Create commands
             BrowseImportDBCommand = new CommandBase(OnBrowseImportDBCommand);
             BrowseImportTransactionsCommand = new CommandBase(OnBrowseImportTransactionsCommand);
-
-            // Create account list for autocomplete text box
-            foreach (Household.AccountRow accountRow in household.Account)
-            {
-                var accountItem = AccountItem.CreateFromDB(accountRow);
-                accounts.Add(accountItem);
-            }
+            BrowseParsePDFCommand = new CommandBase(OnBrowseParsePDFCommand);
 
             // Init
-            importType = EImportType.Transactions;
+            importType = EImportType.PDFTransactions;
 
             // Init file names
             string lastFile = mainWindowLogic.UserSettings.LastFileOpened;
-            string ImportDBPath = mainWindowLogic.UserSettings.LastImportDBFile;
 
+            string ImportDBPath = mainWindowLogic.UserSettings.LastImportDBFile;
             if (ImportDBPath == null)
             {
                 ImportDBPath = System.IO.Path.Combine(
                     lastFile == null ? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) : System.IO.Path.GetDirectoryName(lastFile),
                     "DB.QIF");
+
+                mainWindowLogic.UserSettings.LastImportDBFile = ImportDBPath;
                 mainWindowLogic.SaveUserSettings();
             }
 
@@ -60,11 +56,26 @@ namespace BanaData.Logic.Dialogs.Pickers
                     lastFile == null ?
                     System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Transactions.QIF") :
                     lastFile.Substring(0, lastFile.LastIndexOf('.')) + ".QIF";
+
+                mainWindowLogic.UserSettings.LastImportTransactionsFile = ImportTransactionsPath;
                 mainWindowLogic.SaveUserSettings();
             }
 
-            SpecificAccount = mainWindowLogic.UserSettings.LastImportAccountName;
+            ParsePDFPath = mainWindowLogic.UserSettings.LastImportPDFFile;
+            if (ParsePDFPath == null)
+            {
+                ParsePDFPath =
+                    lastFile == null ?
+                    System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Statement.pdf") :
+                    lastFile.Substring(0, lastFile.LastIndexOf('.')) + ".pdf";
 
+                mainWindowLogic.UserSettings.LastImportPDFFile = ImportTransactionsPath;
+                mainWindowLogic.SaveUserSettings();
+            }
+
+            OnPropertyChanged(() => ImportDBPath);
+            OnPropertyChanged(() => ImportTransactionsPath);
+            OnPropertyChanged(() => ParsePDFPath);
             UpdateEnabled();
         }
 
@@ -75,40 +86,45 @@ namespace BanaData.Logic.Dialogs.Pickers
         //
         // Radio button import DB/transactions
         //
-        private enum EImportType { Full, Transactions, None };
         private EImportType importType;
-        public bool ImportDB { get => importType == EImportType.Full ; set { if (value) importType = EImportType.Full; UpdateEnabled(); } }
-        public bool ImportTransactions { get => importType == EImportType.Transactions; set { if (value) importType = EImportType.Transactions; UpdateEnabled(); } }
+        public bool ImportDB
+        {
+            get => importType == EImportType.FullQIF;
+            set { if (value) { importType = EImportType.FullQIF; UpdateEnabled(); } } 
+        }
+        
+        public bool ImportTransactions 
+        { 
+            get => importType == EImportType.QIFTransactions;
+            set { if (value) { importType = EImportType.QIFTransactions; UpdateEnabled(); } }
+        }
+        
+        public bool ParsePDF
+        {
+            get => importType == EImportType.PDFTransactions;
+            set { if (value) { importType = EImportType.PDFTransactions; UpdateEnabled(); } }
+        }
 
         //
         // Full import filename
         //
         public string ImportDBPath { get; set; }
         public CommandBase BrowseImportDBCommand { get; }
-        public bool ImportDBPathEnabled => importType == EImportType.Full;
+        public bool ImportDBPathEnabled => importType == EImportType.FullQIF;
 
         //
         // Transaction import filename
         //
         public string ImportTransactionsPath { get; set; }
         public CommandBase BrowseImportTransactionsCommand { get; }
-        public bool ImportTransactionsPathEnabled => importType == EImportType.Transactions;
+        public bool ImportTransactionsPathEnabled => importType == EImportType.QIFTransactions;
 
         //
-        // If importing for a specific account
+        // Parse PDF filename
         //
-        private bool? importToSpecificAccount = false;
-        public bool? ImportToSpecificAccount { get => importToSpecificAccount; set { importToSpecificAccount = value; UpdateEnabled(); } }
-        public string SpecificAccount { get; set; }
-        private readonly List<AccountItem> accounts = new List<AccountItem>();
-        public IEnumerable<AccountItem> Accounts => accounts;
-        public bool ImportToSpecificAccountEnabled => importType == EImportType.Transactions && ImportToSpecificAccount == true;
-
-        //
-        // Options when importing transactions
-        //
-        public bool? ImportComments { get; set; } = false;
-        public bool? LowerCasePayees { get; set; } = true;
+        public string ParsePDFPath { get; set; }
+        public CommandBase BrowseParsePDFCommand { get; }
+        public bool ParsePDFPathEnabled => importType == EImportType.PDFTransactions;
 
         #endregion
 
@@ -118,7 +134,7 @@ namespace BanaData.Logic.Dialogs.Pickers
         {
             OnPropertyChanged(() => ImportDBPathEnabled);
             OnPropertyChanged(() => ImportTransactionsPathEnabled);
-            OnPropertyChanged(() => ImportToSpecificAccountEnabled);
+            OnPropertyChanged(() => ParsePDFPathEnabled);
         }
 
         private void OnBrowseImportDBCommand()
@@ -145,34 +161,41 @@ namespace BanaData.Logic.Dialogs.Pickers
             }
         }
 
+        private void OnBrowseParsePDFCommand()
+        {
+            var logic = new Basics.OpenFileLogic(ParsePDFPath, "Portable Document Files (*.PDF)|*.PDF|Any file (*.*)|*.*", "Parse PDF file");
+            if (mainWindowLogic.GuiServices.ShowDialog(logic))
+            {
+                ParsePDFPath = logic.File;
+                OnPropertyChanged(() => ParsePDFPath);
+                mainWindowLogic.UserSettings.LastImportPDFFile = ImportTransactionsPath;
+                mainWindowLogic.SaveUserSettings();
+            }
+        }
+
         // Result
-        public QIFImportSpecification ImportSpecification { get; private set; }
+        public EImportType ImportType => importType;
+        public string ImportPath { get; private set; }
 
         protected override bool? Commit()
         {
-            if (ImportDB)
+            switch (importType)
             {
-                ImportSpecification = new QIFImportSpecification(true, ImportDBPath, null, true, false);
+                case EImportType.FullQIF:
+                    ImportPath = ImportDBPath;
+                    break;
+                case EImportType.QIFTransactions:
+                    ImportPath = ImportTransactionsPath;
+                    break;
+                case EImportType.PDFTransactions:
+                    ImportPath = ParsePDFPath;
+                    break;
             }
-            else
+
+            if (String.IsNullOrWhiteSpace(ImportPath))
             {
-                Household.AccountRow account = null;
-                if (ImportToSpecificAccount == true)
-                {
-                    var accountItem = accounts.Find(a => a.Name == SpecificAccount);
-                    if (accountItem == null)
-                    {
-                        mainWindowLogic.ErrorMessage("Please specify the account to import the transactions into.");
-                        return null;
-                    }
-                    account = accountItem.AccountRow;
-                    if (SpecificAccount != mainWindowLogic.UserSettings.LastImportAccountName)
-                    {
-                        mainWindowLogic.UserSettings.LastImportAccountName = SpecificAccount;
-                        mainWindowLogic.SaveUserSettings();
-                    }
-                }
-                ImportSpecification = new QIFImportSpecification(false, ImportTransactionsPath, account, ImportComments == true, LowerCasePayees == true);
+                mainWindowLogic.ErrorMessage("Please select a path", "Import");
+                return null;
             }
 
             return true;

@@ -77,7 +77,7 @@ namespace BanaData.Database
                     baseRow = this.Where(c => c.Date == DateTime.MinValue).Single();
                     curRow = this.Where(c => c.Date != DateTime.MinValue).Single();
                 }
-                catch(Exception)
+                catch (Exception)
                 {
                     InitializeCheckpoints();
                     CreateNewCheckpoint();

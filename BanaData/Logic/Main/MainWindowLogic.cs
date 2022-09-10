@@ -445,31 +445,108 @@ namespace BanaData.Logic.Main
             household.AcceptChanges();
         }
 
-        public void ImportQIF(QIFImportSpecification spec)
+        public void ImportQIF(EImportType type, string path)
         {
-            GuiServices.SetCursor(true);
-
-            var parser = new QIFParser(household);
-
-            try
+            if (type == EImportType.FullQIF)
             {
-                parser.ImportFromQIF(spec);
+                if (YesNoQuestion("Are you sure you want to replace the current database with the content of the QIF file?"))
+                {
+                    GuiServices.SetCursor(true);
+                    var parser = new QIFParser(household);
+
+                    try
+                    {
+                        parser.ImportFullDBFromQIF(path);
+                    }
+                    catch (Exception e)
+                    {
+                        ErrorMessage(e.Message, "Import error");
+                    }
+                    finally
+                    {
+                        GuiServices.SetCursor(false);
+                    }
+
+                    if (!string.IsNullOrEmpty(parser.Log))
+                    {
+                        ErrorMessage(parser.Log, "Import results");
+                    }
+                }
             }
-            catch (Exception e)
+            else
             {
-                ErrorMessage(e.Message, "Import results");
+                // Create a database with only accounts and categories in it
+                var miniDB = CreateMiniDB();
+
+                // Parse qif/pdf
+                if (type == EImportType.QIFTransactions)
+                {
+                    // Use the mini DB to parse the transactions
+                    var parser = new QIFParser(miniDB);
+
+                    try
+                    {
+                        parser.ImportTransactionsFromQIF(path);
+                    }
+                    catch (Exception e)
+                    {
+                        ErrorMessage(e.Message, "Import error");
+                        return;
+                    }
+
+                    // ZZZ probably not needed
+                    if (!string.IsNullOrEmpty(parser.Log))
+                    {
+                        ErrorMessage(parser.Log, "Import results");
+                    }
+                }
+                else // PDF parsing
+                {
+                    // ZZZZ RUF
+                }
+
+                // Edit the imported transactions
+                var editor = new Dialogs.Editors.EditImportedTransactionsLogic(this, miniDB);
+                if (!GuiServices.ShowDialog(editor))
+                {
+                    return;
+                }
+
+                // Add the transactions to the real DB
+                MergeMiniDB(miniDB);
             }
 
-            GuiServices.SetCursor(false);
-
-            if (!string.IsNullOrEmpty(parser.Log))
-            {
-                ErrorMessage(parser.Log, "Import results");
-            }
 
             Dirty = true;
             UpdateAll();
             UpdateTitle();
+        }
+
+        private Household CreateMiniDB()
+        {
+            var miniDB = new Household();
+
+            foreach (var person in household.Person)
+            {
+                miniDB.Person.ImportRow(person);
+            }
+
+            foreach (var account in household.Account)
+            {
+                miniDB.Account.ImportRow(account);
+            }
+
+            foreach (var category in household.Category)
+            {
+                miniDB.Category.ImportRow(category);
+            }
+
+            return miniDB;
+        }
+
+        private void MergeMiniDB(Household miniDB)
+        {
+            // ZZZZ
         }
 
         public void ExportQIF(string file, QIFWriter.EContents contents, IEnumerable<Household.AccountRow> transactionAccounts)

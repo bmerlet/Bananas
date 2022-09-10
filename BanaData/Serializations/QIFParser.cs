@@ -14,6 +14,11 @@ using BanaData.Logic.Main;
 namespace BanaData.Serializations
 {
     /// <summary>
+    /// Type of imports
+    /// </summary>
+    public enum EImportType { FullQIF, QIFTransactions, PDFTransactions, None };
+
+    /// <summary>
     /// Parse a QIF file, creating a Household database or merging it in. 
     /// </summary>
     class QIFParser
@@ -80,59 +85,71 @@ namespace BanaData.Serializations
         #region Entry points
 
         //
-        // Parse QIF, importing either the whole DB or just transactions
+        // Parse the whole DB from a QIF file
         //
-        public void ImportFromQIF(QIFImportSpecification spec)
+        public void ImportFullDBFromQIF(string path)
         {
             // Init
             Log = "";
             accountNames.Clear();
             numberOfTransactions = 0;
 
-            // If replacing the whole DB, preserve info not present in QIF
-            // hoping that it could be used against the new DB
-            var supplementalInfo = spec.Full ? GetSupplemtalInfo() : null;
+            // Preserve info not present in QIF hoping that it could be used against the new DB
+            var supplementalInfo = GetSupplemtalInfo();
 
             // Zap the database
-            if (spec.Full)
-            {
-                household.Clear();
-                household.AcceptChanges();
-            }
+            household.Clear();
+            household.AcceptChanges();
 
             // Create a checkpoint - all transactions are created under this checkpoint
             household.Checkpoint.CreateNewCheckpoint();
             checkpointRow = household.Checkpoint.GetCurrentCheckpoint();
 
             // Parse the file
-            ParseFile(spec);
+            ParseFile(path, false);
 
             // Log what we got
-            if (spec.Full)
-            {
-                Log += $"Imported {household.Account.Rows.Count:N0} accounts" + eol;
-                Log += $"Imported {household.Category.Rows.Count:N0} categories" + eol;
-                Log += $"Imported {household.Security.Rows.Count:N0} securities" + eol;
-                Log += $"Imported {household.SecurityPrice.Rows.Count:N0} security prices" + eol;
-                Log += $"Imported {household.RegularTransactions.Count():N0} transactions" + eol;
-                Log += $"Imported {household.MemorizedPayees.Count():N0} memorized payees" + eol;
-            }
-            else
-            {
-                Log += $"Imported {numberOfTransactions:N0} transactions" + eol;
-            }
+            Log += $"Imported {household.Account.Rows.Count:N0} accounts" + eol;
+            Log += $"Imported {household.Category.Rows.Count:N0} categories" + eol;
+            Log += $"Imported {household.Security.Rows.Count:N0} securities" + eol;
+            Log += $"Imported {household.SecurityPrice.Rows.Count:N0} security prices" + eol;
+            Log += $"Imported {household.RegularTransactions.Count():N0} transactions" + eol;
+            Log += $"Imported {household.MemorizedPayees.Count():N0} memorized payees" + eol;
             Log += eol;
 
             // Find other sides of transfers
-            if (spec.Full)
-            {
-                PairTransfers();
-            }
+            PairTransfers();
 
-            if (supplementalInfo != null)
-            {
-                ApplySupplementalInfo(supplementalInfo);
-            }
+            // Re-apply supplemental info
+            ApplySupplementalInfo(supplementalInfo);
+
+            // Create a new checkpoint, all transactions created by the user henceforth
+            // will be associated with this new checkpoint
+            household.Checkpoint.CreateNewCheckpoint();
+
+            // Commit
+            household.AcceptChanges();
+        }
+
+        //
+        // Parse QIF transactions
+        //
+        public void ImportTransactionsFromQIF(string path)
+        {
+            // Init
+            Log = "";
+            accountNames.Clear();
+            numberOfTransactions = 0;
+
+            // Create a checkpoint - all transactions are created under this checkpoint
+            household.Checkpoint.CreateNewCheckpoint();
+            checkpointRow = household.Checkpoint.GetCurrentCheckpoint();
+
+            // Parse the file
+            ParseFile(path, true);
+
+            // Log what we got
+            Log += $"Imported {numberOfTransactions:N0} transactions" + eol;
 
             // Create a new checkpoint, all transactions created by the user henceforth
             // will be associated with this new checkpoint
@@ -145,26 +162,25 @@ namespace BanaData.Serializations
 
         #region QIF main parser
 
-        // Parse a QIF file file
-        private void ParseFile(QIFImportSpecification spec)
+        // Parse a QIF file
+        private void ParseFile(string path, bool onlyTransactions)
         {
-            var accountRow = spec.TransactionAccount;
+            // Pick the first account in the DB if parsing only transactions
+            Household.AccountRow accountRow = onlyTransactions ? household.Account[0] : null;
 
             // Read the file
-            using (var sr = new StreamReader(spec.Filename))
+            using (var sr = new StreamReader(path))
             {
                 // Parse all sections
                 while (!sr.EndOfStream)
                 {
-                    accountRow = ParseOneSection(sr, accountRow, spec);
+                    accountRow = ParseOneSection(sr, accountRow, onlyTransactions);
                 }
             }
         }
 
-        private Household.AccountRow ParseOneSection(StreamReader sr, Household.AccountRow accountRow, QIFImportSpecification spec)
+        private Household.AccountRow ParseOneSection(StreamReader sr, Household.AccountRow accountRow, bool onlyTransactions)
         {
-            bool onlyTransactions = !spec.Full;
-
             var sectionStr = sr.ReadLine();
             if (!sectionStr.StartsWith("!"))
             {
@@ -192,20 +208,20 @@ namespace BanaData.Serializations
                                 ParseSecurities(sr);
                                 break;
                             case "Bank":
-                                ParseBankTransactions(sr, accountRow, spec);
+                                ParseBankTransactions(sr, accountRow);
                                 break;
                             case "CCard":
-                                ParseBankTransactions(sr, accountRow, spec);
+                                ParseBankTransactions(sr, accountRow);
                                 break;
                             case "Cash":
-                                ParseBankTransactions(sr, accountRow, spec);
+                                ParseBankTransactions(sr, accountRow);
                                 break;
                             case "Oth A":
                             case "Oth L":
-                                ParseBankTransactions(sr, accountRow, spec);
+                                ParseBankTransactions(sr, accountRow);
                                 break;
                             case "Invst":
-                                ParseInvestmentTransactions(sr, accountRow, spec);
+                                ParseInvestmentTransactions(sr, accountRow);
                                 break;
                             case "Memorized":
                                 ComplainIfOnlyTransactions("Memorized payee", onlyTransactions);
@@ -526,7 +542,7 @@ namespace BanaData.Serializations
 
         # region Parse QIF banking transactions
 
-        private void ParseBankTransactions(StreamReader sr, Household.AccountRow account, QIFImportSpecification spec)
+        private void ParseBankTransactions(StreamReader sr, Household.AccountRow account)
         {
             if (account == null)
             {
@@ -535,7 +551,7 @@ namespace BanaData.Serializations
 
             while (sr.Peek() != '!' && !sr.EndOfStream)
             {
-                ParseOneBankTransaction(sr, account, spec);
+                ParseOneBankTransaction(sr, account);
             }
         }
 
@@ -547,7 +563,7 @@ namespace BanaData.Serializations
             public decimal Amount = 0;
         }
 
-        private void ParseOneBankTransaction(TextReader sr, Household.AccountRow accountRow, QIFImportSpecification spec)
+        private void ParseOneBankTransaction(TextReader sr, Household.AccountRow accountRow)
         {
             DateTime date = DateTime.MinValue;
             decimal amount = 0;
@@ -592,27 +608,17 @@ namespace BanaData.Serializations
 
                     case 'M':
                         // Main memo
-                        if (spec.ImportComments)
-                        {
-                            memo = l.Substring(1);
-                        }
+                        memo = l.Substring(1);
                         break;
 
                     case 'E':
                         // Line item memo
-                        if (spec.ImportComments)
-                        {
-                            lineItemHolder.Memo = l.Substring(1);
-                        }
+                        lineItemHolder.Memo = l.Substring(1);
                         break;
 
                     case 'P':
                         // Payee
                         payee = l.Substring(1);
-                        if (spec.LowerCasePayees)
-                        {
-                            payee = MakePayeeLowercase(payee);
-                        }
                         break;
 
                     case 'C':
@@ -710,7 +716,7 @@ namespace BanaData.Serializations
 
         #region Parse QIF investment transactions
 
-        private void ParseInvestmentTransactions(StreamReader sr, Household.AccountRow account, QIFImportSpecification spec)
+        private void ParseInvestmentTransactions(StreamReader sr, Household.AccountRow account)
         {
             if (account == null)
             {
@@ -719,11 +725,11 @@ namespace BanaData.Serializations
 
             while (sr.Peek() != '!' && !sr.EndOfStream)
             {
-                ParseOneInvestmentTransaction(sr, account, spec);
+                ParseOneInvestmentTransaction(sr, account);
             }
         }
 
-        private void ParseOneInvestmentTransaction(TextReader sr, Household.AccountRow accountRow, QIFImportSpecification spec)
+        private void ParseOneInvestmentTransaction(TextReader sr, Household.AccountRow accountRow)
         {
             DateTime date = DateTime.MinValue;
             decimal amount = 0;
@@ -797,18 +803,11 @@ namespace BanaData.Serializations
 
                     //case 'E':
                     case 'M':
-                        if (spec.ImportComments)
-                        {
-                            memo = arg;
-                        }
+                        memo = arg;
                         break;
 
                     case 'P':
                         payee = arg;
-                        if (spec.LowerCasePayees)
-                        {
-                            payee = MakePayeeLowercase(payee);
-                        }
                         break;
 
                     case 'C':
@@ -917,20 +916,6 @@ namespace BanaData.Serializations
             }
 
             return transRow;
-        }
-
-        static private string MakePayeeLowercase(string payee)
-        {
-            var words = payee.Trim().Split(new char[] { ' ' });
-            string result = "";
-            foreach(var word in words)
-            {
-                var lowercaseWord = word[0] + word.Substring(1).ToLower();
-                result += (result == "") ? "" : " ";
-                result += lowercaseWord;
-            }
-
-            return result;
         }
 
         #endregion
@@ -1954,29 +1939,4 @@ namespace BanaData.Serializations
 
         #endregion
     }
-
-    /// <summary>
-    /// Parsing specification
-    /// </summary>
-    public class QIFImportSpecification
-    {
-        #region Properties
-
-        public readonly bool Full;
-        public readonly string Filename;
-        public readonly Household.AccountRow TransactionAccount;
-        public readonly bool ImportComments;
-        public readonly bool LowerCasePayees;
-
-        #endregion
-
-        #region Constructor
-
-        public QIFImportSpecification(bool full, string filename, Household.AccountRow transactionAccount, bool importComments, bool lowerCasePayees) =>
-            (Full, Filename, TransactionAccount, ImportComments, LowerCasePayees) = (full, filename, transactionAccount, importComments, lowerCasePayees);
-
-        #endregion
-    }
-
-
 }

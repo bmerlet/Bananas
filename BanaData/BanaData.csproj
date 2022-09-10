@@ -76,6 +76,7 @@
     <Compile Include="Logic\Dialogs\Basics\YearPickerLogic.cs" />
     <Compile Include="Logic\Dialogs\Editors\EditAccountLogic.cs" />
     <Compile Include="Logic\Dialogs\Editors\EditCategoryLogic.cs" />
+    <Compile Include="Logic\Dialogs\Editors\EditImportedTransactionsLogic.cs" />
     <Compile Include="Logic\Dialogs\Editors\EditMemorizedPayeeLogic.cs" />
     <Compile Include="Logic\Dialogs\Editors\EditPersonsLogic.cs" />
     <Compile Include="Logic\Dialogs\Editors\EditScheduleLogic.cs" />

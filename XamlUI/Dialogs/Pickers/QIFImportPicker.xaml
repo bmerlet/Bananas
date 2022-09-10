@@ -9,7 +9,7 @@
         xmlns:pickers="clr-namespace:BanaData.Logic.Dialogs.Pickers;assembly=BanaData" 
         d:DataContext="{d:DesignInstance Type=pickers:QIFImportPickerLogic}"
         mc:Ignorable="d"
-        Title="Import from QIF"        
+        Title="Import file"        
         Icon="/XamlUI;component/Images/Bananas.ico"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
@@ -22,48 +22,36 @@
             <Style TargetType="Button" BasedOn="{StaticResource FormButton}"/>
             <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}"/>
             <Style TargetType="TextBox" BasedOn="{StaticResource FormTextBox}"/>
-            <Style TargetType="CheckBox" BasedOn="{StaticResource FormCheckBox}"/>
         </DockPanel.Resources>
 
         <!-- OK/Cancel panel -->
         <u:OKCancel DockPanel.Dock="Bottom"/>
         
-        <!-- Differential/Regular panel -->
+        <!-- Type of import panel -->
         <Grid DockPanel.Dock="Top">
             <Grid.RowDefinitions>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
-                <RowDefinition Height="30"/>
-                <RowDefinition Height="30"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="135"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="200"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="80"/>
             </Grid.ColumnDefinitions>
 
-            <RadioButton Grid.Row="0" GroupName="ImportType" Content="Import DB" IsChecked="{Binding ImportDB}"/>
-            <TextBlock Grid.Row="0" Grid.Column="1" Text="File name:"/>
-            <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding ImportDBPath, Mode=TwoWay}" IsEnabled="{Binding ImportDBPathEnabled}"/>
-            <Button Grid.Row="0" Grid.Column="3" Content="Browse..." Command="{Binding BrowseImportDBCommand}" IsEnabled="{Binding ImportDBPathEnabled}"/>
+            <RadioButton Grid.Row="0" GroupName="ImportType" Content="Import whole DB from QIF" IsChecked="{Binding ImportDB}"/>
+            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ImportDBPath, Mode=TwoWay}" IsEnabled="{Binding ImportDBPathEnabled}"/>
+            <Button Grid.Row="0" Grid.Column="2" Content="Browse..." Command="{Binding BrowseImportDBCommand}" IsEnabled="{Binding ImportDBPathEnabled}"/>
 
-            <RadioButton Grid.Row="1" GroupName="ImportType" Content="Import Transactions" IsChecked="{Binding ImportTransactions}"/>
-            <TextBlock Grid.Row="1" Grid.Column="1" Text="File name:"/>
-            <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding ImportTransactionsPath, Mode=TwoWay}" IsEnabled="{Binding ImportTransactionsPathEnabled}"/>
-            <Button Grid.Row="1" Grid.Column="3" Content="Browse..." Command="{Binding BrowseImportTransactionsCommand}" IsEnabled="{Binding ImportTransactionsPathEnabled}"/>
+            <RadioButton Grid.Row="1" GroupName="ImportType" Content="Import Transactions from QIF" IsChecked="{Binding ImportTransactions}"/>
+            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ImportTransactionsPath, Mode=TwoWay}" IsEnabled="{Binding ImportTransactionsPathEnabled}"/>
+            <Button Grid.Row="1" Grid.Column="2" Content="Browse..." Command="{Binding BrowseImportTransactionsCommand}" IsEnabled="{Binding ImportTransactionsPathEnabled}"/>
 
-            <CheckBox Grid.Row="2" Grid.ColumnSpan="2" Margin="20,0,0,0" Content="Add transaction to:" IsChecked="{Binding ImportToSpecificAccount}" IsEnabled="{Binding ImportTransactionsPathEnabled}"/>
-            <w:AutoCompleteTextBox 
-                Grid.Row="2" Grid.Column="2" Margin="5"
-                IsEnabled="{Binding ImportToSpecificAccountEnabled}"
-                Style="{StaticResource AccountBoxStyle}"
-                Text="{Binding SpecificAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                ItemsSource="{Binding Accounts}"/>
+            <RadioButton Grid.Row="2" GroupName="ImportType" Content="Parse PDF statement" IsChecked="{Binding ParsePDF}"/>
+            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ParsePDFPath, Mode=TwoWay}" IsEnabled="{Binding ParsePDFPathEnabled}"/>
+            <Button Grid.Row="2" Grid.Column="2" Content="Browse..." Command="{Binding BrowseParsePDFCommand}" IsEnabled="{Binding ImportTransactionsPathEnabled}"/>
 
-            <CheckBox Grid.Row="3" Grid.ColumnSpan="4" Margin="20,0,0,0" Content="Import comments" IsChecked="{Binding ImportComments}" IsEnabled="{Binding ImportTransactionsPathEnabled}"/>
-            <CheckBox Grid.Row="4" Grid.ColumnSpan="4" Margin="20,0,0,0" Content="Lowercase Payee" IsChecked="{Binding LowerCasePayees}" IsEnabled="{Binding ImportTransactionsPathEnabled}"/>
         </Grid>
         
     </DockPanel>

@@ -30,6 +30,7 @@ namespace BanaData.Serializations
         // Last import files
         public string LastImportDBFile;
         public string LastImportTransactionsFile;
+        public string LastImportPDFFile;
         public string LastImportAccountName;
 
         // Play Ka-Ching sound

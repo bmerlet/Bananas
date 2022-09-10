@@ -159,11 +159,10 @@ namespace BanaData.Logic.Main
 
         private void OnImport()
         {
-            var importFileLogic = new QIFImportPickerLogic(mainWindow, household);
-            if (mainWindow.GuiServices.ShowDialog(importFileLogic))
+            var logic = new QIFImportPickerLogic(mainWindow);
+            if (mainWindow.GuiServices.ShowDialog(logic))
             {
-                var importSpec = importFileLogic.ImportSpecification;
-                mainWindow.ImportQIF(importSpec);
+                mainWindow.ImportQIF(logic.ImportType, logic.ImportPath);
             }
         }
 
