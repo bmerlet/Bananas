@@ -480,6 +480,10 @@
       <Project>{236290E0-1E4F-489B-A6B3-0F48ADA5B23B}</Project>
       <Name>BanaData</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PdfParser\PdfParser.csproj">
+      <Project>{9be67917-323e-4bf6-885d-1830d8e26b60}</Project>
+      <Name>PdfParser</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\Bananas.ico">

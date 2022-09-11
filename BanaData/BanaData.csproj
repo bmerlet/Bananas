@@ -134,6 +134,7 @@
     <Compile Include="Logic\Main\InvestmentTransactionType.cs" />
     <Compile Include="Logic\Main\MainWindowLogic.cs" />
     <Compile Include="Logic\Main\MainMenuLogic.cs" />
+    <Compile Include="Parsers\PdfStatementParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serializations\BANSerializer.cs" />
     <Compile Include="Serializations\QIFWriter.cs" />
@@ -154,6 +155,11 @@
       <DependentUpon>HouseholdDataSet.xsd</DependentUpon>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\PdfParser\PdfParser.csproj">
+      <Project>{9be67917-323e-4bf6-885d-1830d8e26b60}</Project>
+      <Name>PdfParser</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

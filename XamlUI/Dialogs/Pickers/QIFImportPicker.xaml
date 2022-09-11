@@ -50,7 +50,7 @@
 
             <RadioButton Grid.Row="2" GroupName="ImportType" Content="Parse PDF statement" IsChecked="{Binding ParsePDF}"/>
             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ParsePDFPath, Mode=TwoWay}" IsEnabled="{Binding ParsePDFPathEnabled}"/>
-            <Button Grid.Row="2" Grid.Column="2" Content="Browse..." Command="{Binding BrowseParsePDFCommand}" IsEnabled="{Binding ImportTransactionsPathEnabled}"/>
+            <Button Grid.Row="2" Grid.Column="2" Content="Browse..." Command="{Binding BrowseParsePDFCommand}" IsEnabled="{Binding ParsePDFPathEnabled}"/>
 
         </Grid>
         

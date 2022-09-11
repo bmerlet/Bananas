@@ -16,6 +16,7 @@ using BanaData.Logic.Items;
 using BanaData.Logic.Dialogs.Reports;
 using BanaData.Logic.Dialogs.Basics;
 using System.IO;
+using BanaData.Parsers;
 
 namespace BanaData.Logic.Main
 {
@@ -475,7 +476,7 @@ namespace BanaData.Logic.Main
             }
             else
             {
-                // Create a database with only accounts and categories in it
+                // Create a database with only accounts and securities in it
                 var miniDB = CreateMiniDB();
 
                 // Parse qif/pdf
@@ -502,13 +503,37 @@ namespace BanaData.Logic.Main
                 }
                 else // PDF parsing
                 {
-                    // ZZZZ RUF
+                    var psp = new PdfStatementParser();
+
+                    try
+                    {
+                        psp.Parse(path, miniDB);
+                    }
+                    catch (Exception e)
+                    {
+                        ErrorMessage(e.Message, "Import error");
+                        return;
+                    }
+
+                    // ZZZ probably not needed
+                    if (!string.IsNullOrEmpty(psp.Log))
+                    {
+                        ErrorMessage(psp.Log, "Import results");
+                    }
                 }
 
                 // Edit the imported transactions
-                var editor = new Dialogs.Editors.EditImportedTransactionsLogic(this, miniDB);
-                if (!GuiServices.ShowDialog(editor))
+                try
                 {
+                    var editor = new Dialogs.Editors.EditImportedTransactionsLogic(this, miniDB);
+                    if (!GuiServices.ShowDialog(editor))
+                    {
+                        return;
+                    }
+                }
+                catch(InvalidOperationException e)
+                {
+                    ErrorMessage(e.Message, "Import error");
                     return;
                 }
 
@@ -536,9 +561,9 @@ namespace BanaData.Logic.Main
                 miniDB.Account.ImportRow(account);
             }
 
-            foreach (var category in household.Category)
+            foreach (var security in household.Security)
             {
-                miniDB.Category.ImportRow(category);
+                miniDB.Security.ImportRow(security);
             }
 
             return miniDB;
@@ -546,7 +571,56 @@ namespace BanaData.Logic.Main
 
         private void MergeMiniDB(Household miniDB)
         {
-            // ZZZZ
+            var checkpointRow = household.Checkpoint.GetCurrentCheckpoint();
+
+            foreach (var trin in miniDB.Transaction)
+            {
+                // Find the account in the real DB
+                var accountOut = household.Account.First(a => a.Name == trin.AccountRow.Name);
+
+                // Copy transaction
+                var transout = household.Transaction.Add(
+                    accountOut,
+                    trin.Date,
+                    trin.IsPayeeNull() ? null: trin.Payee,
+                    trin.IsMemoNull() ? null : trin.Memo,
+                    trin.Status,
+                    checkpointRow,
+                    ETransactionType.Regular);
+
+                // Copy bank/investment info
+                if (accountOut.Type == EAccountType.Bank)
+                {
+                    var bankin = trin.GetBankingTransaction();
+                    household.BankingTransaction.Add(transout, bankin.Medium, bankin.IsCheckNumberNull() ? (uint)0 : (uint)bankin.CheckNumber);
+                }
+                else if (accountOut.Type == EAccountType.Investment)
+                {
+                    var invstin = trin.GetInvestmentTransaction();
+                    household.InvestmentTransaction.Add(
+                        transout,
+                        invstin.Type,
+                        invstin.IsSecurityIDNull() ? null : invstin.SecurityRow,
+                        invstin.IsSecurityPriceNull() ? 0 : invstin.SecurityPrice,
+                        invstin.IsSecurityQuantityNull() ? 0 : invstin.SecurityQuantity,
+                        invstin.Commission);
+                }
+
+                // Copy the line items (should only be one, and they should have neither
+                // an associated line item transfer nor an associated line item category)
+                foreach(var liin in trin.GetLineItemRows())
+                {
+                    household.LineItem.Add(transout, liin.IsMemoNull() ? null : liin.Memo, liin.Amount);
+                    if (liin.GetLineItemCategoryRow() != null)
+                    {
+                        throw new InvalidOperationException("Imported transactions should not have a category");
+                    }
+                    if (liin.GetLineItemTransferRow() != null)
+                    {
+                        throw new InvalidOperationException("Imported transactions should not be transfers");
+                    }
+                }
+            }
         }
 
         public void ExportQIF(string file, QIFWriter.EContents contents, IEnumerable<Household.AccountRow> transactionAccounts)

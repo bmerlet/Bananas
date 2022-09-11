@@ -165,8 +165,8 @@ namespace BanaData.Serializations
         // Parse a QIF file
         private void ParseFile(string path, bool onlyTransactions)
         {
-            // Pick the first account in the DB if parsing only transactions
-            Household.AccountRow accountRow = onlyTransactions ? household.Account[0] : null;
+            // Pick the first credit card account in the DB if parsing only transactions
+            Household.AccountRow accountRow = onlyTransactions ? household.Account.First(a => a.Type == EAccountType.CreditCard) : null;
 
             // Read the file
             using (var sr = new StreamReader(path))

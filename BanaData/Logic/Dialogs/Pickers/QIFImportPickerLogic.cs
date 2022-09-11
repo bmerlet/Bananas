@@ -168,7 +168,7 @@ namespace BanaData.Logic.Dialogs.Pickers
             {
                 ParsePDFPath = logic.File;
                 OnPropertyChanged(() => ParsePDFPath);
-                mainWindowLogic.UserSettings.LastImportPDFFile = ImportTransactionsPath;
+                mainWindowLogic.UserSettings.LastImportPDFFile = ParsePDFPath;
                 mainWindowLogic.SaveUserSettings();
             }
         }
