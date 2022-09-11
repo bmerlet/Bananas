@@ -38,7 +38,7 @@ namespace BanaData.Logic.Dialogs.Pickers
             // Init file names
             string lastFile = mainWindowLogic.UserSettings.LastFileOpened;
 
-            string ImportDBPath = mainWindowLogic.UserSettings.LastImportDBFile;
+            ImportDBPath = mainWindowLogic.UserSettings.LastImportDBFile;
             if (ImportDBPath == null)
             {
                 ImportDBPath = System.IO.Path.Combine(
