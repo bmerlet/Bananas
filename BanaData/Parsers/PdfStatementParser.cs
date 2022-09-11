@@ -415,14 +415,14 @@ namespace BanaData.Parsers
                     // We are after "Transaction Description" and before "Annual Percentage Rate (APR)"
                     if (strs[i].StartsWith("Payment Thank You"))
                     {
-                        var cct = new CCTransaction(strs[i - 1].Trim() + year, "Payment", null, null, decimal.Parse(strs[i + 1]));
+                        var cct = new CCTransaction(strs[i - 1].Trim() + year, "Payment", null, null, -decimal.Parse(strs[i + 1]));
                         trans.Add(cct);
                     }
                     else if (strs[i].StartsWith("Order Number"))
                     {
                         var split = strs[i].Split(new char[] { ' ', '\t' });
                         var orderNumber = split[split.Length - 1];
-                        var cct = new CCTransaction(strs[i - 3].Trim() + year, "Amazon", orderNumber, null, decimal.Parse(strs[i + -1]));
+                        var cct = new CCTransaction(strs[i - 3].Trim() + year, "Amazon", orderNumber, null, -decimal.Parse(strs[i - 1]));
                         trans.Add(cct);
                     }
                 }
