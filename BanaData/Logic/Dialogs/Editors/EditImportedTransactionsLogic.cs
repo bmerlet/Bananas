@@ -226,6 +226,7 @@ namespace BanaData.Logic.Dialogs.Editors
                     
                     if (!it.Row.IsAccountIDNull() && it.Row.AccountRow.Type == EAccountType.Investment)
                     {
+                        // Should not happen
                         it.Row.GetInvestmentTransaction().Delete();
                     }
                     else if (!it.Row.IsAccountIDNull() && it.Row.AccountRow.Type == EAccountType.Bank)
@@ -233,7 +234,6 @@ namespace BanaData.Logic.Dialogs.Editors
                         it.Row.GetBankingTransaction().Delete();
                     }
 
-                    // ZZZ else if bank, remove bank trans
                     it.Row.Delete();
                 }
                 else
@@ -243,6 +243,47 @@ namespace BanaData.Logic.Dialogs.Editors
                         accountRow,
                         it.Date,
                         string.IsNullOrWhiteSpace(it.Payee) ? null : it.Payee,
+                        string.IsNullOrWhiteSpace(it.Memo) ? null : it.Memo,
+                        ETransactionStatus.Pending,
+                        checkpointRow,
+                        ETransactionType.Regular);
+
+                    if (accountRow.Type == EAccountType.Bank)
+                    {
+                        household.BankingTransaction.Add(it.Row, ETransactionMedium.None, 0);
+                    }
+                }
+            }
+
+            foreach (var it in importedInvestmentTransactions)
+            {
+                if (it.Import == false)
+                {
+                    // Remove from DB
+                    foreach (var lineItem in it.Row.GetLineItemRows())
+                    {
+                        lineItem.Delete();
+                    }
+
+                    if (!it.Row.IsAccountIDNull() && it.Row.AccountRow.Type == EAccountType.Investment)
+                    {
+                        it.Row.GetInvestmentTransaction().Delete();
+                    }
+                    else if (!it.Row.IsAccountIDNull() && it.Row.AccountRow.Type == EAccountType.Bank)
+                    {
+                        // Should not happen
+                        it.Row.GetBankingTransaction().Delete();
+                    }
+
+                    it.Row.Delete();
+                }
+                else
+                {
+                    household.Transaction.Update(
+                        it.Row.ID,
+                        accountRow,
+                        it.Date,
+                        null,
                         string.IsNullOrWhiteSpace(it.Memo) ? null : it.Memo,
                         ETransactionStatus.Pending,
                         checkpointRow,
