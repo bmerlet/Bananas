@@ -169,7 +169,7 @@ namespace BanaData.Serializations
             Household.AccountRow accountRow = onlyTransactions ? household.Account.First(a => a.Type == EAccountType.CreditCard) : null;
 
             // Read the file
-            using (var sr = new StreamReader(path))
+            using (var sr = new QIFReader(path))
             {
                 // Parse all sections
                 while (!sr.EndOfStream)
@@ -182,6 +182,7 @@ namespace BanaData.Serializations
         private Household.AccountRow ParseOneSection(StreamReader sr, Household.AccountRow accountRow, bool onlyTransactions)
         {
             var sectionStr = sr.ReadLine();
+
             if (!sectionStr.StartsWith("!"))
             {
                 throw new InvalidDataException("QIF parser: section does not start with '!': " + sectionStr);
@@ -1933,6 +1934,34 @@ namespace BanaData.Serializations
                     public readonly string Category;
                     public readonly string Account;
                     public readonly decimal Amount;
+                }
+            }
+        }
+
+        #endregion
+
+        #region Stream reader that skips blank lines
+
+        private class QIFReader : StreamReader
+        {
+            public QIFReader(string path) : base(path)
+            {
+                SkipBlankLines();
+            }
+
+            public override string ReadLine()
+            {
+                var line = base.ReadLine();
+                SkipBlankLines();
+
+                return line;
+            }
+
+            private void SkipBlankLines()
+            {
+                while(Peek() == '\n' || Peek() == '\r')
+                {
+                    base.ReadLine();
                 }
             }
         }
