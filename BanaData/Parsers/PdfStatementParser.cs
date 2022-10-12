@@ -201,6 +201,10 @@ namespace BanaData.Parsers
                 foreach (var str in strs)
                 {
                     int ix = str.IndexOf(", monthly transaction statement");
+                    if (ix < 0)
+                    {
+                        ix = str.IndexOf(", quarter-to-date statement");
+                    }
                     if (ix > 4)
                     {
                         year = "/" + str.Substring(ix - 4, 4);
@@ -244,7 +248,7 @@ namespace BanaData.Parsers
                     }
                     else
                     {
-                        foreach (var ticker in new string[] { "BND", "BNDX", "VGIT", "VXUS", "VTI" })
+                        foreach (var ticker in new string[] { "BND", "BNDX", "VGIT", "VXUS", "VTI", "VNQ" })
                         {
                             if (strs[i] == ticker)
                             {
