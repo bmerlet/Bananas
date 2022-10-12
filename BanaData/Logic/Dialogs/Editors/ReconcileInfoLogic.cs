@@ -53,16 +53,16 @@ namespace BanaData.Logic.Dialogs.Editors
                 {
                     if (statementEndDate.Day == 28)
                     {
-                        statementEndDate.AddDays(3);
+                        statementEndDate = statementEndDate.AddDays(3);
                     }
                     else if (statementEndDate.Day == 29)
                     {
-                        statementEndDate.AddDays(2);
+                        statementEndDate = statementEndDate.AddDays(2);
                     }
                 }
                 else if (statementEndDate.Day == 30)
                 {
-                    statementEndDate.AddDays(1);
+                    statementEndDate = statementEndDate.AddDays(1);
                 }
             }
 
