@@ -3,10 +3,11 @@ using BanaData.Serializations;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Windows.Data;
 using Toolbox.UILogic;
 
 namespace BanaData.Logic.Main
@@ -42,10 +43,14 @@ namespace BanaData.Logic.Main
                     Footer = "Investments total:";
                     break;
                 case EType.Asset:
-                    Header = "Asset Accounts:";
+                    Header = "Assets:";
                     Footer = "Assets total:";
                     break;
             }
+
+            AccountsAndBalances = (CollectionView)CollectionViewSource.GetDefaultView(accountsAndBalances);
+            AccountsAndBalances.SortDescriptions.Add(new SortDescription("SubType", ListSortDirection.Ascending));
+            AccountsAndBalances.SortDescriptions.Add(new SortDescription("AccountName", ListSortDirection.Ascending));
         }
 
         #endregion
@@ -74,7 +79,8 @@ namespace BanaData.Logic.Main
         public string Footer { get; private set; }
 
         // List of accounts and balances
-        public ObservableCollection<AccountAndBalance> AccountsAndBalances { get; } = new ObservableCollection<AccountAndBalance>();
+        private ObservableCollection<AccountAndBalance> accountsAndBalances { get; } = new ObservableCollection<AccountAndBalance>();
+        public CollectionView AccountsAndBalances { get; }
 
         // Selected account
         private AccountAndBalance selectedAccount;
@@ -109,7 +115,7 @@ namespace BanaData.Logic.Main
             if (accountIDs == null)
             {
                 // Recreate the list from scratch
-                AccountsAndBalances.Clear();
+                accountsAndBalances.Clear();
                 Household.AccountRow[] accounts = null;
 
                 switch (type)
@@ -133,9 +139,33 @@ namespace BanaData.Logic.Main
                         continue;
                     }
 
+                    // To group bank accounts, cash and credit cards together
+                    int subType = 0;
+                    if (type == EType.Banking)
+                    {
+                        // Display bank accounts first, then cash accounts, then credit cards
+                        switch(account.Type)
+                        {
+                            case EAccountType.Bank:
+                                subType = 1;
+                                break;
+                            case EAccountType.Cash:
+                                subType = 2;
+                                break;
+                            case EAccountType.CreditCard:
+                                subType = 3;
+                                break;
+                        }
+                    }
+                    else if (type == EType.Investment)
+                    {
+                        // Display brokerage accounts then IRAs
+                        subType = account.Kind == EInvestmentKind.TraditionalIRA ? 2 : 1;
+                    }
+
                     decimal balance = type == EType.Investment ? account.GetInvestmentValue() : account.GetBalance();
 
-                    AccountsAndBalances.Add(new AccountAndBalance(account.ID, account.Name, balance));
+                    accountsAndBalances.Add(new AccountAndBalance(account.ID, account.Name, subType, balance));
 
                     totalBalance += balance;
                 }
@@ -145,7 +175,7 @@ namespace BanaData.Logic.Main
                 // Update balance for given IDs
                 foreach (var id in accountIDs)
                 {
-                    var accountAndBalance = AccountsAndBalances.FirstOrDefault(aab => aab.AccountID == id);
+                    var accountAndBalance = accountsAndBalances.FirstOrDefault(aab => aab.AccountID == id);
                     if (accountAndBalance != null)
                     {
                         var account = household.Account.FindByID(id);
@@ -161,7 +191,7 @@ namespace BanaData.Logic.Main
                     }
                 }
 
-                totalBalance = AccountsAndBalances.Sum(aab => aab.Balance);
+                totalBalance = accountsAndBalances.Sum(aab => aab.Balance);
             }
 
             if (totalBalance != Balance)
@@ -179,8 +209,8 @@ namespace BanaData.Logic.Main
 
         public class AccountAndBalance : LogicBase
         {
-            public AccountAndBalance(int accountID, string accountName, decimal balance) =>
-                (AccountID, AccountName, Balance) = (accountID, accountName, balance);
+            public AccountAndBalance(int accountID, string accountName, int subType, decimal balance) =>
+                (AccountID, AccountName, SubType, Balance) = (accountID, accountName, subType, balance);
 
             // Properties for logic
             public readonly int AccountID;
@@ -188,7 +218,10 @@ namespace BanaData.Logic.Main
             // UI Properties
 
             // Account name
-            public string AccountName { get; private set; }
+            public string AccountName { get; private set;}
+
+            // Subtype for sorting
+            public int SubType { get; }
 
             // Account balance
             public decimal Balance { get; private set; }
