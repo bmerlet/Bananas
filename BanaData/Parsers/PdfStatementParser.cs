@@ -235,12 +235,23 @@ namespace BanaData.Parsers
                     }
 
                     // We are after Completed Transactions" and before "Disclosures"
-                    if (strs[i] == "VANGUARD FEDERAL MONEY" && strs[i + 1] == "Reinvestment")
+                    if (strs[i] == "VANGUARD FEDERAL MONEY" && (i + 1) < strs.Length && strs[i + 1] == "Reinvestment")
                     {
                         var vg = new VanguardTransaction(
                             strs[i - 3] + year,
                             "VMFXX",
                             GetVanguardType(strs[i + 1]),
+                            -decimal.Parse(strs[i + 6]),
+                            1,
+                            -decimal.Parse(strs[i + 6]));
+                        trans.Add(vg);
+                    }
+                    else if (strs[i] == "VANGUARD FEDERAL MONEY" && (i+1) < strs.Length && strs[i + 1] == "Sweep in")
+                    {
+                        var vg = new VanguardTransaction(
+                            strs[i - 3] + year,
+                            "VMFXX",
+                            EInvestmentTransactionType.Buy,
                             -decimal.Parse(strs[i + 6]),
                             1,
                             -decimal.Parse(strs[i + 6]));
