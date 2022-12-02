@@ -108,7 +108,7 @@ namespace BanaData.Logic.Dialogs.Reports
             FREQUENCY_YEAR
         };
 
-        private string frequency = FREQUENCY_YEAR;
+        private string frequency = FREQUENCY_WEEK;
         public string Frequency { get => frequency; set { frequency = value; UpdateGraph(); } }
 
         // 0-based Y axis

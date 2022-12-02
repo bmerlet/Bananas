@@ -237,28 +237,34 @@ namespace BanaData.Parsers
                     // We are after Completed Transactions" and before "Disclosures"
                     if (strs[i] == "VANGUARD FEDERAL MONEY" && (i + 1) < strs.Length && strs[i + 1] == "Reinvestment")
                     {
+                        // Settlement fund reinvestment 
+                        decimal quantity = -decimal.Parse(strs[i + 6]);
                         var vg = new VanguardTransaction(
                             strs[i - 3] + year,
                             "VMFXX",
                             GetVanguardType(strs[i + 1]),
-                            -decimal.Parse(strs[i + 6]),
+                            quantity,
                             1,
-                            -decimal.Parse(strs[i + 6]));
+                            quantity);
                         trans.Add(vg);
                     }
                     else if (strs[i] == "VANGUARD FEDERAL MONEY" && (i+1) < strs.Length && strs[i + 1] == "Sweep in")
                     {
+                        // Sweep in
+                        decimal quantity = -decimal.Parse(strs[i + 6]);
                         var vg = new VanguardTransaction(
                             strs[i - 3] + year,
                             "VMFXX",
                             EInvestmentTransactionType.Buy,
-                            -decimal.Parse(strs[i + 6]),
+                            quantity,
                             1,
-                            -decimal.Parse(strs[i + 6]));
+                            -quantity,
+                            "Sweep in");
                         trans.Add(vg);
                     }
                     else
                     {
+                        // Transactions on specific securities
                         foreach (var ticker in new string[] { "BND", "BNDX", "VGIT", "VXUS", "VTI", "VNQ" })
                         {
                             if (strs[i] == ticker)
@@ -282,7 +288,7 @@ namespace BanaData.Parsers
                 }
             }
 
-            // Remove extraneous transactions
+            // Remove extraneous transactions (combine dividend and reinvestment)
             var tmpTrans = trans;
             trans = new List<VanguardTransaction>();
             for (int i = 0; i < tmpTrans.Count; i++)
@@ -301,7 +307,7 @@ namespace BanaData.Parsers
             // ZZZ Debug
             foreach (var vg in trans)
             {
-                LogLine($"{vg.Date}\t{vg.Ticker}\t{vg.Type}\t{vg.Quantity}\t{vg.Price}\t{vg.Amount}");
+                LogLine($"{vg.Date}\t{vg.Ticker}\t{vg.Quantity}\t{vg.Price}\t{vg.Amount}\t{vg.Type}");
             }
             LogLine("");
 
@@ -310,7 +316,7 @@ namespace BanaData.Parsers
             foreach (var vg in trans)
             {
                 var securityRow = db.Security.First(s => s.Symbol == vg.Ticker);
-                var transRow = db.Transaction.Add(account, DateTime.Parse(vg.Date), null, null, ETransactionStatus.Pending, checkpointRow, ETransactionType.Regular);
+                var transRow = db.Transaction.Add(account, DateTime.Parse(vg.Date), null, vg.Memo, ETransactionStatus.Pending, checkpointRow, ETransactionType.Regular);
                 db.InvestmentTransaction.Add(transRow, vg.Type, securityRow, vg.Price, vg.Quantity, 0);
                 db.LineItem.Add(transRow, null, vg.Amount);
             }
@@ -343,14 +349,15 @@ namespace BanaData.Parsers
 
         class VanguardTransaction
         {
-            public VanguardTransaction(string date, string ticker, EInvestmentTransactionType type, decimal quantity, decimal price, decimal amount) =>
-                (Date, Ticker, Type, Quantity, Price, Amount) = (date, ticker, type, quantity, price, amount);
+            public VanguardTransaction(string date, string ticker, EInvestmentTransactionType type, decimal quantity, decimal price, decimal amount, string memo = null) =>
+                (Date, Ticker, Type, Quantity, Price, Amount, Memo) = (date, ticker, type, quantity, price, amount, memo);
             public readonly string Date;
             public readonly string Ticker;
             public readonly EInvestmentTransactionType Type;
             public readonly decimal Quantity;
             public readonly decimal Price;
             public readonly decimal Amount;
+            public readonly string Memo;
         }
 
         #endregion

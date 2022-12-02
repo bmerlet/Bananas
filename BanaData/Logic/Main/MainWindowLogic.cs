@@ -542,9 +542,22 @@ namespace BanaData.Logic.Main
             }
 
 
+            // Update dirty
             Dirty = true;
-            UpdateAll();
             UpdateTitle();
+
+            // Update account balances
+            UpdateAccountNamesAndBalances(null);
+
+            // Update the visible account in case it got changed
+            if (IsBankRegisterVisible)
+            {
+                BankRegister.SetAccount(DisplayedAccountID, int.MinValue);
+            }
+            else if (IsInvestmentRegisterVisible)
+            {
+                InvestmentRegister.SetAccount(DisplayedAccountID, int.MinValue);
+            }
         }
 
         private Household CreateMiniDB()
