@@ -40,13 +40,13 @@
             <TextBlock Text="Security name:"/>
             <w:WatermarkTextBox Text="{Binding Name, Mode=TwoWay}" Watermark="Name" Grid.Column="1"/>
 
-            <!-- Row 1: Symbol -->
-            <TextBlock Text="Symbol:" Grid.Row="1"/>
-            <w:WatermarkTextBox Text="{Binding Symbol, Mode=TwoWay}" Watermark="Symbol" Grid.Row="1" Grid.Column="1"/>
+            <!-- Row 1: Type -->
+            <TextBlock Text="Type:" Grid.Row="1"/>
+            <ComboBox ItemsSource="{Binding TypeSource, Mode=OneTime}" SelectedItem="{Binding Type}" Grid.Row="1" Grid.Column="1"/>
 
-            <!-- Row 2: Type -->
-            <TextBlock Text="Type:" Grid.Row="2"/>
-            <ComboBox ItemsSource="{Binding TypeSource, Mode=OneTime}" SelectedItem="{Binding Type}" Grid.Row="2" Grid.Column="1"/>
+            <!-- Row 2: Symbol -->
+            <TextBlock Text="Symbol:" Grid.Row="2"/>
+            <w:WatermarkTextBox Text="{Binding Symbol, Mode=TwoWay}" Watermark="Symbol" IsEnabled="{Binding SymbolEnabled}" Grid.Row="2" Grid.Column="1"/>
 
         </Grid>
     </DockPanel>

@@ -42,13 +42,24 @@ namespace BanaData.Logic.Dialogs.Editors
 
         // Symbol
         public string Symbol { get; set; }
+        public bool? SymbolEnabled { get; private set; }
 
         // Type
         private ESecurityType type;
         public string Type
         {
             get => EnumDescriptionAttribute.GetDescription(type);
-            set => type = EnumDescriptionAttribute.MatchDescription<ESecurityType>(value);
+            set
+            {
+                type = EnumDescriptionAttribute.MatchDescription<ESecurityType>(value);
+                SymbolEnabled = type == ESecurityType.Stock || type == ESecurityType.MutualFund || type == ESecurityType.MarketIndex || type == ESecurityType.EmployeeStockOption;
+                OnPropertyChanged(() => SymbolEnabled);
+                if (SymbolEnabled == false)
+                {
+                    Symbol = "N/A";
+                    OnPropertyChanged(() => Symbol);
+                }
+            }
         }
         public string[] TypeSource { get; } = EnumDescriptionAttribute.GetDescriptions<ESecurityType>();
 

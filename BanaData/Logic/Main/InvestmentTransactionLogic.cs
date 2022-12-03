@@ -577,7 +577,7 @@ namespace BanaData.Logic.Main
             }
             else
             {
-                securities.ReplaceRange(mainWindowLogic.Securities);
+                securities.ReplaceRange(mainWindowLogic.Securities.Where(s => s.Type != ESecurityType.Asset && s.Type != ESecurityType.MarketIndex));
             }
         }
 

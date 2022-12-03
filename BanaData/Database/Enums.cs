@@ -66,6 +66,9 @@ namespace BanaData.Database
         [EnumDescription("Employee Stock Option")]
         EmployeeStockOption,
 
+        [EnumDescription("Asset")]
+        Asset,
+
         [EnumDescription("Other")]
         Invalid
     }
