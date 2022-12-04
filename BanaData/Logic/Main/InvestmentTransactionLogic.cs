@@ -526,6 +526,7 @@ namespace BanaData.Logic.Main
             if (!string.IsNullOrWhiteSpace(value))
             {
                 var securityRow = household.Security.GetBySymbol(value);
+
                 if (securityRow != null)
                 {
                     id = securityRow.ID; 
@@ -577,7 +578,16 @@ namespace BanaData.Logic.Main
             }
             else
             {
-                securities.ReplaceRange(mainWindowLogic.Securities.Where(s => s.Type != ESecurityType.Asset && s.Type != ESecurityType.MarketIndex));
+                if (accountRow.Kind == EInvestmentKind.Asset)
+                {
+                    // Only show the securities that have the "Asset" flag set
+                    securities.ReplaceRange(mainWindowLogic.Securities.Where(s => s.Type == ESecurityType.Asset));
+                }
+                else
+                {
+                    // Exclude asset securities and market indexes
+                    securities.ReplaceRange(mainWindowLogic.Securities.Where(s => s.Type != ESecurityType.Asset && s.Type != ESecurityType.MarketIndex));
+                }
             }
         }
 

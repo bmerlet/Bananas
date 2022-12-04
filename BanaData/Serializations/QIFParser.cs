@@ -405,11 +405,9 @@ namespace BanaData.Serializations
                                     kind = EInvestmentKind._401k;
                                     break;
                                 case "Oth A":
-                                    type = EAccountType.OtherAsset;
-                                    break;
+                                    throw new InvalidDataException("Other asset account type (Oth A) not supported");
                                 case "Oth L":
-                                    type = EAccountType.OtherLiability;
-                                    break;
+                                    throw new InvalidDataException("Other Liability account type (Oth L) not supported");
                                 default:
                                     throw new InvalidDataException("Unknown account type: " + l);
                             }

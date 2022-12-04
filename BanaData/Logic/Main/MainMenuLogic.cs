@@ -355,7 +355,7 @@ namespace BanaData.Logic.Main
             // Go through all investment accounts
             foreach(Household.AccountRow account in household.Account.Rows)
             {
-                if (account.Type == EAccountType.Investment)
+                if (account.Type == EAccountType.Investment && account.Kind != EInvestmentKind.Asset)
                 {
                     // Find the securities held
                     foreach(int security in account.GetPortfolio().GetSecurities())

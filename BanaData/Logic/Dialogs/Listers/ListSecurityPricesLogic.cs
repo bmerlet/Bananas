@@ -260,15 +260,15 @@ namespace BanaData.Logic.Dialogs.Listers
             if (datePriceItems.Count == 0)
             {
                 // Need to add a new item
-                datePriceItems.Add(new DatePriceItem(mainWindowLogic, securityID));
+                datePriceItems.Add(new DatePriceItem(mainWindowLogic, household, securityID));
             }
 
             RegisterItems.MoveCurrentToFirst();
-            selectedDatePrice = RegisterItems.CurrentItem as DatePriceItem;
-            editedDatePrice = selectedDatePrice;
+            SelectedDatePrice = RegisterItems.CurrentItem as DatePriceItem;
+            //editedDatePrice = selectedDatePrice;
             OnPropertyChanged(() => SelectedDatePrice);
-            OnPropertyChanged(() => EditedDatePrice);
-            OnPropertyChanged("UpdateOverlayPosition");
+            //OnPropertyChanged(() => EditedDatePrice);
+            //OnPropertyChanged("UpdateOverlayPosition");
         }
 
         public override void MoveUp()
@@ -327,7 +327,7 @@ namespace BanaData.Logic.Dialogs.Listers
             else
             {
                 // Need to add a new item
-                var dpi = new DatePriceItem(mainWindowLogic, securityID);
+                var dpi = new DatePriceItem(mainWindowLogic, household, securityID);
                 datePriceItems.Add(dpi);
 
                 logicIsChangingSelection = true;
@@ -415,9 +415,10 @@ namespace BanaData.Logic.Dialogs.Listers
         }
 
         // Create the open date/price
-        public DatePriceItem(MainWindowLogic _mainWindowLogic, int _securityID)
+        public DatePriceItem(MainWindowLogic _mainWindowLogic, Household _household, int _securityID)
         {
             mainWindowLogic = _mainWindowLogic;
+            household = _household;
             securityID = _securityID;
 
             data.Date = DateTime.Now;

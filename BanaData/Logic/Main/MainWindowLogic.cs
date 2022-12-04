@@ -78,9 +78,9 @@ namespace BanaData.Logic.Main
             BankRegister = new BankRegisterLogic(this, household);
             InvestmentRegister = new InvestmentRegisterLogic(this, household);
 
-            BankAccountGroup.AccountClicked += (o, e) => OnBankAccountClicked(o as AccountGroupLogic, e.AccountID);
-            InvestmentAccountGroup.AccountClicked += (o, e) => OnInvestmentAccountClicked(e.AccountID);
-            AssetAccountGroup.AccountClicked += (o, e) => OnBankAccountClicked(o as AccountGroupLogic, e.AccountID);
+            BankAccountGroup.AccountClicked += (o, e) => OnBankAccountClicked(e.AccountID);
+            InvestmentAccountGroup.AccountClicked += (o, e) => OnInvestmentAccountClicked(o as AccountGroupLogic, e.AccountID);
+            AssetAccountGroup.AccountClicked += (o, e) => OnInvestmentAccountClicked(o as AccountGroupLogic, e.AccountID);
 
             // Create list of investment transaction type
             foreach (EInvestmentTransactionType itt in Enum.GetValues(typeof(EInvestmentTransactionType)))
@@ -944,19 +944,12 @@ namespace BanaData.Logic.Main
             }
         }
 
-        public void OnBankAccountClicked(AccountGroupLogic sender, int accountID)
+        public void OnBankAccountClicked(int accountID)
         {
             InvestmentAccountGroup.SelectedAccount = null;
-            if (sender == AssetAccountGroup)
-            {
-                BankAccountGroup.SelectedAccount = null;
-            }
-            else
-            {
-                AssetAccountGroup.SelectedAccount = null;
-            }
+            AssetAccountGroup.SelectedAccount = null;
 
-            OnBankAccountClicked(accountID);
+            OnBankAccountClicked(accountID, int.MinValue);
         }
 
         private void OnBankAccountClicked(int accountID, int transactionID = int.MinValue)
@@ -972,11 +965,22 @@ namespace BanaData.Logic.Main
             OnPropertyChanged(() => IsBankRegisterVisible);
         }
 
-        public void OnInvestmentAccountClicked(int accountID, int transactionID = int.MinValue)
+        public void OnInvestmentAccountClicked(AccountGroupLogic sender, int accountID, int transactionID = int.MinValue)
         {
             BankAccountGroup.SelectedAccount = null;
-            AssetAccountGroup.SelectedAccount = null;
+            if (sender == AssetAccountGroup)
+            {
+                InvestmentAccountGroup.SelectedAccount = null;
+            }
+            else
+            {
+                AssetAccountGroup.SelectedAccount = null;
+            }
+            OnInvestmentAccountClicked(accountID, transactionID);
+        }
 
+        private void OnInvestmentAccountClicked(int accountID, int transactionID)
+        { 
             InvestmentRegister.SetAccount(accountID, transactionID);
             DisplayedAccountID = accountID;
             MainMenuLogic.Reconcile.SetCanExecute(accountID >= 0);

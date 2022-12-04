@@ -190,13 +190,10 @@ namespace BanaData.Serializations
                         case EInvestmentKind._401k:
                             return "401(k)/403(b)";
                         case EInvestmentKind.Invalid:
+                        case EInvestmentKind.Asset:
                             return "Invst";
                     }
                     break;
-                case EAccountType.OtherAsset:
-                    return "Oth A";
-                case EAccountType.OtherLiability:
-                    return "Oth L";
             }
 
             throw new InvalidDataException("Trouble parsing account type");

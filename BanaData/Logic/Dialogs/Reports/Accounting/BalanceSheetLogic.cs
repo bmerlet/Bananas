@@ -121,17 +121,9 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
                             break;
                         case EAccountType.Investment:
                             list = assets;
-                            group = "21Investment";
+                            group = account.Kind == EInvestmentKind.Asset ? "31Assets" : "21Investment";
                             hasInvestment = true;
-                            break;
-                        case EAccountType.OtherAsset:
-                            list = assets;
-                            group = "31Assets";
-                            hasAssets = true;
-                            break;
-                        case EAccountType.OtherLiability:
-                            list = liabilities;
-                            group = "21Other";
+                            // Note: If there is support for EInvestmentKind,Liabilities, the bucket for it is "21Other"
                             break;
                     }
 

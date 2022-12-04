@@ -23,12 +23,6 @@ namespace BanaData.Database
         [EnumDescription("Investment")]
         Investment,
 
-        [EnumDescription("Asset")]
-        OtherAsset,
-
-        [EnumDescription("Liability")]
-        OtherLiability, 
-
         Invalid 
     };
 
@@ -47,6 +41,9 @@ namespace BanaData.Database
         [EnumDescription("Traditional IRA")]
         TraditionalIRA,
 
+        [EnumDescription("Asset")]
+        Asset,
+
         [EnumDescription("N/A")]
         Invalid
     };
@@ -61,7 +58,7 @@ namespace BanaData.Database
         MutualFund,
 
         [EnumDescription("Market Index")]
-        MarketIndex,
+        MarketIndex, // Not currently in use
 
         [EnumDescription("Employee Stock Option")]
         EmployeeStockOption,

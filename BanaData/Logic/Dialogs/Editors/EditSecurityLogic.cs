@@ -30,7 +30,7 @@ namespace BanaData.Logic.Dialogs.Editors
 
             Name = securityItem.Name;
             Symbol = securityItem.Symbol;
-            type = securityItem.Type;
+            Type = EnumDescriptionAttribute.GetDescription(securityItem.Type);
         }
 
         #endregion
@@ -51,17 +51,41 @@ namespace BanaData.Logic.Dialogs.Editors
             get => EnumDescriptionAttribute.GetDescription(type);
             set
             {
+                var oldType = type;
                 type = EnumDescriptionAttribute.MatchDescription<ESecurityType>(value);
-                SymbolEnabled = type == ESecurityType.Stock || type == ESecurityType.MutualFund || type == ESecurityType.MarketIndex || type == ESecurityType.EmployeeStockOption;
-                OnPropertyChanged(() => SymbolEnabled);
-                if (SymbolEnabled == false)
+                if (oldType != type)
                 {
-                    Symbol = "N/A";
+                    switch(type)
+                    {
+                        case ESecurityType.Stock:
+                        case ESecurityType.MutualFund:
+                        case ESecurityType.MarketIndex:
+                        case ESecurityType.EmployeeStockOption:
+                            SymbolEnabled = true;
+                            if (oldType == ESecurityType.Asset)
+                            {
+                                Symbol = "";
+                            }
+                            break;
+
+                        case ESecurityType.Asset:
+                            SymbolEnabled = false;
+                            Symbol = "[Same as name]";
+                            break;
+                    }
+
+                    OnPropertyChanged(() => SymbolEnabled);
                     OnPropertyChanged(() => Symbol);
                 }
             }
         }
-        public string[] TypeSource { get; } = EnumDescriptionAttribute.GetDescriptions<ESecurityType>();
+        public string[] TypeSource { get; } = new string[] {
+            EnumDescriptionAttribute.GetDescription(ESecurityType.Stock),
+            EnumDescriptionAttribute.GetDescription(ESecurityType.MutualFund),
+            EnumDescriptionAttribute.GetDescription(ESecurityType.Asset),
+            EnumDescriptionAttribute.GetDescription(ESecurityType.MarketIndex),
+            EnumDescriptionAttribute.GetDescription(ESecurityType.EmployeeStockOption)
+        };
 
         #endregion
 
@@ -79,6 +103,11 @@ namespace BanaData.Logic.Dialogs.Editors
             {
                 mainWindowLogic.ErrorMessage("Security name cannot be blank");
                 return null;
+            }
+
+            if (type == ESecurityType.Asset)
+            {
+                Symbol = Name;
             }
 
             if (string.IsNullOrWhiteSpace(Symbol))

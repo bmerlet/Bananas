@@ -163,7 +163,7 @@ namespace BanaData.Logic.Main
                         subType = account.Kind == EInvestmentKind.TraditionalIRA ? 2 : 1;
                     }
 
-                    decimal balance = type == EType.Investment ? account.GetInvestmentValue() : account.GetBalance();
+                    decimal balance = type == EType.Banking ? account.GetBalance() : account.GetInvestmentValue();
 
                     accountsAndBalances.Add(new AccountAndBalance(account.ID, account.Name, subType, balance));
 
@@ -179,7 +179,7 @@ namespace BanaData.Logic.Main
                     if (accountAndBalance != null)
                     {
                         var account = household.Account.FindByID(id);
-                        decimal balance = type == EType.Investment ? account.GetInvestmentValue() : account.GetBalance();
+                        decimal balance = type == EType.Banking ? account.GetBalance() : account.GetInvestmentValue();
                         if (accountAndBalance.Balance != balance)
                         {
                             accountAndBalance.UpdateBalance(balance);

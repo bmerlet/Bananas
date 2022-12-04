@@ -281,7 +281,7 @@ namespace BanaData.Database
             {
                 var lquery =
                     from acc in this
-                    where acc.Type == EAccountType.Investment
+                    where acc.Type == EAccountType.Investment && acc.Kind != EInvestmentKind.Asset
                     select acc;
 
                 return lquery.ToArray();
@@ -292,7 +292,7 @@ namespace BanaData.Database
             {
                 var lquery =
                     from acc in this
-                    where acc.Type == EAccountType.OtherAsset || acc.Type == EAccountType.OtherLiability
+                    where acc.Type == EAccountType.Investment && acc.Kind == EInvestmentKind.Asset
                     select acc;
 
                 return lquery.ToArray();
