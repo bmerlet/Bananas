@@ -42,6 +42,11 @@ namespace BanaData.Logic.Items
             return Payee.CompareTo(other.Payee);
         }
 
+        public override string ToString()
+        {
+            return $"{Payee} cat {Category} memo {Memo} split {IsSplit} Amount {Amount}";
+        }
+
         public override bool Equals(object obj)
         {
             return obj is MemorizedPayeeItem o && o.ID == ID;

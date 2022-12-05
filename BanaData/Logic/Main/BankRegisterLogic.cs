@@ -100,8 +100,10 @@ namespace BanaData.Logic.Main
 
         private void UpdateMemorizedPayees()
         {
-            memorizedPayees.ReplaceRange(mainWindowLogic.MemorizedPayees);
+            memorizedPayees.Clear();
+            memorizedPayees.AddRange(mainWindowLogic.MemorizedPayees);
             MemorizedPayees.Refresh();
+            OnPropertyChanged(nameof(MemorizedPayees));
             foreach (BankingTransactionLogic transaction in transactions)
             {
                 transaction.UpdatePayeeNameFromDatabase();
@@ -131,7 +133,7 @@ namespace BanaData.Logic.Main
 
             public void IsBankHasChanged()
             {
-                OnPropertyChanged(() => WidthOfMediumColumn);
+                OnPropertyChanged(nameof(WidthOfMediumColumn));
             }
 
             public double WidthOfDateColumn
