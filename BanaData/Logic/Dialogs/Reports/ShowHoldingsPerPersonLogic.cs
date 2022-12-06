@@ -69,7 +69,7 @@ namespace BanaData.Logic.Dialogs.Reports
             }
 
             TotalValue = personItems.Sum(pi => pi.Value);
-            OnPropertyChanged(() => TotalValue);
+            InvokePropertyChanged(nameof(TotalValue));
         }
 
         #endregion

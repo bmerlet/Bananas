@@ -103,8 +103,8 @@ namespace BanaData.Logic.Main
                 {
                     balance = value;
                     BalanceString = balance.ToString("N");
-                    OnPropertyChanged(() => BalanceString);
-                    OnPropertyChanged(() => BalanceState);
+                    InvokePropertyChanged(nameof(BalanceString));
+                    InvokePropertyChanged(nameof(BalanceState));
                 }
             }
         }
@@ -144,25 +144,25 @@ namespace BanaData.Logic.Main
                 if (data.Date != backup.Date)
                 {
                     data.Date = backup.Date;
-                    OnPropertyChanged(() => Date);
+                    InvokePropertyChanged(nameof(Date));
                 }
 
                 if (data.Payee != backup.Payee)
                 {
                     data.Payee = backup.Payee;
-                    OnPropertyChanged(() => Payee);
+                    InvokePropertyChanged(nameof(Payee));
                 }
 
                 if (data.Memo != backup.Memo)
                 {
                     data.Memo = backup.Memo;
-                    OnPropertyChanged(() => Memo);
+                    InvokePropertyChanged(nameof(Memo));
                 }
 
                 if (data.Status != backup.Status)
                 {
                     data.Status = backup.Status;
-                    OnPropertyChanged(() => Status);
+                    InvokePropertyChanged(nameof(Status));
                 }
             }
         }
@@ -178,27 +178,27 @@ namespace BanaData.Logic.Main
         {
             if (data.Date != backup.Date)
             {
-                OnPropertyChanged(() => Date);
+                InvokePropertyChanged(nameof(Date));
             }
 
             if (data.Payee != backup.Payee)
             {
-                OnPropertyChanged(() => Payee);
+                InvokePropertyChanged(nameof(Payee));
             }
 
             if (data.Memo != backup.Memo)
             {
-                OnPropertyChanged(() => Memo);
+                InvokePropertyChanged(nameof(Memo));
             }
 
             if (data.Memo != backup.Memo)
             {
-                OnPropertyChanged(() => Memo);
+                InvokePropertyChanged(nameof(Memo));
             }
 
             if (data.Status != backup.Status)
             {
-                OnPropertyChanged(() => Status);
+                InvokePropertyChanged(nameof(Status));
             }
 
             if (mainWindowLogic.UserSettings.PlayKaChingSound)
@@ -381,7 +381,7 @@ namespace BanaData.Logic.Main
                 if (data.Status != trRow.Status)
                 {
                     data.Status = trRow.Status;
-                    OnPropertyChanged(() => Status);
+                    InvokePropertyChanged(nameof(Status));
                 }
             }
         }
@@ -524,7 +524,7 @@ namespace BanaData.Logic.Main
                     data.Status = ETransactionStatus.Reconciled;
                     break;
             }
-            OnPropertyChanged(() => Status);
+            InvokePropertyChanged(nameof(Status));
         }
 
         // Used in investment derived class

@@ -129,11 +129,11 @@ namespace BanaData.Logic.Dialogs.Pickers
             if (AccountListEnabled != enableAccountList)
             {
                 AccountListEnabled = enableAccountList;
-                OnPropertyChanged(() => AccountListEnabled);
+                InvokePropertyChanged(nameof(AccountListEnabled));
             }
 
-            OnPropertyChanged(() => DifferentialEnabled);
-            OnPropertyChanged(() => RegularEnabled);
+            InvokePropertyChanged(nameof(DifferentialEnabled));
+            InvokePropertyChanged(nameof(RegularEnabled));
         }
 
         private void OnBrowseDifferentialCommand()
@@ -142,7 +142,7 @@ namespace BanaData.Logic.Dialogs.Pickers
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
             {
                 DifferentialExportPath = logic.File;
-                OnPropertyChanged(() => DifferentialExportPath);
+                InvokePropertyChanged(nameof(DifferentialExportPath));
             }
         }
 
@@ -152,7 +152,7 @@ namespace BanaData.Logic.Dialogs.Pickers
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
             {
                 RegularExportPath = logic.File;
-                OnPropertyChanged(() => RegularExportPath);
+                InvokePropertyChanged(nameof(RegularExportPath));
             }
         }
 

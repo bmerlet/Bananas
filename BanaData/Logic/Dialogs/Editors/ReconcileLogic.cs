@@ -162,8 +162,8 @@ namespace BanaData.Logic.Dialogs.Editors
             ClearedBalance = PriorStatementBalance + Deposits.TotalCleared + interestAmount - Payments.TotalCleared;
             BalanceToClear = StatementBalance - ClearedBalance;
 
-            OnPropertyChanged(() => ClearedBalance);
-            OnPropertyChanged(() => BalanceToClear);
+            InvokePropertyChanged(nameof(ClearedBalance));
+            InvokePropertyChanged(nameof(BalanceToClear));
         }
 
         private void OnMarkAll()

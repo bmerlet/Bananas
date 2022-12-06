@@ -161,7 +161,7 @@ namespace BanaData.Logic.Dialogs.Reports
                 if (dateColumnWidth != value)
                 {
                     dateColumnWidth = value;
-                    OnPropertyChanged(() => dateColumnWidth);
+                    InvokePropertyChanged(nameof(dateColumnWidth));
                 }
             }
         }
@@ -175,7 +175,7 @@ namespace BanaData.Logic.Dialogs.Reports
                 if (accountColumnWidth != value)
                 {
                     accountColumnWidth = value;
-                    OnPropertyChanged(() => accountColumnWidth);
+                    InvokePropertyChanged(nameof(accountColumnWidth));
                 }
             }
         }
@@ -189,7 +189,7 @@ namespace BanaData.Logic.Dialogs.Reports
                 if (symbolColumnWidth != value)
                 {
                     symbolColumnWidth = value;
-                    OnPropertyChanged(() => symbolColumnWidth);
+                    InvokePropertyChanged(nameof(symbolColumnWidth));
                 }
             }
         }
@@ -203,7 +203,7 @@ namespace BanaData.Logic.Dialogs.Reports
                 if (descriptionColumnWidth != value)
                 {
                     descriptionColumnWidth = value;
-                    OnPropertyChanged(() => descriptionColumnWidth);
+                    InvokePropertyChanged(nameof(descriptionColumnWidth));
                 }
             }
         }
@@ -217,7 +217,7 @@ namespace BanaData.Logic.Dialogs.Reports
                 if (dividendColumnWidth != value)
                 {
                     dividendColumnWidth = value;
-                    OnPropertyChanged(() => dividendColumnWidth);
+                    InvokePropertyChanged(nameof(dividendColumnWidth));
                 }
             }
         }
@@ -231,7 +231,7 @@ namespace BanaData.Logic.Dialogs.Reports
                 if (stcgColumnWidth != value)
                 {
                     stcgColumnWidth = value;
-                    OnPropertyChanged(() => stcgColumnWidth);
+                    InvokePropertyChanged(nameof(stcgColumnWidth));
                 }
             }
         }
@@ -245,7 +245,7 @@ namespace BanaData.Logic.Dialogs.Reports
                 if (ltcgColumnWidth != value)
                 {
                     ltcgColumnWidth = value;
-                    OnPropertyChanged(() => ltcgColumnWidth);
+                    InvokePropertyChanged(nameof(ltcgColumnWidth));
                 }
             }
         }
@@ -259,7 +259,7 @@ namespace BanaData.Logic.Dialogs.Reports
                 if (interestColumnWidth != value)
                 {
                     interestColumnWidth = value;
-                    OnPropertyChanged(() => interestColumnWidth);
+                    InvokePropertyChanged(nameof(interestColumnWidth));
                 }
             }
         }
@@ -387,10 +387,10 @@ namespace BanaData.Logic.Dialogs.Reports
 
             // Publish the new list and the new totals
             transactions.ReplaceRange(tempTransList);
-            OnPropertyChanged(() => TotalDividend);
-            OnPropertyChanged(() => TotalSTCG);
-            OnPropertyChanged(() => TotalLTCG);
-            OnPropertyChanged(() => TotalInterest);
+            InvokePropertyChanged(nameof(TotalDividend));
+            InvokePropertyChanged(nameof(TotalSTCG));
+            InvokePropertyChanged(nameof(TotalLTCG));
+            InvokePropertyChanged(nameof(TotalInterest));
         }
 
         private void OnPickAccountsCommand()

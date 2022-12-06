@@ -87,8 +87,8 @@ namespace BanaData.Logic.Dialogs.Listers
                 accountsSource.Add(newAccount);
                 SelectedAccount = newAccount;
                 AccountToScrollTo = newAccount;
-                OnPropertyChanged(() => SelectedAccount);
-                OnPropertyChanged(() => AccountToScrollTo);
+                InvokePropertyChanged(nameof(SelectedAccount));
+                InvokePropertyChanged(nameof(AccountToScrollTo));
             }
         }
 
@@ -110,8 +110,8 @@ namespace BanaData.Logic.Dialogs.Listers
                     accountsSource.Add(newAccount);
                     SelectedAccount = newAccount;
                     AccountToScrollTo = newAccount;
-                    OnPropertyChanged(() => SelectedAccount);
-                    OnPropertyChanged(() => AccountToScrollTo);
+                    InvokePropertyChanged(nameof(SelectedAccount));
+                    InvokePropertyChanged(nameof(AccountToScrollTo));
                 }
             }
         }

@@ -122,7 +122,7 @@ namespace BanaData.Logic.Dialogs.Pickers
                     if (isSelected != value)
                     {
                         isSelected = value;
-                        OnPropertyChanged(() => IsSelected);
+                        InvokePropertyChanged(nameof(IsSelected));
                     }
                 }
             }

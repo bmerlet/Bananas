@@ -88,35 +88,35 @@ namespace BanaData.Logic.Dialogs.Reports
         public double WidthOfSecurityColumn
         {
             get => widthOfSecurityColumn;
-            set { widthOfSecurityColumn = value; OnPropertyChanged(() => WidthOfSecurityColumn); }
+            set { widthOfSecurityColumn = value; InvokePropertyChanged(nameof(WidthOfSecurityColumn)); }
         }
 
         private double widthOfTargetColumn = 60;
         public double WidthOfTargetColumn
         {
             get => widthOfTargetColumn;
-            set { widthOfTargetColumn = value; OnPropertyChanged(() => WidthOfTargetColumn); }
+            set { widthOfTargetColumn = value; InvokePropertyChanged(nameof(WidthOfTargetColumn)); }
         }
 
         private double widthOfQuantityColumn = 90;
         public double WidthOfQuantityColumn
         {
             get => widthOfQuantityColumn;
-            set { widthOfQuantityColumn = value; OnPropertyChanged(() => WidthOfQuantityColumn); }
+            set { widthOfQuantityColumn = value; InvokePropertyChanged(nameof(WidthOfQuantityColumn)); }
         }
 
         private double widthOfPriceColumn = 60;
         public double WidthOfPriceColumn
         {
             get => widthOfPriceColumn;
-            set { widthOfPriceColumn = value; OnPropertyChanged(() => WidthOfPriceColumn); }
+            set { widthOfPriceColumn = value; InvokePropertyChanged(nameof(WidthOfPriceColumn)); }
         }
 
         private double widthOValueColumn = 100;
         public double WidthOValueColumn
         {
             get => widthOValueColumn;
-            set { widthOValueColumn = value; OnPropertyChanged(() => WidthOValueColumn); }
+            set { widthOValueColumn = value; InvokePropertyChanged(nameof(WidthOValueColumn)); }
         }
 
         #endregion
@@ -184,7 +184,7 @@ namespace BanaData.Logic.Dialogs.Reports
             }
 
             TotalValue = securityItems.Sum(si => si.SecurityQuantity * si.SecurityPrice);
-            OnPropertyChanged(() => TotalValue);
+            InvokePropertyChanged(nameof(TotalValue));
 
             // Recompute actual percentages
             foreach (var si in securityItems)
@@ -194,7 +194,7 @@ namespace BanaData.Logic.Dialogs.Reports
 
             // Recompute total target percentage
             TotalTarget = securityItems.Sum(si => si.Target);
-            OnPropertyChanged(() => TotalTarget);
+            InvokePropertyChanged(nameof(TotalTarget));
             if (TotalTarget != 1)
             {
                 Error = "The total target percentage must be 100%";
@@ -242,7 +242,7 @@ namespace BanaData.Logic.Dialogs.Reports
 
             }
 
-            OnPropertyChanged(() => Error);
+            InvokePropertyChanged(nameof(Error));
         }
 
         protected override bool? Commit()
@@ -324,7 +324,7 @@ namespace BanaData.Logic.Dialogs.Reports
             public decimal SecurityPrice
             {
                 get => securityPrice;
-                set { securityPrice = value; OnPropertyChanged(() => SecurityPrice); }
+                set { securityPrice = value; InvokePropertyChanged(nameof(SecurityPrice)); }
             }
 
             // Value (set by the logic, not the UI)
@@ -332,7 +332,7 @@ namespace BanaData.Logic.Dialogs.Reports
             public decimal Valuation
             {
                 get => valuation;
-                set { valuation = value; OnPropertyChanged(() => Valuation); }
+                set { valuation = value; InvokePropertyChanged(nameof(Valuation)); }
             }
 
             // Actual %
@@ -340,7 +340,7 @@ namespace BanaData.Logic.Dialogs.Reports
             public decimal Actual
             {
                 get => actual;
-                set { actual = value; OnPropertyChanged(() => Actual); }
+                set { actual = value; InvokePropertyChanged(nameof(Actual)); }
             }
 
             // Result: too high/too low
@@ -348,7 +348,7 @@ namespace BanaData.Logic.Dialogs.Reports
             public string Status
             {
                 get => status;
-                set { status = value; OnPropertyChanged(() => Status); }
+                set { status = value; InvokePropertyChanged(nameof(Status)); }
             }
 
             // Action to take
@@ -356,7 +356,7 @@ namespace BanaData.Logic.Dialogs.Reports
             public string Action
             {
                 get => action;
-                set { action = value; OnPropertyChanged(() => Action); }
+                set { action = value; InvokePropertyChanged(nameof(Action)); }
             }
 
             // Tax consequence
@@ -364,7 +364,7 @@ namespace BanaData.Logic.Dialogs.Reports
             public string Consequences
             {
                 get => consequences;
-                set { consequences = value; OnPropertyChanged(() => Consequences); }
+                set { consequences = value; InvokePropertyChanged(nameof(Consequences)); }
             }
         }
 

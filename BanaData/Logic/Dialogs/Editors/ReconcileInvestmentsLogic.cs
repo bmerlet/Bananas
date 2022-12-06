@@ -269,7 +269,7 @@ namespace BanaData.Logic.Dialogs.Editors
             public decimal ClearedBalance
             {
                 get => clearedBalance;
-                set { clearedBalance = value; OnPropertyChanged(() => ClearedBalance); }
+                set { clearedBalance = value; InvokePropertyChanged(nameof(ClearedBalance)); }
             }
 
             // Statement balance
@@ -280,7 +280,7 @@ namespace BanaData.Logic.Dialogs.Editors
             public decimal BalanceToClear
             {
                 get => balanceToClear;
-                set { balanceToClear = value; OnPropertyChanged(() => BalanceToClear); }
+                set { balanceToClear = value; InvokePropertyChanged(nameof(BalanceToClear)); }
             }
 
             // Format string to use

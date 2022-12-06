@@ -888,13 +888,13 @@ namespace BanaData.Logic.Main
             MainMenuLogic.Reconcile.SetCanExecute(false);
             MainMenuLogic.ShowHoldings.SetCanExecute(false);
             MainMenuLogic.ShowRebalance.SetCanExecute(false);
-            OnPropertyChanged(() => IsInvestmentRegisterVisible);
-            OnPropertyChanged(() => IsBankRegisterVisible);
+            InvokePropertyChanged(nameof(IsInvestmentRegisterVisible));
+            InvokePropertyChanged(nameof(IsBankRegisterVisible));
 
             // Update all accounts
             UpdateAccountNamesAndBalances(null);
 
-            OnPropertyChanged(() => NetWorth);
+            InvokePropertyChanged(nameof(NetWorth));
 
             // Compute the known categories
             BuildCategoriesList();
@@ -938,8 +938,8 @@ namespace BanaData.Logic.Main
             {
                 IsInvestmentRegisterVisible = false;
                 IsBankRegisterVisible = false;
-                OnPropertyChanged(() => IsInvestmentRegisterVisible);
-                OnPropertyChanged(() => IsBankRegisterVisible);
+                InvokePropertyChanged(nameof(IsInvestmentRegisterVisible));
+                InvokePropertyChanged(nameof(IsBankRegisterVisible));
                 DisplayedAccountID = -1;
             }
         }
@@ -961,8 +961,8 @@ namespace BanaData.Logic.Main
             MainMenuLogic.ShowRebalance.SetCanExecute(false);
             IsInvestmentRegisterVisible = false;
             IsBankRegisterVisible = true;
-            OnPropertyChanged(() => IsInvestmentRegisterVisible);
-            OnPropertyChanged(() => IsBankRegisterVisible);
+            InvokePropertyChanged(nameof(IsInvestmentRegisterVisible));
+            InvokePropertyChanged(nameof(IsBankRegisterVisible));
         }
 
         public void OnInvestmentAccountClicked(AccountGroupLogic sender, int accountID, int transactionID = int.MinValue)
@@ -988,8 +988,8 @@ namespace BanaData.Logic.Main
             MainMenuLogic.ShowRebalance.SetCanExecute(accountID >= 0);
             IsInvestmentRegisterVisible = true;
             IsBankRegisterVisible = false;
-            OnPropertyChanged(() => IsInvestmentRegisterVisible);
-            OnPropertyChanged(() => IsBankRegisterVisible);
+            InvokePropertyChanged(nameof(IsInvestmentRegisterVisible));
+            InvokePropertyChanged(nameof(IsBankRegisterVisible));
         }
 
         public void GotoTransaction(int accountID, int transactionID)
@@ -1018,7 +1018,7 @@ namespace BanaData.Logic.Main
             NetWorth += InvestmentAccountGroup.UpdateAccountsAndBalances(accountIDs);
             NetWorth += AssetAccountGroup.UpdateAccountsAndBalances(accountIDs);
 
-            OnPropertyChanged(() => NetWorth);
+            InvokePropertyChanged(nameof(NetWorth));
         }
 
         #endregion
@@ -1039,7 +1039,7 @@ namespace BanaData.Logic.Main
                 Title += " *";
             }
 
-            OnPropertyChanged(() => Title);
+            InvokePropertyChanged(nameof(Title));
         }
 
         // Save dataset to file in XML, encrypted or not

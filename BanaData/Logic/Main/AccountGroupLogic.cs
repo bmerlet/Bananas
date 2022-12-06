@@ -96,7 +96,7 @@ namespace BanaData.Logic.Main
                     {
                         AccountClicked?.Invoke(this, new AccountClickedEventArgs(selectedAccount.AccountID));
                     }
-                    OnPropertyChanged(() => SelectedAccount);
+                    InvokePropertyChanged(nameof(SelectedAccount));
                 }
             }
         }
@@ -197,7 +197,7 @@ namespace BanaData.Logic.Main
             if (totalBalance != Balance)
             {
                 Balance = totalBalance;
-                OnPropertyChanged(() => Balance);
+                InvokePropertyChanged(nameof(Balance));
             }
 
             return totalBalance;
@@ -229,13 +229,13 @@ namespace BanaData.Logic.Main
             public void UpdateBalance(decimal balance)
             {
                 Balance = balance;
-                OnPropertyChanged(() => Balance);
+                InvokePropertyChanged(nameof(Balance));
             }
 
             public void UpdateName(string name)
             {
                 AccountName = name;
-                OnPropertyChanged(() => AccountName);
+                InvokePropertyChanged(nameof(AccountName));
             }
         }
 

@@ -74,8 +74,8 @@ namespace BanaData.Logic.Dialogs.Editors
                             break;
                     }
 
-                    OnPropertyChanged(() => SymbolEnabled);
-                    OnPropertyChanged(() => Symbol);
+                    InvokePropertyChanged(nameof(SymbolEnabled));
+                    InvokePropertyChanged(nameof(Symbol));
                 }
             }
         }

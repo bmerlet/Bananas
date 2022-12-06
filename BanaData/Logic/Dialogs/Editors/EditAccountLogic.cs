@@ -66,8 +66,8 @@ namespace BanaData.Logic.Dialogs.Editors
             set
             {
                 type = EnumDescriptionAttribute.MatchDescription<EAccountType>(value);
-                OnPropertyChanged(() => CreditLimitEnabled);
-                OnPropertyChanged(() => InvestmentKindEnabled);
+                InvokePropertyChanged(nameof(CreditLimitEnabled));
+                InvokePropertyChanged(nameof(InvestmentKindEnabled));
             }
         }
         public string[] TypeSource { get; } = EnumDescriptionAttribute.GetDescriptions<EAccountType>();

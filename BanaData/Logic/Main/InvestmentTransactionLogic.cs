@@ -168,7 +168,7 @@ namespace BanaData.Logic.Main
                 {
                     shareBalance = value;
                     ShareBalanceString = shareBalance == decimal.MinValue ? "" : shareBalance.ToString("N4");
-                    OnPropertyChanged(() => ShareBalanceString);
+                    InvokePropertyChanged(nameof(ShareBalanceString));
                 }
             }
         }
@@ -186,7 +186,7 @@ namespace BanaData.Logic.Main
                 if (data.PositiveAmount != value)
                 {
                     data.PositiveAmount = value;
-                    OnPropertyChanged(() => AmountState);
+                    InvokePropertyChanged(nameof(AmountState));
                 }
                 OnAmountChanged();
             }
@@ -259,38 +259,38 @@ namespace BanaData.Logic.Main
                 if (data.Type != _backup.Type)
                 {
                     SetType(_backup.Type, false);
-                    OnPropertyChanged(() => Type);
+                    InvokePropertyChanged(nameof(Type));
                 }
 
                 if (data.SecurityID != _backup.SecurityID)
                 {
                     data.SecurityID = _backup.SecurityID;
-                    OnPropertyChanged(() => SecuritySymbol);
+                    InvokePropertyChanged(nameof(SecuritySymbol));
                 }
 
                 if (data.SecurityQuantity != _backup.SecurityQuantity)
                 {
                     data.SecurityQuantity = _backup.SecurityQuantity;
-                    OnPropertyChanged(() => SecurityQuantity);
+                    InvokePropertyChanged(nameof(SecurityQuantity));
                 }
 
                 if (data.SecurityPrice != _backup.SecurityPrice)
                 {
                     data.SecurityPrice = _backup.SecurityPrice;
-                    OnPropertyChanged(() => SecurityPrice);
+                    InvokePropertyChanged(nameof(SecurityPrice));
                 }
 
                 if (data.Commission != _backup.Commission)
                 {
                     data.Commission = _backup.Commission;
-                    OnPropertyChanged(() => Commission);
+                    InvokePropertyChanged(nameof(Commission));
                 }
 
-                OnPropertyChanged(() => Description);
+                InvokePropertyChanged(nameof(Description));
 
                 data.LineItem = new LineItem(_backup.LineItem);
-                OnPropertyChanged(() => Amount);
-                OnPropertyChanged(() => Category);
+                InvokePropertyChanged(nameof(Amount));
+                InvokePropertyChanged(nameof(Category));
 
                 //Console.WriteLine("backup = null from CANCEL");
                 //Console.WriteLine(System.Environment.StackTrace);
@@ -390,39 +390,39 @@ namespace BanaData.Logic.Main
             var _backup = backup as InvestmentTransactionData;
             if (data.Type != _backup.Type)
             {
-                OnPropertyChanged(() => Type);
+                InvokePropertyChanged(nameof(Type));
             }
 
             if (data.SecurityID != _backup.SecurityID)
             {
-                OnPropertyChanged(() => SecuritySymbol);
+                InvokePropertyChanged(nameof(SecuritySymbol));
             }
 
             if (data.SecurityQuantity != _backup.SecurityQuantity)
             {
-                OnPropertyChanged(() => SecurityQuantity);
+                InvokePropertyChanged(nameof(SecurityQuantity));
             }
 
             if (data.SecurityPrice != _backup.SecurityPrice)
             {
-                OnPropertyChanged(() => SecurityPrice);
+                InvokePropertyChanged(nameof(SecurityPrice));
             }
 
             if (data.Commission != _backup.Commission)
             {
-                OnPropertyChanged(() => Commission);
+                InvokePropertyChanged(nameof(Commission));
             }
 
-            OnPropertyChanged(() => Description);
+            InvokePropertyChanged(nameof(Description));
 
             if (data.LineItem.Category != _backup.LineItem.Category)
             {
-                OnPropertyChanged(() => Category);
+                InvokePropertyChanged(nameof(Category));
             }
 
             if (data.LineItem.Amount != _backup.LineItem.Amount)
             {
-                OnPropertyChanged(() => Amount);
+                InvokePropertyChanged(nameof(Amount));
             }
 
             // Update context menu commands
@@ -475,7 +475,7 @@ namespace BanaData.Logic.Main
             {
                 data.PositiveAmount *= -1;
             }
-            OnPropertyChanged(() => Amount);
+            InvokePropertyChanged(nameof(Amount));
 
             // If switching from transfers to categories or vice versa
             var newCategoriesOrTransferView = (CollectionView)CollectionViewSource.GetDefaultView(investmentTransactionType.IsTransfer ? transfers : categories);
@@ -483,27 +483,27 @@ namespace BanaData.Logic.Main
             {
                 CategoriesOrTransferView = newCategoriesOrTransferView;
                 data.LineItem.Category = "";
-                OnPropertyChanged(() => Category);
+                InvokePropertyChanged(nameof(Category));
             }
 
-            OnPropertyChanged(() => IsSecuritySymbolVisible);
-            OnPropertyChanged(() => SecuritySymbolTabIndex);
+            InvokePropertyChanged(nameof(IsSecuritySymbolVisible));
+            InvokePropertyChanged(nameof(SecuritySymbolTabIndex));
 
-            OnPropertyChanged(() => IsSecurityQuantityVisible);
-            OnPropertyChanged(() => SecurityQuantityTabIndex);
+            InvokePropertyChanged(nameof(IsSecurityQuantityVisible));
+            InvokePropertyChanged(nameof(SecurityQuantityTabIndex));
 
-            OnPropertyChanged(() => IsSecurityPriceVisible);
-            OnPropertyChanged(() => SecurityPriceTabIndex);
+            InvokePropertyChanged(nameof(IsSecurityPriceVisible));
+            InvokePropertyChanged(nameof(SecurityPriceTabIndex));
 
-            OnPropertyChanged(() => IsCommissionVisible);
-            OnPropertyChanged(() => CommissionTabIndex);
+            InvokePropertyChanged(nameof(IsCommissionVisible));
+            InvokePropertyChanged(nameof(CommissionTabIndex));
 
-            OnPropertyChanged(() => IsAmountVisible);
-            OnPropertyChanged(() => AmountTabIndex);
+            InvokePropertyChanged(nameof(IsAmountVisible));
+            InvokePropertyChanged(nameof(AmountTabIndex));
 
-            OnPropertyChanged(() => IsCategoryVisible);
-            OnPropertyChanged(() => CategoryTabIndex);
-            OnPropertyChanged(() => CategoriesSource);
+            InvokePropertyChanged(nameof(IsCategoryVisible));
+            InvokePropertyChanged(nameof(CategoryTabIndex));
+            InvokePropertyChanged(nameof(CategoriesSource));
         }
 
         private string GetSecuritySymbol(int id)
@@ -544,7 +544,7 @@ namespace BanaData.Logic.Main
             {
                 // Compute amount
                 data.PositiveAmount = Math.Round(data.SecurityQuantity * data.SecurityPrice, 2, MidpointRounding.AwayFromZero) - data.Commission;
-                OnPropertyChanged(() => Amount);
+                InvokePropertyChanged(nameof(Amount));
             }
         }
 
@@ -558,7 +558,7 @@ namespace BanaData.Logic.Main
                 if (data.SecurityQuantity > 0)
                 {
                     data.SecurityPrice = data.PositiveAmount / data.SecurityQuantity;
-                    OnPropertyChanged(() => SecurityPrice);
+                    InvokePropertyChanged(nameof(SecurityPrice));
                 }
             }
         }
@@ -596,7 +596,7 @@ namespace BanaData.Logic.Main
             categories.ReplaceRange(mainWindowLogic.Categories);
             transfers.ReplaceRange(mainWindowLogic.Transfers);
             data.LineItem.UpdateCategoryName();
-            OnPropertyChanged(() => Category);
+            InvokePropertyChanged(nameof(Category));
         }
 
         private void CommitTransactionToDataSet()

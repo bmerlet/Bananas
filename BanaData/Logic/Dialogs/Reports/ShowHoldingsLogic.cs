@@ -85,7 +85,7 @@ namespace BanaData.Logic.Dialogs.Reports
                     securityItems.Add(new SecurityItem(securityRow.Name, securityRow.Symbol, lots, price));
                 }
 
-                OnPropertyChanged(() => TotalValue);
+                InvokePropertyChanged(nameof(TotalValue));
             }
         }
 

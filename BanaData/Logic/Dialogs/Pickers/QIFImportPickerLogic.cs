@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using BanaData.Database;
-using BanaData.Logic.Items;
 using BanaData.Logic.Main;
 using BanaData.Serializations;
 using Toolbox.UILogic;
@@ -73,9 +71,9 @@ namespace BanaData.Logic.Dialogs.Pickers
                 mainWindowLogic.SaveUserSettings();
             }
 
-            OnPropertyChanged(() => ImportDBPath);
-            OnPropertyChanged(() => ImportTransactionsPath);
-            OnPropertyChanged(() => ParsePDFPath);
+            InvokePropertyChanged(nameof(ImportDBPath));
+            InvokePropertyChanged(nameof(ImportTransactionsPath));
+            InvokePropertyChanged(nameof(ParsePDFPath));
             UpdateEnabled();
         }
 
@@ -132,9 +130,9 @@ namespace BanaData.Logic.Dialogs.Pickers
 
         private void UpdateEnabled()
         {
-            OnPropertyChanged(() => ImportDBPathEnabled);
-            OnPropertyChanged(() => ImportTransactionsPathEnabled);
-            OnPropertyChanged(() => ParsePDFPathEnabled);
+            InvokePropertyChanged(nameof(ImportDBPathEnabled));
+            InvokePropertyChanged(nameof(ImportTransactionsPathEnabled));
+            InvokePropertyChanged(nameof(ParsePDFPathEnabled));
         }
 
         private void OnBrowseImportDBCommand()
@@ -143,7 +141,7 @@ namespace BanaData.Logic.Dialogs.Pickers
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
             {
                 ImportDBPath = logic.File;
-                OnPropertyChanged(() => ImportDBPath);
+                InvokePropertyChanged(nameof(ImportDBPath));
                 mainWindowLogic.UserSettings.LastImportDBFile = ImportDBPath;
                 mainWindowLogic.SaveUserSettings();
             }
@@ -155,7 +153,7 @@ namespace BanaData.Logic.Dialogs.Pickers
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
             {
                 ImportTransactionsPath = logic.File;
-                OnPropertyChanged(() => ImportTransactionsPath);
+                InvokePropertyChanged(nameof(ImportTransactionsPath));
                 mainWindowLogic.UserSettings.LastImportTransactionsFile = ImportTransactionsPath;
                 mainWindowLogic.SaveUserSettings();
             }
@@ -167,7 +165,7 @@ namespace BanaData.Logic.Dialogs.Pickers
             if (mainWindowLogic.GuiServices.ShowDialog(logic))
             {
                 ParsePDFPath = logic.File;
-                OnPropertyChanged(() => ParsePDFPath);
+                InvokePropertyChanged(nameof(ParsePDFPath));
                 mainWindowLogic.UserSettings.LastImportPDFFile = ParsePDFPath;
                 mainWindowLogic.SaveUserSettings();
             }

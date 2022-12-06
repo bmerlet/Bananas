@@ -77,8 +77,8 @@ namespace BanaData.Logic.Main
                     try
                     {
                         data.LineItems[0].Category = value;
-                        OnPropertyChanged(() => IsDepositTabStop);
-                        OnPropertyChanged(() => IsPaymentTabStop);
+                        InvokePropertyChanged(nameof(IsDepositTabStop));
+                        InvokePropertyChanged(nameof(IsPaymentTabStop));
                     }
                     catch (ArgumentException e)
                     {
@@ -113,9 +113,9 @@ namespace BanaData.Logic.Main
                     if (data.LineItems.Count == 1)
                     {
                         data.LineItems[0].Amount = -value;
-                        OnPropertyChanged(() => Deposit);
-                        OnPropertyChanged(() => Amount);
-                        OnPropertyChanged(() => AmountState);
+                        InvokePropertyChanged(nameof(Deposit));
+                        InvokePropertyChanged(nameof(Amount));
+                        InvokePropertyChanged(nameof(AmountState));
                     }
                     else
                     {
@@ -136,8 +136,8 @@ namespace BanaData.Logic.Main
                     if (data.LineItems.Count == 1)
                     {
                         data.LineItems[0].Amount = value;
-                        OnPropertyChanged(() => Payment);
-                        OnPropertyChanged(() => Amount);
+                        InvokePropertyChanged(nameof(Payment));
+                        InvokePropertyChanged(nameof(Amount));
                     }
                     else
                     {
@@ -190,22 +190,22 @@ namespace BanaData.Logic.Main
                 if (data.Medium != _backup.Medium)
                 {
                     data.Medium = _backup.Medium;
-                    OnPropertyChanged(() => Medium);
+                    InvokePropertyChanged(nameof(Medium));
                 }
 
                 if (data.CheckNumber != _backup.CheckNumber)
                 {
                     data.CheckNumber = _backup.CheckNumber;
-                    OnPropertyChanged(() => Medium);
+                    InvokePropertyChanged(nameof(Medium));
                 }
 
                 data.LineItems.Clear();
                 _backup.LineItems.ForEach(li => data.LineItems.Add(new LineItem(li)));
 
-                OnPropertyChanged(() => Amount);
-                OnPropertyChanged(() => Category);
-                OnPropertyChanged(() => Payment);
-                OnPropertyChanged(() => Deposit);
+                InvokePropertyChanged(nameof(Amount));
+                InvokePropertyChanged(nameof(Category));
+                InvokePropertyChanged(nameof(Payment));
+                InvokePropertyChanged(nameof(Deposit));
 
                 backup = null;
             }
@@ -269,24 +269,24 @@ namespace BanaData.Logic.Main
             var _backup = backup as BankTransactionData;
             if (_data.Medium != _backup.Medium)
             {
-                OnPropertyChanged(() => Medium);
+                InvokePropertyChanged(nameof(Medium));
             }
 
             if (_data.CheckNumber != _backup.CheckNumber)
             {
-                OnPropertyChanged(() => Medium);
+                InvokePropertyChanged(nameof(Medium));
             }
 
             if (data.Category != _backup.Category)
             {
-                OnPropertyChanged(() => Category);
+                InvokePropertyChanged(nameof(Category));
             }
 
             if (data.Amount != _backup.Amount)
             {
-                OnPropertyChanged(() => Amount);
-                OnPropertyChanged(() => Payment);
-                OnPropertyChanged(() => Deposit);
+                InvokePropertyChanged(nameof(Amount));
+                InvokePropertyChanged(nameof(Payment));
+                InvokePropertyChanged(nameof(Deposit));
             }
 
             // Update goto context menu status
@@ -423,10 +423,10 @@ namespace BanaData.Logic.Main
 
                 data.Memo = memorizedPayee.Memo;
 
-                OnPropertyChanged(() => Memo);
-                OnPropertyChanged(() => Category);
-                OnPropertyChanged(() => Payment);
-                OnPropertyChanged(() => Deposit);
+                InvokePropertyChanged(nameof(Memo));
+                InvokePropertyChanged(nameof(Category));
+                InvokePropertyChanged(nameof(Payment));
+                InvokePropertyChanged(nameof(Deposit));
             }
         }
 
@@ -451,9 +451,9 @@ namespace BanaData.Logic.Main
                     data.LineItems.Add(li);
                 }
 
-                OnPropertyChanged(() => Category);
-                OnPropertyChanged(() => Payment);
-                OnPropertyChanged(() => Deposit);
+                InvokePropertyChanged(nameof(Category));
+                InvokePropertyChanged(nameof(Payment));
+                InvokePropertyChanged(nameof(Deposit));
             }
         }
 
@@ -464,22 +464,22 @@ namespace BanaData.Logic.Main
             if (data.Medium != medium)
             {
                 data.Medium = medium;
-                OnPropertyChanged(() => Medium);
-                OnPropertyChanged(() => IsDepositTabStop);
-                OnPropertyChanged(() => IsPaymentTabStop);
+                InvokePropertyChanged(nameof(Medium));
+                InvokePropertyChanged(nameof(IsDepositTabStop));
+                InvokePropertyChanged(nameof(IsPaymentTabStop));
             }
 
             if (data.CheckNumber != (uint)checkNumber)
             {
                 data.CheckNumber = (uint)checkNumber;
-                OnPropertyChanged(() => Medium);
+                InvokePropertyChanged(nameof(Medium));
             }
         }
 
         public void UpdateCategoryNames()
         {
             data.LineItems.ForEach(li => li.UpdateCategoryName());
-            OnPropertyChanged(() => Category);
+            InvokePropertyChanged(nameof(Category));
         }
 
         // Activated after payee rename
@@ -493,7 +493,7 @@ namespace BanaData.Logic.Main
                     if (data.Payee != transactionRow.Payee)
                     {
                         data.Payee = transactionRow.Payee;
-                        OnPropertyChanged(() => Payee);
+                        InvokePropertyChanged(nameof(Payee));
                     }
                 }
             }

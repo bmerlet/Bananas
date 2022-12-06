@@ -91,7 +91,7 @@ namespace BanaData.Logic.Main
                 transactions.Clear();
                 accountRow = null;
                 AccountName = "";
-                OnPropertyChanged(() => AccountName);
+                InvokePropertyChanged(nameof(AccountName));
                 return;
             }
 
@@ -103,7 +103,7 @@ namespace BanaData.Logic.Main
 
             // Export account name
             AccountName = accountRow.Name;
-            OnPropertyChanged(() => AccountName);
+            InvokePropertyChanged(nameof(AccountName));
 
             // Find transactions and put them in a temp transaction list
             // (for performance)
@@ -137,7 +137,7 @@ namespace BanaData.Logic.Main
                         logicIsChangingSelection = false;
 
                         TransactionToScrollTo = transToSelect;
-                        OnPropertyChanged(() => TransactionToScrollTo);
+                        InvokePropertyChanged(nameof(TransactionToScrollTo));
                     });
 
                 }
@@ -529,8 +529,8 @@ namespace BanaData.Logic.Main
                     selectedTransaction = value;
                     EditedTransaction = value;
                     TransactionToScrollTo = value;
-                    OnPropertyChanged(() => SelectedTransaction);
-                    OnPropertyChanged(() => TransactionToScrollTo);
+                    InvokePropertyChanged(nameof(SelectedTransaction));
+                    InvokePropertyChanged(nameof(TransactionToScrollTo));
                 }
                 else
                 {
@@ -555,12 +555,12 @@ namespace BanaData.Logic.Main
 
                     // Set focus on date field
                     DateFocus = false;
-                    OnPropertyChanged(() => DateFocus);
+                    InvokePropertyChanged(nameof(DateFocus));
 
                     UpdateOverlayPosition = () =>
                     {
                         DateFocus = true;
-                        OnPropertyChanged(() => DateFocus);
+                        InvokePropertyChanged(nameof(DateFocus));
                     };
                 }
                 else
@@ -570,8 +570,8 @@ namespace BanaData.Logic.Main
                     MoveTransaction.SetCanExecute(false);
                 }
 
-                OnPropertyChanged(() => EditedTransaction);
-                OnPropertyChanged(() => UpdateOverlayPosition);
+                InvokePropertyChanged(nameof(EditedTransaction));
+                InvokePropertyChanged(nameof(UpdateOverlayPosition));
             }
         }
 
@@ -594,7 +594,7 @@ namespace BanaData.Logic.Main
                     // Go to the bottom
                     //TransactionToScrollTo = emptyTransaction;
                     //OnPropertyChanged(() => TransactionToScrollTo);
-                    OnPropertyChanged("ScrollToBottom");
+                    InvokePropertyChanged("ScrollToBottom");
                 });
             }
         }

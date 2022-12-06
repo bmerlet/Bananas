@@ -476,7 +476,7 @@ namespace BanaData.Logic.Dialogs.Reports
                     userSettings.MemberOrderForCashFlowDialog = value;
                     mainWindowLogic.SaveUserSettings();
                 }
-                OnPropertyChanged(() => ColumnDescriptions);
+                InvokePropertyChanged(nameof(ColumnDescriptions));
                 ComputeCashFlow();
             }
         }
@@ -545,7 +545,7 @@ namespace BanaData.Logic.Dialogs.Reports
             public void SetBalance(decimal balance)
             {
                 Balance = balance;
-                OnPropertyChanged(() => Balance);
+                InvokePropertyChanged(nameof(Balance));
             }
 
             public readonly Household.PersonRow Member;

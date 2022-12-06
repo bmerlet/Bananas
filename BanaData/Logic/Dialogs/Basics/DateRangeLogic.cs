@@ -150,9 +150,9 @@ namespace BanaData.Logic.Dialogs.Basics
                     break;
             }
 
-            OnPropertyChanged(() => StartDate);
-            OnPropertyChanged(() => EndDate);
-            OnPropertyChanged(() => AreDatesEnabled);
+            InvokePropertyChanged(nameof(StartDate));
+            InvokePropertyChanged(nameof(EndDate));
+            InvokePropertyChanged(nameof(AreDatesEnabled));
 
             DateRangeChanged?.Invoke(this, new DateRangeChangedArgs(StartDate, EndDate));
         }

@@ -281,7 +281,7 @@ namespace BanaData.Logic.Dialogs.Reports
         private void RedrawGraph()
         {
             UpdateGraphSignal = !UpdateGraphSignal;
-            OnPropertyChanged(() => UpdateGraphSignal);
+                InvokePropertyChanged(nameof(UpdateGraphSignal));
         }
 
         #endregion

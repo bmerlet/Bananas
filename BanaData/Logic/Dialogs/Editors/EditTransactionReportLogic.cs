@@ -233,26 +233,26 @@ namespace BanaData.Logic.Dialogs.Editors
                     case GROUP_ACCOUNT:
                         localFlags |= ETransactionReportFlag.GroupByAccount;
                         ShowAccountColumn = true;
-                        OnPropertyChanged(() => ShowAccountColumn);
+                        InvokePropertyChanged(nameof(ShowAccountColumn));
                         IsAccountColumnEnabled = false;
                         break;
                     case GROUP_PAYEE:
                         localFlags |= ETransactionReportFlag.GroupByPayee;
                         ShowPayeeColumn = true;
-                        OnPropertyChanged(() => ShowPayeeColumn);
+                        InvokePropertyChanged(nameof(ShowPayeeColumn));
                         IsPayeeColumnEnabled = false;
                         break;
                     case GROUP_CATEGORY:
                         localFlags |= ETransactionReportFlag.GroupByCategory;
                         ShowCategoryColumn = true;
-                        OnPropertyChanged(() => ShowCategoryColumn);
+                        InvokePropertyChanged(nameof(ShowCategoryColumn));
                         IsCategoryColumnEnabled = false;
                         break;
                 }
 
-                OnPropertyChanged(() => IsAccountColumnEnabled);
-                OnPropertyChanged(() => IsPayeeColumnEnabled);
-                OnPropertyChanged(() => IsCategoryColumnEnabled);
+                InvokePropertyChanged(nameof(IsAccountColumnEnabled));
+                InvokePropertyChanged(nameof(IsPayeeColumnEnabled));
+                InvokePropertyChanged(nameof(IsCategoryColumnEnabled));
             }
         }
 
@@ -276,8 +276,8 @@ namespace BanaData.Logic.Dialogs.Editors
                         break;
                 }
 
-                OnPropertyChanged(() => IsColumnPanelEnabled);
-                OnPropertyChanged(() => IsSubtotalFrequencyEnabled);
+                InvokePropertyChanged(nameof(IsColumnPanelEnabled));
+                InvokePropertyChanged(nameof(IsSubtotalFrequencyEnabled));
             }
         }
 

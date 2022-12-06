@@ -132,7 +132,7 @@ namespace BanaData.Logic.Main
                     {
                         mainWindowLogic.UserSettings.InvstWidthOfStatusColumn = value;
                         mainWindowLogic.SaveUserSettings();
-                        OnPropertyChanged(() => WidthOfStatusColumn);
+                        InvokePropertyChanged(nameof(WidthOfStatusColumn));
                     }
                 }
             }
@@ -146,7 +146,7 @@ namespace BanaData.Logic.Main
                     {
                         mainWindowLogic.UserSettings.InvstWidthOfDateColumn = value;
                         mainWindowLogic.SaveUserSettings();
-                        OnPropertyChanged(() => WidthOfDateColumn);
+                        InvokePropertyChanged(nameof(WidthOfDateColumn));
                     }
                 }
             }
@@ -160,7 +160,7 @@ namespace BanaData.Logic.Main
                     {
                         mainWindowLogic.UserSettings.InvstWidthOfTypeColumn = value;
                         mainWindowLogic.SaveUserSettings();
-                        OnPropertyChanged(() => WidthOfTypeColumn);
+                        InvokePropertyChanged(nameof(WidthOfTypeColumn));
                     }
                 }
             }
@@ -174,7 +174,7 @@ namespace BanaData.Logic.Main
                     {
                         mainWindowLogic.UserSettings.InvstWidthOfDescriptionColumn = value;
                         mainWindowLogic.SaveUserSettings();
-                        OnPropertyChanged(() => WidthOfDescriptionColumn);
+                        InvokePropertyChanged(nameof(WidthOfDescriptionColumn));
                     }
                 }
             }
@@ -188,7 +188,7 @@ namespace BanaData.Logic.Main
                     {
                         mainWindowLogic.UserSettings.InvstWidthOfMemoColumn = value;
                         mainWindowLogic.SaveUserSettings();
-                        OnPropertyChanged(() => WidthOfMemoColumn);
+                        InvokePropertyChanged(nameof(WidthOfMemoColumn));
                     }
                 }
             }
@@ -202,7 +202,7 @@ namespace BanaData.Logic.Main
                     {
                         mainWindowLogic.UserSettings.InvstWidthOfCategoryColumn = value;
                         mainWindowLogic.SaveUserSettings();
-                        OnPropertyChanged(() => WidthOfCategoryColumn);
+                        InvokePropertyChanged(nameof(WidthOfCategoryColumn));
                     }
                 }
             }
@@ -216,7 +216,7 @@ namespace BanaData.Logic.Main
                     {
                         mainWindowLogic.UserSettings.InvstWidthOfSecuritySymbolColumn = value;
                         mainWindowLogic.SaveUserSettings();
-                        OnPropertyChanged(() => WidthOfSecuritySymbolColumn);
+                        InvokePropertyChanged(nameof(WidthOfSecuritySymbolColumn));
                     }
                 }
             }
@@ -230,7 +230,7 @@ namespace BanaData.Logic.Main
                     {
                         mainWindowLogic.UserSettings.InvstWidthOfSecurityQuantityColumn = value;
                         mainWindowLogic.SaveUserSettings();
-                        OnPropertyChanged(() => WidthOfSecurityQuantityColumn);
+                        InvokePropertyChanged(nameof(WidthOfSecurityQuantityColumn));
                     }
                 }
             }
@@ -244,7 +244,7 @@ namespace BanaData.Logic.Main
                     {
                         mainWindowLogic.UserSettings.InvstWidthOfSecurityPriceColumn = value;
                         mainWindowLogic.SaveUserSettings();
-                        OnPropertyChanged(() => WidthOfSecurityPriceColumn);
+                        InvokePropertyChanged(nameof(WidthOfSecurityPriceColumn));
                     }
                 }
             }
@@ -258,7 +258,7 @@ namespace BanaData.Logic.Main
                     {
                         mainWindowLogic.UserSettings.InvstWidthOfCommissionColumn = value;
                         mainWindowLogic.SaveUserSettings();
-                        OnPropertyChanged(() => WidthOfCommissionColumn);
+                        InvokePropertyChanged(nameof(WidthOfCommissionColumn));
                     }
                 }
             }
@@ -272,7 +272,7 @@ namespace BanaData.Logic.Main
                     {
                         mainWindowLogic.UserSettings.InvstWidthOfSecurityBalanceColumn = value;
                         mainWindowLogic.SaveUserSettings();
-                        OnPropertyChanged(() => WidthOfSecurityBalanceColumn);
+                        InvokePropertyChanged(nameof(WidthOfSecurityBalanceColumn));
                     }
                 }
             }
@@ -286,7 +286,7 @@ namespace BanaData.Logic.Main
                     {
                         mainWindowLogic.UserSettings.InvstWidthOfAmountColumn = value;
                         mainWindowLogic.SaveUserSettings();
-                        OnPropertyChanged(() => WidthOfAmountColumn);
+                        InvokePropertyChanged(nameof(WidthOfAmountColumn));
                     }
                 }
             }
@@ -300,7 +300,7 @@ namespace BanaData.Logic.Main
                     {
                         mainWindowLogic.UserSettings.InvstWidthOfBalanceColumn = value;
                         mainWindowLogic.SaveUserSettings();
-                        OnPropertyChanged(() => WidthOfBalanceColumn);
+                        InvokePropertyChanged(nameof(WidthOfBalanceColumn));
                     }
                 }
             }

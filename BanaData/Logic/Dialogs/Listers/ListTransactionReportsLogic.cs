@@ -88,8 +88,8 @@ namespace BanaData.Logic.Dialogs.Listers
                 reportsSource.Add(newReport);
                 SelectedReport = newReport;
                 ReportToScrollTo = newReport;
-                OnPropertyChanged(() => SelectedReport);
-                OnPropertyChanged(() => ReportToScrollTo);
+                InvokePropertyChanged(nameof(SelectedReport));
+                InvokePropertyChanged(nameof(ReportToScrollTo));
 
                 mainWindowLogic.MainMenuLogic.UpdateTransactionReports();
             }
@@ -113,8 +113,8 @@ namespace BanaData.Logic.Dialogs.Listers
                     reportsSource.Add(newReport);
                     SelectedReport = newReport;
                     ReportToScrollTo = newReport;
-                    OnPropertyChanged(() => SelectedReport);
-                    OnPropertyChanged(() => ReportToScrollTo);
+                    InvokePropertyChanged(nameof(SelectedReport));
+                    InvokePropertyChanged(nameof(ReportToScrollTo));
 
                     mainWindowLogic.MainMenuLogic.UpdateTransactionReports();
                 }
@@ -149,8 +149,8 @@ namespace BanaData.Logic.Dialogs.Listers
                     reportsSource.Add(newReport);
                     SelectedReport = newReport;
                     ReportToScrollTo = newReport;
-                    OnPropertyChanged(() => SelectedReport);
-                    OnPropertyChanged(() => ReportToScrollTo);
+                    InvokePropertyChanged(nameof(SelectedReport));
+                    InvokePropertyChanged(nameof(ReportToScrollTo));
 
                     mainWindowLogic.MainMenuLogic.UpdateTransactionReports();
                 }

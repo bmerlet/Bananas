@@ -114,12 +114,12 @@ namespace BanaData.Logic.Dialogs.Editors
             AbsoluteAmount = Math.Abs(amount);
             Type = amount > 0 ? DEPOSIT : PAYMENT;
 
-            OnPropertyChanged(() => Category);
-            OnPropertyChanged(() => CategoryEnabled);
-            OnPropertyChanged(() => Type);
-            OnPropertyChanged(() => TypeEnabled);
-            OnPropertyChanged(() => AbsoluteAmount);
-            OnPropertyChanged(() => AbsoluteAmountEnabled);
+            InvokePropertyChanged(nameof(Category));
+            InvokePropertyChanged(nameof(CategoryEnabled));
+            InvokePropertyChanged(nameof(Type));
+            InvokePropertyChanged(nameof(TypeEnabled));
+            InvokePropertyChanged(nameof(AbsoluteAmount));
+            InvokePropertyChanged(nameof(AbsoluteAmountEnabled));
         }
 
         protected override bool? Commit()

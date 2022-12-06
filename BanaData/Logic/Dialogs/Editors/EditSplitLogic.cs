@@ -77,7 +77,7 @@ namespace BanaData.Logic.Dialogs.Editors
         public void UpdateTotal()
         {
             Total = Register.RegisterItems.Cast<GridViewLineItem>().Sum(gvli => gvli.Amount).ToString("N");
-            OnPropertyChanged(() => Total);
+            InvokePropertyChanged(nameof(Total));
         }
 
         protected override bool? Commit()
@@ -211,7 +211,7 @@ namespace BanaData.Logic.Dialogs.Editors
                         // This logic is changing the selection (e.g. processing of return key)
                         selectedLineItem = value;
                         editedLineItem = value;
-                        OnPropertyChanged(() => SelectedLineItem);
+                        InvokePropertyChanged(nameof(SelectedLineItem));
                     }
                     else
                     {
@@ -229,11 +229,11 @@ namespace BanaData.Logic.Dialogs.Editors
                         selectedLineItem.BeginEdit();
 
                         CategoryFocus = false;
-                        OnPropertyChanged(() => CategoryFocus);
+                        InvokePropertyChanged(nameof(CategoryFocus));
                         UpdateOverlayPosition = () =>
                         {
                             CategoryFocus = true;
-                            OnPropertyChanged(() => CategoryFocus);
+                            InvokePropertyChanged(nameof(CategoryFocus));
                         };
                     }
                     else
@@ -241,8 +241,8 @@ namespace BanaData.Logic.Dialogs.Editors
                         UpdateOverlayPosition = null;
                     }
 
-                    OnPropertyChanged(() => EditedLineItem);
-                    OnPropertyChanged(() => UpdateOverlayPosition);
+                    InvokePropertyChanged(nameof(EditedLineItem));
+                    InvokePropertyChanged(nameof(UpdateOverlayPosition));
                 }
             }
         }
@@ -252,7 +252,7 @@ namespace BanaData.Logic.Dialogs.Editors
         public GridViewLineItem EditedLineItem
         {
             get => editedLineItem;
-            set { editedLineItem = value; OnPropertyChanged(() => EditedLineItem); }
+            set { editedLineItem = value; InvokePropertyChanged(nameof(EditedLineItem)); }
         }
 
         public IEnumerable<CategoryItem> Categories => categories;
@@ -268,21 +268,21 @@ namespace BanaData.Logic.Dialogs.Editors
         public double WidthOfCategoryColumn
         {
             get => widthOfCategoryColumn;
-            set { widthOfCategoryColumn = value; OnPropertyChanged(() => WidthOfCategoryColumn); }
+            set { widthOfCategoryColumn = value; InvokePropertyChanged(nameof(WidthOfCategoryColumn)); }
         }
 
         private double widthOfMemoColumn = 200;
         public double WidthOfMemoColumn
         {
             get => widthOfMemoColumn;
-            set { widthOfMemoColumn = value; OnPropertyChanged(() => WidthOfMemoColumn); }
+            set { widthOfMemoColumn = value; InvokePropertyChanged(nameof(WidthOfMemoColumn)); }
         }
 
         private double widthOfAmountColumn = 90;
         public double WidthOfAmountColumn
         {
             get => widthOfAmountColumn;
-            set { widthOfAmountColumn = value; OnPropertyChanged(() => WidthOfAmountColumn); }
+            set { widthOfAmountColumn = value; InvokePropertyChanged(nameof(WidthOfAmountColumn)); }
         }
 
         #endregion
@@ -295,9 +295,9 @@ namespace BanaData.Logic.Dialogs.Editors
             // Select first line item
             selectedLineItem = gridViewLineItems[0];
             editedLineItem = gridViewLineItems[0];
-            OnPropertyChanged(() => SelectedLineItem);
-            OnPropertyChanged(() => EditedLineItem);
-            OnPropertyChanged("UpdateOverlayPosition");
+            InvokePropertyChanged(nameof(SelectedLineItem));
+            InvokePropertyChanged(nameof(EditedLineItem));
+            InvokePropertyChanged("UpdateOverlayPosition");
         }
 
         public override void MoveUp()
@@ -467,9 +467,9 @@ namespace BanaData.Logic.Dialogs.Editors
             {
                 // Publish data
                 editing = false;
-                OnPropertyChanged(() => Category);
-                OnPropertyChanged(() => Memo);
-                OnPropertyChanged(() => Amount);
+                InvokePropertyChanged(nameof(Category));
+                InvokePropertyChanged(nameof(Memo));
+                InvokePropertyChanged(nameof(Amount));
             }
         }
 
@@ -480,9 +480,9 @@ namespace BanaData.Logic.Dialogs.Editors
                 // Recover from backup data
                 editing = false;
                 data = backup;
-                OnPropertyChanged(() => Category);
-                OnPropertyChanged(() => Memo);
-                OnPropertyChanged(() => Amount);
+                InvokePropertyChanged(nameof(Category));
+                InvokePropertyChanged(nameof(Memo));
+                InvokePropertyChanged(nameof(Amount));
             }
         }
 

@@ -156,8 +156,8 @@ namespace BanaData.Logic.Dialogs.Listers
                 categoriesSource.Add(newEditCategory);
                 SelectedCategory = newEditCategory;
                 CategoryToScrollTo = newEditCategory;
-                OnPropertyChanged(() => SelectedCategory);
-                OnPropertyChanged(() => CategoryToScrollTo);
+                InvokePropertyChanged(nameof(SelectedCategory));
+                InvokePropertyChanged(nameof(CategoryToScrollTo));
             }
         }
 
@@ -194,8 +194,8 @@ namespace BanaData.Logic.Dialogs.Listers
                     categoriesSource.Add(updatedEditCategory);
                     SelectedCategory = updatedEditCategory;
                     CategoryToScrollTo = updatedEditCategory;
-                    OnPropertyChanged(() => SelectedCategory);
-                    OnPropertyChanged(() => CategoryToScrollTo);
+                    InvokePropertyChanged(nameof(SelectedCategory));
+                    InvokePropertyChanged(nameof(CategoryToScrollTo));
                 }
             }
         }

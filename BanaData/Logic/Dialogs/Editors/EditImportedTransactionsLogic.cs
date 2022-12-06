@@ -313,19 +313,19 @@ namespace BanaData.Logic.Dialogs.Editors
             public void ResetMemo()
             {
                 Memo = "";
-                OnPropertyChanged(() => Memo);
+                InvokePropertyChanged(nameof(Memo));
             }
 
             public void MakePayeeLowerCase()
             {
                 Payee = MakePayeeLowercase(Payee);
-                OnPropertyChanged(() => Payee);
+                InvokePropertyChanged(nameof(Payee));
             }
 
             public void SetImport(bool val)
             {
                 Import = val;
-                OnPropertyChanged(() => Import);
+                InvokePropertyChanged(nameof(Import));
             }
 
             static private string MakePayeeLowercase(string payee)
@@ -359,13 +359,13 @@ namespace BanaData.Logic.Dialogs.Editors
             public void ResetMemo()
             {
                 Memo = "";
-                OnPropertyChanged(() => Memo);
+                InvokePropertyChanged(nameof(Memo));
             }
 
             public void SetImport(bool val)
             {
                 Import = val;
-                OnPropertyChanged(() => Import);
+                InvokePropertyChanged(nameof(Import));
             }
         }
 

@@ -84,8 +84,8 @@ namespace BanaData.Logic.Dialogs.Listers
                 securitySource.Add(newSecurity);
                 SelectedSecurity = newSecurity;
                 SecurityToScrollTo = newSecurity;
-                OnPropertyChanged(() => SelectedSecurity);
-                OnPropertyChanged(() => SecurityToScrollTo);
+                InvokePropertyChanged(nameof(SelectedSecurity));
+                InvokePropertyChanged(nameof(SecurityToScrollTo));
             }
         }
 
@@ -112,8 +112,8 @@ namespace BanaData.Logic.Dialogs.Listers
                     securitySource.Add(newSecurity);
                     SelectedSecurity = newSecurity;
                     SecurityToScrollTo = newSecurity;
-                    OnPropertyChanged(() => SelectedSecurity);
-                    OnPropertyChanged(() => SecurityToScrollTo);
+                    InvokePropertyChanged(nameof(SelectedSecurity));
+                    InvokePropertyChanged(nameof(SecurityToScrollTo));
                 }
             }
         }

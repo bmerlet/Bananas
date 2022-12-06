@@ -81,7 +81,7 @@ namespace BanaData.Logic.Dialogs.Editors
         public bool? Expires
         {
             get => flags.HasFlag(EScheduleFlag.Expires);
-            set { flags = value == true ? flags | EScheduleFlag.Expires : flags & ~EScheduleFlag.Expires; OnPropertyChanged(() => EndDateEnabled); }
+            set { flags = value == true ? flags | EScheduleFlag.Expires : flags & ~EScheduleFlag.Expires; InvokePropertyChanged(nameof(EndDateEnabled)); }
         }
 
         // Account name
@@ -93,7 +93,7 @@ namespace BanaData.Logic.Dialogs.Editors
             {
                 account = value;
                 MediumEnabled = (household.Account.GetByName(account) is Household.AccountRow accountRow) && accountRow.Type == EAccountType.Bank;
-                OnPropertyChanged(() => MediumEnabled);
+                InvokePropertyChanged(nameof(MediumEnabled));
             }
         }
         public IEnumerable<string> Accounts =>
@@ -174,12 +174,12 @@ namespace BanaData.Logic.Dialogs.Editors
             AbsoluteAmount = Math.Abs(amount);
             Type = amount > 0 ? DEPOSIT : PAYMENT;
 
-            OnPropertyChanged(() => Category);
-            OnPropertyChanged(() => CategoryEnabled);
-            OnPropertyChanged(() => Type);
-            OnPropertyChanged(() => TypeEnabled);
-            OnPropertyChanged(() => AbsoluteAmount);
-            OnPropertyChanged(() => AbsoluteAmountEnabled);
+            InvokePropertyChanged(nameof(Category));
+            InvokePropertyChanged(nameof(CategoryEnabled));
+            InvokePropertyChanged(nameof(Type));
+            InvokePropertyChanged(nameof(TypeEnabled));
+            InvokePropertyChanged(nameof(AbsoluteAmount));
+            InvokePropertyChanged(nameof(AbsoluteAmountEnabled));
         }
 
         protected override bool? Commit()

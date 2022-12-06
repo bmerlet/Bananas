@@ -78,8 +78,8 @@ namespace BanaData.Logic.Dialogs.Listers
                 memorizedPayeesSource.Add(newPayee);
                 SelectedMemorizedPayee = newPayee;
                 MemorizedPayeeToScrollTo = newPayee;
-                OnPropertyChanged(() => SelectedMemorizedPayee);
-                OnPropertyChanged(() => MemorizedPayeeToScrollTo);
+                InvokePropertyChanged(nameof(SelectedMemorizedPayee));
+                InvokePropertyChanged(nameof(MemorizedPayeeToScrollTo));
             }
         }
 
@@ -101,8 +101,8 @@ namespace BanaData.Logic.Dialogs.Listers
                     memorizedPayeesSource.Add(newPayee);
                     SelectedMemorizedPayee = newPayee;
                     MemorizedPayeeToScrollTo = newPayee;
-                    OnPropertyChanged(() => SelectedMemorizedPayee);
-                    OnPropertyChanged(() => MemorizedPayeeToScrollTo);
+                    InvokePropertyChanged(nameof(SelectedMemorizedPayee));
+                    InvokePropertyChanged(nameof(MemorizedPayeeToScrollTo));
                 }
             }
         }

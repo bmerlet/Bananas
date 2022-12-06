@@ -85,8 +85,8 @@ namespace BanaData.Logic.Dialogs.Listers
                 schedulesSource.Add(newScheduleItem);
                 SelectedSchedule = newScheduleItem;
                 ScheduleToScrollTo = newScheduleItem;
-                OnPropertyChanged(() => SelectedSchedule);
-                OnPropertyChanged(() => ScheduleToScrollTo);
+                InvokePropertyChanged(nameof(SelectedSchedule));
+                InvokePropertyChanged(nameof(ScheduleToScrollTo));
             }
         }
 
@@ -108,8 +108,8 @@ namespace BanaData.Logic.Dialogs.Listers
                     schedulesSource.Add(updatedScheduleItem);
                     SelectedSchedule = updatedScheduleItem;
                     ScheduleToScrollTo = updatedScheduleItem;
-                    OnPropertyChanged(() => SelectedSchedule);
-                    OnPropertyChanged(() => ScheduleToScrollTo);
+                    InvokePropertyChanged(nameof(SelectedSchedule));
+                    InvokePropertyChanged(nameof(ScheduleToScrollTo));
                 }
             }
         }

@@ -265,7 +265,7 @@ namespace BanaData.Logic.Dialogs.Pickers
         private void SetIsCheckedNonRecursively(bool? value)
         {
             isChecked = value;
-            OnPropertyChanged(() => IsChecked);
+            InvokePropertyChanged(nameof(IsChecked));
         }
 
         #endregion

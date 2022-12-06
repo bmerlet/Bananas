@@ -63,13 +63,13 @@ namespace BanaData.Logic.Dialogs.Listers
 
         // Dividend reinvestments date and price
         private bool showReinvDivs = true;
-        public bool? ShowReinvDivs { get => showReinvDivs; set { showReinvDivs = value == true; OnPropertyChanged(() => ShowReinvDivs); } }
+        public bool? ShowReinvDivs { get => showReinvDivs; set { showReinvDivs = value == true; InvokePropertyChanged(nameof(ShowReinvDivs)); } }
         public WpfObservableRangeCollection<DatePriceGraphItem> ReinvestedDividends { get; } =
             new WpfObservableRangeCollection<DatePriceGraphItem>();
 
         // Sale/Purchase date and price
         private bool showTrades = true;
-        public bool? ShowTrades { get => showTrades; set { showTrades = value == true; OnPropertyChanged(() => ShowTrades); } }
+        public bool? ShowTrades { get => showTrades; set { showTrades = value == true; InvokePropertyChanged(nameof(ShowTrades)); } }
         public WpfObservableRangeCollection<DatePriceGraphItem> Trades { get; } =
             new WpfObservableRangeCollection<DatePriceGraphItem>();
 
@@ -115,7 +115,7 @@ namespace BanaData.Logic.Dialogs.Listers
                 .Select(it => new DatePriceGraphItem(it)));
 
             UpdateGraphSignal = !UpdateGraphSignal;
-            OnPropertyChanged(() => UpdateGraphSignal);
+            InvokePropertyChanged(nameof(UpdateGraphSignal));
         }
 
         #endregion
@@ -184,7 +184,7 @@ namespace BanaData.Logic.Dialogs.Listers
                         // This logic is changing the selection (e.g. processing of return key)
                         selectedDatePrice = value;
                         editedDatePrice = value;
-                        OnPropertyChanged(() => SelectedDatePrice);
+                        InvokePropertyChanged(nameof(SelectedDatePrice));
                     }
                     else
                     {
@@ -202,11 +202,11 @@ namespace BanaData.Logic.Dialogs.Listers
                         selectedDatePrice.BeginEdit();
 
                         DateFocus = false;
-                        OnPropertyChanged(() => DateFocus);
+                        InvokePropertyChanged(nameof(DateFocus));
                         UpdateOverlayPosition = () =>
                         {
                             DateFocus = true;
-                            OnPropertyChanged(() => DateFocus);
+                            InvokePropertyChanged(nameof(DateFocus));
                         };
                     }
                     else
@@ -214,8 +214,8 @@ namespace BanaData.Logic.Dialogs.Listers
                         UpdateOverlayPosition = null;
                     }
 
-                    OnPropertyChanged(() => EditedDatePrice);
-                    OnPropertyChanged(() => UpdateOverlayPosition);
+                    InvokePropertyChanged(nameof(EditedDatePrice));
+                    InvokePropertyChanged(nameof(UpdateOverlayPosition));
                 }
             }
         }
@@ -225,7 +225,7 @@ namespace BanaData.Logic.Dialogs.Listers
         public DatePriceItem EditedDatePrice
         {
             get => editedDatePrice;
-            set { editedDatePrice = value; OnPropertyChanged(() => EditedDatePrice); }
+            set { editedDatePrice = value; InvokePropertyChanged(nameof(EditedDatePrice)); }
         }
 
         // Delete command from context menu
@@ -239,14 +239,14 @@ namespace BanaData.Logic.Dialogs.Listers
         public double WidthOfDateColumn
         {
             get => widthOfDateColumn;
-            set { widthOfDateColumn = value; OnPropertyChanged(() => WidthOfDateColumn); }
+            set { widthOfDateColumn = value; InvokePropertyChanged(nameof(WidthOfDateColumn)); }
         }
 
         private double widthOfPriceColumn = 90;
         public double WidthOfPriceColumn
         {
             get => widthOfPriceColumn;
-            set { widthOfPriceColumn = value; OnPropertyChanged(() => WidthOfPriceColumn); }
+            set { widthOfPriceColumn = value; InvokePropertyChanged(nameof(WidthOfPriceColumn)); }
         }
 
         #endregion
@@ -265,10 +265,7 @@ namespace BanaData.Logic.Dialogs.Listers
 
             RegisterItems.MoveCurrentToFirst();
             SelectedDatePrice = RegisterItems.CurrentItem as DatePriceItem;
-            //editedDatePrice = selectedDatePrice;
-            OnPropertyChanged(() => SelectedDatePrice);
-            //OnPropertyChanged(() => EditedDatePrice);
-            //OnPropertyChanged("UpdateOverlayPosition");
+            InvokePropertyChanged(nameof(SelectedDatePrice));
         }
 
         public override void MoveUp()
@@ -459,9 +456,9 @@ namespace BanaData.Logic.Dialogs.Listers
             {
                 // Publish data
                 editing = false;
-                OnPropertyChanged(() => Date);
-                OnPropertyChanged(() => Price);
-                OnPropertyChanged(() => Tip);
+                InvokePropertyChanged(nameof(Date));
+                InvokePropertyChanged(nameof(Price));
+                InvokePropertyChanged(nameof(Tip));
 
                 // Save in DB
                 if (mainWindowLogic != null)
@@ -488,8 +485,8 @@ namespace BanaData.Logic.Dialogs.Listers
                 // Recover from backup data
                 editing = false;
                 data = backup;
-                OnPropertyChanged(() => Date);
-                OnPropertyChanged(() => Price);
+                InvokePropertyChanged(nameof(Date));
+                InvokePropertyChanged(nameof(Price));
             }
         }
 

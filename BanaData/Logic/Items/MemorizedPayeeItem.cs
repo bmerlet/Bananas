@@ -11,6 +11,8 @@ namespace BanaData.Logic.Items
     /// </summary>
     public class MemorizedPayeeItem : IComparable<MemorizedPayeeItem>
     {
+        #region Constructor
+
         public MemorizedPayeeItem(int id, string payee, string memo, LineItem[] lineItems)
         {
             (ID, Payee, LineItems) = (id, payee, lineItems);
@@ -28,8 +30,16 @@ namespace BanaData.Logic.Items
             }
         }
 
+        #endregion
+
+        #region Logic properties
+
         public readonly int ID;
         public readonly LineItem[] LineItems;
+
+        #endregion
+
+        #region UI properties
 
         public string Payee { get; }
         public string Category { get; }
@@ -37,10 +47,18 @@ namespace BanaData.Logic.Items
         public string Memo { get; }
         public decimal Amount { get; }
 
+        #endregion
+
+        #region IComparable implementation
+
         public int CompareTo(MemorizedPayeeItem other)
         {
             return Payee.CompareTo(other.Payee);
         }
+
+        #endregion
+
+        #region Overrides
 
         public override string ToString()
         {
@@ -56,5 +74,7 @@ namespace BanaData.Logic.Items
         {
             return ID.GetHashCode();
         }
+
+        #endregion
     }
 }

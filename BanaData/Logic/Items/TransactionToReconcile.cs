@@ -33,7 +33,7 @@ namespace BanaData.Logic.Items
                 if (isCleared != value)
                 {
                     isCleared = value == true;
-                    OnPropertyChanged(() => IsCleared);
+                    InvokePropertyChanged(nameof(IsCleared));
                     TransactionCleared?.Invoke(this, EventArgs.Empty);
                 }
             }

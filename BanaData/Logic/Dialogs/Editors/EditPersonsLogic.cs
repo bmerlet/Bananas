@@ -159,7 +159,7 @@ namespace BanaData.Logic.Dialogs.Editors
             public string Name
             {
                 get => name;
-                set { name = value; NameChanged?.Invoke(this, EventArgs.Empty); OnPropertyChanged(() => Name); }
+                set { name = value; NameChanged?.Invoke(this, EventArgs.Empty); InvokePropertyChanged(nameof(Name)); }
             }
 
             public string Grouper => (ID < 0 && string.IsNullOrWhiteSpace(name)) ? "Z" : "A";

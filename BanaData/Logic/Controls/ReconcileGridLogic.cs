@@ -96,10 +96,10 @@ namespace BanaData.Logic.Controls
         private void UpdateClearedTotal()
         {
             TotalCleared = transactions.Sum(tr => tr.IsCleared == true ? tr.Amount : 0);
-            OnPropertyChanged(() => TotalCleared);
+            InvokePropertyChanged(nameof(TotalCleared));
 
             NumberOfCheckedItems = "Cleared transactions: " + transactions.Count(tr => tr.IsCleared == true);
-            OnPropertyChanged(() => NumberOfCheckedItems);
+            InvokePropertyChanged(nameof(NumberOfCheckedItems));
 
             ClearedBalanceChanged?.Invoke(this, EventArgs.Empty);
         }
