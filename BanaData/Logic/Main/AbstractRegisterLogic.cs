@@ -593,7 +593,7 @@ namespace BanaData.Logic.Main
 
                     // Go to the bottom
                     //TransactionToScrollTo = emptyTransaction;
-                    //OnPropertyChanged(() => TransactionToScrollTo);
+                    //InvokePropertyChanged(nameof(TransactionToScrollTo));
                     InvokePropertyChanged("ScrollToBottom");
                 });
             }
