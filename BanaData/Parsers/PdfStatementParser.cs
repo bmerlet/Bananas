@@ -205,6 +205,10 @@ namespace BanaData.Parsers
                     {
                         ix = str.IndexOf(", quarter-to-date statement");
                     }
+                    if (ix < 0)
+                    {
+                        ix = str.IndexOf(", year-to-date statement");
+                    }
                     if (ix > 4)
                     {
                         year = "/" + str.Substring(ix - 4, 4);
