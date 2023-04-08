@@ -15,6 +15,25 @@ namespace BanaData.Logic.Main
     public class AccountGroupLogic : LogicBase
     {
         public enum EType { Banking, Investment, Asset };
+        public enum ESubType
+        {
+            // Banking
+            BankHeader = 0,
+            BankAccount = 1,
+            CashHeader = 2,
+            CashAccount = 3,
+            CreditCardHeader = 4,
+            CreditCardAccount = 5,
+
+            // Investment
+            BrokerageHeader = 0,
+            BrokerageAccount = 1,
+            RetirementHeader = 2,
+            RetirementAccount = 3,
+
+            // Assets
+            AssetAccount = 1
+        };
 
         #region Private members
 
@@ -118,6 +137,12 @@ namespace BanaData.Logic.Main
                 accountsAndBalances.Clear();
                 Household.AccountRow[] accounts = null;
 
+                bool hasBank = false;
+                bool hasCash = false;
+                bool hasCreditCard = false;
+                bool hasBrokerage = false;
+                bool hasRetirement= false;
+
                 switch (type)
                 {
                     case EType.Banking:
@@ -140,34 +165,76 @@ namespace BanaData.Logic.Main
                     }
 
                     // To group bank accounts, cash and credit cards together
-                    int subType = 0;
+                    ESubType subType = ESubType.AssetAccount;
+
                     if (type == EType.Banking)
                     {
                         // Display bank accounts first, then cash accounts, then credit cards
                         switch(account.Type)
                         {
                             case EAccountType.Bank:
-                                subType = 1;
+                                subType = ESubType.BankAccount;
+                                hasBank= true;
                                 break;
                             case EAccountType.Cash:
-                                subType = 2;
+                                subType = ESubType.CashAccount;
+                                hasCash= true;
                                 break;
                             case EAccountType.CreditCard:
-                                subType = 3;
+                                subType = ESubType.CreditCardAccount;
+                                hasCreditCard= true;
                                 break;
                         }
                     }
                     else if (type == EType.Investment)
                     {
                         // Display brokerage accounts then IRAs
-                        subType = account.Kind == EInvestmentKind.TraditionalIRA ? 2 : 1;
+                        switch(account.Kind)
+                        {
+                            case EInvestmentKind.Asset:
+                                subType = ESubType.AssetAccount;
+                                break;
+
+                            case EInvestmentKind.Brokerage:
+                                subType = ESubType.BrokerageAccount;
+                                hasBrokerage= true;
+                                break;
+
+                            case EInvestmentKind.TraditionalIRA:
+                            case EInvestmentKind._401k:
+                                subType = ESubType.RetirementAccount;
+                                hasRetirement = true;
+                                break;
+                        }
                     }
 
                     decimal balance = type == EType.Banking ? account.GetBalance() : account.GetInvestmentValue();
 
-                    accountsAndBalances.Add(new AccountAndBalance(account.ID, account.Name, subType, balance));
+                    accountsAndBalances.Add(new AccountAndBalance(account.ID, "    " + account.Name, subType, balance));
 
                     totalBalance += balance;
+                }
+
+                // Create headers for present categories
+                if (hasBank)
+                {
+                    accountsAndBalances.Add(new AccountAndBalance(-1, "Bank:", ESubType.BankHeader, 0));
+                }
+                if (hasCash)
+                {
+                    accountsAndBalances.Add(new AccountAndBalance(-1, "Cash:", ESubType.CashHeader, 0));
+                }
+                if (hasCreditCard)
+                {
+                    accountsAndBalances.Add(new AccountAndBalance(-1, "Credit cards:", ESubType.CreditCardHeader, 0));
+                }
+                if (hasBrokerage)
+                {
+                    accountsAndBalances.Add(new AccountAndBalance(-1, "Brokerage accounts:", ESubType.BrokerageHeader, 0));
+                }
+                if (hasRetirement)
+                {
+                    accountsAndBalances.Add(new AccountAndBalance(-1, "Retirement accounts:", ESubType.RetirementHeader, 0));
                 }
             }
             else
@@ -209,8 +276,8 @@ namespace BanaData.Logic.Main
 
         public class AccountAndBalance : LogicBase
         {
-            public AccountAndBalance(int accountID, string accountName, int subType, decimal balance) =>
-                (AccountID, AccountName, SubType, Balance) = (accountID, accountName, subType, balance);
+            public AccountAndBalance(int accountID, string accountName, ESubType _subType, decimal balance) =>
+                (AccountID, AccountName, subType, Balance) = (accountID, accountName, _subType, balance);
 
             // Properties for logic
             public readonly int AccountID;
@@ -221,7 +288,17 @@ namespace BanaData.Logic.Main
             public string AccountName { get; private set;}
 
             // Subtype for sorting
-            public int SubType { get; }
+            public readonly ESubType subType;
+            public int SubType => (int)subType;
+
+            // Color of text
+            public string TextColor =>
+                (subType == ESubType.BankHeader || subType == ESubType.CashHeader || subType == ESubType.CreditCardHeader ||
+                 subType == ESubType.BrokerageHeader || subType == ESubType.RetirementHeader) ? "Black" : "Blue";
+
+            // Show balance
+            public bool ShowBalance => !(subType == ESubType.BankHeader || subType == ESubType.CashHeader || subType == ESubType.CreditCardHeader ||
+                 subType == ESubType.BrokerageHeader || subType == ESubType.RetirementHeader);
 
             // Account balance
             public decimal Balance { get; private set; }
