@@ -251,9 +251,9 @@ namespace BanaData.Logic.Main
                         {
                             accountAndBalance.UpdateBalance(balance);
                         }
-                        if (accountAndBalance.AccountName != account.Name)
+                        if (accountAndBalance.AccountName.Trim() != account.Name)
                         {
-                            accountAndBalance.UpdateName(account.Name);
+                            accountAndBalance.UpdateName("    " + account.Name);
                         }
                     }
                 }

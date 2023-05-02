@@ -72,7 +72,7 @@ namespace BanaData.Parsers
             new AccountSpec(EInstitution.Vanguard, "BVanguard Roll IRA", new AccountHint[] { new AccountHint(2, 2, new string[] { "Vanguard", "Benoit", "Rollover IRA brokerage" }) }),
             new AccountSpec(EInstitution.Vanguard, "SVanguard Brokerage", new AccountHint[] { new AccountHint(2, 2, new string[] { "Vanguard", "Susan", "brokerage" }) }),
             new AccountSpec(EInstitution.Vanguard, "BVanguard Brokerage", new AccountHint[] { new AccountHint(2, 2, new string[] { "Vanguard", "Benoit", "brokerage" }) }),
-            new AccountSpec(EInstitution.Chase, "SAmazon XX6555", new AccountHint[] { new AccountHint(1, 1, new string[] { "Amazon Customer Service" }) }),
+            new AccountSpec(EInstitution.Chase, "GAmazon XX6555", new AccountHint[] { new AccountHint(1, 1, new string[] { "Amazon Customer Service" }) }),
         };
 
         // Account
