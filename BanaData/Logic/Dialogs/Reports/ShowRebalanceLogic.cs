@@ -130,7 +130,15 @@ namespace BanaData.Logic.Dialogs.Reports
             {
                 if (si.Symbol != Household.SecurityRow.SYMBOL_NONE)
                 {
-                    si.SecurityPrice = quote.GetQuote(si.Symbol);
+                    try
+                    {
+                        si.SecurityPrice = quote.GetQuote(si.Symbol);
+                    }
+                    catch (Exception e)
+                    {
+                        mainWindowLogic.ErrorMessage($"Cannot get quote for {si.Symbol}: {e.Message}");
+                        break;
+                    }
                 }
                 else
                 {
