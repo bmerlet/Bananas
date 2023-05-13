@@ -125,20 +125,13 @@ namespace BanaData.Logic.Dialogs.Reports
 
         private void OnUpdateQuotes()
         {
-            var quote = new Quote();
-            foreach (var si in securityItems)
+            // Build list of securities
+            var symbols = new List<string>();
+            foreach(var si in securityItems)
             {
                 if (si.Symbol != Household.SecurityRow.SYMBOL_NONE)
                 {
-                    try
-                    {
-                        si.SecurityPrice = quote.GetQuote(si.Symbol);
-                    }
-                    catch (Exception e)
-                    {
-                        mainWindowLogic.ErrorMessage($"Cannot get quote for {si.Symbol}: {e.Message}");
-                        break;
-                    }
+                    symbols.Add(si.Symbol);
                 }
                 else
                 {
@@ -146,6 +139,29 @@ namespace BanaData.Logic.Dialogs.Reports
                 }
             }
 
+            // Ask for a quote for all of them
+            decimal[] quotes;
+            try
+            {
+                quotes = Quote.GetQuote(symbols.ToArray());
+            }
+            catch (Exception e)
+            {
+                mainWindowLogic.ErrorMessage($"Cannot get quote: {e.Message}");
+                return;
+            }
+
+            // Update prices
+            int quoteIx = 0;
+            foreach (var si in securityItems)
+            {
+                if (si.Symbol != Household.SecurityRow.SYMBOL_NONE)
+                {
+                    si.SecurityPrice = quotes[quoteIx++];
+                }
+            }
+
+            // Recompute values
             Recompute();
         }
 

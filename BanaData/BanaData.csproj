@@ -34,6 +34,7 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -140,7 +141,9 @@
     <Compile Include="Serializations\QIFWriter.cs" />
     <Compile Include="Serializations\UserSettings.cs" />
     <Compile Include="Serializations\QIFParser.cs" />
+    <Compile Include="Web\JSONParser.cs" />
     <Compile Include="Web\Quote.cs" />
+    <Compile Include="Web\YahooFinanceAPI.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Database\HouseholdDataSet.xsc">

@@ -349,7 +349,6 @@ namespace BanaData.Logic.Main
         {
             decimal oldNetWorth = mainWindow.NetWorth;
             var securities = new List<int>();
-            var quoter = new Quote();
             var investmentIDs = new List<int>();
 
             // Go through all investment accounts
@@ -360,39 +359,44 @@ namespace BanaData.Logic.Main
                     // Find the securities held
                     foreach(int security in account.GetPortfolio().GetSecurities())
                     {
-                        if (!securities.Contains(security))
+                        var secRow = household.Security.FindByID(security);
+                        if (secRow.Symbol != Household.SecurityRow.SYMBOL_NONE)
                         {
-                            securities.Add(security);
+                            if (!securities.Contains(security))
+                            {
+                                securities.Add(security);
+                            }
                         }
                     }
 
+                    // Remember to update balance for this account
                     investmentIDs.Add(account.ID);
                 }
             }
 
+            // Ask quote for all symbols
+            var symbols = securities.Select(s => household.Security.FindByID(s).Symbol).ToArray();
+            var quotes = Quote.GetQuote(symbols);
+
             // Now ask quote for all securities held
             var today = DateTime.Today;
-            foreach (int security in securities)
+            for(int sIx = 0; sIx < securities.Count; sIx++) 
             {
-                var secRow = household.Security.FindByID(security);
-                if (secRow.Symbol != Household.SecurityRow.SYMBOL_NONE)
+                var secRow = household.Security.FindByID(securities[sIx]);
+                var price = quotes[sIx];
+
+                //Console.WriteLine($"{secRow.Symbol}:\t{price}");
+                if (price >= 0)
                 {
-                    var price = quoter.GetQuote(secRow.Symbol);
-
-                    Console.WriteLine($"{secRow.Symbol}:\t{price}");
-
-                    if (price >= 0)
+                    // Keep at most one price per day
+                    var secPriceRow = household.SecurityPrice.Where(sp => sp.SecurityRow == secRow && sp.Date == today).SingleOrDefault();
+                    if (secPriceRow == null)
                     {
-                        // Keep at most one price per day
-                        var secPriceRow = household.SecurityPrice.Where(sp => sp.SecurityRow == secRow && sp.Date == today).SingleOrDefault();
-                        if (secPriceRow == null)
-                        {
-                            household.SecurityPrice.Add(secRow, DateTime.Today, price);
-                        }
-                        else
-                        {
-                            secPriceRow.Value = price;
-                        }
+                        household.SecurityPrice.Add(secRow, DateTime.Today, price);
+                    }
+                    else
+                    {
+                        secPriceRow.Value = price;
                     }
                 }
             }
