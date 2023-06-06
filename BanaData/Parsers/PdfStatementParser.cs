@@ -252,7 +252,7 @@ namespace BanaData.Parsers
                             quantity);
                         trans.Add(vg);
                     }
-                    else if (strs[i] == "VANGUARD FEDERAL MONEY" && (i+1) < strs.Length && strs[i + 1] == "Sweep in")
+                    else if (strs[i] == "VANGUARD FEDERAL MONEY" && (i + 1) < strs.Length && strs[i + 1] == "Sweep in")
                     {
                         // Sweep in
                         decimal quantity = -decimal.Parse(strs[i + 6]);
@@ -264,6 +264,20 @@ namespace BanaData.Parsers
                             1,
                             -quantity,
                             "Sweep in");
+                        trans.Add(vg);
+                    }
+                    else if (strs[i] == "VANGUARD FEDERAL MONEY" && (i + 1) < strs.Length && strs[i + 1] == "Sweep out")
+                    {
+                        // Sweep out
+                        decimal quantity = -decimal.Parse(strs[i + 6]);
+                        var vg = new VanguardTransaction(
+                            strs[i - 3] + year,
+                            "VMFXX",
+                            EInvestmentTransactionType.Sell,
+                            quantity,
+                            1,
+                            -quantity,
+                            "Sweep out");
                         trans.Add(vg);
                     }
                     else
@@ -332,6 +346,7 @@ namespace BanaData.Parsers
             {
                 case "Dividend": return EInvestmentTransactionType.Dividends;
                 case "Reinvestment": return EInvestmentTransactionType.ReinvestDividends;
+                case "Buy": return EInvestmentTransactionType.Buy;
             }
             throw new FormatException("Unknown vanguard type " + vgType);
         }
