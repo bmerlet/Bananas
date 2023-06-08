@@ -276,7 +276,7 @@ namespace BanaData.Parsers
                             EInvestmentTransactionType.Sell,
                             quantity,
                             1,
-                            -quantity,
+                            quantity,
                             "Sweep out");
                         trans.Add(vg);
                     }
@@ -288,16 +288,27 @@ namespace BanaData.Parsers
                             if (strs[i] == ticker)
                             {
                                 // Found transaction
-                                var quantity = strs[i + 4];
-                                var price = RemoveDollarSign(strs[i + 5]);
-                                var amount = RemoveNegativeSign(RemoveDollarSign(strs[i + 7]));
+                                var type = GetVanguardType(strs[i + 2]);
+                                var quantityStr = strs[i + 4];
+                                var priceStr = RemoveDollarSign(strs[i + 5]);
+                                var amountStr = RemoveNegativeSign(RemoveDollarSign(strs[i + 7]));
+                                decimal amount = 0;
+                                if (amountStr != "-")
+                                {
+                                    amount = decimal.Parse(amountStr);
+                                }
+                                if (type == EInvestmentTransactionType.Buy)
+                                {
+                                    amount = -amount;
+                                }
+
                                 var vg = new VanguardTransaction(
                                     strs[i - 2] + year,
                                     ticker,
-                                    GetVanguardType(strs[i + 2]),
-                                    quantity == "-" ? 0 : decimal.Parse(quantity),
-                                    price == "-" ? 0 : decimal.Parse(price),
-                                    amount == "-" ? 0 : decimal.Parse(amount)
+                                    type,
+                                    quantityStr == "-" ? 0 : decimal.Parse(quantityStr),
+                                    priceStr == "-" ? 0 : decimal.Parse(priceStr),
+                                    amount
                                 );
                                 trans.Add(vg);
                             }
