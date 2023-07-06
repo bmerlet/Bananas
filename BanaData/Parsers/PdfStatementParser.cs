@@ -288,29 +288,36 @@ namespace BanaData.Parsers
                             if (strs[i] == ticker)
                             {
                                 // Found transaction
-                                var type = GetVanguardType(strs[i + 2]);
-                                var quantityStr = strs[i + 4];
-                                var priceStr = RemoveDollarSign(strs[i + 5]);
-                                var amountStr = RemoveNegativeSign(RemoveDollarSign(strs[i + 7]));
-                                decimal amount = 0;
-                                if (amountStr != "-")
+                                try
                                 {
-                                    amount = decimal.Parse(amountStr);
-                                }
-                                if (type == EInvestmentTransactionType.Buy)
-                                {
-                                    amount = -amount;
-                                }
+                                    var type = GetVanguardType(strs[i + 2]);
+                                    var quantityStr = strs[i + 4];
+                                    var priceStr = RemoveDollarSign(strs[i + 5]);
+                                    var amountStr = RemoveNegativeSign(RemoveDollarSign(strs[i + 7]));
+                                    decimal amount = 0;
+                                    if (amountStr != "-")
+                                    {
+                                        amount = decimal.Parse(amountStr);
+                                    }
+                                    if (type == EInvestmentTransactionType.Buy)
+                                    {
+                                        amount = -amount;
+                                    }
 
-                                var vg = new VanguardTransaction(
-                                    strs[i - 2] + year,
-                                    ticker,
-                                    type,
-                                    quantityStr == "-" ? 0 : decimal.Parse(quantityStr),
-                                    priceStr == "-" ? 0 : decimal.Parse(priceStr),
-                                    amount
-                                );
-                                trans.Add(vg);
+                                    var vg = new VanguardTransaction(
+                                        strs[i - 2] + year,
+                                        ticker,
+                                        type,
+                                        quantityStr == "-" ? 0 : decimal.Parse(quantityStr),
+                                        priceStr == "-" ? 0 : decimal.Parse(priceStr),
+                                        amount
+                                    );
+                                    trans.Add(vg);
+                                }
+                                catch (FormatException)
+                                {
+                                    LogLine($"Unknown transaction on {strs[i]}: {strs[i+2]}");
+                                }
                             }
                         }
                     }
