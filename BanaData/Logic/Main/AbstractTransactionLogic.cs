@@ -256,20 +256,23 @@ namespace BanaData.Logic.Main
                     {
                         impactedAccounts.Add(liTransferRow.AccountID);
 
-                        // The transfer was moved to a different account. We need to take care of the
-                        // banking/investment transactions
+                        // The transfer was moved to a different account
                         var formerTransferAccountRow = liTransferRow.AccountRow;
                         var newTransferAccountRow = household.Account.FindByID(li.CategoryAccountID);
-                        
-                        if (formerTransferAccountRow.Type == EAccountType.Bank &&
-                            newTransferAccountRow.Type != EAccountType.Bank)
+
+                        // If not a transfer to self, take care of any orphaned banking/investment transactions
+                        if (formerTransferAccountRow != accountRow)
                         {
-                            peerTransactionRow.GetBankingTransaction().Delete();
-                        }
-                        if (formerTransferAccountRow.Type == EAccountType.Investment &&
-                            newTransferAccountRow.Type != EAccountType.Investment)
-                        {
-                            peerTransactionRow.GetInvestmentTransaction().Delete();
+                            if (formerTransferAccountRow.Type == EAccountType.Bank &&
+                                newTransferAccountRow.Type != EAccountType.Bank)
+                            {
+                                peerTransactionRow.GetBankingTransaction().Delete();
+                            }
+                            if (formerTransferAccountRow.Type == EAccountType.Investment &&
+                                newTransferAccountRow.Type != EAccountType.Investment)
+                            {
+                                peerTransactionRow.GetInvestmentTransaction().Delete();
+                            }
                         }
 
                         // If we are now transferring to self, we need to delete the peer and point to self
@@ -280,6 +283,7 @@ namespace BanaData.Logic.Main
                         }
                         else
                         {
+                            // Otherwise create new banking/investment transactions if needed
                             if (formerTransferAccountRow.Type != EAccountType.Bank &&
                                 newTransferAccountRow.Type == EAccountType.Bank)
                             {
