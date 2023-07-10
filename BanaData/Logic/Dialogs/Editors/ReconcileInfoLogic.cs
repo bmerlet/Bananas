@@ -24,6 +24,7 @@ namespace BanaData.Logic.Dialogs.Editors
         private readonly MainWindowLogic mainWindowLogic;
         private readonly Household household;
         private readonly Household.AccountRow accountRow;
+        private readonly decimal creditCardInverter;
         private Household.ReconcileInfoRow reconcileInfoRow;
 
         #endregion
@@ -37,11 +38,14 @@ namespace BanaData.Logic.Dialogs.Editors
             // Fill out properties with account info
             BasicInfo = $"Information to reconcile account {accountRow.Name}";
 
+            // Is this a Credit card? We display negative balance as positive numbers.
+            creditCardInverter = accountRow.Type == EAccountType.CreditCard ? -1 : 1;
+
             // Get prior statement end date
             PriorStatementEndDate = accountRow.IsLastStatementDateNull() ? new DateTime(2021, 01, 01) : accountRow.LastStatementDate;
 
             // Compute last reconciled balance
-            PriorStatementBalance = accountRow.GetReconciledBalance();
+            PriorStatementBalance = accountRow.GetReconciledBalance() * creditCardInverter;
 
             // Guess the statement end date
             statementEndDate = PriorStatementEndDate.AddMonths(1);
@@ -98,7 +102,7 @@ namespace BanaData.Logic.Dialogs.Editors
 
                 // Copy basic info from reconcile info item
                 StatementEndDate = reconcileInfoRow.StatementDate;
-                StatementBalance = reconcileInfoRow.StatementBalance;
+                StatementBalance = reconcileInfoRow.StatementBalance * creditCardInverter;
 
                 // Copy interest info if available
                 if (accountRow.Type == EAccountType.Bank)
@@ -247,7 +251,7 @@ namespace BanaData.Logic.Dialogs.Editors
             }
 
             reconcileInfoRow.StatementDate = StatementEndDate;
-            reconcileInfoRow.StatementBalance = StatementBalance;
+            reconcileInfoRow.StatementBalance = StatementBalance * creditCardInverter;
 
             if (IsInterestInfoVisible)
             {
