@@ -249,7 +249,8 @@ namespace BanaData.Parsers
                             GetVanguardType(strs[i + 1]),
                             quantity,
                             1,
-                            quantity);
+                            quantity,
+                            0);
                         trans.Add(vg);
                     }
                     else if (strs[i] == "VANGUARD FEDERAL MONEY" && (i + 1) < strs.Length && strs[i + 1] == "Sweep in")
@@ -263,13 +264,14 @@ namespace BanaData.Parsers
                             quantity,
                             1,
                             -quantity,
+                            0,
                             "Sweep in");
                         trans.Add(vg);
                     }
                     else if (strs[i] == "VANGUARD FEDERAL MONEY" && (i + 1) < strs.Length && strs[i + 1] == "Sweep out")
                     {
                         // Sweep out
-                        decimal quantity = -decimal.Parse(strs[i + 6]);
+                        decimal quantity = decimal.Parse(strs[i + 6]);
                         var vg = new VanguardTransaction(
                             strs[i - 3] + year,
                             "VMFXX",
@@ -277,6 +279,7 @@ namespace BanaData.Parsers
                             quantity,
                             1,
                             quantity,
+                            0,
                             "Sweep out");
                         trans.Add(vg);
                     }
@@ -303,6 +306,15 @@ namespace BanaData.Parsers
                                     {
                                         amount = -amount;
                                     }
+                                    decimal commission = 0;
+                                    if (type == EInvestmentTransactionType.Sell)
+                                    {
+                                        var commStr = RemoveDollarSign(strs[i + 6]);
+                                        if (commStr != "-")
+                                        {
+                                            commission = decimal.Parse(commStr);
+                                        }
+                                    }
 
                                     var vg = new VanguardTransaction(
                                         strs[i - 2] + year,
@@ -310,7 +322,8 @@ namespace BanaData.Parsers
                                         type,
                                         quantityStr == "-" ? 0 : decimal.Parse(quantityStr),
                                         priceStr == "-" ? 0 : decimal.Parse(priceStr),
-                                        amount
+                                        amount,
+                                        commission
                                     );
                                     trans.Add(vg);
                                 }
@@ -353,7 +366,7 @@ namespace BanaData.Parsers
             {
                 var securityRow = db.Security.First(s => s.Symbol == vg.Ticker);
                 var transRow = db.Transaction.Add(account, DateTime.Parse(vg.Date), null, vg.Memo, ETransactionStatus.Pending, checkpointRow, ETransactionType.Regular);
-                db.InvestmentTransaction.Add(transRow, vg.Type, securityRow, vg.Price, vg.Quantity, 0);
+                db.InvestmentTransaction.Add(transRow, vg.Type, securityRow, vg.Price, vg.Quantity, vg.Commission);
                 db.LineItem.Add(transRow, null, vg.Amount);
             }
         }
@@ -365,6 +378,7 @@ namespace BanaData.Parsers
                 case "Dividend": return EInvestmentTransactionType.Dividends;
                 case "Reinvestment": return EInvestmentTransactionType.ReinvestDividends;
                 case "Buy": return EInvestmentTransactionType.Buy;
+                case "Sell": return EInvestmentTransactionType.Sell;
             }
             throw new FormatException("Unknown vanguard type " + vgType);
         }
@@ -386,13 +400,14 @@ namespace BanaData.Parsers
 
         class VanguardTransaction
         {
-            public VanguardTransaction(string date, string ticker, EInvestmentTransactionType type, decimal quantity, decimal price, decimal amount, string memo = null) =>
-                (Date, Ticker, Type, Quantity, Price, Amount, Memo) = (date, ticker, type, quantity, price, amount, memo);
+            public VanguardTransaction(string date, string ticker, EInvestmentTransactionType type, decimal quantity, decimal price, decimal amount, decimal commission, string memo = null) =>
+                (Date, Ticker, Type, Quantity, Price, Amount, Commission, Memo) = (date, ticker, type, quantity, price, amount, commission, memo);
             public readonly string Date;
             public readonly string Ticker;
             public readonly EInvestmentTransactionType Type;
             public readonly decimal Quantity;
             public readonly decimal Price;
+            public readonly decimal Commission;
             public readonly decimal Amount;
             public readonly string Memo;
         }
