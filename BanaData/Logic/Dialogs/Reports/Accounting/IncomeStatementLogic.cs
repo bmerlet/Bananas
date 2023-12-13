@@ -417,6 +417,8 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
                 {
                     var investmentTransactionRow = transactionRow.GetInvestmentTransaction();
                     IncomeStatementNode node = null;
+                    IncomeStatementNode parentNode = null;
+                    string symbol;
                     decimal amount = Math.Abs(transactionRow.GetAmount());
 
                     switch (investmentTransactionRow.Type)
@@ -424,8 +426,10 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
                         case EInvestmentTransactionType.Buy:
                         case EInvestmentTransactionType.BuyFromTransferredCash:
                             // Buy shares
+                            symbol = investmentTransactionRow.SecurityRow.Symbol;
+                            parentNode = GetNodeByName(investmentNode, symbol, investmentTransactionRow.SecurityRow.Name, symbol);
                             node = IncomeStatementNode.GetLeaf(
-                                $"{sortableDate}: Bought {investmentTransactionRow.SecurityQuantity} shares of {investmentTransactionRow.SecurityRow.Symbol}",
+                                $"{sortableDate}: Bought {investmentTransactionRow.SecurityQuantity:N4} shares of {symbol}",
                                 transactionRow.AccountRow.Name,
                                 sortableDate,
                                 amount);
@@ -434,8 +438,10 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
                         case EInvestmentTransactionType.Sell:
                         case EInvestmentTransactionType.SellAndTransferCash:
                             // sell shares
+                            symbol = investmentTransactionRow.SecurityRow.Symbol;
+                            parentNode = GetNodeByName(investmentNode, symbol, investmentTransactionRow.SecurityRow.Name, symbol);
                             node = IncomeStatementNode.GetLeaf(
-                                $"{sortableDate}: Sold {investmentTransactionRow.SecurityQuantity} shares of {investmentTransactionRow.SecurityRow.Symbol}",
+                                $"{sortableDate}: Sold {investmentTransactionRow.SecurityQuantity:N4} shares of {symbol}",
                                 transactionRow.AccountRow.Name, 
                                 sortableDate,
                                 -amount);
@@ -443,8 +449,10 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
 
                         case EInvestmentTransactionType.ReinvestDividends:
                             // Reinvest shares
+                            symbol = investmentTransactionRow.SecurityRow.Symbol;
+                            parentNode = GetNodeByName(investmentNode, symbol, investmentTransactionRow.SecurityRow.Name, symbol);
                             node = IncomeStatementNode.GetLeaf(
-                                $"{sortableDate}: Reinvest {investmentTransactionRow.SecurityQuantity} shares of {investmentTransactionRow.SecurityRow.Symbol}",
+                                $"{sortableDate}: Reinvest {investmentTransactionRow.SecurityQuantity:N4} shares of {symbol}",
                                 transactionRow.AccountRow.Name,
                                 sortableDate,
                                 amount);
@@ -453,7 +461,7 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
 
                     if (node != null)
                     {
-                        investmentNode.AddChild(node);
+                        parentNode.AddChild(node);
                     }
 
                     ComputeTotals(investmentNode);
