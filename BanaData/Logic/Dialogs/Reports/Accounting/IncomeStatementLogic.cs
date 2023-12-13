@@ -10,6 +10,7 @@ using BanaData.Database;
 using BanaData.Logic.Dialogs.Basics;
 using BanaData.Logic.Main;
 using Toolbox.UILogic;
+using static BanaData.Database.Household;
 
 namespace BanaData.Logic.Dialogs.Reports.Accounting
 {
@@ -26,8 +27,10 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
         private const string EXPENSE_GROUP = "200Expenses";
         private const string INCOME_NAME = "Income";
         private const string INCOME_GROUP = "500Income";
+        private const string INVESTMENT_NAME = "Money invested";
+        private const string INVESTMENT_GROUP = "700Investment";
         private const string INVESTMENTVALUE_NAME = "Change in investment value";
-        private const string INVESTMENTVALUE_GROUP = "800CahngeInInvestmentValue";
+        private const string INVESTMENTVALUE_GROUP = "800ChangeInInvestmentValue";
 
         // Strings for 2nd level nodes
         private const string TAXABLE_NAME = "Taxable";
@@ -295,6 +298,9 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
             incomeNode.SetValue(RevenueNode.Value - ExpenseNode.Value);
             nodes.Add(incomeNode);
 
+            // Add investment node
+            ComputeInvestment();
+
             // Add Change in investment value node
             ComputeChangeInInvestmentValue();
         }
@@ -381,6 +387,77 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
                     sum += child.Value;
                 }
                 node.SetValue(sum);
+            }
+        }
+
+        //
+        // Compute amoount of money invested
+        //
+        private void ComputeInvestment()
+        {
+            var startDate = DateRangeLogic.StartDate;
+            var endDate = DateRangeLogic.EndDate;
+            var member = selectedMember.Member;
+
+            var investmentNode = IncomeStatementNode.GetTitle(INVESTMENT_NAME, INVESTMENT_GROUP);
+            nodes.Add(investmentNode);
+
+            // Loop on all investment transaction for the selected period and selected member
+            foreach (var transactionRow in household.RegularTransactions
+                .Where(
+                    tr => tr.Date >= startDate &&
+                    tr.Date <= endDate &&
+                    tr.AccountRow.Type == EAccountType.Investment &&
+                    (member == null || (!tr.AccountRow.IsPersonIDNull() && tr.AccountRow.PersonRow == member))))
+            {
+                string sortableDate = $"{transactionRow.Date:yyyy/MM/dd}";
+                string transTip = $"{transactionRow.AccountRow.Name} on {transactionRow.Date:MM/dd/yyyy}";
+
+                foreach (var li in transactionRow.GetLineItemRows())
+                {
+                    var investmentTransactionRow = transactionRow.GetInvestmentTransaction();
+                    IncomeStatementNode node = null;
+                    decimal amount = Math.Abs(transactionRow.GetAmount());
+
+                    switch (investmentTransactionRow.Type)
+                    {
+                        case EInvestmentTransactionType.Buy:
+                        case EInvestmentTransactionType.BuyFromTransferredCash:
+                            // Buy shares
+                            node = IncomeStatementNode.GetLeaf(
+                                $"{sortableDate}: Bought {investmentTransactionRow.SecurityQuantity} shares of {investmentTransactionRow.SecurityRow.Symbol}",
+                                transactionRow.AccountRow.Name,
+                                sortableDate,
+                                amount);
+                            break;
+
+                        case EInvestmentTransactionType.Sell:
+                        case EInvestmentTransactionType.SellAndTransferCash:
+                            // sell shares
+                            node = IncomeStatementNode.GetLeaf(
+                                $"{sortableDate}: Sold {investmentTransactionRow.SecurityQuantity} shares of {investmentTransactionRow.SecurityRow.Symbol}",
+                                transactionRow.AccountRow.Name, 
+                                sortableDate,
+                                -amount);
+                                break;
+
+                        case EInvestmentTransactionType.ReinvestDividends:
+                            // Reinvest shares
+                            node = IncomeStatementNode.GetLeaf(
+                                $"{sortableDate}: Reinvest {investmentTransactionRow.SecurityQuantity} shares of {investmentTransactionRow.SecurityRow.Symbol}",
+                                transactionRow.AccountRow.Name,
+                                sortableDate,
+                                amount);
+                            break;
+                    }
+
+                    if (node != null)
+                    {
+                        investmentNode.AddChild(node);
+                    }
+
+                    ComputeTotals(investmentNode);
+                }
             }
         }
 
