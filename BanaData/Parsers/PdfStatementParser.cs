@@ -494,9 +494,10 @@ namespace BanaData.Parsers
                     }
                     else if (strs[i].StartsWith("Order Number"))
                     {
+                        var date = strs[i - 3] == "&" ? strs[i - 4] : strs[i - 3];
                         var split = strs[i].Split(new char[] { ' ', '\t' });
                         var orderNumber = split[split.Length - 1];
-                        var cct = new CCTransaction(strs[i - 3].Trim() + year, "Amazon", orderNumber, null, -decimal.Parse(strs[i - 1]));
+                        var cct = new CCTransaction(date.Trim() + year, "Amazon", orderNumber, null, -decimal.Parse(strs[i - 1]));
                         trans.Add(cct);
                     }
                 }
