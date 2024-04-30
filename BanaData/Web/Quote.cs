@@ -12,8 +12,8 @@ namespace BanaData.Web
     {
         static public decimal[] GetQuote(string[] symbols)
         {
-            // We support only the yahoo finance API as of today
-            return YahooFinanceAPI.GetQuote(symbols);
+            // The yahoo finance API does not work anymnore, use the Alphavantage one
+            return AlphavantageAPI.GetQuote(symbols);
         }
     }
 }

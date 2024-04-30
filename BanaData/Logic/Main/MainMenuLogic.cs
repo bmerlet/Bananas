@@ -17,6 +17,7 @@ using BanaData.Logic.Items;
 using BanaData.Collections;
 using BanaData.Logic.Dialogs.Reports.Accounting;
 using BanaData.Logic.Dialogs.Pickers;
+using System.Windows;
 
 namespace BanaData.Logic.Main
 {
@@ -348,7 +349,7 @@ namespace BanaData.Logic.Main
         private void OnUpdateStockPrices()
         {
             decimal oldNetWorth = mainWindow.NetWorth;
-            var securities = new List<int>();
+            var securities = new List<Household.SecurityRow>();
             var investmentIDs = new List<int>();
 
             // Go through all investment accounts
@@ -362,9 +363,9 @@ namespace BanaData.Logic.Main
                         var secRow = household.Security.FindByID(security);
                         if (secRow.Symbol != Household.SecurityRow.SYMBOL_NONE)
                         {
-                            if (!securities.Contains(security))
+                            if (!securities.Contains(secRow))
                             {
-                                securities.Add(security);
+                                securities.Add(secRow);
                             }
                         }
                     }
@@ -374,15 +375,27 @@ namespace BanaData.Logic.Main
                 }
             }
 
-            // Ask quote for all symbols
-            var symbols = securities.Select(s => household.Security.FindByID(s).Symbol).ToArray();
-            var quotes = Quote.GetQuote(symbols);
+            // Ask quote for symbols of all securities held
+            var quotes = Quote.GetQuote(securities.Select(s => s.Symbol).ToArray());
 
-            // Now ask quote for all securities held
+            if (quotes.Any(q => q < 0))
+            {
+                string str = "Could not get quotes for the following symbols:\n";
+                for (int i = 0; i < securities.Count; i++)
+                {
+                    if (quotes[i] < 0)
+                    {
+                        str += securities[i].Symbol + " ";
+                    }
+                }
+                mainWindow.ErrorMessage(str, "Quotes");
+            }
+
+            // Now update quotes
             var today = DateTime.Today;
             for(int sIx = 0; sIx < securities.Count; sIx++) 
             {
-                var secRow = household.Security.FindByID(securities[sIx]);
+                var secRow = securities[sIx];
                 var price = quotes[sIx];
 
                 //Console.WriteLine($"{secRow.Symbol}:\t{price}");

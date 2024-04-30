@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace BanaData.Web
 {
+    //
+    // Stopped working 4/30/2024. Switched to Alphavantage API
+    //
     static internal class YahooFinanceAPI
     {
         const string QuoteQuery =
