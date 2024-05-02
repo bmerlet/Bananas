@@ -361,7 +361,9 @@ namespace BanaData.Logic.Main
                     foreach(int security in account.GetPortfolio().GetSecurities())
                     {
                         var secRow = household.Security.FindByID(security);
-                        if (secRow.Symbol != Household.SecurityRow.SYMBOL_NONE)
+
+                        // Ignore securities without a symbol and securities with a symbol starting with "*", denoting a pseudo security
+                        if (secRow.Symbol != Household.SecurityRow.SYMBOL_NONE && secRow.IsQuotable)
                         {
                             if (!securities.Contains(secRow))
                             {

@@ -24,6 +24,9 @@ namespace BanaData.Database
             // Symbol used for securities without a symbol
             public const string SYMBOL_NONE = "N/A";
 
+            // Is this a real security that is quoted?
+            public bool IsQuotable => !Symbol.StartsWith("*");
+
             // Get most recent price, or most recent price known at a given date
             public decimal GetMostRecentPrice(DateTime? limit = null)
             {
