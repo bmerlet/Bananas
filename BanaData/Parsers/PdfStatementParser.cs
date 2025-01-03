@@ -315,12 +315,21 @@ namespace BanaData.Parsers
                                             commission = decimal.Parse(commStr);
                                         }
                                     }
+                                    decimal quantity = 0;
+                                    if (quantityStr != "-")
+                                    {
+                                        quantity = decimal.Parse(quantityStr);
+                                        if (type == EInvestmentTransactionType.Sell)
+                                        {
+                                            quantity = -quantity;
+                                        }
+                                    }
 
                                     var vg = new VanguardTransaction(
                                         strs[i - 2] + year,
                                         ticker,
                                         type,
-                                        quantityStr == "-" ? 0 : decimal.Parse(quantityStr),
+                                        quantity,
                                         priceStr == "-" ? 0 : decimal.Parse(priceStr),
                                         amount,
                                         commission
