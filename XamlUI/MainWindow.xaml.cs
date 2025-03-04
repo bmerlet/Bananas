@@ -197,6 +197,14 @@ namespace XamlUI
             {
                 dialog = new ListTransactionReports(listTransactionReportsLogic);
             }
+            else if (logic is ListStatementAccountHintsLogic listStatementAccountHintsLogic)
+            {
+                dialog = new ListStatementAccountHints(listStatementAccountHintsLogic);
+            }
+            else if (logic is EditStatementAccountHintsLogic editStatementAccountHintsLogic)
+            {
+                dialog = new EditStatementAccountHints(editStatementAccountHintsLogic);
+            }
             else if (logic is EditTransactionReportLogic editTransactionReportLogic)
             {
                 dialog = new EditTransactionReport(editTransactionReportLogic);

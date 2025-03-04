@@ -1,0 +1,69 @@
+﻿<Window x:Class="XamlUI.Dialogs.Editors.EditStatementAccountHints"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:local="clr-namespace:XamlUI.Dialogs.Editors"
+        xmlns:ucs="clr-namespace:XamlUI.UserControls"
+        xmlns:w="clr-namespace:XamlUI.Widgets"
+        xmlns:editors="clr-namespace:BanaData.Logic.Dialogs.Editors;assembly=BanaData"
+        d:DataContext="{d:DesignInstance Type=editors:EditStatementAccountHintsLogic}"
+        mc:Ignorable="d" 
+        Icon="/XamlUI;component/Images/Bananas.ico"
+        Title="Edit statement parsing hint"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        SizeToContent="WidthAndHeight">
+
+    <Window.Resources>
+
+        <Style TargetType="TextBlock" BasedOn="{StaticResource FormTextBlock}"/>
+        <Style TargetType="w:WatermarkTextBox" BasedOn="{StaticResource FormWatermarkTextBox}"/>
+        <Style TargetType="w:AmountBox" BasedOn="{StaticResource FormAmountBox}"/>
+        <Style TargetType="ComboBox" BasedOn="{StaticResource FormComboBox}"/>
+        <Style TargetType="CheckBox" BasedOn="{StaticResource FormCheckBox}"/>
+
+    </Window.Resources>
+    <DockPanel>
+        <!-- OK/Cancel panel -->
+        <ucs:OKCancel DockPanel.Dock="Bottom"/>
+        <!-- Main panel -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="80" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="200"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Row 0: Institution -->
+            <TextBlock Text="Institution:" Grid.Row="0"/>
+            <ComboBox ItemsSource="{Binding InstitutionSource, Mode=OneTime}" SelectedItem="{Binding Institution}" Grid.Row="0" Grid.Column="1"/>
+
+            <!-- Row 1: Account -->
+            <TextBlock Text="Account:" Grid.Row="1"/>
+            <ComboBox ItemsSource="{Binding AccountNameSource, Mode=OneTime}" SelectedItem="{Binding AccountName}" Grid.Row="1" Grid.Column="1"/>
+
+            <!-- Row 2: Start page -->
+            <TextBlock Text="String search start page:" Grid.Row="2"/>
+            <w:WatermarkTextBox Text="{Binding MinPage, Mode=TwoWay}" Watermark="Start page" Grid.Row="2" Grid.Column="1"/>
+
+            <!-- Row 3: End page -->
+            <TextBlock Text="String search end page:" Grid.Row="3"/>
+            <w:WatermarkTextBox Text="{Binding MinPage, Mode=TwoWay}" Watermark="End page" Grid.Row="3" Grid.Column="1"/>
+
+            <!-- Row 4: Strings -->
+            <TextBlock Text="Strings to search for (all must be present):" Grid.Row="4" Grid.ColumnSpan="2"/>
+
+            <!-- Row 5: Space for the user to write the strings, one per line -->
+            <TextBox AcceptsReturn="True" VerticalScrollBarVisibility="Visible" Text="{Binding StringsForEdit}" Grid.ColumnSpan="2" Grid.Row="5"/>
+        </Grid>
+
+    </DockPanel>
+</Window>

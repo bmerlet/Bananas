@@ -89,6 +89,9 @@
     <Compile Include="Dialogs\Editors\EditSplit.xaml.cs">
       <DependentUpon>EditSplit.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\Editors\EditStatementAccountHints.xaml.cs">
+      <DependentUpon>EditStatementAccountHints.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\Editors\EditTransactionReport.xaml.cs">
       <DependentUpon>EditTransactionReport.xaml</DependentUpon>
     </Compile>
@@ -121,6 +124,9 @@
     </Compile>
     <Compile Include="Dialogs\Listers\ListSecurityPrices.xaml.cs">
       <DependentUpon>ListSecurityPrices.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Listers\ListStatementAccountHints.xaml.cs">
+      <DependentUpon>ListStatementAccountHints.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Listers\ListTransactionReports.xaml.cs">
       <DependentUpon>ListTransactionReports.xaml</DependentUpon>
@@ -268,6 +274,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Dialogs\Editors\EditStatementAccountHints.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\Editors\EditTransactionReport.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -309,6 +319,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\Listers\ListSecurityPrices.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Listers\ListStatementAccountHints.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

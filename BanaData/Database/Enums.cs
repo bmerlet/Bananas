@@ -278,4 +278,17 @@ namespace BanaData.Database
         NotifyAfter = 0x2,
         Expires = 0x4
     }
+
+    // Institutations, for the StatementAccountHint table
+    public enum EInstitution 
+    {
+        [EnumDescription("None")]
+        None,
+
+        [EnumDescription("Vanguard")]
+        Vanguard,
+
+        [EnumDescription("Chase")]
+        Chase
+    }
 }

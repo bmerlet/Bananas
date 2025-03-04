@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,7 +22,7 @@ namespace BanaData.Parsers
             data.Parse();
 
             // Try to recognize statement and institution
-            (EInstitution institution, string account) = DetermineAccount(data);
+            (EInstitution institution, string account) = DetermineAccount(data, db);
             LogLine("Institution: " + institution.ToString());
             LogLine("Account: " + account);
             LogLine("");
@@ -63,75 +65,65 @@ namespace BanaData.Parsers
 
         #region Account descriptions
 
-        public enum EInstitution { None, Vanguard, Chase }
-
         static readonly AccountSpec[] accountSpecs = new AccountSpec[]
         {
-            new AccountSpec(EInstitution.Vanguard, "GVanguard Brokerage", new AccountHint[] { new AccountHint(2, 2, new string[] { "Vanguard", "Susan", "Benoit", "Joint brokerage" }) }),
-            new AccountSpec(EInstitution.Vanguard, "SVanguard IRA XX1248", new AccountHint[] { new AccountHint(2, 2, new string[] { "Vanguard", "Susan", "Traditional IRA brokerage" }) }),
-            new AccountSpec(EInstitution.Vanguard, "BVanguard Roll IRA", new AccountHint[] { new AccountHint(2, 2, new string[] { "Vanguard", "Benoit", "Rollover IRA brokerage" }) }),
-            new AccountSpec(EInstitution.Vanguard, "SVanguard Brokerage", new AccountHint[] { new AccountHint(2, 2, new string[] { "Vanguard", "Susan", "brokerage" }) }),
-            new AccountSpec(EInstitution.Vanguard, "BVanguard Brokerage", new AccountHint[] { new AccountHint(2, 2, new string[] { "Vanguard", "Benoit", "brokerage" }) }),
-            new AccountSpec(EInstitution.Chase, "GAmazon XX8145", new AccountHint[] { new AccountHint(1, 1, new string[] { "Amazon Customer Service" }) }),
+            new AccountSpec(EInstitution.Vanguard, "GVanguard Brokerage", 2, 2, new string[] { "Vanguard", "Susan", "Benoit", "Joint brokerage" }),
+            new AccountSpec(EInstitution.Vanguard, "SVanguard IRA XX1248", 2, 2, new string[] { "Vanguard", "Susan", "Traditional IRA brokerage" }),
+            new AccountSpec(EInstitution.Vanguard, "BVanguard Roll IRA", 2, 2, new string[] { "Vanguard", "Benoit", "Rollover IRA brokerage" }),
+            new AccountSpec(EInstitution.Vanguard, "SVanguard Brokerage", 2, 2, new string[] { "Vanguard", "Susan", "brokerage" }),
+            new AccountSpec(EInstitution.Vanguard, "BVanguard Brokerage",2, 2,  new string[] { "Vanguard", "Benoit", "brokerage" }),
+            new AccountSpec(EInstitution.Chase, "GAmazon XX8145",1 , 1, new string[] { "Amazon Customer Service" }),
         };
 
         // Account
         class AccountSpec
         {
-            public AccountSpec(EInstitution institution, string name, AccountHint[] hints) =>
-                (Institution, BananaAccountName, AccountHints) = (institution, name, hints);
+            public AccountSpec(EInstitution institution, string name, int minPage, int maxPage, string[] required) =>
+                (Institution, BananaAccountName, MinPage, MaxPage, Required) = (institution, name, minPage, maxPage, required);
 
             public readonly EInstitution Institution;
             public readonly string BananaAccountName;
-            public readonly AccountHint[] AccountHints;
-        }
-
-        // Account hint
-        class AccountHint
-        {
-            public AccountHint(int min, int max, string[] required) => (MinPage, MaxPage, Required) = (min, max, required);
             public readonly int MinPage;
             public readonly int MaxPage;
             public readonly string[] Required;
         }
 
-        static private (EInstitution, string) DetermineAccount(PdfData data)
+        static private (EInstitution, string) DetermineAccount(PdfData data, Household db)
         {
+            // ZZZ Build hint from DB RFU ZZZ
+            AccountSpec[] dbAccountSpecs =
+                db.StatementAccountHint.Select<Household.StatementAccountHintRow, AccountSpec>(
+                    s => new AccountSpec(s.Institution, s.AccountRow.Name, s.MinPage, s.MaxPage, 
+                    db.StatementAccountString.Where(st => st.HintID == s.ID).Select<Household.StatementAccountStringRow, String>(str => str.String).ToArray())).ToArray();
+
             EInstitution institution = EInstitution.None;
             string accountName = "?";
 
             foreach (var spec in accountSpecs)
             {
                 bool pass = true;
-                foreach (var hint in spec.AccountHints)
+                for (int page = spec.MinPage - 1; page <= spec.MaxPage - 1; page++)
                 {
-                    for (int page = hint.MinPage - 1; page <= hint.MaxPage - 1; page++)
+                    var strs = data.ExtractTextFromPage(page);
+                    foreach (var required in spec.Required)
                     {
-                        var strs = data.ExtractTextFromPage(page);
-                        foreach (var required in hint.Required)
+                        bool found = false;
+                        foreach (var str in strs)
                         {
-                            bool found = false;
-                            foreach (var str in strs)
+                            if (str.Contains(required))
                             {
-                                if (str.Contains(required))
-                                {
-                                    found = true;
-                                    break;
-                                }
-                            }
-                            if (!found)
-                            {
-                                pass = false;
+                                found = true;
                                 break;
                             }
                         }
-                    }
-
-                    if (!pass)
-                    {
-                        break;
+                        if (!found)
+                        {
+                            pass = false;
+                            break;
+                        }
                     }
                 }
+
 
                 if (pass)
                 {

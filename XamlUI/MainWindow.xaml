@@ -56,6 +56,7 @@
                     <MenuItem Header="Scheduled transactions..." Command="{Binding EditScheduledTransactions}"/>
                     <MenuItem Header="Household members..." Command="{Binding EditPersons}"/>
                     <MenuItem Header="Transaction reports..." Command="{Binding EditTransactionReports}"/>
+                    <MenuItem Header="Statement parsing hints..." Command="{Binding EditStatementParsingHints}"/>
                 </MenuItem>
                 <MenuItem Header="Actions">
                     <MenuItem Header="Reconcile..." Command="{Binding Reconcile}" InputGestureText="^R"/>

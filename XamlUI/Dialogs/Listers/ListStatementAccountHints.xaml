@@ -1,0 +1,42 @@
+﻿<Window x:Class="XamlUI.Dialogs.Listers.ListStatementAccountHints"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:XamlUI.Dialogs.Listers"
+        mc:Ignorable="d"
+        xmlns:w="clr-namespace:XamlUI.UserControls"
+        xmlns:listers="clr-namespace:BanaData.Logic.Dialogs.Listers;assembly=BanaData"
+        d:DataContext="{d:DesignInstance Type=listers:ListStatementAccountHintsLogic}"
+        Title="Edit statement parsing hints" Height="450" Width="800"
+        Icon="/XamlUI;component/Images/Bananas.ico"
+        WindowStartupLocation="CenterOwner">
+    <DockPanel>
+
+        <!-- Done panel -->
+        <w:DonePanel DockPanel.Dock="Bottom"/>
+
+        <!-- Add/Edit/Delete panel -->
+        <w:AddEditDeletePanel DockPanel.Dock="Bottom"/>
+
+        <!-- Main panel: Listview of accounts -->
+        <ListView
+            x:Name="listView"
+            SelectionMode="Single"
+            ItemsSource="{Binding StatementAccountHintsSource}"
+            SelectedItem="{Binding SelectedStatementAccountHint, Mode=TwoWay}"
+            MouseDoubleClick="OnListviewDoubleClick">
+
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Account name" Width="200" DisplayMemberBinding="{Binding AccountName}"/>
+                    <GridViewColumn Header="Institution" Width="100" DisplayMemberBinding="{Binding InstitutionStr}"/>
+                    <GridViewColumn Header="Start Page" Width="70" DisplayMemberBinding="{Binding MinPage}"/>
+                    <GridViewColumn Header="End Page" Width="70" DisplayMemberBinding="{Binding MaxPage}"/>
+                    <GridViewColumn Header="Strings to search for" Width="300" DisplayMemberBinding="{Binding StringsForList}"/>
+                </GridView>
+            </ListView.View>
+
+        </ListView>
+    </DockPanel>
+</Window>

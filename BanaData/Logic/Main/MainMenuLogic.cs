@@ -54,6 +54,7 @@ namespace BanaData.Logic.Main
             EditSecurities = new CommandBase(OnEditSecurities);
             EditTransactionReports = new CommandBase(OnEditTransactionReports);
             EditScheduledTransactions = new CommandBase(OnEditScheduledTransactions);
+            EditStatementParsingHints = new CommandBase(OnEditStatementParsingHints);
             RenamePayee = new CommandBase(OnRenamePayee);
 
             Reconcile = new CommandBase(OnReconcile);
@@ -291,6 +292,17 @@ namespace BanaData.Logic.Main
             var logic = new ListSchedulesLogic(mainWindow, household);
             mainWindow.GuiServices.ShowDialog(logic);
             mainWindow.CheckForScheduledTransactions();
+        }
+
+        //
+        // Edit statement parsing hints
+        //
+        public CommandBase EditStatementParsingHints { get; }
+
+        private void OnEditStatementParsingHints()
+        {
+            var logic = new ListStatementAccountHintsLogic(mainWindow, household);
+            mainWindow.GuiServices.ShowDialog(logic);
         }
 
         #endregion
