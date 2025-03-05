@@ -31,7 +31,8 @@ namespace BanaData.Logic.Items
             AccountName = sah.AccountRow.Name;
             MinPage = sah.MinPage;
             MaxPage = sah.MaxPage;
-            Strings = sah.GetStatementAccountStringRows().Select<Household.StatementAccountStringRow, String>(s => s.String).ToArray();
+            var stringRows = sah.GetStatementAccountStringRows();
+            Strings = stringRows.Select<Household.StatementAccountStringRow, String>(s => s.String).ToArray();
         }
 
         // Properties

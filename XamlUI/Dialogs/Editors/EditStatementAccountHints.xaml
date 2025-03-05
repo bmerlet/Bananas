@@ -56,7 +56,7 @@
 
             <!-- Row 3: End page -->
             <TextBlock Text="String search end page:" Grid.Row="3"/>
-            <w:WatermarkTextBox Text="{Binding MinPage, Mode=TwoWay}" Watermark="End page" Grid.Row="3" Grid.Column="1"/>
+            <w:WatermarkTextBox Text="{Binding MaxPage, Mode=TwoWay}" Watermark="End page" Grid.Row="3" Grid.Column="1"/>
 
             <!-- Row 4: Strings -->
             <TextBlock Text="Strings to search for (all must be present):" Grid.Row="4" Grid.ColumnSpan="2"/>

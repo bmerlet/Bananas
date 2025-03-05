@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,12 +23,10 @@ namespace BanaData.Parsers
             data.Parse();
 
             // Try to recognize statement and institution
-            (EInstitution institution, string account) = DetermineAccount(data, db);
+            (EInstitution institution, Household.AccountRow accountRow) = DetermineAccount(data, db);
             LogLine("Institution: " + institution.ToString());
-            LogLine("Account: " + account);
+            LogLine("Account: " + accountRow.Name);
             LogLine("");
-
-            var accountRow = db.Account.Where(a => a.Name == account).Single();
 
             switch (institution)
             {
@@ -63,77 +62,53 @@ namespace BanaData.Parsers
 
         #endregion
 
-        #region Account descriptions
+        #region Account/Institution parsing
 
-        static readonly AccountSpec[] accountSpecs = new AccountSpec[]
+        //
+        // Find the institution and account for the statement based on hints
+        //
+        static private (EInstitution, Household.AccountRow) DetermineAccount(PdfData data, Household db)
         {
-            new AccountSpec(EInstitution.Vanguard, "GVanguard Brokerage", 2, 2, new string[] { "Vanguard", "Susan", "Benoit", "Joint brokerage" }),
-            new AccountSpec(EInstitution.Vanguard, "SVanguard IRA XX1248", 2, 2, new string[] { "Vanguard", "Susan", "Traditional IRA brokerage" }),
-            new AccountSpec(EInstitution.Vanguard, "BVanguard Roll IRA", 2, 2, new string[] { "Vanguard", "Benoit", "Rollover IRA brokerage" }),
-            new AccountSpec(EInstitution.Vanguard, "SVanguard Brokerage", 2, 2, new string[] { "Vanguard", "Susan", "brokerage" }),
-            new AccountSpec(EInstitution.Vanguard, "BVanguard Brokerage",2, 2,  new string[] { "Vanguard", "Benoit", "brokerage" }),
-            new AccountSpec(EInstitution.Chase, "GAmazon XX8145",1 , 1, new string[] { "Amazon Customer Service" }),
-        };
-
-        // Account
-        class AccountSpec
-        {
-            public AccountSpec(EInstitution institution, string name, int minPage, int maxPage, string[] required) =>
-                (Institution, BananaAccountName, MinPage, MaxPage, Required) = (institution, name, minPage, maxPage, required);
-
-            public readonly EInstitution Institution;
-            public readonly string BananaAccountName;
-            public readonly int MinPage;
-            public readonly int MaxPage;
-            public readonly string[] Required;
-        }
-
-        static private (EInstitution, string) DetermineAccount(PdfData data, Household db)
-        {
-            // ZZZ Build hint from DB RFU ZZZ
-            AccountSpec[] dbAccountSpecs =
-                db.StatementAccountHint.Select<Household.StatementAccountHintRow, AccountSpec>(
-                    s => new AccountSpec(s.Institution, s.AccountRow.Name, s.MinPage, s.MaxPage, 
-                    db.StatementAccountString.Where(st => st.HintID == s.ID).Select<Household.StatementAccountStringRow, String>(str => str.String).ToArray())).ToArray();
-
-            EInstitution institution = EInstitution.None;
-            string accountName = "?";
-
-            foreach (var spec in accountSpecs)
+            // Go through all the hints
+            foreach(Household.StatementAccountHintRow hint in db.StatementAccountHint.Rows)
             {
-                bool pass = true;
-                for (int page = spec.MinPage - 1; page <= spec.MaxPage - 1; page++)
+                // Concatenate all the pages to read
+                var stringsInPages = new List<string>();
+                for (int page = hint.MinPage; page <= hint.MaxPage; page++)
                 {
-                    var strs = data.ExtractTextFromPage(page);
-                    foreach (var required in spec.Required)
+                    stringsInPages.AddRange(data.ExtractTextFromPage(page));
+                }
+
+                // Check that all our strings are present
+                bool allStringsPresent = true;
+                foreach (var stringRow in hint.GetStatementAccountStringRows())
+                {
+                    bool found = false;
+                    foreach (var str in stringsInPages)
                     {
-                        bool found = false;
-                        foreach (var str in strs)
+                        if (str.Contains(stringRow.String))
                         {
-                            if (str.Contains(required))
-                            {
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (!found)
-                        {
-                            pass = false;
+                            found = true;
                             break;
                         }
                     }
+
+                    // Fail if a string is not found
+                    if (!found)
+                    {
+                        allStringsPresent = false;
+                        break;
+                    }
                 }
 
-
-                if (pass)
+                // Check if we have a winner
+                if (allStringsPresent)
                 {
-                    accountName = spec.BananaAccountName;
-                    institution = spec.Institution;
-                    break;
+                    return (hint.Institution, hint.AccountRow);
                 }
             }
 
-            return (institution, accountName);
+            throw new InvalidOperationException("Could not find institution/account in statement");
         }
 
         #endregion

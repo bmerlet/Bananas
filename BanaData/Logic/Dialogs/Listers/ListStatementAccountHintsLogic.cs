@@ -94,9 +94,11 @@ namespace BanaData.Logic.Dialogs.Listers
                 {
                     // Get new hint
                     var newHint = logic.NewStatementAccountHintItem;
+                    bool hintChanged = logic.IsChangingOtherThanStrings;
+                    bool stringsChanged = logic.IsChangingStrings;
 
                     // Commit change
-                    UpdateStatementHintInDataSet(newHint);
+                    UpdateStatementHintInDataSet(newHint, hintChanged, stringsChanged);
 
                     // Update UI
                     statementAccountHintsSource.Remove(SelectedStatementAccountHint);
@@ -122,9 +124,18 @@ namespace BanaData.Logic.Dialogs.Listers
 
         private StatementAccountHintItem AddStatementHintToDataSet(StatementAccountHintItem newHint)
         {
-            // Create new hint
+            // Create new hint row
             var accountID = household.Account.Rows.Cast<Household.AccountRow>().Where(a => a.Name == newHint.AccountName).Single().ID;
             var newHintRow = household.StatementAccountHint.Add(newHint.Institution, accountID, newHint.MinPage, newHint.MaxPage);
+
+            // Create the string rows
+            foreach (var str in newHint.Strings)
+            {
+                var newStringRow = household.StatementAccountString.NewStatementAccountStringRow();
+                newStringRow.HintID = newHintRow.ID;
+                newStringRow.String = str;
+                household.StatementAccountString.Rows.Add(newStringRow);
+            }
 
             // Commit
             mainWindowLogic.CommitChanges(household);
@@ -133,11 +144,32 @@ namespace BanaData.Logic.Dialogs.Listers
             return new StatementAccountHintItem(newHintRow);
         }
 
-        private void UpdateStatementHintInDataSet(StatementAccountHintItem newHint)
+        private void UpdateStatementHintInDataSet(StatementAccountHintItem newHint, bool updateHint, bool updateStrings)
         {
-            // Update the row
-            var accountID = household.Account.Rows.Cast<Household.AccountRow>().Where(a => a.Name == newHint.AccountName).Single().ID;
-            household.StatementAccountHint.Update(newHint.StatementAccountHintRow, newHint.Institution, accountID, newHint.MinPage, newHint.MaxPage);
+            // Update the row if needed
+            if (updateHint)
+            {
+                var accountID = household.Account.Rows.Cast<Household.AccountRow>().Where(a => a.Name == newHint.AccountName).Single().ID;
+                household.StatementAccountHint.Update(newHint.StatementAccountHintRow, newHint.Institution, accountID, newHint.MinPage, newHint.MaxPage);
+            }
+
+            if (updateStrings)
+            {
+                // Delete all previous strings
+                foreach(var stringRow in newHint.StatementAccountHintRow.GetStatementAccountStringRows())
+                {
+                    stringRow.Delete();
+                }
+
+                // Add all the new strings
+                foreach (var str in newHint.Strings)
+                {
+                    var newStringRow = household.StatementAccountString.NewStatementAccountStringRow();
+                    newStringRow.HintID = newHint.StatementAccountHintRow.ID;
+                    newStringRow.String = str;
+                    household.StatementAccountString.Rows.Add(newStringRow);
+                }
+            }
 
             // Commit
             mainWindowLogic.CommitChanges(household);

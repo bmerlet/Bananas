@@ -516,10 +516,10 @@ namespace BanaData.Logic.Main
                     }
 
                     // ZZZ probably not needed
-                    if (!string.IsNullOrEmpty(psp.Log))
-                    {
-                        ErrorMessage(psp.Log, "Import results");
-                    }
+                    //if (!string.IsNullOrEmpty(psp.Log))
+                    //{
+                    //    ErrorMessage(psp.Log, "Import results");
+                    //}
                 }
 
                 // Edit the imported transactions
@@ -577,6 +577,16 @@ namespace BanaData.Logic.Main
             foreach (var security in household.Security)
             {
                 miniDB.Security.ImportRow(security);
+            }
+
+            foreach (var hint in household.StatementAccountHint)
+            {
+                miniDB.StatementAccountHint.ImportRow(hint);
+            }
+
+            foreach (var hintString in household.StatementAccountString)
+            {
+                miniDB.StatementAccountString.ImportRow(hintString);
             }
 
             return miniDB;

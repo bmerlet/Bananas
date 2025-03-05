@@ -82,8 +82,7 @@ namespace BanaData.Logic.Dialogs.Editors
         { 
             get
             {
-                var str = StringsForEdit.Replace("\r\n", "\n");
-                var strings = str.Split('\n');
+                var strings = GetArrayFromEditString();
 
                 return new StatementAccountHintItem(
                     institution,
@@ -94,6 +93,15 @@ namespace BanaData.Logic.Dialogs.Editors
                     oldHint.StatementAccountHintRow);
             }
         }
+
+        public bool IsChangingOtherThanStrings =>
+                oldHint.Institution != institution ||
+                oldHint.AccountName != AccountName ||
+                oldHint.MinPage != minPage ||
+                oldHint.MaxPage != maxPage;
+
+        public bool IsChangingStrings => oldHint.StringsForEdit != StringsForEdit;
+
 
         #endregion
 
@@ -131,6 +139,13 @@ namespace BanaData.Logic.Dialogs.Editors
                 return null;
             }
 
+            var strings = GetArrayFromEditString();
+            if (strings.Length == 0)
+            {
+                mainWindowLogic.ErrorMessage("There must be at least one string to search for");
+                return null;
+            }
+
             bool change =
                 oldHint.Institution != institution ||
                 oldHint.AccountName != AccountName ||
@@ -139,6 +154,28 @@ namespace BanaData.Logic.Dialogs.Editors
                 oldHint.StringsForEdit != StringsForEdit;
 
             return change;
+        }
+
+        private string[] GetArrayFromEditString()
+        {
+            // Remove \r
+            var str = StringsForEdit.Replace("\r\n", "\n");
+
+            // Remove empty lines
+            while (str.Contains("\n\n"))
+            {
+                str = StringsForEdit.Replace("\n\n", "\n");
+            }
+            if (str.StartsWith("\n"))
+            {
+                str = str.Substring(1);
+            }
+            if (str.EndsWith("\n"))
+            {
+                str = str.Substring(0, str.Length - 1);
+            }
+
+            return str.Split('\n');
         }
 
         #endregion

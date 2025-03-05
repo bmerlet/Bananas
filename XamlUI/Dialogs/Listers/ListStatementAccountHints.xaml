@@ -30,7 +30,7 @@
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Account name" Width="200" DisplayMemberBinding="{Binding AccountName}"/>
-                    <GridViewColumn Header="Institution" Width="100" DisplayMemberBinding="{Binding InstitutionStr}"/>
+                    <GridViewColumn Header="Institution" Width="100" DisplayMemberBinding="{Binding InstitutionName}"/>
                     <GridViewColumn Header="Start Page" Width="70" DisplayMemberBinding="{Binding MinPage}"/>
                     <GridViewColumn Header="End Page" Width="70" DisplayMemberBinding="{Binding MaxPage}"/>
                     <GridViewColumn Header="Strings to search for" Width="300" DisplayMemberBinding="{Binding StringsForList}"/>
