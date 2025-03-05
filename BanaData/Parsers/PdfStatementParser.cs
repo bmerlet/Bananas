@@ -186,6 +186,7 @@ namespace BanaData.Parsers
 
             // Start at page 5 "Completed Transactions", stop at page containing "Disclosures"
             bool foundCompletedTransactions = false;
+            bool cashPlusAccount = false;
             for (int page = 4; page < data.NumberOfPages; page++)
             {
                 var strs = data.ExtractTextFromPage(page);
@@ -196,6 +197,12 @@ namespace BanaData.Parsers
 
                 for (int i = 0; i < strs.Length; i++)
                 {
+                    if (!cashPlusAccount && strs[i].Contains("Cash Plus account"))
+                    {
+                        cashPlusAccount = true;
+                        continue;
+                    }
+
                     if (!foundCompletedTransactions)
                     {
                         if (strs[i].Contains("Completed transactions"))
@@ -206,106 +213,126 @@ namespace BanaData.Parsers
                     }
 
                     // We are after Completed Transactions" and before "Disclosures"
-                    if (strs[i] == "VANGUARD FEDERAL MONEY" && (i + 1) < strs.Length && strs[i + 1] == "Reinvestment")
+                    if (cashPlusAccount)
                     {
-                        // Settlement fund reinvestment 
-                        decimal quantity = -decimal.Parse(strs[i + 6]);
-                        var vg = new VanguardTransaction(
-                            strs[i - 3] + year,
-                            "VMFXX",
-                            GetVanguardType(strs[i + 1]),
-                            quantity,
-                            1,
-                            quantity,
-                            0);
-                        trans.Add(vg);
-                    }
-                    else if (strs[i] == "VANGUARD FEDERAL MONEY" && (i + 1) < strs.Length && strs[i + 1] == "Sweep in")
-                    {
-                        // Sweep in
-                        decimal quantity = -decimal.Parse(strs[i + 6]);
-                        var vg = new VanguardTransaction(
-                            strs[i - 3] + year,
-                            "VMFXX",
-                            EInvestmentTransactionType.Buy,
-                            quantity,
-                            1,
-                            -quantity,
-                            0,
-                            "Sweep in");
-                        trans.Add(vg);
-                    }
-                    else if (strs[i] == "VANGUARD FEDERAL MONEY" && (i + 1) < strs.Length && strs[i + 1] == "Sweep out")
-                    {
-                        // Sweep out
-                        decimal quantity = decimal.Parse(strs[i + 6]);
-                        var vg = new VanguardTransaction(
-                            strs[i - 3] + year,
-                            "VMFXX",
-                            EInvestmentTransactionType.Sell,
-                            quantity,
-                            1,
-                            quantity,
-                            0,
-                            "Sweep out");
-                        trans.Add(vg);
+                        if (strs[i] == "VANGUARD CASH PLUS" && (i + 1) < strs.Length && strs[i + 1] == "INTEREST REINVEST")
+                        {
+                            // Monthly interest
+                            decimal quantity = -decimal.Parse(strs[i + 6]);
+                            var vg = new VanguardTransaction(
+                                strs[i - 3] + year,
+                                "*VCP",
+                                EInvestmentTransactionType.ReinvestDividends,
+                                quantity,
+                                1,
+                                quantity,
+                                0);
+                            trans.Add(vg);
+                        }
                     }
                     else
                     {
-                        // Transactions on specific securities
-                        foreach (var ticker in new string[] { "BND", "BNDX", "VGIT", "VXUS", "VTI", "VNQ" })
+                        if (strs[i] == "VANGUARD FEDERAL MONEY" && (i + 1) < strs.Length && strs[i + 1] == "Reinvestment")
                         {
-                            if (strs[i] == ticker)
+                            // Settlement fund reinvestment 
+                            decimal quantity = -decimal.Parse(strs[i + 6]);
+                            var vg = new VanguardTransaction(
+                                strs[i - 3] + year,
+                                "VMFXX",
+                                GetVanguardType(strs[i + 1]),
+                                quantity,
+                                1,
+                                quantity,
+                                0);
+                            trans.Add(vg);
+                        }
+                        else if (strs[i] == "VANGUARD FEDERAL MONEY" && (i + 1) < strs.Length && strs[i + 1] == "Sweep in")
+                        {
+                            // Sweep in
+                            decimal quantity = -decimal.Parse(strs[i + 6]);
+                            var vg = new VanguardTransaction(
+                                strs[i - 3] + year,
+                                "VMFXX",
+                                EInvestmentTransactionType.Buy,
+                                quantity,
+                                1,
+                                -quantity,
+                                0,
+                                "Sweep in");
+                            trans.Add(vg);
+                        }
+                        else if (strs[i] == "VANGUARD FEDERAL MONEY" && (i + 1) < strs.Length && strs[i + 1] == "Sweep out")
+                        {
+                            // Sweep out
+                            decimal quantity = decimal.Parse(strs[i + 6]);
+                            var vg = new VanguardTransaction(
+                                strs[i - 3] + year,
+                                "VMFXX",
+                                EInvestmentTransactionType.Sell,
+                                quantity,
+                                1,
+                                quantity,
+                                0,
+                                "Sweep out");
+                            trans.Add(vg);
+                        }
+                        else
+                        {
+                            // Transactions on specific securities
+                            foreach (var ticker in new string[] { "BND", "BNDX", "VGIT", "VXUS", "VTI", "VNQ" })
                             {
-                                // Found transaction
-                                try
+                                if (strs[i] == ticker)
                                 {
-                                    var type = GetVanguardType(strs[i + 2]);
-                                    var quantityStr = strs[i + 4];
-                                    var priceStr = RemoveDollarSign(strs[i + 5]);
-                                    var amountStr = RemoveNegativeSign(RemoveDollarSign(strs[i + 7]));
-                                    decimal amount = 0;
-                                    if (amountStr != "-")
+                                    // Found transaction
+                                    try
                                     {
-                                        amount = decimal.Parse(amountStr);
-                                    }
-                                    if (type == EInvestmentTransactionType.Buy)
-                                    {
-                                        amount = -amount;
-                                    }
-                                    decimal commission = 0;
-                                    if (type == EInvestmentTransactionType.Sell)
-                                    {
-                                        var commStr = RemoveDollarSign(strs[i + 6]);
-                                        if (commStr != "-")
+                                        var type = GetVanguardType(strs[i + 2]);
+                                        var quantityStr = strs[i + 4];
+                                        var priceStr = RemoveDollarSign(strs[i + 5]);
+                                        var amountStr = RemoveNegativeSign(RemoveDollarSign(strs[i + 7]));
+                                        decimal amount = 0;
+                                        if (amountStr != "-")
                                         {
-                                            commission = decimal.Parse(commStr);
+                                            amount = decimal.Parse(amountStr);
                                         }
-                                    }
-                                    decimal quantity = 0;
-                                    if (quantityStr != "-")
-                                    {
-                                        quantity = decimal.Parse(quantityStr);
+                                        if (type == EInvestmentTransactionType.Buy)
+                                        {
+                                            amount = -amount;
+                                        }
+                                        decimal commission = 0;
                                         if (type == EInvestmentTransactionType.Sell)
                                         {
-                                            quantity = -quantity;
+                                            var commStr = RemoveDollarSign(strs[i + 6]);
+                                            if (commStr != "-")
+                                            {
+                                                commission = decimal.Parse(commStr);
+                                            }
                                         }
-                                    }
+                                        decimal quantity = 0;
+                                        if (quantityStr != "-")
+                                        {
+                                            quantity = decimal.Parse(quantityStr);
+                                            if (type == EInvestmentTransactionType.Sell)
+                                            {
+                                                quantity = -quantity;
+                                            }
+                                        }
 
-                                    var vg = new VanguardTransaction(
-                                        strs[i - 2] + year,
-                                        ticker,
-                                        type,
-                                        quantity,
-                                        priceStr == "-" ? 0 : decimal.Parse(priceStr),
-                                        amount,
-                                        commission
-                                    );
-                                    trans.Add(vg);
-                                }
-                                catch (FormatException)
-                                {
-                                    LogLine($"Unknown transaction on {strs[i]}: {strs[i+2]}");
+                                        var vg = new VanguardTransaction(
+                                            strs[i - 2] + year,
+                                            ticker,
+                                            type,
+                                            quantity,
+                                            priceStr == "-" ? 0 : decimal.Parse(priceStr),
+                                            amount,
+                                            commission
+                                        );
+                                        trans.Add(vg);
+                                    }
+                                    catch (FormatException)
+                                    {
+                                        LogLine($"Unknown transaction on {strs[i]}: {strs[i + 2]}");
+                                    }
                                 }
                             }
                         }
