@@ -76,7 +76,7 @@ namespace BanaData.Parsers
                 var stringsInPages = new List<string>();
                 for (int page = hint.MinPage; page <= hint.MaxPage; page++)
                 {
-                    stringsInPages.AddRange(data.ExtractTextFromPage(page));
+                    stringsInPages.AddRange(data.ExtractTextFromPage(page - 1));
                 }
 
                 // Check that all our strings are present
