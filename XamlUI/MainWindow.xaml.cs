@@ -52,8 +52,10 @@ namespace XamlUI
             // Set window to location specified by logic (if initialized)
             if (logic.Width > 40 && logic.Height > 40)
             {
-                Left = logic.LeftX;
-                Top = logic.TopY;
+                // For some unknown reason, leftX and topy got set to -32000 one day, making the main window invisible.
+                // This corrects the issue, but the root cause remains unknown.
+                Left = Math.Max(0, logic.LeftX);
+                Top = Math.Max(0, logic.TopY);
                 Width = logic.Width;
                 Height = logic.Height;
             }
