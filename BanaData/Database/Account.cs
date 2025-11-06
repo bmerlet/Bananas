@@ -193,7 +193,7 @@ namespace BanaData.Database
                     portfolio = new Portfolio();
                 }
 
-                // Shift the portfolio to the specified time
+                // Sort the transactions first by date and second by having the transactions that bring securities in before the ones that bring them out.  
                 var transactions = GetRegularTransactionRows().ToList();
                 transactions.Sort((t1, t2) =>
                 {
@@ -222,6 +222,7 @@ namespace BanaData.Database
                     return ret;
                 });
 
+                // Build the protfolio, one transaction at a time
                 foreach (TransactionRow transRow in transactions)
                 {
                     if (transRow == excludedTransaction)

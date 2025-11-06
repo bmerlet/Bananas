@@ -174,40 +174,6 @@ namespace BanaData.Database
 
                 return desc;
             }
-
-            public bool HasSame(
-                EInvestmentTransactionType type,
-                SecurityRow securityRow,
-                decimal securityPrice,
-                decimal securityQuantity,
-                decimal commission)
-            {
-                if (Type != type)
-                {
-                    return false;
-                }
-
-                if (IsSecurityIDNull())
-                {
-                    if (securityRow != null || securityPrice != 0 || securityQuantity != 0)
-                    {
-                        return false;
-                    }
-                }
-                else if (SecurityID != securityRow.ID ||
-                         SecurityPrice != securityPrice ||
-                         SecurityQuantity != securityQuantity)
-                {
-                    return false;
-                }
-
-                if (Commission != commission)
-                {
-                    return false;
-                }
-
-                return true;
-            }
         }
 
         partial class InvestmentTransactionDataTable
