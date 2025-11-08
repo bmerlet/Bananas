@@ -189,7 +189,13 @@ namespace BanaData.Database
         Exercise,
 
         [EnumDescription("Expire")]
-        Expire
+        Expire,
+
+        [EnumDescription("XShares in")]
+        XSharesIn,
+
+        [EnumDescription("XShares out")]
+        XSharesOut
     }
 
     // Composite transaction state for the UI

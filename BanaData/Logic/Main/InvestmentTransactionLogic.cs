@@ -369,7 +369,7 @@ namespace BanaData.Logic.Main
                 }
 
                 // Check based on transaction type
-                string error = investmentTransactionType.CheckData(data);
+                string error = investmentTransactionType.CheckData(household, data);
                 if (error != null)
                 {
                     mainWindowLogic.ErrorMessage(error);
@@ -631,10 +631,10 @@ namespace BanaData.Logic.Main
                 TransID = transactionRow.ID;
 
                 // Create new investment transaction row
-                household.InvestmentTransaction.Add(transactionRow, data.Type, securityRow, data.SecurityPrice, data.SecurityQuantity, data.Commission);
+                var investmentTransaction = household.InvestmentTransaction.Add(transactionRow, data.Type, securityRow, data.SecurityPrice, data.SecurityQuantity, data.Commission);
 
                 // Create the line item
-                CreateLineItemInDB(data.LineItem, transactionRow, impactedAccounts);
+                CreateLineItemInDB(data.LineItem, transactionRow, impactedAccounts, investmentTransaction);
             }
             else
             {
@@ -649,11 +649,11 @@ namespace BanaData.Logic.Main
                     household.Checkpoint.GetCurrentCheckpoint(),
                     ETransactionType.Regular);
 
-                // Update the line item
-                UpdateLineItemInDB(data.LineItem, transactionRow, impactedAccounts);
-
                 // Update investment transaction row
-                household.InvestmentTransaction.Update(transactionRow, data.Type, securityRow, data.SecurityPrice, data.SecurityQuantity, data.Commission);
+                var investmentTransaction = household.InvestmentTransaction.Update(transactionRow, data.Type, securityRow, data.SecurityPrice, data.SecurityQuantity, data.Commission);
+
+                // Update the line item
+                UpdateLineItemInDB(data.LineItem, transactionRow, impactedAccounts, investmentTransaction);
             }
 
             mainWindowLogic.CommitChanges(household);

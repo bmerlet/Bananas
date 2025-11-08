@@ -74,6 +74,7 @@ namespace BanaData.Database
             // Transactions that removes some shares of a security
             static public bool SecurityOut(EInvestmentTransactionType type) =>
                 type == EInvestmentTransactionType.SharesOut ||
+                type == EInvestmentTransactionType.XSharesOut ||
                 type == EInvestmentTransactionType.SellAndTransferCash ||
                 type == EInvestmentTransactionType.Sell;
 
@@ -170,6 +171,15 @@ namespace BanaData.Database
                     case EInvestmentTransactionType.Expire:
                         desc = $"{EnumDescriptionAttribute.GetDescription(type)}: Not supported";
                         break;
+
+                    case EInvestmentTransactionType.XSharesIn:
+                        desc = $"Received in kind {quantity:N4} {symbol}";
+                        break;
+
+                    case EInvestmentTransactionType.XSharesOut:
+                        desc = $"Transferred in kind {quantity:N4} {symbol}";
+                        break;
+
                 }
 
                 return desc;

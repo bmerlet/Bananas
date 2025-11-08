@@ -124,6 +124,15 @@ namespace BanaData.Logic.Items
                 case EInvestmentTransactionType.Expire:
                     Description = "Expire";
                     break;
+
+                case EInvestmentTransactionType.XSharesIn:
+                    Description = "Receive shares in kind";
+                    break;
+
+                case EInvestmentTransactionType.XSharesOut:
+                    Description = "Transfer shares in kind";
+                    break;
+
             }
         }
 

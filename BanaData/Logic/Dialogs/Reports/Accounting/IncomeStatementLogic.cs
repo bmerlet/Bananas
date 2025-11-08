@@ -151,6 +151,8 @@ namespace BanaData.Logic.Dialogs.Reports.Accounting
 
                             case EInvestmentTransactionType.SharesIn:
                             case EInvestmentTransactionType.SharesOut:
+                            case EInvestmentTransactionType.XSharesIn:
+                            case EInvestmentTransactionType.XSharesOut:
                                 // Used for share exchange, revenue-neutral
                                 break;
 

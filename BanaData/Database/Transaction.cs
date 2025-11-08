@@ -43,7 +43,7 @@ namespace BanaData.Database
                 return GetInvestmentTransactionRows().Single();
             }
 
-            public void CreatePeerTransaction(int targetAccountID, LineItemRow liRow, decimal peerAmount)
+            public void CreatePeerTransaction(int targetAccountID, LineItemRow liRow, decimal peerAmount, InvestmentTransactionRow sourceInvestmentTransaction)
             {
                 var household = this.Table.DataSet as Household;
 
@@ -74,8 +74,19 @@ namespace BanaData.Database
                 }
                 else if (targetAccountRow.Type == EAccountType.Investment)
                 {
-                    var type = peerLiRow.Amount >= 0 ? EInvestmentTransactionType.TransferCashIn : EInvestmentTransactionType.TransferCashOut;
-                    household.InvestmentTransaction.Add(peerTransactionRow, type, null, 0, 0, 0);
+                    if (sourceInvestmentTransaction != null && sourceInvestmentTransaction.Type == EInvestmentTransactionType.XSharesOut)
+                    {
+                        household.InvestmentTransaction.Add(peerTransactionRow, EInvestmentTransactionType.XSharesIn, sourceInvestmentTransaction.SecurityRow, 0, sourceInvestmentTransaction.SecurityQuantity, 0);
+                    }
+                    else if (sourceInvestmentTransaction != null && sourceInvestmentTransaction.Type == EInvestmentTransactionType.XSharesIn)
+                    {
+                        household.InvestmentTransaction.Add(peerTransactionRow, EInvestmentTransactionType.XSharesOut, sourceInvestmentTransaction.SecurityRow, 0, sourceInvestmentTransaction.SecurityQuantity, 0);
+                    }
+                    else
+                    {
+                        var type = peerLiRow.Amount >= 0 ? EInvestmentTransactionType.TransferCashIn : EInvestmentTransactionType.TransferCashOut;
+                        household.InvestmentTransaction.Add(peerTransactionRow, type, null, 0, 0, 0);
+                    }
                 }
 
                 // Create the transfer line items

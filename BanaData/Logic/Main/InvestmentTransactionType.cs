@@ -65,6 +65,12 @@ namespace BanaData.Logic.Main
                 case EInvestmentTransactionType.Vest:
                 case EInvestmentTransactionType.Expire:
                     return new InvestmentTransactionNotSupported();
+
+                case EInvestmentTransactionType.XSharesIn:
+                    return new InvestmentTransactionXSharesIn();
+
+                case EInvestmentTransactionType.XSharesOut:
+                    return new InvestmentTransactionXSharesOut();
             }
 
             return new InvestmentTransactionNotSupported();
@@ -98,7 +104,7 @@ namespace BanaData.Logic.Main
         bool IsTransfer { get; }
 
         // Check that the data is OK for the transaction type
-        string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data);
+        string CheckData(Household household, InvestmentTransactionLogic.InvestmentTransactionData data);
 
         // Zero out not needed values
         void CleanupData(InvestmentTransactionLogic.InvestmentTransactionData data);
@@ -130,7 +136,7 @@ namespace BanaData.Logic.Main
         public virtual int CategoryTabIndex => -1;
         public virtual bool IsTransfer => true;
 
-        public virtual string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data) { return null; }
+        public virtual string CheckData(Household household, InvestmentTransactionLogic.InvestmentTransactionData data) { return null; }
 
         public virtual void CleanupData(InvestmentTransactionLogic.InvestmentTransactionData data) { }
     }
@@ -145,7 +151,7 @@ namespace BanaData.Logic.Main
         public override int CategoryTabIndex => 4;
         public override bool IsTransfer => false;
 
-        public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
+        public override string CheckData(Household household, InvestmentTransactionLogic.InvestmentTransactionData data)
         {
             if (data.LineItem.Amount == 0)
             {
@@ -178,14 +184,14 @@ namespace BanaData.Logic.Main
     {
         public override bool IsTransfer => false;
 
-        public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
+        public override string CheckData(Household household, InvestmentTransactionLogic.InvestmentTransactionData data)
         {
             if (string.IsNullOrWhiteSpace(data.LineItem.Category))
             {
                 return "Please choose a category";
             }
 
-            return base.CheckData(data);
+            return base.CheckData(household, data);
         }
     }
 
@@ -198,7 +204,7 @@ namespace BanaData.Logic.Main
         public override int AmountTabIndex => 3;
         public override int CategoryTabIndex => 4;
 
-        public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
+        public override string CheckData(Household household, InvestmentTransactionLogic.InvestmentTransactionData data)
         {
             if (data.LineItem.Amount == 0)
             {
@@ -232,7 +238,7 @@ namespace BanaData.Logic.Main
         public override int SecurityQuantityTabIndex => 4;
         public override int SecurityPriceTabIndex => 5;
 
-        public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
+        public override string CheckData(Household household, InvestmentTransactionLogic.InvestmentTransactionData data)
         {
             if (data.SecurityID < 0)
             {
@@ -270,7 +276,7 @@ namespace BanaData.Logic.Main
         public override int SecurityQuantityTabIndex => 4;
         public override bool IsFilteringSecurity => true;
 
-        public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
+        public override string CheckData(Household household, InvestmentTransactionLogic.InvestmentTransactionData data)
         {
             if (data.SecurityID < 0)
             {
@@ -312,7 +318,7 @@ namespace BanaData.Logic.Main
         public override int AmountTabIndex => 7;
         public override bool IsFilteringSecurity { get; }
 
-        public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
+        public override string CheckData(Household household, InvestmentTransactionLogic.InvestmentTransactionData data)
         {
             if (data.SecurityID < 0)
             {
@@ -360,14 +366,14 @@ namespace BanaData.Logic.Main
 
         public override int CategoryTabIndex => 8;
 
-        public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
+        public override string CheckData(Household household, InvestmentTransactionLogic.InvestmentTransactionData data)
         {
             if (string.IsNullOrWhiteSpace(data.LineItem.Category))
             {
                 return "Please choose a transfer account";
             }
 
-            return base.CheckData(data);
+            return base.CheckData(household, data);
         }
 
         public override void CleanupData(InvestmentTransactionLogic.InvestmentTransactionData data)
@@ -385,7 +391,7 @@ namespace BanaData.Logic.Main
         public override int AmountTabIndex => 4;
         public override bool IsFilteringSecurity => true;
 
-        public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
+        public override string CheckData(Household household, InvestmentTransactionLogic.InvestmentTransactionData data)
         {
             if (data.SecurityID < 0)
             {
@@ -420,7 +426,7 @@ namespace BanaData.Logic.Main
         public override int CategoryTabIndex => 5;
         public override bool IsFilteringSecurity => true;
 
-        public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
+        public override string CheckData(Household household, InvestmentTransactionLogic.InvestmentTransactionData data)
         {
             if (data.SecurityID < 0)
             {
@@ -461,7 +467,7 @@ namespace BanaData.Logic.Main
         public override int AmountTabIndex => 4;
         public override bool IsFilteringSecurity => true;
 
-        public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
+        public override string CheckData(Household household, InvestmentTransactionLogic.InvestmentTransactionData data)
         {
             if (data.SecurityID < 0)
             {
@@ -498,7 +504,7 @@ namespace BanaData.Logic.Main
 
     internal class InvestmentTransactionNotSupported : AInvestmentTransactionType
     {
-        public override string CheckData(InvestmentTransactionLogic.InvestmentTransactionData data)
+        public override string CheckData(Household household, InvestmentTransactionLogic.InvestmentTransactionData data)
         {
             return "Not supported";
         }
@@ -511,6 +517,93 @@ namespace BanaData.Logic.Main
             data.Commission = 0;
             data.LineItem.Amount = 0;
             data.LineItem.Category = "";
+        }
+    }
+
+    #endregion
+
+    #region XSharesIn helper
+
+    internal class InvestmentTransactionXSharesIn : AInvestmentTransactionType
+    {
+        public override int SecuritySymbolTabIndex => 3;
+        public override int SecurityQuantityTabIndex => 4;
+        public override int CategoryTabIndex => 5;
+
+        public override string CheckData(Household household, InvestmentTransactionLogic.InvestmentTransactionData data)
+        {
+            if (data.SecurityID < 0)
+            {
+                return "Please enter a security symbol.";
+            }
+
+            if (data.SecurityQuantity == 0)
+            {
+                return "Please enter a number of shares.";
+            }
+
+            if (data.LineItem.CategoryAccountID < 0)
+            {
+                return "Please choose a transfer account";
+            }
+
+            if (household.Account.FindByID(data.LineItem.CategoryAccountID).Type != EAccountType.Investment)
+            {
+                return "Transfer account must be an investment account";
+            }
+
+            return null;
+        }
+
+        public override void CleanupData(InvestmentTransactionLogic.InvestmentTransactionData data)
+        {
+            data.Commission = 0;
+            data.LineItem.Amount = 0;
+            data.SecurityPrice = 0;
+        }
+    }
+
+    #endregion
+
+    #region XSharesOut helper
+
+    internal class InvestmentTransactionXSharesOut : AInvestmentTransactionType
+    {
+        public override int SecuritySymbolTabIndex => 3;
+        public override int SecurityQuantityTabIndex => 4;
+        public override int CategoryTabIndex => 5;
+        public override bool IsFilteringSecurity => true;
+
+        public override string CheckData(Household household, InvestmentTransactionLogic.InvestmentTransactionData data)
+        {
+            if (data.SecurityID < 0)
+            {
+                return "Please enter a security symbol.";
+            }
+
+            if (data.SecurityQuantity == 0)
+            {
+                return "Please enter a number of shares.";
+            }
+
+            if (data.LineItem.CategoryAccountID < 0)
+            {
+                return "Please choose a transfer account";
+            }
+
+            if (household.Account.FindByID(data.LineItem.CategoryAccountID).Type != EAccountType.Investment)
+            {
+                return "Transfer account must be an investment account";
+            }
+
+            return null;
+        }
+
+        public override void CleanupData(InvestmentTransactionLogic.InvestmentTransactionData data)
+        {
+            data.SecurityPrice = 0;
+            data.Commission = 0;
+            data.LineItem.Amount = 0;
         }
     }
 

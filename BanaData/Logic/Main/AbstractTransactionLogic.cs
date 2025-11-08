@@ -1,13 +1,13 @@
-﻿using System;
+﻿using BanaData.Database;
+using BanaData.Logic.Items;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-using BanaData.Database;
-using BanaData.Logic.Items;
 using Toolbox.UILogic;
+using static BanaData.Database.Household;
 
 namespace BanaData.Logic.Main
 {
@@ -207,7 +207,7 @@ namespace BanaData.Logic.Main
             }
         }
 
-        protected void CreateLineItemInDB(LineItem li, Household.TransactionRow transactionRow, List<int> impactedAccounts)
+        protected void CreateLineItemInDB(LineItem li, Household.TransactionRow transactionRow, List<int> impactedAccounts, InvestmentTransactionRow sourceInvestmentTransaction)
         {
             var liRow = household.LineItem.Add(transactionRow, li.Memo, li.Amount);
             li.ID = liRow.ID;
@@ -219,11 +219,11 @@ namespace BanaData.Logic.Main
             else if (li.CategoryAccountID != -1)
             {
                 impactedAccounts.Add(li.CategoryAccountID);
-                transactionRow.CreatePeerTransaction(li.CategoryAccountID, liRow, -li.Amount);
+                transactionRow.CreatePeerTransaction(li.CategoryAccountID, liRow, -li.Amount, sourceInvestmentTransaction);
             }
         }
 
-        protected void UpdateLineItemInDB(LineItem li, Household.TransactionRow transactionRow, List<int> impactedAccounts)
+        protected void UpdateLineItemInDB(LineItem li, Household.TransactionRow transactionRow, List<int> impactedAccounts, InvestmentTransactionRow sourceInvestmentTransaction)
         {
             var liRow = household.LineItem.FindByID(li.ID);
             var liCategoryRow = liRow.GetLineItemCategoryRow();
@@ -246,7 +246,7 @@ namespace BanaData.Logic.Main
                 if (liTransferRow == null)
                 {
                     // The line item was not a transfer: Make it one
-                    transactionRow.CreatePeerTransaction(li.CategoryAccountID, liRow, -li.Amount);
+                    transactionRow.CreatePeerTransaction(li.CategoryAccountID, liRow, -li.Amount, sourceInvestmentTransaction);
                 }
                 else
                 {

@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,11 +47,19 @@ namespace BanaData.Database
                 cashBalance += transaction.GetAmount();
             }
 
-            if (investmentTransaction.IsSecurityIn)
+            if (investmentTransaction.Type == EInvestmentTransactionType.XSharesIn)
+            {
+                AddSharesFromManyLots(transaction, security, investmentTransaction.SecurityQuantity);
+            }
+            else if (investmentTransaction.Type == EInvestmentTransactionType.XSharesOut)
+            {
+                RemoveSharesAcrossLots(security, investmentTransaction.SecurityQuantity);
+            }
+            else if (investmentTransaction.IsSecurityIn && investmentTransaction.SecurityQuantity > 0)
             {
                 AddShares(transaction.Date, security, investmentTransaction.SecurityQuantity, investmentTransaction.SecurityPrice);
             }
-            else if (investmentTransaction.IsSecurityOut)
+            else if (investmentTransaction.IsSecurityOut && investmentTransaction.SecurityQuantity > 0)
             {
                 RemoveShares(security, investmentTransaction.SecurityQuantity, allowNegativeLots);
             }
@@ -95,6 +104,71 @@ namespace BanaData.Database
                     decimal newLotQuantity = lot.Quantity - quantity;
                     lots[ix] = new Lot(lot.Date, lot.Security, newLotQuantity, lot.SecurityPrice);
                     quantity = 0;
+                }
+            }
+        }
+
+        private void AddSharesFromManyLots(Household.TransactionRow transaction, Household.SecurityRow security, decimal quantity)
+        {
+            // Find account of peer transaction
+            var household = (Household)transaction.Table.DataSet;
+            var transferLineItem = transaction.GetLineItemRows().Single().GetLineItemTransferRows().Single();
+            int peerTransactionId = transferLineItem.PeerTransID;
+            var peerTransaction = household.Transaction.FindByID(peerTransactionId);
+            var peerAccount = peerTransaction.AccountRow;
+
+            // Compute portfolio for peer account at transaction date (excluding the peer XSharesOut transaction)
+            var peerPortfolio = peerAccount.GetPortfolio(transaction.Date, peerTransaction);
+
+            // Keep only the security we are interested in
+            peerPortfolio.lots.RemoveAll(l => l.Security.ID != security.ID);
+            decimal totalQuantity = peerPortfolio.lots.Sum(l => l.Quantity);
+
+            // Create new lots (merge when possible)
+            decimal proportion = quantity / totalQuantity;
+            foreach (var lot in peerPortfolio.lots)
+            {
+                lots.Add(new Lot(transaction.Date, security, lot.Quantity * proportion, lot.SecurityPrice));
+                //ZZZZZ Need merge
+            }
+        }
+
+        private void RemoveSharesAcrossLots(Household.SecurityRow security, decimal quantity)
+        {
+            // Make a list of lots for this security
+            var securityLots = new List<Lot>();
+            securityLots.AddRange(lots.Where(l => l.Security.ID == security.ID));
+
+            // Remove those lots from the portfolio
+            lots.RemoveAll(l => l.Security.ID == security.ID);
+
+            // Find out what proportion of the security we are removing
+            decimal totalQuantity = securityLots.Sum(l => l.Quantity);
+
+            if (quantity == 0)
+            {
+                throw new InvalidOperationException("You must specify a non-zero quantity of security " + security.Name);
+            }
+            if (totalQuantity == 0)
+            {
+                throw new InvalidOperationException("There are no security " + security.Name);
+            }
+            if (quantity > totalQuantity)
+            {
+                throw new InvalidOperationException("There are not that many securities " + security.Name);
+            }
+
+            if (quantity < totalQuantity)
+            {
+                // Re-create the lots with a fraction of the shares in them, so that "quantity" shares are removed
+                decimal proportion = 1 - (quantity / totalQuantity);
+                foreach(var lot in securityLots)
+                {
+                    decimal newQuantity = lot.Quantity * proportion;
+                    if (newQuantity >= 0.0001m)
+                    {
+                        lots.Add(new Lot(lot.Date, lot.Security, newQuantity, lot.SecurityPrice));
+                    }
                 }
             }
         }

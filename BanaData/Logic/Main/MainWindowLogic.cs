@@ -791,7 +791,7 @@ namespace BanaData.Logic.Main
                             else if (sli.GetLineItemTransferRow() is Household.LineItemTransferRow litr)
                             {
                                 // Create peer transaction
-                                transactionRow.CreatePeerTransaction(litr.AccountID, lineItemRow, -lineItemRow.Amount);
+                                transactionRow.CreatePeerTransaction(litr.AccountID, lineItemRow, -lineItemRow.Amount, null);
                             }
                         }
 
