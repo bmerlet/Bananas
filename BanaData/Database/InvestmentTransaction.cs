@@ -69,6 +69,7 @@ namespace BanaData.Database
                 type == EInvestmentTransactionType.ReinvestMediumTermCapitalGains ||
                 type == EInvestmentTransactionType.ReinvestLongTermCapitalGains ||
                 type == EInvestmentTransactionType.Buy ||
+                type == EInvestmentTransactionType.XSharesIn ||
                 type == EInvestmentTransactionType.Exercise;
 
             // Transactions that removes some shares of a security
