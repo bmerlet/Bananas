@@ -63,7 +63,7 @@ namespace BanaData.Web
             {
                 webresp = (HttpWebResponse)webreq.GetResponse();
             }
-            catch (System.Net.WebException e)
+            catch (System.Net.WebException)
             {
                 return -1;
             }
