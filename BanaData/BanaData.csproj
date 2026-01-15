@@ -146,6 +146,7 @@
     <Compile Include="Serializations\UserSettings.cs" />
     <Compile Include="Serializations\QIFParser.cs" />
     <Compile Include="Web\AlphavantageAPI.cs" />
+    <Compile Include="Web\FinnHubAPI.cs" />
     <Compile Include="Web\JSONParser.cs" />
     <Compile Include="Web\Quote.cs" />
     <Compile Include="Web\YahooFinanceAPI.cs" />

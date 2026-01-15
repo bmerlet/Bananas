@@ -13,6 +13,7 @@ namespace BanaData.Web
     //
     // Get quotes based on Alphavantage API (www.alphavantage.co)
     // My free key: F0LIOHHMLTUHPC5K
+    // My alternate free key: AU82WV5G96O55250
     // Sample query and answer:
     //https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=IBM&apikey=F0LIOHHMLTUHPC5K
     //{
@@ -32,27 +33,38 @@ namespace BanaData.Web
     //
     static internal class AlphavantageAPI
     {
-        const string KEY = "F0LIOHHMLTUHPC5K";
-        //const string KEY = "demo";
+        const string KEY1 = "F0LIOHHMLTUHPC5K";
+        const string KEY2 = "AU82WV5G96O55250";
         const string QuoteQuery =
              "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={0}&apikey={1}";
 
-        static public decimal[] GetQuote(string[] symbols)
+        static public void GetQuote(string[] symbols, decimal[] result)
         {
-            var result = new decimal[symbols.Length];
+            string curKey = KEY1;
 
             for(int i = 0; i < symbols.Length; i++)
             {
-                result[i] = GetOneQuote(symbols[i]);
-            }
+                if (result[i] >= 0)
+                {
+                    continue;
+                }
 
-            return result;
+                decimal st = GetOneQuote(symbols[i], curKey);
+                if (st < 0 && curKey == KEY1)
+                {
+                    curKey = KEY2;
+                    st = GetOneQuote(symbols[i], curKey);
+                }
+                result[i] = st;
+                System.Threading.Thread.Sleep(1100); // ZZZ No more than 1 queries a second says support
+                // System.Threading.Thread.Sleep(6100); // ZZZ No more than 10 queries a minute says support
+            }
         }
 
-        static public decimal GetOneQuote(string symbol)
+        static public decimal GetOneQuote(string symbol, string key)
         {
             // Form URL
-            var url = string.Format(QuoteQuery, symbol, KEY);
+            var url = string.Format(QuoteQuery, symbol, key);
 
             // Create web request
             HttpWebRequest webreq = (HttpWebRequest)WebRequest.Create(url);

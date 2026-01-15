@@ -20,7 +20,7 @@ namespace BanaData.Web
         static private Cookie cookie = null;
         static private string crumb = null;
 
-        static public decimal[] GetQuote(string[] symbols)
+        static public decimal[] GetQuotes(string[] symbols)
         {
             // Deal with stupid input
             if (symbols.Length == 0)
