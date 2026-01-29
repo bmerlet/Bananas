@@ -460,14 +460,14 @@ namespace BanaData.Logic.Dialogs.Reports
         //
         private void ParseMemberOrder(string value, bool publish)
         {
-            var newMembers = new Household.PersonRow[members.Length];
-            int mIx = 0;
-            foreach(var name in value.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries))
+            var newMembers = new List<Household.PersonRow>();
+            foreach(var name in value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
             {
-                newMembers[mIx++] = members.Where(m => m.Name == name).Single();
+                string tname = name.Trim(' ');
+                newMembers.Add(household.Person.Where(m => m.Name == tname).Single());
             }
 
-            members = newMembers;
+            members = newMembers.ToArray();
 
             if (publish)
             {
