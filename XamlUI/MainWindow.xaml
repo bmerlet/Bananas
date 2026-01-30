@@ -84,6 +84,7 @@
                     <MenuItem Header="Show cash flow between household members..." Command="{Binding ShowCashFlowBetweenPersons}"/>
                     <MenuItem Header="Show yearly capital gains and dividends..." Command="{Binding ShowYearlyCapGainsAndDividends}"/>
                     <MenuItem Header="Show wealth over time..." Command="{Binding ShowWealthOverTime}"/>
+                    <MenuItem Header="Show investment returns..." Command="{Binding ShowReturns}"/>
                     <Separator/>
                     <MenuItem Header="Show holdings..." Command="{Binding ShowHoldings}"/>
                     <MenuItem Header="Show rebalance dashboard..." Command="{Binding ShowRebalance}"/>

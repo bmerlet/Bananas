@@ -69,6 +69,7 @@ namespace BanaData.Logic.Main
             ShowRebalance.SetCanExecute(false);
             ShowWealthOverTime = new CommandBase(OnShowWealthOverTime);
             ShowCashFlowBetweenPersons = new CommandBase(OnShowCashFlowBetweenPersons);
+            ShowReturns = new CommandBase(OnShowReturns);
             ShowBalanceSheet = new CommandBase(OnShowBalanceSheet);
             ShowIncomeStatement = new CommandBase(OnShowIncomeStatement);
             ShowJournal = new CommandBase(OnShowJournal);
@@ -531,6 +532,17 @@ namespace BanaData.Logic.Main
         private void OnShowHoldingsPerPerson()
         {
             var logic = new ShowHoldingsPerPersonLogic(mainWindow, household);
+            mainWindow.GuiServices.ShowDialog(logic);
+        }
+
+        //
+        // Show investment returns
+        //
+        public CommandBase ShowReturns { get; }
+
+        private void OnShowReturns()
+        {
+            var logic = new ShowReturnsLogic(mainWindow, household);
             mainWindow.GuiServices.ShowDialog(logic);
         }
 
