@@ -12,12 +12,65 @@
         Title="Investment returns"
         Icon="/XamlUI;component/Images/Bananas.ico"
         WindowStartupLocation="CenterOwner"
-        Height="350" Width="500">
+        Height="350" Width="620">
     <DockPanel>
+
+        <!-- Tree display-->
+        <DockPanel.Resources>
+            <HierarchicalDataTemplate DataType="{x:Type l:AccountOrSecurityItem}" ItemsSource="{Binding SecuritiesSource}">
+
+                <!-- First level -->
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding Name}" Width="200" Margin="0"/>
+                    <TextBlock TextAlignment="Center" Text="{Binding ReturnThisYear, StringFormat={}{0:F1}%}"
+                        Foreground="{Binding ReturnThisYear, Converter={StaticResource amountToColorConverter}}" Width="90" Margin="0"/>
+                    <TextBlock TextAlignment="Center" Text="{Binding ReturnLastYear, StringFormat={}{0:F1}%}"
+                        Foreground="{Binding ReturnLastYear, Converter={StaticResource amountToColorConverter}}" Width="90" Margin="0"/>
+                    <TextBlock TextAlignment="Center" Text="{Binding ReturnLastXYears, StringFormat={}{0:F1}%}"
+                        Foreground="{Binding ReturnLastXYears, Converter={StaticResource amountToColorConverter}}" Width="90" Margin="0"/>
+                    <TextBlock TextAlignment="Center" Text="{Binding ReturnAll, StringFormat={}{0:F1}%}"
+                        Foreground="{Binding ReturnAll, Converter={StaticResource amountToColorConverter}}" Width="90" Margin="0"/>
+                </StackPanel>
+
+                <!-- Second level-->
+                <HierarchicalDataTemplate.ItemTemplate>
+                    <HierarchicalDataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Name}" Width="180"/>
+                            <TextBlock TextAlignment="Center" Text="{Binding ReturnThisYear, StringFormat={}{0:F1}%}"
+                                Foreground="{Binding ReturnThisYear, Converter={StaticResource amountToColorConverter}}" Width="90" Margin="0"/>
+                            <TextBlock TextAlignment="Center" Text="{Binding ReturnLastYear, StringFormat={}{0:F1}%}"
+                                Foreground="{Binding ReturnLastYear, Converter={StaticResource amountToColorConverter}}" Width="90" Margin="0"/>
+                            <TextBlock TextAlignment="Center" Text="{Binding ReturnLastXYears, StringFormat={}{0:F1}%}"
+                                Foreground="{Binding ReturnLastXYears, Converter={StaticResource amountToColorConverter}}" Width="90" Margin="0"/>
+                            <TextBlock TextAlignment="Center" Text="{Binding ReturnAll, StringFormat={}{0:F1}%}"
+                                Foreground="{Binding ReturnAll, Converter={StaticResource amountToColorConverter}}" Width="90" Margin="0"/>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                </HierarchicalDataTemplate.ItemTemplate>
+            </HierarchicalDataTemplate>
+        </DockPanel.Resources>
 
         <!-- Done panel -->
         <ucs:DonePanel DockPanel.Dock="Bottom"/>
 
+        <!-- Column names -->
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <TextBlock Margin="20,5,0,5" Text="Account" Width="200"/>
+            <TextBlock Margin="0,5" Text="This year" Width="90" TextAlignment="Center"/>
+            <TextBlock Margin="0,5" Text="Last year" Width="90" TextAlignment="Center"/>
+            <ComboBox Margin="0,3" ItemsSource="{Binding DurationSource}" SelectedItem="{Binding DurationString}" Width="90" VerticalAlignment="Top"/>
+            <TextBlock Margin="0,5" Text="All available" Width="90" TextAlignment="Center"/>
+        </StackPanel>
+
+        <!-- Column names -->
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom">
+            <CheckBox Margin="20,5,0,5" Content="Annualized" IsChecked="{Binding Annualized, Mode=TwoWay}" Width="100"/>
+            <CheckBox Margin="20,5,0,5" Content="Compounded" IsChecked="{Binding Annualized, Mode=TwoWay}" Width="100"/>
+        </StackPanel>
+
+        <!-- Tree of accounts -->
+        <TreeView ItemsSource="{Binding AccountSource}"/>
 
     </DockPanel>
 </Window>
