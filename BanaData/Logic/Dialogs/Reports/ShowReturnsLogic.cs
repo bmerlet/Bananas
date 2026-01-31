@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
@@ -37,7 +38,7 @@ namespace BanaData.Logic.Dialogs.Reports
             {
                 if (account.Type == EAccountType.Investment && (!mainWindowLogic.UserSettings.HideClosedAccounts || !account.Hidden))
                 {
-                    accountItems.Add(new AccountOrSecurityItem(account, duration, annualized));
+                    accountItems.Add(new AccountOrSecurityItem(household, account, duration, annualized));
                 }
             }
         }
@@ -102,25 +103,6 @@ namespace BanaData.Logic.Dialogs.Reports
             }
         }
 
-        // If the results take compound into account even if the dividedns are not reinvested
-        private bool compounded = false;
-        public bool? Compounded
-        {
-            get => compounded;
-            set
-            {
-                if (compounded != value)
-                {
-                    compounded = value == true;
-                    foreach (var account in accountItems)
-                    {
-                        account.UpdateCompounded(compounded);
-                    }
-                }
-            }
-        }
-
-
         #endregion
 
     }
@@ -129,6 +111,7 @@ namespace BanaData.Logic.Dialogs.Reports
     {
         #region Private members
 
+        private Household household;
         private Household.AccountRow account;
         private int duration;
         private bool annualized;
@@ -138,8 +121,9 @@ namespace BanaData.Logic.Dialogs.Reports
         #region Constructors
 
         // Constructor when representing an account
-        public AccountOrSecurityItem(Household.AccountRow _account, int _duration, bool _annualized)
+        public AccountOrSecurityItem(Household _household, Household.AccountRow _account, int _duration, bool _annualized)
         {
+            household = _household;
             account = _account;
             duration = _duration;
             annualized = _annualized;
@@ -155,21 +139,24 @@ namespace BanaData.Logic.Dialogs.Reports
             // Create securities
             foreach (var security in portfolio.GetSecuritiesRows())
             {
-                securityItems.Add(new AccountOrSecurityItem(security, duration, annualized));
+                securityItems.Add(new AccountOrSecurityItem(household,security, duration, annualized));
             }
 
-            ComputeReturnForAccount(account);
+            ComputeHowFarInTheYearWeAre();
+            ComputeReturnForAccount(account, portfolio);
         }
 
         // Constructor when representing a security
-        public AccountOrSecurityItem(Household.SecurityRow security, int _duration, bool _annualized)
+        public AccountOrSecurityItem(Household _household, Household.SecurityRow security, int _duration, bool _annualized)
         {
+            household = _household;
             account = null;
             duration = _duration;
             annualized = _annualized;
 
             Name = security.Symbol;
 
+            ComputeHowFarInTheYearWeAre();
             ComputeReturnForSecurity(security);
         }
 
@@ -312,14 +299,164 @@ namespace BanaData.Logic.Dialogs.Reports
             }
         }
 
-        public void UpdateCompounded(bool _compounded)
+        private void ComputeReturnForAccount(Household.AccountRow account, Portfolio portfolio)
         {
-            // ZZZ
+            // Set dates we are looking for
+            var today = DateTime.Today;
+            var firstOfThisYear = new DateTime(today.Year, 1, 1);
+            var firstOfLastYear = new DateTime(today.Year - 1, 1, 1);
+            var firstOf2YearsAgo = new DateTime(today.Year - 2, 1, 1);
+            var firstOf5YearsAgo = new DateTime(today.Year - 5, 1, 1);
+            var firstOf10YearsAgo = new DateTime(today.Year - 10, 1, 1);
+            var darkAges = new DateTime(today.Year - 50, 1, 1);
+
+            var transactions = GetTimeSortedRelevantTransactionsForAccount(account);
+
+            rawYearToDateReturn = ComputeReturnForAccount(account, transactions, firstOfThisYear, today);
+
+            // Last year return
+            lastYearRawReturn = ComputeReturnForAccount(account, transactions, firstOfLastYear, firstOfThisYear);
+
+            // Last 2, 5, 10 years
+            rawLast2YearsReturn = ComputeReturnForAccount(account, transactions, firstOf2YearsAgo, firstOfThisYear);
+            rawLast5YearsReturn = ComputeReturnForAccount(account, transactions, firstOf5YearsAgo, firstOfThisYear);
+            rawLast10YearsReturn = ComputeReturnForAccount(account, transactions, firstOf10YearsAgo, firstOfThisYear);
+
+            // Find oldest transaction
+            DateTime oldestTransactionDate = DateTime.Today;
+            foreach (var transactionRow in household.RegularTransactions.Where(tr => tr.AccountRow == account))
+            {
+                if (transactionRow.Date <  oldestTransactionDate)
+                {
+                     oldestTransactionDate = transactionRow.Date;
+                }
+            }
+
+            rawReturnAllAvailable = ComputeReturnForAccount(account, transactions, oldestTransactionDate, today);
+
+            var timeSpan = new TimeSpan(today.Ticks - oldestTransactionDate.Ticks);
+            try
+            {
+                allAvailableTimeSpan = (decimal)timeSpan.TotalDays / 365M;
+            }
+            catch (OverflowException)
+            {
+                allAvailableTimeSpan = 1;
+            }
+
         }
 
-        private void ComputeReturnForAccount(Household.AccountRow account)
+        private IEnumerable<MiniTransaction> GetTimeSortedRelevantTransactionsForAccount(Household.AccountRow account)
         {
+            var result = new List<MiniTransaction>();
 
+            foreach (var transactionRow in household.RegularTransactions.Where(tr => tr.AccountRow == account))
+            {
+                // Remove irrelevant transactions, i.e. the ones that do not bring in or out external cash or shares
+                var itr = transactionRow.GetInvestmentTransaction();
+                decimal amount = 0;
+
+                switch (itr.Type)
+                {
+                    // Transactions that add external cash
+                    case EInvestmentTransactionType.CashIn:
+                    case EInvestmentTransactionType.TransferCashIn:
+                    case EInvestmentTransactionType.BuyFromTransferredCash:
+                        amount = transactionRow.GetAmount();
+                        break;
+
+                    // Transactions that sends cash out
+                    case EInvestmentTransactionType.CashOut:
+                    case EInvestmentTransactionType.TransferCashOut:
+                    case EInvestmentTransactionType.SellAndTransferCash:
+                    case EInvestmentTransactionType.TransferDividends:
+                    case EInvestmentTransactionType.TransferShortTermCapitalGains:
+                    case EInvestmentTransactionType.TransferLongTermCapitalGains:
+                        amount = transactionRow.GetAmount();
+                        break;
+
+                    // Transactions that add external shares
+                    case EInvestmentTransactionType.SharesIn:
+                    case EInvestmentTransactionType.XSharesIn:
+                        amount = itr.SecurityQuantity * itr.SecurityRow.GetMostRecentPrice(transactionRow.Date);
+                        break;
+
+
+                    // Transactions that remove external shares
+                    case EInvestmentTransactionType.SharesOut:
+                    case EInvestmentTransactionType.XSharesOut:
+                        amount = -itr.SecurityQuantity * itr.SecurityRow.GetMostRecentPrice(transactionRow.Date);
+                        break;
+
+                    // Transaction that are internal to the account (no external cash in/out)
+                    case EInvestmentTransactionType.InterestIncome:
+                    case EInvestmentTransactionType.Buy:
+                    case EInvestmentTransactionType.Sell:
+                    case EInvestmentTransactionType.Dividends:
+                    case EInvestmentTransactionType.ReinvestDividends:
+                    case EInvestmentTransactionType.ShortTermCapitalGains:
+                    case EInvestmentTransactionType.ReinvestShortTermCapitalGains:
+                    case EInvestmentTransactionType.ReinvestMediumTermCapitalGains:
+                    case EInvestmentTransactionType.LongTermCapitalGains:
+                    case EInvestmentTransactionType.ReinvestLongTermCapitalGains:
+                    case EInvestmentTransactionType.ReturnOnCapital:
+                    case EInvestmentTransactionType.Grant:
+                    case EInvestmentTransactionType.Vest:
+                    case EInvestmentTransactionType.Exercise:
+                    case EInvestmentTransactionType.Expire:
+                        break;
+                }
+
+                if (amount != 0)
+                {
+                    result.Add(new MiniTransaction(transactionRow.Date, amount));
+                }
+            }
+
+            // Sort by ascending time
+            result.Sort((tr1, tr2) => tr1.Date.CompareTo(tr2.Date));
+
+            // Consolidate transactions on same date
+            var consolidatedList = new List<MiniTransaction>();
+
+            for (int i = 0; i < result.Count; i++)
+            {
+                MiniTransaction curTrans = result[i];
+                while (i < result.Count - 1 && result[i + 1].Date.CompareTo(curTrans.Date) == 0)
+                {
+                    curTrans = new MiniTransaction(curTrans.Date, curTrans.Amount + result[i + 1].Amount);
+                    i += 1;
+                }
+                consolidatedList.Add(curTrans);
+            }
+
+            return consolidatedList;
+        }
+
+        private decimal ComputeReturnForAccount(Household.AccountRow account, IEnumerable<MiniTransaction> transactions, DateTime startDate, DateTime endDate)
+        {
+            decimal lastValue = account.GetInvestmentValue(startDate);
+            decimal growthFactor = 1;
+
+            foreach (var miniTrans in transactions.Where(tr => tr.Date >= startDate && tr.Date < endDate))
+            {
+                decimal valueNow = account.GetInvestmentValue(miniTrans.Date);
+                if (lastValue != 0 && valueNow != miniTrans.Amount)
+                {
+                    decimal periodGrowthFactor = (valueNow - miniTrans.Amount) / lastValue;
+                    growthFactor *= periodGrowthFactor;
+                }
+                lastValue = valueNow;
+            }
+
+            // Final value
+            decimal finalValue = account.GetInvestmentValue(endDate);
+            if (finalValue != 0)
+            {
+                growthFactor *= finalValue / lastValue;
+            }
+
+            return growthFactor - 1M;
         }
 
         // Compute the returns for a security
@@ -331,7 +468,7 @@ namespace BanaData.Logic.Dialogs.Reports
             var firstOfLastYear = new DateTime(today.Year - 1, 1, 1);
             var firstOf2YearsAgo = new DateTime(today.Year - 2, 1, 1);
             var firstOf5YearsAgo = new DateTime(today.Year - 5, 1, 1);
-            var firstOf10YearsAgo = new DateTime(today.Year - 5, 1, 1);
+            var firstOf10YearsAgo = new DateTime(today.Year - 10, 1, 1);
             var darkAges = new DateTime(today.Year - 50, 1, 1);
 
             // Find prices closest to these dates
@@ -344,10 +481,6 @@ namespace BanaData.Logic.Dialogs.Reports
             Household.SecurityPriceRow mostAncient = GetClosestSecurityPriceFromDate(security, darkAges);
 
             // Compute the returns
-
-            // How far in the year we are
-            decimal daysInYear = DateTime.IsLeapYear(today.Year) ? 366 : 365;
-            yearToDateRatio =  daysInYear / today.DayOfYear;
 
             // YTD return
             rawYearToDateReturn = (mostRecent.Value - closestToFirstOfYear.Value) / closestToFirstOfYear.Value;
@@ -371,8 +504,6 @@ namespace BanaData.Logic.Dialogs.Reports
             {
                 allAvailableTimeSpan = 1;
             }
-
-            // ZZZ take the most ancient date, deduce the time span,  adjust accordingly ZZZ
         }
 
         private Household.SecurityPriceRow GetClosestSecurityPriceFromDate(Household.SecurityRow security, DateTime date)
@@ -415,6 +546,30 @@ namespace BanaData.Logic.Dialogs.Reports
             catch (OverflowException)
             {
                 return 0;
+            }
+        }
+
+        // How far in the year we are
+        private void ComputeHowFarInTheYearWeAre()
+        {
+            var today = DateTime.Today;
+            decimal daysInYear = DateTime.IsLeapYear(today.Year) ? 366 : 365;
+            yearToDateRatio = daysInYear / today.DayOfYear;
+        }
+
+        #endregion
+
+        #region Supporting classes
+
+        internal class MiniTransaction
+        {
+            public readonly DateTime Date;
+            public readonly decimal Amount;
+
+            internal MiniTransaction(DateTime date, decimal amount)
+            {
+                Date = date;
+                Amount = amount;
             }
         }
 
