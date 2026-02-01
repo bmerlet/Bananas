@@ -176,8 +176,10 @@ namespace BanaData.Logic.Dialogs.Reports
             {
                 if (annualized)
                 {
-                    decimal result = decpow(1M + rawYearToDateReturn, yearToDateRatio) - 1M;
-                    return result * 100M;
+                    // Annualizing for YTD does not make much sense
+                    //decimal result = decpow(1M + rawYearToDateReturn, yearToDateRatio) - 1M;
+                    //return result * 100M;
+                    return rawYearToDateReturn * 100M;
                 }
                 else
                 {
@@ -310,30 +312,11 @@ namespace BanaData.Logic.Dialogs.Reports
             var firstOf10YearsAgo = new DateTime(today.Year - 10, 1, 1);
             var darkAges = new DateTime(today.Year - 50, 1, 1);
 
-            var transactions = GetTimeSortedRelevantTransactionsForAccount(account);
+            // Get time-sorted relevant transactions
+            DateTime oldestTransactionDate;
+            var transactions = GetTimeSortedRelevantTransactionsForAccount(account, out oldestTransactionDate);
 
-            rawYearToDateReturn = ComputeReturnForAccount(account, transactions, firstOfThisYear, today);
-
-            // Last year return
-            lastYearRawReturn = ComputeReturnForAccount(account, transactions, firstOfLastYear, firstOfThisYear);
-
-            // Last 2, 5, 10 years
-            rawLast2YearsReturn = ComputeReturnForAccount(account, transactions, firstOf2YearsAgo, firstOfThisYear);
-            rawLast5YearsReturn = ComputeReturnForAccount(account, transactions, firstOf5YearsAgo, firstOfThisYear);
-            rawLast10YearsReturn = ComputeReturnForAccount(account, transactions, firstOf10YearsAgo, firstOfThisYear);
-
-            // Find oldest transaction
-            DateTime oldestTransactionDate = DateTime.Today;
-            foreach (var transactionRow in household.RegularTransactions.Where(tr => tr.AccountRow == account))
-            {
-                if (transactionRow.Date <  oldestTransactionDate)
-                {
-                     oldestTransactionDate = transactionRow.Date;
-                }
-            }
-
-            rawReturnAllAvailable = ComputeReturnForAccount(account, transactions, oldestTransactionDate, today);
-
+            // Setup the time span of the account (for annualization of all available return)
             var timeSpan = new TimeSpan(today.Ticks - oldestTransactionDate.Ticks);
             try
             {
@@ -344,14 +327,52 @@ namespace BanaData.Logic.Dialogs.Reports
                 allAvailableTimeSpan = 1;
             }
 
+            //
+            // Optimization: only go through the whole transactions once
+            //
+            // Long ago to 10 years return
+            decimal returnOldestTo10YearsAgo = ComputeReturnForAccount(account, transactions, oldestTransactionDate, firstOf10YearsAgo);
+
+            // 10 years ago to 5 years ago
+            decimal return10YearsAgoTo5YearsAgo = ComputeReturnForAccount(account, transactions, firstOf10YearsAgo, firstOf5YearsAgo);
+
+            // 5 years ago to 2 years ago
+            decimal return5YearsAgoTo2YearsAgo = ComputeReturnForAccount(account, transactions, firstOf5YearsAgo, firstOf2YearsAgo);
+
+            // 2 years ago to 1 year ago
+            decimal return2YearsAgoTo1YearsAgo = ComputeReturnForAccount(account, transactions, firstOf2YearsAgo, firstOfLastYear);
+
+            // Last year return
+            lastYearRawReturn = ComputeReturnForAccount(account, transactions, firstOfLastYear, firstOfThisYear);
+
+            // Current year return
+            rawYearToDateReturn = ComputeReturnForAccount(account, transactions, firstOfThisYear, today);
+
+            // Last 2, 5, 10 years
+            //rawLast2YearsReturn = ComputeReturnForAccount(account, transactions, firstOf2YearsAgo, firstOfThisYear);
+            //rawLast5YearsReturn = ComputeReturnForAccount(account, transactions, firstOf5YearsAgo, firstOfThisYear);
+            //rawLast10YearsReturn = ComputeReturnForAccount(account, transactions, firstOf10YearsAgo, firstOfThisYear);
+            //rawReturnAllAvailable = ComputeReturnForAccount(account, transactions, oldestTransactionDate, today);
+
+            rawLast2YearsReturn = ((lastYearRawReturn + 1M) * (return2YearsAgoTo1YearsAgo + 1M)) - 1M;
+            rawLast5YearsReturn = ((rawLast2YearsReturn + 1M) * (return5YearsAgoTo2YearsAgo + 1M)) - 1M;
+            rawLast10YearsReturn = ((rawLast5YearsReturn + 1M) * (return10YearsAgoTo5YearsAgo + 1M)) - 1M;
+            rawReturnAllAvailable = ((rawLast10YearsReturn + 1M) * (returnOldestTo10YearsAgo + 1M)) - 1M;
         }
 
-        private IEnumerable<MiniTransaction> GetTimeSortedRelevantTransactionsForAccount(Household.AccountRow account)
+        private List<MiniTransaction> GetTimeSortedRelevantTransactionsForAccount(Household.AccountRow account, out DateTime oldestTransaction)
         {
             var result = new List<MiniTransaction>();
+            oldestTransaction = DateTime.Today;
 
             foreach (var transactionRow in household.RegularTransactions.Where(tr => tr.AccountRow == account))
             {
+                // Keep track of oldest transaction
+                if (transactionRow.Date < oldestTransaction)
+                {
+                    oldestTransaction = transactionRow.Date;
+                }
+
                 // Remove irrelevant transactions, i.e. the ones that do not bring in or out external cash or shares
                 var itr = transactionRow.GetInvestmentTransaction();
                 decimal amount = 0;
@@ -433,6 +454,9 @@ namespace BanaData.Logic.Dialogs.Reports
             return consolidatedList;
         }
 
+        //
+        // Compute return for an account, using the time-weighted method
+        //
         private decimal ComputeReturnForAccount(Household.AccountRow account, IEnumerable<MiniTransaction> transactions, DateTime startDate, DateTime endDate)
         {
             decimal lastValue = account.GetInvestmentValue(startDate);
@@ -441,7 +465,7 @@ namespace BanaData.Logic.Dialogs.Reports
             foreach (var miniTrans in transactions.Where(tr => tr.Date >= startDate && tr.Date < endDate))
             {
                 decimal valueNow = account.GetInvestmentValue(miniTrans.Date);
-                if (lastValue != 0 && valueNow != miniTrans.Amount)
+                if (lastValue != 0 && (valueNow - miniTrans.Amount) > 0.01M )
                 {
                     decimal periodGrowthFactor = (valueNow - miniTrans.Amount) / lastValue;
                     growthFactor *= periodGrowthFactor;

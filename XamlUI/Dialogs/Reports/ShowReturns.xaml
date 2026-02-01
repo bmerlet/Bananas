@@ -12,7 +12,7 @@
         Title="Investment returns"
         Icon="/XamlUI;component/Images/Bananas.ico"
         WindowStartupLocation="CenterOwner"
-        Height="350" Width="620">
+        Height="380" Width="620">
     <DockPanel>
 
         <!-- Tree display-->
