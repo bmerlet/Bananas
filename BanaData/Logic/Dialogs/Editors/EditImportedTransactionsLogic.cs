@@ -50,7 +50,7 @@ namespace BanaData.Logic.Dialogs.Editors
             }
 
             // If account is assigned, preselect it
-            if (!household.Transaction[0].IsAccountIDNull())
+            if (household.Transaction.Count > 0 && !household.Transaction[0].IsAccountIDNull())
             {
                 ImportAccount = household.Transaction[0].AccountRow.Name;
             }

@@ -215,7 +215,7 @@ namespace BanaData.Parsers
                     // We are after Completed Transactions" and before "Disclosures"
                     if (cashPlusAccount)
                     {
-                        if (strs[i] == "VANGUARD CASH PLUS" && (i + 1) < strs.Length && strs[i + 1] == "INTEREST REINVEST")
+                        if (strs[i] == "VANGUARD CASH PLUS" && (i + 1) < strs.Length && (strs[i + 1] == "INTEREST REINVEST" || strs[i + 1] == "Reinvestment"))
                         {
                             // Monthly interest
                             decimal quantity = -decimal.Parse(strs[i + 6]);
@@ -289,7 +289,7 @@ namespace BanaData.Parsers
                                         var type = GetVanguardType(strs[i + 2]);
                                         var quantityStr = strs[i + 4];
                                         var priceStr = RemoveDollarSign(strs[i + 5]);
-                                        var amountStr = RemoveNegativeSign(RemoveDollarSign(strs[i + 7]));
+                                        var amountStr = RemoveDollarSign(RemoveNegativeSign(RemoveDollarSign(strs[i + 7])));
                                         decimal amount = 0;
                                         if (amountStr != "-")
                                         {
