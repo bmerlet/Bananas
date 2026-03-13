@@ -4,6 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+//
+// Copyright 2026 Benoit Merlet
+//
+
 namespace PdfParser
 {
     // From github, user hoiogi.
