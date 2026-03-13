@@ -89,6 +89,63 @@ namespace XamlUI
 
         #region Gui services implementation
 
+        // Map of dialog logic to dialog 
+        private class DialogMap
+        {
+            public readonly Type logic;
+            public readonly Type dialog;
+            public DialogMap(Type logic, Type dialog)
+            {
+                this.logic = logic;
+                this.dialog = dialog;
+            }
+        }
+
+        static private DialogMap[] dialogTable = new DialogMap[] {
+            new DialogMap(typeof(ListAccountsLogic), typeof(ListAccounts)),
+            new DialogMap(typeof(EditAccountLogic), typeof(EditAccount)),
+            new DialogMap(typeof(AccountPickerLogic), typeof(AccountPicker)),
+            new DialogMap(typeof(CategoryListPickerLogic), typeof(CategoryListPicker)),
+            new DialogMap(typeof(PayeeListPickerLogic), typeof(PayeeListPicker)),
+            new DialogMap(typeof(QIFExportPickerLogic), typeof(QIFExportPicker)),
+            new DialogMap(typeof(QIFImportPickerLogic), typeof(QIFImportPicker)),
+            new DialogMap(typeof(ListCategoriesLogic), typeof(ListCategories)),
+            new DialogMap(typeof(EditCategoryLogic), typeof(EditCategory)),
+            new DialogMap(typeof(ListMemorizedPayeesLogic), typeof(ListMemorizedPayees)),
+            new DialogMap(typeof(RenamePayeeLogic), typeof(RenamePayee)),
+            new DialogMap(typeof(EditMemorizedPayeeLogic), typeof(EditMemorizedPayee)),
+            new DialogMap(typeof(EditPersonsLogic), typeof(EditPersons)),
+            new DialogMap(typeof(ListSchedulesLogic), typeof(ListSchedules)),
+            new DialogMap(typeof(EditScheduleLogic), typeof(EditSchedule)),
+            new DialogMap(typeof(ListSecuritiesLogic), typeof(ListSecurities)),
+            new DialogMap(typeof(EditSecurityLogic), typeof(EditSecurity)),
+            new DialogMap(typeof(ListSecurityPricesLogic), typeof(ListSecurityPrices)),
+            new DialogMap(typeof(ListTransactionReportsLogic), typeof(ListTransactionReports)),
+            new DialogMap(typeof(ListStatementAccountHintsLogic), typeof(ListStatementAccountHints)),
+            new DialogMap(typeof(EditStatementAccountHintsLogic), typeof(EditStatementAccountHints)),
+            new DialogMap(typeof(EditTransactionReportLogic), typeof(EditTransactionReport)),
+            new DialogMap(typeof(EditSplitLogic), typeof(EditSplit)),
+            new DialogMap(typeof(ReconcileInfoLogic), typeof(ReconcileInfo)),
+            new DialogMap(typeof(ReconcileLogic), typeof(Reconcile)),
+            new DialogMap(typeof(ReconcileInvestmentsLogic), typeof(ReconcileInvestments)),
+            new DialogMap(typeof(SearchResultLogic), typeof(SearchResult)),
+            new DialogMap(typeof(ShowHoldingsLogic), typeof(ShowHoldings)),
+            new DialogMap(typeof(ShowHoldingsPerPersonLogic), typeof(ShowHoldingsPerPerson)),
+            new DialogMap(typeof(ShowReturnsLogic), typeof(ShowReturns)),
+            new DialogMap(typeof(ShowCashFlowBetweenPersonsLogic), typeof(ShowCashFlowBetweenPersons)),
+            new DialogMap(typeof(ShowWealthOverTimeLogic), typeof(ShowWealthOverTime)),
+            new DialogMap(typeof(ShowCapitalGainsLogic), typeof(ShowCapitalGains)),
+            new DialogMap(typeof(ShowYearlyCGDivIntLogic), typeof(ShowYearlyCGDivInt)),
+            new DialogMap(typeof(ShowRebalanceLogic), typeof(ShowRebalance)),
+            new DialogMap(typeof(ShowQuoteUpdateLogic), typeof(ShowQuoteUpdate)),
+            new DialogMap(typeof(TransactionReportLogic), typeof(TransactionReport)),
+            new DialogMap(typeof(PasswordPromptLogic), typeof(PasswordPrompt)),
+            new DialogMap(typeof(BalanceSheetLogic), typeof(BalanceSheet)),
+            new DialogMap(typeof(IncomeStatementLogic), typeof(IncomeStatement)),
+            new DialogMap(typeof(JournalLogic), typeof(Journal)),
+            new DialogMap(typeof(EditImportedTransactionsLogic), typeof(EditImportedTransactions))
+        };
+
         //
         // Show a dialog
         //
@@ -118,187 +175,21 @@ namespace XamlUI
             //
             // Our own dialogs
             //
-            Window dialog;
-            if (logic is ListAccountsLogic listAccountsLogic)
-            {
-                dialog = new ListAccounts(listAccountsLogic);
-            }
-            else if (logic is EditAccountLogic editAccountLogic)
-            {
-                dialog = new EditAccount(editAccountLogic);
-            }
-            else if (logic is AccountPickerLogic accountPickerLogic)
-            {
-                dialog = new AccountPicker(accountPickerLogic);
-            }
-            else if (logic is AccountListPickerLogic accountListPickerLogic)
-            {
-                dialog = new AccountListPicker(accountListPickerLogic);
-            }
-            else if (logic is CategoryListPickerLogic categoryListPickerLogic)
-            {
-                dialog = new CategoryListPicker(categoryListPickerLogic);
-            }
-            else if (logic is PayeeListPickerLogic payeeListPickerLogic)
-            {
-                dialog = new PayeeListPicker(payeeListPickerLogic);
-            }
-            else if (logic is QIFExportPickerLogic qifExportPickerLogic)
-            {
-                dialog = new QIFExportPicker(qifExportPickerLogic);
-            }
-            else if (logic is QIFImportPickerLogic qifImportPickerLogic)
-            {
-                dialog = new QIFImportPicker(qifImportPickerLogic);
-            }
-            else if (logic is ListCategoriesLogic listCategoriesLogic)
-            {
-                dialog = new ListCategories(listCategoriesLogic);
-            }
-            else if (logic is EditCategoryLogic editCategoryLogic)
-            {
-                dialog = new EditCategory(editCategoryLogic);
-            }
-            else if (logic is ListMemorizedPayeesLogic listMemorizedPayeesLogic)
-            {
-                dialog = new ListMemorizedPayees(listMemorizedPayeesLogic);
-            }
-            else if (logic is RenamePayeeLogic renamePayeeLogic)
-            {
-                dialog = new RenamePayee(renamePayeeLogic);
-            }
-            else if (logic is EditMemorizedPayeeLogic editMemorizedPayeeLogic)
-            {
-                dialog = new EditMemorizedPayee(editMemorizedPayeeLogic);
-            }
-            else if (logic is EditPersonsLogic editPersonsLogic)
-            {
-                dialog = new EditPersons(editPersonsLogic);
-            }
-            else if (logic is ListSchedulesLogic listSchedulesLogic)
-            {
-                dialog = new ListSchedules(listSchedulesLogic);
-            }
-            else if (logic is EditScheduleLogic editScheduleLogic)
-            {
-                dialog = new EditSchedule(editScheduleLogic);
-            }
-            else if (logic is ListSecuritiesLogic listSecuritiesLogic)
-            {
-                dialog = new ListSecurities(listSecuritiesLogic);
-            }
-            else if (logic is EditSecurityLogic editSecurityLogic)
-            {
-                dialog = new EditSecurity(editSecurityLogic);
-            }
-            else if (logic is ListSecurityPricesLogic listSecurityPricesLogic)
-            {
-                dialog = new ListSecurityPrices(listSecurityPricesLogic);
-            }
-            else if (logic is ListTransactionReportsLogic listTransactionReportsLogic)
-            {
-                dialog = new ListTransactionReports(listTransactionReportsLogic);
-            }
-            else if (logic is ListStatementAccountHintsLogic listStatementAccountHintsLogic)
-            {
-                dialog = new ListStatementAccountHints(listStatementAccountHintsLogic);
-            }
-            else if (logic is EditStatementAccountHintsLogic editStatementAccountHintsLogic)
-            {
-                dialog = new EditStatementAccountHints(editStatementAccountHintsLogic);
-            }
-            else if (logic is EditTransactionReportLogic editTransactionReportLogic)
-            {
-                dialog = new EditTransactionReport(editTransactionReportLogic);
-            }
-            else if (logic is EditSplitLogic editSplitLogic)
-            {
-                dialog = new EditSplit(editSplitLogic);
-            }
-            else if (logic is ReconcileInfoLogic reconcileInfoLogic)
-            {
-                dialog = new ReconcileInfo(reconcileInfoLogic);
-            }
-            else if (logic is ReconcileLogic reconcileLogic)
-            {
-                dialog = new Reconcile(reconcileLogic);
-            }
-            else if (logic is ReconcileInvestmentsLogic reconcileInvestmentsLogic)
-            {
-                dialog = new ReconcileInvestments(reconcileInvestmentsLogic);
-            }
-            else if (logic is SearchResultLogic searchResultLogic)
-            {
-                dialog = new SearchResult(searchResultLogic);
-            }
-            else if (logic is ShowHoldingsLogic showHoldingsLogic)
-            {
-                dialog = new ShowHoldings(showHoldingsLogic);
-            }
-            else if (logic is ShowHoldingsPerPersonLogic showHoldingsPerPersonLogic)
-            {
-                dialog = new ShowHoldingsPerPerson(showHoldingsPerPersonLogic);
-            }
-            else if (logic is ShowReturnsLogic showReturnsLogic)
-            {
-                dialog = new ShowReturns(showReturnsLogic);
-            }
-            else if (logic is ShowCashFlowBetweenPersonsLogic showCashFlowBetweenPersonsLogic)
-            {
-                dialog = new ShowCashFlowBetweenPersons(showCashFlowBetweenPersonsLogic);
-            }
-            else if (logic is ShowWealthOverTimeLogic showWealthOverTimeLogic)
-            {
-                dialog = new ShowWealthOverTime(showWealthOverTimeLogic);
-            }
-            else if (logic is ShowCapitalGainsLogic showCapitalGainsLogic)
-            {
-                dialog = new ShowCapitalGains(showCapitalGainsLogic);
-            }
-            else if (logic is ShowYearlyCGDivIntLogic showYearlyCGDivIntLogic)
-            {
-                dialog = new ShowYearlyCGDivInt(showYearlyCGDivIntLogic);
-            }
-            else if (logic is ShowRebalanceLogic showRebalanceLogic)
-            {
-                dialog = new ShowRebalance(showRebalanceLogic);
-            }
-            else if (logic is ShowQuoteUpdateLogic showQuoteUpdateLogic)
-            {
-                dialog = new ShowQuoteUpdate(showQuoteUpdateLogic);
-            }
-            else if (logic is TransactionReportLogic transactionReportLogic)
-            {
-                dialog = new TransactionReport(transactionReportLogic);
-            }
-            else if (logic is PasswordPromptLogic passwordPromptLogic)
-            {
-                dialog = new PasswordPrompt(passwordPromptLogic);
-            }
-            else if (logic is BalanceSheetLogic balanceSheetLogic)
-            {
-                dialog = new BalanceSheet(balanceSheetLogic);
-            }
-            else if (logic is IncomeStatementLogic incomeStatementLogic)
-            {
-                dialog = new IncomeStatement(incomeStatementLogic);
-            }
-            else if (logic is JournalLogic journalLogic)
-            {
-                dialog = new Journal(journalLogic);
-            }
-            else if (logic is EditImportedTransactionsLogic editImportedTransactionsLogic)
-            {
-                dialog = new EditImportedTransactions(editImportedTransactionsLogic);
-            }
-            else
+            // Look for the dialog corresponding to the passed in logic in the dialog map
+            Type logicType = logic.GetType();
+            var dialogMap = dialogTable.FirstOrDefault(m => m.logic == logicType);
+            if (dialogMap == null)
             {
                 throw new NotImplementedException();
             }
 
+            // Create an instance of the dialog, passing the logic as a parameter
+            Window dialog = Activator.CreateInstance(dialogMap.dialog, new Object[] { logic }) as Window;
+
             // Set the owner
             dialog.Owner = this;
 
+            // Show the dialog
             bool change = dialog.ShowDialog() == true;
 
             // See comments in Harmony checker ScoreWindow.ShowDialog
